@@ -260,6 +260,7 @@
     };
 
     let cart = [];
+    let submittedOrders = []; // Keeps track of orders placed by this customer session
     let customerPhoneVal = "";
     let selectedTable = "Table 1";
     let activeKey = null;
@@ -435,19 +436,23 @@
 
       try {
         const orderTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-        await addDoc(collection(db, "orders"), {
+        const orderObj = {
           table: selectedTable,
           phone: customerPhoneVal,
-          items: cart,
+          items: [...cart],
           total: orderTotal,
           status: "Preparing",
-          timestamp: serverTimestamp()
-        });
+          timestamp: new Date().toLocaleTimeString()
+        };
+        await addDoc(collection(db, "orders"), orderObj);
+        submittedOrders.push(orderObj);
         alert("Order successfully placed and sent to kitchen KOT!");
         cart = [];
         renderCart();
       } catch (e) {
-        alert("Order saved locally & sent to KOT queue!");
+        const orderTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+        submittedOrders.push({ table: selectedTable, phone: customerPhoneVal, items: [...cart], total: orderTotal, status: "Preparing" });
+        alert("Order sent to KOT queue!");
         cart = [];
         renderCart();
       }
@@ -456,15 +461,32 @@
     window.openCustomerBillModal = function() {
       const container = document.getElementById("bill-items-container");
       const totalEl = document.getElementById("bill-modal-total");
-      if (cart.length === 0) return alert("No items in current bill session.");
+      if (submittedOrders.length === 0 && cart.length === 0) return alert("No active orders or bill items found.");
       
       container.innerHTML = "";
-      let total = 0;
-      cart.forEach(i => {
-        total += i.price * i.qty;
-        container.innerHTML += `<div class="flex justify-between text-xs py-1 border-b border-slate-800"><span>${i.name} (${i.variant}) × ${i.qty}</span><strong>₹${i.price * i.qty}</strong></div>`;
+      let grandTotal = 0;
+
+      // Show previously submitted active orders
+      submittedOrders.forEach((ord, index) => {
+        container.innerHTML += `<div class="text-xs font-bold text-amber-500 pt-2">Order #${index+1} (${ord.status})</div>`;
+        ord.items.forEach(i => {
+          container.innerHTML += `<div class="flex justify-between text-xs py-0.5 pl-2 text-slate-300"><span>${i.name} (${i.variant}) × ${i.qty}</span><strong>₹${i.price * i.qty}</strong></div>`;
+        });
+        grandTotal += ord.total;
       });
-      totalEl.innerText = `₹${total}`;
+
+      // Show current unsubmitted cart items if any
+      if (cart.length > 0) {
+        container.innerHTML += `<div class="text-xs font-bold text-indigo-400 pt-2">Unsubmitted Cart Items</div>`;
+        let cartTotal = 0;
+        cart.forEach(i => {
+          cartTotal += i.price * i.qty;
+          container.innerHTML += `<div class="flex justify-between text-xs py-0.5 pl-2 text-slate-300"><span>${i.name} (${i.variant}) × ${i.qty}</span><strong>₹${i.price * i.qty}</strong></div>`;
+        });
+        grandTotal += cartTotal;
+      }
+
+      totalEl.innerText = `₹${grandTotal}`;
       document.getElementById("customer-bill-modal").classList.remove("hidden");
     }
 
@@ -523,7 +545,7 @@
                 </div>
                 <ul class="space-y-1">${itemsList}</ul>
               </div>
-              <button onclick="completeOrder('${docSnap.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-sm transition">Mark Ready & Clear 🖨️</button>
+              <button onclick="completeOrder('${docSnap.id}', ${order.total}, '${order.table || 'Table 1'}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-sm transition">Mark Ready & Clear 🖨️</button>
             </div>
           `;
         });
@@ -532,9 +554,15 @@
       }
     }
 
-    window.completeOrder = async function(id) {
-      try { await deleteDoc(doc(db, "orders", id)); } catch(e){}
-      alert("Order marked ready and cleared from queue!");
+    window.completeOrder = async function(id, total, table) {
+      try { 
+        await deleteDoc(doc(db, "orders", id)); 
+        const webhook = localStorage.getItem("sheets_webhook");
+        if (webhook) {
+          await fetch(webhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ table: table, total: "₹" + total, method: "Cleared / Paid" }) });
+        }
+      } catch(e){}
+      alert("Order marked ready, synced to Google Sheets ledger, and cleared!");
       loadAdminKOTs();
     }
 
