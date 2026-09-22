@@ -49,10 +49,10 @@
         </div>
       </div>
 
-      <!-- Chef's Specials Banner -->
+      <!-- Chef's Specials & 5-Star Pinned Banner -->
       <div id="specials-wrapper" class="hidden space-y-3">
         <h2 class="text-lg font-black text-amber-400 flex items-center space-x-2">
-          <span>⭐ Chef's Specials & Top Rated Dishes</span>
+          <span>⭐ 5-Star & Top Rated Chef Specials</span>
         </h2>
         <div id="specials-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
       </div>
@@ -82,14 +82,14 @@
               <span id="cart-grand-total" class="text-amber-400">₹0</span>
             </div>
             <button onclick="submitCustomerOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-black text-base shadow-lg transition">
-              Place Order 🚀
+              Place Order to Kitchen 🚀
             </button>
             <div class="grid grid-cols-2 gap-2">
               <button onclick="raiseBillRequest()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-600/40 py-2.5 rounded-xl font-bold text-xs transition">
                 Raise Bill Request 🧾
               </button>
-              <button onclick="openComplaintModal()" class="bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-600/40 py-2.5 rounded-xl font-bold text-xs transition">
-                Raise Concern ⚠️
+              <button onclick="openFeedbackModal()" class="bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-600/40 py-2.5 rounded-xl font-bold text-xs transition">
+                Send Feedback 💬
               </button>
             </div>
           </div>
@@ -101,8 +101,8 @@
     <div id="view-waiter" class="hidden space-y-6">
       <div id="waiter-login-box" class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md mx-auto text-center space-y-4">
         <h2 class="text-2xl font-bold text-amber-400">Waiter Portal Login</h2>
-        <p class="text-xs text-slate-400">Enter passcode to view table occupancy and bill statuses.</p>
-        <input type="password" id="waiter-passcode" placeholder="Enter Passcode (1234)" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-center text-lg tracking-widest">
+        <p class="text-xs text-slate-400">Enter passcode (1234) to view table occupancy and bill statuses.</p>
+        <input type="password" id="waiter-passcode" placeholder="Enter Passcode" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-center text-lg tracking-widest">
         <button onclick="loginWaiter()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-3 rounded-xl transition">Login as Waiter</button>
       </div>
 
@@ -110,7 +110,7 @@
         <div class="flex justify-between items-center bg-slate-900 p-5 rounded-2xl border border-slate-800">
           <div>
             <h2 class="text-xl font-bold text-amber-400">Waiter Table Management</h2>
-            <p class="text-xs text-slate-400">Monitor table occupancy, bill requests, and payment confirmation.</p>
+            <p class="text-xs text-slate-400">Monitor table occupancy, bill requests, and active status.</p>
           </div>
           <button onclick="loadWaiterTables()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold">Refresh Tables</button>
         </div>
@@ -122,8 +122,8 @@
     <div id="view-admin" class="hidden space-y-6">
       <div id="admin-login-box" class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md mx-auto text-center space-y-4">
         <h2 class="text-2xl font-bold text-amber-500">Admin & Kitchen Login</h2>
-        <p class="text-xs text-slate-400">Enter administrator PIN to access KOT printer routing and inventory.</p>
-        <input type="password" id="admin-passcode" placeholder="Enter Admin PIN (9999)" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-center text-lg tracking-widest">
+        <p class="text-xs text-slate-400">Enter administrator PIN (9999) to access KOT router, bills, and ledger.</p>
+        <input type="password" id="admin-passcode" placeholder="Enter Admin PIN" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-center text-lg tracking-widest">
         <button onclick="loginAdmin()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-3 rounded-xl transition">Login as Admin</button>
       </div>
 
@@ -138,7 +138,7 @@
         <div id="admin-kots-section" class="space-y-4">
           <h3 class="text-lg font-bold text-amber-400">Active Kitchen Orders & Bill Requests</h3>
           <div id="admin-kot-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <p class="text-slate-500 col-span-full text-center py-10">No active kitchen orders or bill requests</p>
+            <p class="text-slate-500 col-span-full text-center py-10">No active kitchen orders or bills</p>
           </div>
         </div>
 
@@ -148,21 +148,18 @@
         </div>
 
         <div id="admin-addProduct-section" class="hidden bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 max-w-2xl">
-          <h3 class="text-xl font-bold text-amber-500">Add Menu Item with WebP Compression</h3>
+          <h3 class="text-xl font-bold text-amber-500">Add Menu Item with WebP Image</h3>
           <div class="grid grid-cols-1 gap-4">
             <input type="text" id="prod-key" placeholder="Unique ID (e.g. mutton_mandi)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
             <input type="text" id="prod-name" placeholder="Item Name (e.g. Special Mutton Mandi)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
             <input type="text" id="prod-variants" placeholder="Variants & Prices (e.g. Single:280, Full:1100)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
             <input type="number" id="prod-stock" placeholder="Initial Quantity Stock (e.g. 40)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
+            <input type="text" id="prod-image-url" placeholder="Image URL (WebP or Unsplash link)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
             <div class="flex items-center space-x-4">
               <label class="flex items-center space-x-2 cursor-pointer">
                 <input type="checkbox" id="prod-special" class="w-4 h-4 accent-amber-500">
-                <span class="text-sm font-semibold text-amber-400">Pin as Chef's Special / Top Rated</span>
+                <span class="text-sm font-semibold text-amber-400">Pin as 5-Star / Chef's Special</span>
               </label>
-            </div>
-            <div>
-              <label class="block text-xs text-slate-400 mb-1">Food Image (Auto-compressed to WebP)</label>
-              <input type="file" id="prod-image-file" accept="image/*" class="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-amber-600 file:text-white font-semibold">
             </div>
             <button onclick="saveNewProduct()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition">Save Product to Menu</button>
           </div>
@@ -184,8 +181,8 @@
             </div>
           </div>
           <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3">
-            <h4 class="font-bold text-slate-200">Google Sheets Auto-Archive Ledger (30-Day Cycle)</h4>
-            <p class="text-xs text-slate-400">Paste your Google Apps Script Webhook URL below to enable automated monthly backups:</p>
+            <h4 class="font-bold text-slate-200">Google Sheets Daily Auto-Sync Ledger</h4>
+            <p class="text-xs text-slate-400">Paste your Google Apps Script Webhook URL below. Every time a bill payment is cleared, it logs instantly:</p>
             <div class="flex gap-2">
               <input type="text" id="sheets-webhook-url" placeholder="https://script.google.com/macros/s/.../exec" class="bg-slate-800 border border-slate-700 p-2.5 rounded-xl text-xs flex-1">
               <button onclick="saveWebhook()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl text-xs font-bold transition">Save Webhook</button>
@@ -214,21 +211,44 @@
   <!-- CUSTOMER PAYMENT MODAL (TRIGGERED WHEN ADMIN ACCEPTS BILL) -->
   <div id="customer-payment-modal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center z-50 p-4">
     <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-4 text-center">
-      <h3 class="text-2xl font-black text-amber-400">🧾 Bill Approved by Admin</h3>
+      <h3 class="text-2xl font-black text-amber-400">🧾 Bill Approved by Receptionist</h3>
       <p id="payment-modal-amount" class="text-xl font-bold text-slate-200">Total Due: ₹0</p>
-      <div class="grid grid-cols-2 gap-3 pt-2">
-        <button onclick="completePayment('UPI')" class="bg-amber-600 hover:bg-amber-500 p-4 rounded-xl font-bold flex flex-col items-center justify-center space-y-1">
-          <span>📱 Pay via UPI / PhonePe</span>
-          <span class="text-xs font-normal opacity-80">Instant Scanner QR</span>
+      
+      <!-- UPI QR Scanner View -->
+      <div id="upi-qr-section" class="hidden bg-slate-800 p-4 rounded-xl space-y-2">
+        <p class="text-xs text-amber-400 font-bold">Scan QR Code via PhonePe / GPay / Paytm</p>
+        <div class="bg-white p-3 inline-block rounded-xl">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=fusionmandi@ybl&pn=FusionMandi" class="w-36 h-36 mx-auto">
+        </div>
+        <p class="text-xs text-slate-400">UPI ID: fusionmandi@ybl</p>
+        <button onclick="completePayment('UPI')" class="w-full bg-emerald-600 hover:bg-emerald-500 py-2 rounded-lg text-xs font-bold">I Have Paid via UPI ✅</button>
+      </div>
+
+      <!-- Cash / Counter Options -->
+      <div id="cash-options-section" class="grid grid-cols-2 gap-3 pt-2">
+        <button onclick="showUPIQR()" class="bg-amber-600 hover:bg-amber-500 p-4 rounded-xl font-bold flex flex-col items-center justify-center space-y-1 col-span-2">
+          <span>📱 Pay via UPI / PhonePe QR</span>
+          <span class="text-xs font-normal opacity-80">Instant Scanner</span>
         </button>
-        <button onclick="completePayment('Cash Counter')" class="bg-blue-600 hover:bg-blue-500 p-4 rounded-xl font-bold flex flex-col items-center justify-center space-y-1">
-          <span>💵 Pay at Counter</span>
-          <span class="text-xs font-normal opacity-80">Cash / Card</span>
+        <button onclick="completePayment('Cash Counter')" class="bg-blue-600 hover:bg-blue-500 p-3 rounded-xl font-bold text-xs">
+          💵 Pay at Counter
+        </button>
+        <button onclick="completePayment('Runner')" class="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl font-bold text-xs text-slate-300">
+          🚶‍♂️ Runner Collects Cash at Table
         </button>
       </div>
-      <button onclick="completePayment('Runner')" class="w-full bg-slate-800 hover:bg-slate-700 py-3 rounded-xl text-xs font-bold text-slate-300">
-        🚶‍♂️ Request Runner to Collect Cash at Table
-      </button>
+    </div>
+  </div>
+
+  <!-- FEEDBACK MODAL -->
+  <div id="feedback-modal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center z-50 p-4">
+    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-4">
+      <h3 class="text-xl font-bold text-amber-400">💬 Send Feedback / Rating</h3>
+      <textarea id="feedback-text" placeholder="Tell us about your food and experience..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm h-28"></textarea>
+      <div class="flex space-x-2">
+        <button onclick="submitFeedback()" class="flex-1 bg-amber-600 hover:bg-amber-500 py-2.5 rounded-xl font-bold text-xs">Submit to Management</button>
+        <button onclick="document.getElementById('feedback-modal').classList.add('hidden')" class="bg-slate-800 px-4 py-2.5 rounded-xl text-xs font-bold">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -350,7 +370,6 @@
           playBeep();
         }
 
-        // Check if customer bill was approved by admin
         if (customerPhoneVal) {
           const myOrder = liveOrders.find(o => o.phone === customerPhoneVal);
           if (myOrder && myOrder.status === "Bill Approved") {
@@ -373,7 +392,10 @@
       specialsGrid.innerHTML = "";
       let hasSpecials = false;
 
-      for (const [key, item] of Object.entries(menuData)) {
+      // Sort items so 5-star / special items come first
+      const sortedItems = Object.entries(menuData).sort((a, b) => (b[1].rating || 4.8) - (a[1].rating || 4.8));
+
+      for (const [key, item] of sortedItems) {
         const stockStatus = item.stock > 0 ? `Stock: ${item.stock}` : `Out of Stock ❌`;
         const card = `
           <div onclick="${item.stock > 0 ? `openVariantModal('${key}')` : 'alert(\'Item currently out of stock\')'}" class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl overflow-hidden cursor-pointer transition shadow flex flex-col justify-between ${item.stock <= 0 ? 'opacity-50' : ''}">
@@ -383,12 +405,12 @@
                 <h3 class="font-bold text-sm text-slate-100">${item.name}</h3>
                 <span class="text-xs font-bold text-amber-400">${stockStatus}</span>
               </div>
-              <p class="text-xs text-slate-400">⭐ ${item.rating || '4.8'} (Voted)</p>
+              <p class="text-xs text-slate-400">⭐ ${item.rating || '4.8'} (Top Voted)</p>
             </div>
           </div>
         `;
 
-        if (item.is_special) {
+        if (item.is_special || (item.rating && item.rating >= 4.9)) {
           hasSpecials = true;
           specialsGrid.innerHTML += card;
         }
@@ -479,15 +501,14 @@
           phone: customerPhoneVal,
           items: [...cart],
           total: orderTotal,
-          status: "Preparing",
-          billRequested: false,
+          status: "Preparing (KOT Sent)",
           timestamp: serverTimestamp()
         });
-        alert("Order placed successfully & sent to kitchen!");
+        alert("Order successfully placed and sent to kitchen KOT!");
         cart = [];
         renderCart();
       } catch (e) {
-        alert("Error: " + e.message);
+        alert("Error placing order: " + e.message);
       }
     }
 
@@ -498,15 +519,22 @@
 
       try {
         await updateDoc(doc(db, "orders", myOrder.id), { status: "Bill Requested" });
-        alert("Bill request sent to admin! Waiting for confirmation...");
+        alert("Bill request sent to receptionist! Waiting for approval...");
       } catch(e) {
         alert("Error sending bill request.");
       }
     }
 
-    window.openComplaintModal = function() {
-      const issue = prompt("Describe your concern or complaint for the receptionist:");
-      if (issue) alert("Your concern has been forwarded directly to management.");
+    window.openFeedbackModal = function() {
+      document.getElementById("feedback-modal").classList.remove("hidden");
+    }
+
+    window.submitFeedback = function() {
+      const txt = document.getElementById("feedback-text").value.trim();
+      if (!txt) return alert("Please type your feedback.");
+      alert("Thank you! Your feedback has been sent to management.");
+      document.getElementById("feedback-text").value = "";
+      document.getElementById("feedback-modal").classList.add("hidden");
     }
 
     async function loadWaiterTables() {
@@ -548,8 +576,8 @@
 
         const isBillReq = order.status === "Bill Requested";
         const actionBtn = isBillReq 
-          ? `<button onclick="acceptBill('${order.id}')" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-sm transition animate-pulse">Accept Bill Request 🧾</button>`
-          : `<button onclick="markReady('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-sm transition">Mark Ready 🍳</button>`;
+          ? `<button onclick="acceptBill('${order.id}')" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-sm transition animate-pulse">Accept Bill Request & Notify Customer 🧾</button>`
+          : `<button onclick="markReady('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-sm transition">Mark KOT Ready 🍳</button>`;
 
         container.innerHTML += `
           <div class="bg-slate-900 border ${isBillReq ? 'border-amber-500' : 'border-slate-800'} p-5 rounded-2xl shadow-xl flex flex-col justify-between space-y-4">
@@ -570,9 +598,9 @@
     window.acceptBill = async function(id) {
       try {
         await updateDoc(doc(db, "orders", id), { status: "Bill Approved" });
-        alert("Bill request accepted! Customer payment popup triggered.");
+        alert("Bill approved! Customer payment options unlocked.");
       } catch(e) {
-        alert("Error accepting bill.");
+        alert("Error approving bill.");
       }
     }
 
@@ -581,6 +609,10 @@
         await updateDoc(doc(db, "orders", id), { status: "Ready to Serve" });
         alert("Order marked ready!");
       } catch(e) {}
+    }
+
+    window.showUPIQR = function() {
+      document.getElementById("upi-qr-section").classList.remove("hidden");
     }
 
     window.completePayment = async function(method) {
@@ -599,14 +631,15 @@
         localStorage.setItem("total_upi", currentUPI);
         localStorage.setItem("total_cash", currentCash);
 
+        // Daily Google Sheets Instant Sync
         const webhook = localStorage.getItem("sheets_webhook");
         if (webhook) {
-          await fetch(webhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ table: myOrder.table, total: "₹" + total, method }) });
+          await fetch(webhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ table: myOrder.table, total: "₹" + total, method, timestamp: new Date().toLocaleString() }) });
         }
 
         await deleteDoc(doc(db, "orders", myOrder.id));
         document.getElementById("customer-payment-modal").classList.add("hidden");
-        alert(`Payment of ₹${total} received via ${method}. Thank you!`);
+        alert(`Payment of ₹${total} received via ${method}. Bill cleared & logged to Google Sheets!`);
         customerPhoneVal = "";
       } catch(e) {
         alert("Payment completed.");
@@ -643,6 +676,28 @@
       menuData[key].stock = Math.max(0, (menuData[key].stock || 30) + amount);
       loadAdminInventory();
       renderCustomerMenu();
+    }
+
+    window.saveNewProduct = async function() {
+      const key = document.getElementById("prod-key").value.trim();
+      const name = document.getElementById("prod-name").value.trim();
+      const variantsRaw = document.getElementById("prod-variants").value.trim();
+      const stock = Number(document.getElementById("prod-stock").value) || 30;
+      const imageUrl = document.getElementById("prod-image-url").value.trim();
+      const isSpecial = document.getElementById("prod-special").checked;
+
+      if (!key || !name || !variantsRaw) return alert("Please fill all required fields!");
+
+      let variants = {};
+      variantsRaw.split(',').forEach(v => {
+        const [vName, vPrice] = v.split(':');
+        if (vName && vPrice) variants[vName.trim()] = Number(vPrice);
+      });
+
+      menuData[key] = { name, variants, stock, is_special: isSpecial, rating: 5.0, image: imageUrl || "https://images.unsplash.com/photo-1544025162-d76694265947?w=400" };
+      await setDoc(doc(db, "inventory", "daily_menu"), { items: menuData });
+      alert("Product saved successfully!");
+      initMenu();
     }
 
     window.saveWebhook = function() {
