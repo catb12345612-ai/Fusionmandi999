@@ -217,7 +217,6 @@
         else { dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; txt.innerText="Offline"; txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest"; }
       });
 
-      // Orders
       db.ref('orders').on('value', snap => {
         const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
         const orders = snap.val() || {};
@@ -255,7 +254,6 @@
       });
 
       if(currentRole === 'admin') {
-        // Inventory
         db.ref('menu').on('value', snap => {
           const list = document.getElementById('inventoryList'); list.innerHTML = '';
           Object.entries(snap.val()||{}).forEach(([id, item]) => {
@@ -280,7 +278,6 @@
           });
         });
 
-        // Dashboard
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => document.getElementById('tallyDaily').innerText = `₹${s.val()||0}`);
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
