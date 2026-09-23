@@ -1,3 +1,4 @@
+<!-- kitchen.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,25 +9,20 @@
     :root { --admin: #e74c3c; --waiter: #3498db; --bg: #1e272e; --card: #2f3640; --text: #f5f6fa; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); }
     
-    /* Login Screen */
     #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
     .login-box { background: var(--card); padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 5px solid var(--admin); width: 300px; }
     .login-box input { width: 100%; padding: 10px; margin: 15px 0; border-radius: 6px; border: none; font-size: 1.1rem; text-align: center; box-sizing: border-box; }
     .login-box button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #2ecc71; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
     
-    /* Dashboard Header */
     header { background: #111; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; }
     .role-badge { background: var(--admin); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
     .btn-logout { background: transparent; border: 1px solid #ccc; color: #ccc; padding: 5px 15px; border-radius: 4px; cursor: pointer; }
     
-    /* Admin Financial Dashboard */
     .financials { display: none; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; background: #222; }
     .fin-card { background: var(--card); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #2ecc71; }
     .fin-card h3 { margin: 0; font-size: 1rem; color: #aaa; text-transform: uppercase; }
     .fin-card .amount { font-size: 1.8rem; font-weight: 900; color: #2ecc71; margin-top: 5px; }
-    .btn-print-summary { background: #f39c12; color: #fff; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px; text-transform: uppercase; }
 
-    /* Tables Grid */
     .section-title { padding: 20px 20px 0; margin: 0; font-size: 1.2rem; color: #aaa; text-transform: uppercase; }
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
     .table-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-top: 5px solid #7f8fa6; position: relative; }
@@ -48,70 +44,41 @@
     .actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .actions button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
     .btn-kot { background: #e67e22; }
-    .btn-clear { background: #2ecc71; display: none; } /* Admin only */
-    .btn-waiter-cash { background: #3498db; display: none; } /* Waiter only */
+    .btn-clear { background: #2ecc71; display: none; }
+    .btn-waiter-cash { background: #3498db; display: none; }
     .btn-resolve { background: #e74c3c; }
-
-    /* Admin Feedback Section */
-    .feedback-section { display: none; padding: 20px; }
-    .feedback-list { display: flex; flex-direction: column; gap: 10px; }
-    .feedback-card { background: var(--card); padding: 15px; border-radius: 8px; border-left: 4px solid #f1c40f; display: flex; justify-content: space-between; align-items: center; }
 
     @keyframes flash { from { box-shadow: 0 0 10px #e74c3c; } to { box-shadow: 0 0 25px #e74c3c; } }
   </style>
 </head>
 <body>
 
-  <!-- Login Screen -->
   <div id="login-screen">
     <div class="login-box">
       <h2>POS Access</h2>
       <input type="password" id="pin-input" placeholder="Enter PIN / Password" autofocus>
       <button onclick="attemptLogin()">Login</button>
-      <p style="color:#aaa; font-size:0.8rem; margin-top:15px;">Admin or Waiter Access Required</p>
+      <p style="color:#aaa; font-size:0.8rem; margin-top:15px;">Admin (admin123) or Waiter (waiter123)</p>
     </div>
   </div>
 
-  <!-- Main Dashboard (Hidden until login) -->
   <div id="main-dashboard" style="display: none;">
     <header>
       <div>
         <span class="role-badge" id="ui-role-badge">WAITING</span>
         <strong style="margin-left: 10px; font-size: 1.2rem;">Command Center</strong>
       </div>
-      <button class="btn-logout" onclick="logout()">Lock Screen</button>
+      <button class="btn-logout" onclick="location.reload()">Lock Screen</button>
     </header>
 
-    <!-- Admin Only: Financials -->
     <div class="financials" id="admin-financials">
-      <div class="fin-card">
-        <h3>Cash Earned</h3>
-        <div class="amount">₹<span id="stat-cash">0</span></div>
-      </div>
-      <div class="fin-card">
-        <h3>Online Earned</h3>
-        <div class="amount">₹<span id="stat-online">0</span></div>
-      </div>
-      <div class="fin-card">
-        <h3>Total Gross</h3>
-        <div class="amount">₹<span id="stat-gross">0</span></div>
-      </div>
-      <div style="grid-column: span 3;">
-        <button class="btn-print-summary" onclick="printDailySummary()">🖨️ Print Daily Summary</button>
-      </div>
+      <div class="fin-card"><h3>Cash Earned</h3><div class="amount">₹<span id="stat-cash">0</span></div></div>
+      <div class="fin-card"><h3>Online Earned</h3><div class="amount">₹<span id="stat-online">0</span></div></div>
+      <div class="fin-card"><h3>Total Gross</h3><div class="amount">₹<span id="stat-gross">0</span></div></div>
     </div>
 
-    <!-- Active Tables -->
     <h2 class="section-title">Active Floor Operations</h2>
-    <div class="grid" id="tables-grid">
-      <!-- Cards auto-populate here -->
-    </div>
-
-    <!-- Admin Only: Feedback -->
-    <div class="feedback-section" id="admin-feedback">
-      <h2 class="section-title">Customer Feedback Drafts</h2>
-      <div class="feedback-list" id="feedback-grid"></div>
-    </div>
+    <div class="grid" id="tables-grid"></div>
   </div>
 
   <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
@@ -119,7 +86,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update, remove, get, increment } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+    import { getDatabase, ref, onValue, update, remove, increment } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
@@ -128,60 +96,40 @@
       projectId: "fusionmandi999-36066",
       storageBucket: "fusionmandi999-36066.firebasestorage.app",
       messagingSenderId: "312237706440",
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd",
+      measurementId: "G-1LM1V9NLMB"
     };
 
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxN7RpmZBT1BkNNQNOqCecuLq2kCQo1TZ8AOJw_M_bMBE69xCUvDjyotHiSTr8KokFdiA/exec";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwXvoOUsaQeKy8tjGuOkYunnK8hau3LJNCt3PUn1g0Ar6pD35jaX32_dZ_7uXRdSQRYUg/exec";
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getDatabase(app);
     const alertSound = document.getElementById('alert-sound');
     const cashSound = document.getElementById('cash-sound');
 
-    // State
-    let currentRole = null; // 'admin' or 'waiter'
-    let todayDateString = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    let dailyTotals = { cash: 0, online: 0, gross: 0 };
+    let currentRole = null;
+    let todayDateString = new Date().toISOString().split('T')[0];
 
-    // --- Authentication Logic ---
     window.attemptLogin = () => {
       const pin = document.getElementById('pin-input').value;
       if (pin === 'admin123') {
         currentRole = 'admin';
-        setupAdminUI();
+        document.getElementById('ui-role-badge').innerText = 'ADMIN';
+        document.getElementById('admin-financials').style.display = 'grid';
       } else if (pin === 'waiter123') {
         currentRole = 'waiter';
-        setupWaiterUI();
+        document.getElementById('ui-role-badge').innerText = 'WAITER';
+        document.getElementById('ui-role-badge').style.backgroundColor = 'var(--waiter)';
       } else {
-        alert('Invalid Password');
-        return;
+        return alert('Invalid Password');
       }
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('main-dashboard').style.display = 'block';
       loadData();
     };
 
-    window.logout = () => {
-      location.reload(); // Quickest way to lock and clear state safely
-    };
-
-    function setupAdminUI() {
-      document.getElementById('ui-role-badge').innerText = 'ADMIN';
-      document.getElementById('ui-role-badge').style.backgroundColor = 'var(--admin)';
-      document.getElementById('admin-financials').style.display = 'grid';
-      document.getElementById('admin-feedback').style.display = 'block';
-    }
-
-    function setupWaiterUI() {
-      document.getElementById('ui-role-badge').innerText = 'WAITER';
-      document.getElementById('ui-role-badge').style.backgroundColor = 'var(--waiter)';
-      document.getElementById('admin-financials').style.display = 'none';
-      document.getElementById('admin-feedback').style.display = 'none';
-    }
-
-    // --- Core Operations ---
     function loadData() {
-      // 1. Listen to Active Tables
       onValue(ref(db, 'active_tables'), (snapshot) => {
         const tables = snapshot.val();
         const grid = document.getElementById('tables-grid');
@@ -201,110 +149,53 @@
             if (data.items) {
               Object.keys(data.items).forEach(itemKey => {
                 const i = data.items[itemKey];
-                const isPending = i.kot_status === 'pending';
-                if (isPending) pendingKOTCount++;
-                
-                itemsHTML += `
-                  <li class="${isPending ? 'pending-kot' : 'printed-kot'}">
-                    <span>${i.quantity}x ${i.name} (${i.variant})</span>
-                    <span>₹${i.subtotal}</span>
-                  </li>
-                `;
+                if (i.kot_status === 'pending') pendingKOTCount++;
+                itemsHTML += `<li class="${i.kot_status === 'pending' ? 'pending-kot' : 'printed-kot'}"><span>${i.quantity}x ${i.name} (${i.variant})</span><span>₹${i.subtotal}</span></li>`;
                 itemsTextForSheet.push(`${i.quantity}x ${i.name} (${i.variant})`);
               });
             }
 
-            // Status Styling
             let cardClass = "table-card";
             if (hasAlert) cardClass += " alert";
             let statusText = "Active";
-            
-            if (data.payment_method === 'upi') {
-              cardClass += " upi-pending";
-              statusText = "VERIFY UPI📱";
-            } else if (data.payment_method === 'cash') {
-              cardClass += " cash-pending";
-              statusText = "CASH PENDING 🤵";
-            } else if (data.payment_method === 'counter') {
-              statusText = "AT COUNTER 🏪";
-            }
+            if (data.payment_method === 'upi') { cardClass += " upi-pending"; statusText = "VERIFY UPI📱"; }
+            else if (data.payment_method === 'cash') { cardClass += " cash-pending"; statusText = "CASH PENDING 🤵"; }
 
             const card = document.createElement('div');
             card.className = cardClass;
-            
-            // Render Card HTML
             card.innerHTML = `
               <div class="table-header">
                 <h2>${tableId.toUpperCase()}</h2>
                 <span class="status-badge">${statusText}</span>
               </div>
-              
-              ${data.help_requested ? '<div style="color:#e74c3c; font-weight:bold; margin-bottom:10px;">🚨 Customer Needs Help</div>' : ''}
-              
+              <div style="margin-bottom:10px; color:#aaa; font-size:0.9rem;">📞 Mobile: ${data.customer_mobile || 'None'}</div>
               <ul class="items-list">${itemsHTML || '<li>Plate is empty</li>'}</ul>
-              
-              <div class="total-row">
-                <span>Total:</span>
-                <span>₹${data.running_total || 0}</span>
-              </div>
-              
+              <div class="total-row"><span>Total:</span><span>₹${data.running_total || 0}</span></div>
               <div class="actions">
                 ${pendingKOTCount > 0 ? `<button class="btn-kot" onclick="printKOT('${tableId}')">Print KOT (${pendingKOTCount})</button>` : ''}
                 ${hasAlert ? `<button class="btn-resolve" onclick="resolveAlerts('${tableId}')">Clear Alerts</button>` : ''}
-                
-                <!-- Waiter Action -->
-                ${currentRole === 'waiter' && data.payment_method === 'cash' ? `<button class="btn-waiter-cash" style="display:block;" onclick="notifyCashCollected('${tableId}')">Mark Cash Collected</button>` : ''}
-                
-                <!-- Admin Action -->
+                ${currentRole === 'waiter' && data.payment_method === 'cash' ? `<button class="btn-waiter-cash" style="display:block;" onclick="notifyCashCollected('${tableId}')">Cash Collected</button>` : ''}
                 ${currentRole === 'admin' ? `<button class="btn-clear" style="display:block;" onclick="clearTable('${tableId}',${data.running_total || 0}, '${itemsTextForSheet.join(' \vert{} ')}', '${data.payment_method || 'unknown'}')">Clear & Finalize</button>` : ''}
               </div>
             `;
             grid.appendChild(card);
           });
-
-          if (playAlarm) alertSound.play().catch(()=>{});
-          else { alertSound.pause(); alertSound.currentTime = 0; }
+          if (playAlarm) alertSound.play().catch(()=>{}); else { alertSound.pause(); alertSound.currentTime = 0; }
         } else {
           grid.innerHTML = '<p style="color:#aaa;">Floor is clear. Waiting for orders...</p>';
         }
       });
 
-      // 2. Admin Only: Listen to Financials & Feedback
       if (currentRole === 'admin') {
         onValue(ref(db, `daily_totals/${todayDateString}`), (snapshot) => {
           const totals = snapshot.val() || { cash: 0, online: 0, gross: 0 };
-          dailyTotals = totals; // Save for printing
           document.getElementById('stat-cash').innerText = totals.cash;
           document.getElementById('stat-online').innerText = totals.online;
           document.getElementById('stat-gross').innerText = totals.gross;
         });
-
-        onValue(ref(db, 'admin_feedback'), (snapshot) => {
-          const feedback = snapshot.val();
-          const grid = document.getElementById('feedback-grid');
-          grid.innerHTML = '';
-          if (feedback) {
-            Object.keys(feedback).forEach(key => {
-              const f = feedback[key];
-              if (!f.cleared) {
-                const div = document.createElement('div');
-                div.className = 'feedback-card';
-                div.innerHTML = `
-                  <div>
-                    <strong>Table ${f.table}</strong> | Score: ${f.score}/5 ⭐
-                    <div style="font-size:0.9rem; margin-top:5px; color:#ccc;">"${f.comment || 'No comment'}"</div>
-                  </div>
-                  <button style="background:#555; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;" onclick="clearFeedback('${key}')">Dismiss</button>
-                `;
-                grid.appendChild(div);
-              }
-            });
-          }
-        });
       }
     }
 
-    // --- Functions ---
     window.printKOT = function(tableId) {
       const itemsRef = ref(db, `active_tables/${tableId}/items`);
       onValue(itemsRef, (snap) => {
@@ -322,87 +213,34 @@
     };
 
     window.notifyCashCollected = function(tableId) {
-      alert("Admin notified. Please hand cash to the counter for clearance.");
+      alert("Admin notified. Please hand cash to the counter.");
       update(ref(db, `active_tables/${tableId}`), { payment_method: "cash_collected_by_waiter" });
-    };
-
-    window.clearFeedback = function(feedbackKey) {
-      update(ref(db, `admin_feedback/${feedbackKey}`), { cleared: true });
     };
 
     window.clearTable = async function(tableId, total, itemsDetails, method) {
       if(!confirm(`Verify payment and Clear Table ${tableId.toUpperCase()}?`)) return;
-      
       cashSound.play();
-
-      // Ensure method is correctly categorized for totals
       let finMethod = method === 'upi' ? 'online' : 'cash';
       
-      // 1. Update Firebase Daily Totals
       const totalsRef = ref(db, `daily_totals/${todayDateString}`);
-      update(totalsRef, {
-        [finMethod]: increment(total),
-        gross: increment(total)
-      });
+      update(totalsRef, { [finMethod]: increment(total), gross: increment(total) });
 
-      // 2. Send to Google Sheets Webhook
       try {
+        const payload = {
+          orderId: Date.now().toString(),
+          tableNo: tableId,
+          totalAmount: total,
+          paymentMethod: method.toUpperCase(),
+          itemsDetails: itemsDetails || "Empty"
+        };
         await fetch(WEBHOOK_URL, {
           method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            orderId: Date.now().toString(),
-            tableNo: tableId,
-            totalAmount: total,
-            paymentMethod: method.toUpperCase(),
-            itemsDetails: itemsDetails || "Empty"
-          })
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         });
       } catch (err) { console.error("Sheet Log Failed"); }
-
-      // 3. Remove table from active queue
       remove(ref(db, `active_tables/${tableId}`));
     };
-
-    // --- Print Daily Ledger Summary ---
-    window.printDailySummary = function() {
-      const date = new Date().toLocaleString();
-      let printWindow = window.open('', '', 'height=600,width=400');
-      
-      let html = `
-        <html>
-        <head>
-          <title>Daily Summary</title>
-          <style>
-            body { font-family: monospace; padding: 20px; }
-            h2 { text-align: center; border-bottom: 1px dashed #000; padding-bottom: 10px; }
-            .row { display: flex; justify-content: space-between; margin: 10px 0; font-size: 1.2rem; }
-            .gross { font-weight: bold; border-top: 1px dashed #000; padding-top: 10px; margin-top: 10px; }
-          </style>
-        </head>
-        <body>
-          <h2>FUSION MANDI<br>END OF DAY SUMMARY</h2>
-          <p>Date: ${date}</p>
-          <div class="row"><span>Cash Total:</span> <span>Rs. ${dailyTotals.cash}</span></div>
-          <div class="row"><span>Online Total:</span> <span>Rs. ${dailyTotals.online}</span></div>
-          <div class="row gross"><span>GROSS TOTAL:</span> <span>Rs. ${dailyTotals.gross}</span></div>
-          <br>
-          <p style="text-align:center; font-size: 0.8rem;">Data synced to Google Sheets Ledger.</p>
-        </body>
-        </html>
-      `;
-      
-      printWindow.document.write(html);
-      printWindow.document.close();
-      printWindow.focus();
-      setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
-    };
-
-    // Ensure Enter key works for login
-    document.getElementById('pin-input').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') attemptLogin();
-    });
   </script>
 </body>
 </html>
