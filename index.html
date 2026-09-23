@@ -1,131 +1,131 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusion Mandi - Digital Menu</title>
+  <title>Fusion Mandi - Premium Digital Menu</title>
   <style>
-    :root { --primary: #ff9800; --dark: #1a1a1a; --light: #f4f4f9; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--light); margin: 0; padding: 0; padding-bottom: 120px; }
+    :root { --primary: #e67e22; --dark: #1e272e; --light: #f5f6fa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--light); margin: 0; padding: 0; padding-bottom: 100px; }
     
-    /* Branding & Header */
-    header { background: linear-gradient(135deg, #111, #333); color: #fff; padding: 1.5rem 1rem; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    .brand-title { font-size: 2rem; font-weight: 900; margin: 0; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-    .table-badge { background: #fff; color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; margin-top: 10px; display: inline-block; }
+    /* Header & Branding */
+    header { position: sticky; top: 0; z-index: 100; background: var(--dark); color: white; padding: 10px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; flex-direction: column; gap: 5px; }
+    .dev-info { font-size: 0.75rem; color: #00e5ff; text-align: center; text-decoration: none; font-weight: bold; border-bottom: 1px solid #333; padding-bottom: 5px; }
+    .header-main { display: flex; justify-content: space-between; align-items: center; }
+    .brand-title { margin: 0; font-size: 1.5rem; font-weight: 900; color: var(--primary); letter-spacing: 1px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .wifi-btn { background: #3498db; color: white; border: none; padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
+    .table-badge { background: #fff; color: #000; padding: 5px 10px; border-radius: 15px; font-weight: bold; font-size: 0.9rem; }
+    
+    /* Carousel */
+    .carousel { width: 100%; height: 220px; position: relative; overflow: hidden; }
+    .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1s ease-in-out; object-fit: cover; }
+    .slide.active { opacity: 1; }
+    .carousel-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 20px; color: white; text-align: center; }
 
-    /* Menu Container */
-    .container { padding: 1rem; max-width: 800px; margin: auto; }
-    .special-badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block; }
+    /* Menu Grid */
+    .container { padding: 15px; max-width: 800px; margin: auto; }
+    .menu-item { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); align-items: center; }
+    .item-img { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; }
+    .item-info { flex: 1; }
+    .item-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 5px 0; color: var(--dark); }
+    .item-price { color: #d35400; font-weight: 900; font-size: 1.1rem; margin: 0 0 10px 0; }
+    select, button { padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; width: 100%; font-weight: bold; box-sizing: border-box; }
+    .btn-add { background: var(--light); color: var(--primary); border: 2px solid var(--primary); cursor: pointer; text-transform: uppercase; margin-top: 5px; }
+    .btn-add:hover { background: var(--primary); color: white; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .cart-modal { align-items: flex-end; }
+    .cart-content { background: white; width: 100%; max-height: 80vh; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; overflow-y: auto; text-align: left; }
+    .cart-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
     
-    .menu-item { background: #fff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s; }
-    .menu-item:hover { transform: translateY(-2px); }
-    .menu-item img { width: 110px; height: 110px; border-radius: 8px; object-fit: cover; margin-right: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .item-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-    .item-title { font-size: 1.2rem; font-weight: bold; margin: 0 0 0.3rem 0; color: var(--dark); }
-    .item-price { color: #d32f2f; font-weight: 900; font-size: 1.1rem; margin: 0; }
-    
-    /* Star Ratings */
-    .star-rating { color: #f1c40f; font-size: 0.9rem; margin-bottom: 5px; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
-    
-    select, button { padding: 0.6rem; margin-top: 0.5rem; width: 100%; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
-    .btn-add { background-color: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 5px rgba(255,152,0,0.4); }
-    .btn-add:hover { background-color: #f57c00; }
-    
-    /* Modals (No Refresh Popups) */
-    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
-    .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-    .modal-content h3 { margin-top: 0; color: var(--dark); }
-    .qr-container img { margin: 15px auto; border-radius: 8px; border: 2px solid #eee; padding: 10px; }
-    
-    /* Bottom Cart & Actions */
-    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 90; }
-    .cart-total { font-size: 1.2rem; font-weight: 900; color: #2e7d32; }
-    .btn-checkout { background: #2e7d32; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(46,125,50,0.3); }
-    
-    .payment-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-    .btn-pay { background: #f8f9fa; border: 2px solid #ddd; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-pay:hover { border-color: var(--primary); background: #fff3e0; }
-    
-    /* Footer Branding */
-    footer { text-align: center; padding: 25px 15px; background: #111; color: #fff; margin-top: 40px; border-top: 4px solid var(--primary); }
-    .dev-link { color: #00e5ff; text-decoration: none; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-    .copyright { font-size: 0.8rem; margin-top: 8px; color: #888; }
+    /* Cart Bar */
+    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 90; }
+    .btn-view-cart { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; width: auto; }
   </style>
 </head>
 <body>
 
+  <!-- Mandatory Mobile Login Modal -->
+  <div class="modal" id="login-modal" style="display: flex;">
+    <div class="modal-content">
+      <h2 style="margin-top:0; color:var(--primary);">Welcome to Fusion Mandi</h2>
+      <p style="color:#666; font-size:0.9rem;">Please enter your mobile number to view the menu and receive your digital bill.</p>
+      <input type="tel" id="customer-mobile" placeholder="10-digit Mobile Number" style="width:100%; padding:12px; margin:15px 0; border:2px solid #ddd; border-radius:8px; font-size:1.1rem; text-align:center;">
+      <button style="background:var(--primary); color:white; border:none; padding:12px; font-size:1.1rem; border-radius:8px;" onclick="registerCustomer()">Proceed to Menu</button>
+    </div>
+  </div>
+
+  <!-- WiFi Modal -->
+  <div class="modal" id="wifi-modal">
+    <div class="modal-content">
+      <h2 style="margin-top:0;">Free WiFi 📶</h2>
+      <p><strong>Network Name:</strong> Fusion_Mandi_Guest</p>
+      <p><strong>Password:</strong> fusionmandi2026</p>
+      <button style="background:#333; color:white; border:none; margin-top:15px;" onclick="document.getElementById('wifi-modal').style.display='none'">Close</button>
+    </div>
+  </div>
+
   <header>
-    <h1 class="brand-title">FUSION MANDI</h1>
-    <div class="table-badge" id="table-display">Loading...</div>
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="dev-info">
+      Developed by Syed Zeeshaan Ali | High-Fledged Engineering And Digital Tech Solutions
+    </a>
+    <div class="header-main">
+      <h1 class="brand-title">FUSION MANDI</h1>
+      <div class="header-actions">
+        <button class="wifi-btn" onclick="document.getElementById('wifi-modal').style.display='flex'">WiFi</button>
+        <div class="table-badge" id="table-display">Loading...</div>
+      </div>
+    </div>
   </header>
 
-  <div class="container" id="menu-container">
-    <!-- Menu auto-populates here. Specials sort to the top. -->
+  <div class="carousel">
+    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80" class="slide active">
+    <img src="https://images.unsplash.com/photo-1544025162-8111142154ea?auto=format&fit=crop&w=800&q=80" class="slide">
+    <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80" class="slide">
+    <div class="carousel-overlay">
+      <h2 style="margin:0; text-shadow: 2px 2px 4px #000;">Experience Authentic Mandi</h2>
+    </div>
   </div>
+
+  <div class="container" id="menu-container"></div>
 
   <div class="cart-bar">
     <div>
-      <div class="cart-total">Tab: ₹<span id="tab-total">0</span></div>
-      <div style="font-size: 0.8rem; color: #666;" id="order-status">Status: Waiting</div>
+      <div style="font-size:0.9rem; color:#aaa;">Total Tab</div>
+      <div style="font-size:1.3rem; font-weight:bold;">₹<span id="tab-total">0</span></div>
     </div>
-    <button class="btn-checkout" onclick="openCheckoutModal()">Pay & Bill 🧾</button>
+    <button class="btn-view-cart" onclick="document.getElementById('cart-modal').style.display='flex'">View Cart 🛒</button>
   </div>
 
-  <!-- Checkout & Payment Modal -->
-  <div class="modal-overlay" id="checkout-modal">
-    <div class="modal-content">
-      <h3>Select Payment Method</h3>
-      <p>Total Due: <strong style="color: #2e7d32; font-size:1.2rem;">₹<span id="modal-total">0</span></strong></p>
+  <div class="modal cart-modal" id="cart-modal">
+    <div class="cart-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+        <h2 style="margin:0;">Your Order</h2>
+        <span style="font-size:1.5rem; cursor:pointer;" onclick="document.getElementById('cart-modal').style.display='none'">&times;</span>
+      </div>
       
-      <div class="payment-options" id="payment-selection">
-        <button class="btn-pay" onclick="selectPayment('upi')">📱 Pay via PhonePe / UPI</button>
-        <button class="btn-pay" onclick="selectPayment('cash')">🤵 Pay Cash to Waiter</button>
-        <button class="btn-pay" onclick="selectPayment('counter')">🏪 Pay at Counter</button>
-      </div>
-
-      <div id="upi-section" style="display: none; margin-top: 15px;">
-        <div style="font-weight: bold; color: #333;">Scan to Pay</div>
-        <div class="qr-container">
-          <img id="upi-qr" src="" alt="UPI QR Code" width="180" height="180">
-        </div>
-        <p style="font-size: 0.8rem; color: #666;">Admin will approve clearance once payment hits the bank.</p>
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-top: 20px;">
-        <button style="background: #ccc; color: #333; flex: 1;" onclick="closeModal('checkout-modal')">Cancel</button>
-        <button style="background: #1976d2; color: #fff; flex: 1;" id="btn-download-bill" onclick="downloadBill()">Download Bill</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Feedback Modal -->
-  <div class="modal-overlay" id="feedback-modal">
-    <div class="modal-content">
-      <h3>Rate Your Food 🌟</h3>
-      <p style="font-size: 0.9rem; color: #555;">Your review updates the public menu!</p>
-      <select id="rating-score">
-        <option value="5">⭐⭐⭐⭐⭐ - Perfect</option>
-        <option value="4">⭐⭐⭐⭐ - Great</option>
-        <option value="3">⭐⭐⭐ - Good</option>
-        <option value="2">⭐⭐ - Okay</option>
-      </select>
-      <textarea id="rating-comment" placeholder="Any specific feedback for the Admin?" style="width: 100%; margin-top: 10px; padding: 10px; box-sizing: border-box; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; resize: none;" rows="3"></textarea>
+      <div id="cart-items-list" style="margin-bottom: 20px;"></div>
       
-      <button style="background: var(--primary); color: #fff; margin-top: 15px;" onclick="submitFeedback()">Submit Review</button>
+      <div style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:bold; margin-bottom:20px;">
+        <span>To Pay:</span>
+        <span>₹<span id="modal-total">0</span></span>
+      </div>
+      
+      <h4 style="margin-bottom:10px;">Select Payment & Get Bill</h4>
+      <button style="background:#3498db; color:white; border:none; margin-bottom:10px;" onclick="checkout('upi')">Request UPI QR 📱</button>
+      <button style="background:#2ecc71; color:white; border:none; margin-bottom:10px;" onclick="checkout('cash')">Call Waiter for Cash 🤵</button>
+      <button style="background:#e67e22; color:white; border:none;" onclick="checkout('counter')">Pay at Counter 🏪</button>
     </div>
   </div>
-
-  <footer>
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="dev-link">
-      <span>Developed by Syed Zeeshaan Ali</span>
-      <span>High-Fledged Engineering And Digital Tech Solutions</span>
-    </a>
-    <div class="copyright">© 2026 syedzeeshaanali07 | All Rights Reserved</div>
-  </footer>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getDatabase, ref, onValue, update, push, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+    import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
@@ -134,239 +134,128 @@
       projectId: "fusionmandi999-36066",
       storageBucket: "fusionmandi999-36066.firebasestorage.app",
       messagingSenderId: "312237706440",
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd",
+      measurementId: "G-1LM1V9NLMB"
     };
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getDatabase(app);
-
+    
     const urlParams = new URLSearchParams(window.location.search);
     const tableId = urlParams.get('table') || 'Takeaway';
-    document.getElementById('table-display').innerText = `Table: ${tableId.toUpperCase()}`;
+    document.getElementById('table-display').innerText = `T: ${tableId.toUpperCase()}`;
     const tableRef = ref(db, `active_tables/${tableId}`);
 
     let currentCartTotal = 0;
-    let orderedItemsForBill = [];
+    let cartItemsData = [];
+    let customerMobile = "";
 
-    // 1. Load Menu & Sort Specials to Top
+    // Carousel Logic
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 10000);
+
+    // Registration
+    window.registerCustomer = () => {
+      const num = document.getElementById('customer-mobile').value;
+      if (num.length < 10) return alert("Please enter a valid 10-digit mobile number.");
+      customerMobile = num;
+      update(tableRef, { customer_mobile: num, status: "browsing" });
+      document.getElementById('login-modal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    };
+
+    // Prevent scrolling behind modal
+    document.body.style.overflow = 'hidden';
+
+    // Menu Loader
     onValue(ref(db, 'menu_items'), (snapshot) => {
       const menu = snapshot.val();
       const container = document.getElementById('menu-container');
       container.innerHTML = '';
-
       if(menu) {
-        // Convert to array for sorting
-        const menuArray = Object.keys(menu).map(key => ({ id: key, ...menu[key] }));
-        
-        // Sort: Specials first
-        menuArray.sort((a, b) => {
-          if (a.is_special && !b.is_special) return -1;
-          if (!a.is_special && b.is_special) return 1;
-          return 0;
-        });
-
-        menuArray.forEach(item => {
-          const div = document.createElement('div');
-          div.className = 'menu-item';
-          
-          let variantHTML = '';
+        Object.keys(menu).forEach(key => {
+          const item = menu[key];
+          let varHTML = '';
           if (item.variants && Object.keys(item.variants).length > 0) {
-            variantHTML = `<select id="variant-${item.id}">`;
-            Object.values(item.variants).forEach(v => {
-              variantHTML += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`;
-            });
-            variantHTML += `</select>`;
+            varHTML = `<select id="var-${key}">`;
+            Object.values(item.variants).forEach(v => { varHTML += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`; });
+            varHTML += `</select>`;
           }
-
-          // Calculate Stars
-          let starDisplay = "⭐⭐⭐⭐⭐ 5.0";
-          if (item.rating && item.rating.count > 0) {
-            const avg = (item.rating.sum / item.rating.count).toFixed(1);
-            const stars = "⭐".repeat(Math.round(avg));
-            starDisplay = `${stars} ${avg}`;
-          }
-
-          div.innerHTML = `
-            <img src="${item.image_url || 'https://via.placeholder.com/110?text=Fusion+Mandi'}" alt="${item.name}" loading="lazy">
-            <div class="item-details">
-              ${item.is_special ? `<span class="special-badge">⭐ Chef's Special</span>` : ''}
-              <h3 class="item-title">${item.name}</h3>
-              <div class="star-rating">${starDisplay}</div>
-              ${item.base_price ? `<p class="item-price">₹${item.base_price}</p>` : ''}
-              ${item.is_out_of_stock ? `<p style="color:red; font-weight:bold;">Sold Out</p>` : variantHTML}
-              ${!item.is_out_of_stock ? `<button class="btn-add" onclick="addToOrder('${item.id}', '${item.name}',${item.base_price || 0})">Add to Plate</button>` : ''}
-            </div>
-          `;
-          container.appendChild(div);
+          container.innerHTML += `
+            <div class="menu-item">
+              <img src="${item.image_url}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/120?text=Mandi'">
+              <div class="item-info">
+                ${item.is_special ? `<span style="background:#e74c3c;color:white;font-size:0.7rem;padding:2px 6px;border-radius:4px;">⭐ Chef's Special</span>` : ''}
+                <h3 class="item-title">${item.name}</h3>
+                ${item.base_price ? `<p class="item-price">₹${item.base_price}</p>` : ''}
+                ${varHTML}
+                <button class="btn-add" onclick="addToOrder('${key}', '${item.name}', ${item.base_price || 0})">+ Add</button>
+              </div>
+            </div>`;
         });
       }
     });
 
-    // 2. Listen to Running Tab
+    // Cart Listener
     onValue(tableRef, (snapshot) => {
-      const tableData = snapshot.val();
-      if(tableData) {
-        currentCartTotal = tableData.running_total || 0;
-        document.getElementById('tab-total').innerText = currentCartTotal;
-        document.getElementById('modal-total').innerText = currentCartTotal;
-        document.getElementById('order-status').innerText = `Status: ${tableData.status || 'Ordering'}`;
-        
-        // Store items for the bill download
-        orderedItemsForBill = [];
-        if (tableData.items) {
-          Object.values(tableData.items).forEach(i => {
-            orderedItemsForBill.push(`${i.quantity}x ${i.name} (${i.variant}) - ₹${i.subtotal}`);
-          });
-        }
+      const data = snapshot.val();
+      const cartList = document.getElementById('cart-items-list');
+      cartList.innerHTML = '';
+      cartItemsData = [];
+      if(data && data.items) {
+        currentCartTotal = data.running_total || 0;
+        Object.values(data.items).forEach(i => {
+          cartItemsData.push(`${i.quantity}x ${i.name} (${i.variant}) - Rs. ${i.subtotal}`);
+          cartList.innerHTML += `<div class="cart-item"><span>${i.quantity}x ${i.name} <br><small style="color:#777;">${i.variant}</small></span><strong>₹${i.subtotal}</strong></div>`;
+        });
+      } else {
+        currentCartTotal = 0;
+        cartList.innerHTML = '<p style="text-align:center; color:#999;">Cart is empty</p>';
       }
+      document.getElementById('tab-total').innerText = currentCartTotal;
+      document.getElementById('modal-total').innerText = currentCartTotal;
     });
 
-    window.addToOrder = function(itemId, itemName, basePrice) {
-      let finalPrice = basePrice;
-      let variantName = "Regular";
-      const variantSelect = document.getElementById(`variant-${itemId}`);
-      
-      if (variantSelect) {
-        const [vName, vPrice] = variantSelect.value.split('|');
-        variantName = vName;
-        finalPrice = parseInt(vPrice);
+    window.addToOrder = (id, name, price) => {
+      let finalPrice = price;
+      let varName = "Regular";
+      const select = document.getElementById(`var-${id}`);
+      if (select) {
+        const parts = select.value.split('|');
+        varName = parts[0]; finalPrice = parseInt(parts[1]);
       }
-
-      const cartItem = {
-        menu_item_id: itemId,
-        name: itemName,
-        variant: variantName,
-        price: finalPrice,
-        quantity: 1,
-        subtotal: finalPrice,
-        kot_status: "pending",
-        timestamp: Date.now()
-      };
-
-      push(ref(db, `active_tables/${tableId}/items`), cartItem).then(() => {
-        update(tableRef, {
-          status: "ordering",
-          running_total: currentCartTotal + finalPrice
-        });
-        // Non-intrusive feedback
-        const btn = document.querySelector(`button[onclick="addToOrder('${itemId}', '${itemName}', ${basePrice})"]`);
-        const originalText = btn.innerText;
-        btn.innerText = "✓ Added";
-        btn.style.backgroundColor = "#2ecc71";
-        setTimeout(() => { btn.innerText = originalText; btn.style.backgroundColor = "var(--primary)"; }, 1500);
+      push(ref(db, `active_tables/${tableId}/items`), { name, variant: varName, price: finalPrice, quantity: 1, subtotal: finalPrice, kot_status: "pending" }).then(() => {
+        update(tableRef, { status: "ordering", running_total: currentCartTotal + finalPrice });
       });
     };
 
-    // 3. Modals & Payment Logic
-    window.openCheckoutModal = () => {
-      if (currentCartTotal === 0) return alert("Your plate is empty!");
-      document.getElementById('checkout-modal').style.display = 'flex';
-      document.getElementById('payment-selection').style.display = 'flex';
-      document.getElementById('upi-section').style.display = 'none';
-    };
-
-    window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
-
-    window.selectPayment = (method) => {
-      let statusMsg = "";
+    window.checkout = (method) => {
+      if(currentCartTotal === 0) return alert("Cart is empty");
       
-      // Update DB with the method the customer selected
-      update(tableRef, { 
-        payment_method: method,
-        bill_requested: true
-      });
-
-      if (method === 'upi') {
-        // Generate dynamic UPI QR using phonepe/gpay format
-        // Replace 'YOUR_UPI_ID' with the actual restaurant UPI ID
-        const upiString = `upi://pay?pa=fusionmandi@ybl&pn=FusionMandi&am=${currentCartTotal}&cu=INR`;
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
-        
-        document.getElementById('payment-selection').style.display = 'none';
-        document.getElementById('upi-section').style.display = 'block';
-        document.getElementById('upi-qr').src = qrUrl;
-        return; // Don't close modal yet, they need to scan
-      } 
-      else if (method === 'cash') {
-        alert("A waiter has been notified to collect cash at your table.");
-      } 
-      else if (method === 'counter') {
-        alert("Please proceed to the counter to complete your payment.");
-      }
-
-      closeModal('checkout-modal');
-      openFeedbackModal();
-    };
-
-    // 4. Auto-Download Text Bill
-    window.downloadBill = () => {
-      const date = new Date().toLocaleString();
-      let billText = `==============================\n`;
-      billText += `         FUSION MANDI         \n`;
-      billText += `==============================\n`;
-      billText += `Date: ${date}\n`;
-      billText += `Table: ${tableId.toUpperCase()}\n`;
-      billText += `------------------------------\n`;
+      update(tableRef, { payment_method: method, bill_requested: true });
       
-      orderedItemsForBill.forEach(item => { billText += `${item}\n`; });
-      
-      billText += `------------------------------\n`;
-      billText += `TOTAL DUE: Rs. ${currentCartTotal}\n`;
-      billText += `==============================\n`;
-      billText += `Thank you for dining with us!\n`;
-      billText += `Developed by High-Fledged Engineering\n`;
-
+      // Auto Download Txt Bill
+      let billText = `FUSION MANDI\nTable: ${tableId.toUpperCase()}\nMobile: ${customerMobile}\n----------------------\n`;
+      cartItemsData.forEach(i => billText += `${i}\n`);
+      billText += `----------------------\nTotal Due: Rs. ${currentCartTotal}\nThank you!`;
       const blob = new Blob([billText], { type: 'text/plain' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `FusionMandi_Bill_${tableId}.txt`;
       a.click();
       
-      update(tableRef, { bill_downloaded: true });
-    };
-
-    // 5. Feedback Logic (Direct to Admin Draft & Menu Sync)
-    window.openFeedbackModal = () => {
-      setTimeout(() => { document.getElementById('feedback-modal').style.display = 'flex'; }, 500);
-    };
-
-    window.submitFeedback = async () => {
-      const score = parseInt(document.getElementById('rating-score').value);
-      const comment = document.getElementById('rating-comment').value;
-
-      // 1. Send feedback draft direct to Admin
-      push(ref(db, 'admin_feedback'), {
-        table: tableId,
-        score: score,
-        comment: comment,
-        timestamp: Date.now(),
-        cleared: false
-      });
-
-      // 2. Update scores for ordered items (calculates average for public menu)
-      // This loops through the active table cart and updates the global menu ratings
-      get(ref(db, `active_tables/${tableId}/items`)).then((snapshot) => {
-        const items = snapshot.val();
-        if (items) {
-          Object.values(items).forEach(cartItem => {
-            const menuId = cartItem.menu_item_id;
-            const ratingRef = ref(db, `menu_items/${menuId}/rating`);
-            
-            get(ratingRef).then((rateSnap) => {
-              let currentData = rateSnap.val() || { sum: 0, count: 0 };
-              update(ref(db, `menu_items/${menuId}`), {
-                rating: {
-                  sum: currentData.sum + score,
-                  count: currentData.count + 1
-                }
-              });
-            });
-          });
-        }
-      });
-
-      closeModal('feedback-modal');
-      alert("Thank you! Your feedback helps us maintain 5-star quality.");
+      // Send WhatsApp
+      const waText = encodeURIComponent(billText);
+      window.open(`https://wa.me/91${customerMobile}?text=${waText}`, '_blank');
+      
+      document.getElementById('cart-modal').style.display = 'none';
+      alert("Waitstaff notified. Your bill has been downloaded and sent to WhatsApp.");
     };
   </script>
 </body>
