@@ -3,171 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusion Mandi - Command Center</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <title>Mandi POS - Command Center</title>
   <style>
-    @media print {
-      body * { visibility: hidden; }
-      #printArea, #printArea * { visibility: visible; }
-      #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; }
-      .no-print { display: none !important; }
-      .print-shadow-none { box-shadow: none !important; border: 1px solid #ddd; }
-    }
-    @keyframes strobe {
-      0% { box-shadow: inset 0 0 0 10px rgba(239, 68, 68, 0); }
-      50% { box-shadow: inset 0 0 0 10px rgba(239, 68, 68, 1); }
-      100% { box-shadow: inset 0 0 0 10px rgba(239, 68, 68, 0); }
-    }
-    .alarm-active { animation: strobe 1s infinite; }
+    :root { --admin: #e74c3c; --waiter: #3498db; --bg: #1e272e; --card: #2f3640; --text: #f5f6fa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); }
+    
+    /* Top Bar */
+    .top-bar { background: #111; padding: 6px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; font-size: 0.8rem; }
+    .dev-info { color: #00e5ff; text-decoration: none; font-weight: bold; }
+    .lang-selector { background: #333; color: white; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; outline: none; }
+    
+    /* Login */
+    #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
+    .login-box { background: var(--card); padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 5px solid var(--admin); width: 300px; }
+    .login-box input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 6px; border: none; font-size: 1.1rem; text-align: center; box-sizing: border-box; }
+    .login-box button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #2ecc71; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+    
+    /* Header */
+    header { background: #1a2228; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; }
+    .role-badge { background: var(--admin); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+    .btn-logout { background: transparent; border: 1px solid #ccc; color: #ccc; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight:bold; }
+    
+    /* Dashboard */
+    .financials { display: none; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; background: #151b20; }
+    .fin-card { background: var(--card); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #2ecc71; }
+    .fin-card h3 { margin: 0; font-size: 0.9rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+    .fin-card .amount { font-size: 2rem; font-weight: 900; color: #2ecc71; margin-top: 5px; }
+
+    .section-title { padding: 20px 20px 0; margin: 0; font-size: 1.2rem; color: #aaa; text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
+    .table-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-top: 5px solid #7f8fa6; position: relative; }
+    .table-card.alert { border-top-color: #e74c3c; animation: flash 1s infinite alternate; }
+    .table-card.upi-pending { border-top-color: #9b59b6; }
+    .table-card.cash-pending { border-top-color: #f1c40f; }
+    
+    .table-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 10px; }
+    .table-header h2 { margin: 0; font-size: 1.5rem; }
+    .status-badge { font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; background: #555; font-weight:bold; }
+    
+    .items-list { margin: 0; padding: 0; list-style: none; max-height: 220px; overflow-y: auto; }
+    .items-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #3d464d; font-size: 0.95rem; }
+    .pending-kot { color: #f39c12; font-weight: bold; }
+    .printed-kot { color: #95a5a6; }
+    
+    .total-row { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; color: #2ecc71; margin: 15px 0; border-top: 1px solid #444; padding-top: 10px; }
+    
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .actions button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; font-size: 0.95rem; }
+    .btn-kot { background: #e67e22; }
+    .btn-clear { background: #2ecc71; display: none; }
+    .btn-waiter-cash { background: #3498db; display: none; }
+    .btn-resolve { background: #e74c3c; }
+
+    @keyframes flash { from { box-shadow: 0 0 10px #e74c3c; } to { box-shadow: 0 0 25px #e74c3c; } }
   </style>
 </head>
-<body id="mainBody" class="bg-slate-100 font-sans antialiased text-slate-800 transition-colors duration-300">
+<body>
 
-  <div id="systemUnlocker" class="fixed inset-0 bg-slate-900/95 z-[100] flex flex-col items-center justify-center text-white cursor-pointer no-print backdrop-blur-sm" onclick="activateSystem()">
-    <div class="bg-slate-800 p-8 rounded-2xl text-center border border-slate-700 shadow-2xl">
-      <h1 class="text-3xl font-black mb-2 text-amber-500 uppercase tracking-widest">Fusion Mandi POS</h1>
-      <p class="text-slate-300 font-bold mb-6">Tap to activate Wake-Lock, Live Sync & Audio.</p>
-      <button class="bg-amber-600 text-white px-8 py-3 rounded-lg font-black text-lg animate-pulse shadow-[0_0_20px_rgba(217,119,6,0.5)]">ACTIVATE POS SYSTEM</button>
+  <div class="top-bar">
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="dev-info">
+      Dev: Syed Zeeshaan Ali | High-Fledged Solutions
+    </a>
+    <select class="lang-selector" onchange="changeLang(this.value)">
+      <option value="en">English</option>
+      <option value="hi">हिंदी (Hindi)</option>
+      <option value="te">తెలుగు (Telugu)</option>
+    </select>
+  </div>
+
+  <div id="login-screen">
+    <div class="login-box">
+      <h2 style="margin-top:0;" data-i18n="pos_access">POS Access</h2>
+      <input type="password" id="pin-input" data-i18n-placeholder="pin_placeholder" placeholder="Enter PIN / Password" autofocus>
+      <button onclick="attemptLogin()" data-i18n="login_btn">Login</button>
+      <p style="color:#aaa; font-size:0.85rem; margin-top:15px;" data-i18n="login_hint">Admin (admin123) or Waiter (waiter123)</p>
     </div>
   </div>
 
-  <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 no-print">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row md:justify-between items-center gap-4">
-      <div class="flex items-center gap-3">
-        <div>
-          <h1 class="text-2xl font-black uppercase text-amber-500">Fusion Mandi</h1>
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest" data-i18n="command_center">Command Center</p>
-        </div>
-        <div class="flex items-center gap-2 ml-4 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
-          <div id="connStatus" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)] animate-pulse"></div>
-          <span id="connText" class="text-[10px] font-bold text-red-400 tracking-widest">OFFLINE</span>
-        </div>
+  <div id="main-dashboard" style="display: none;">
+    <header>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="role-badge" id="ui-role-badge">WAITING</span>
+        <strong style="font-size: 1.2rem; letter-spacing:1px;" data-i18n="command_center">Command Center</strong>
       </div>
-      <div class="flex items-center gap-4">
-        <select id="langSelectAdmin" onchange="changeLanguageAdmin(this.value)" class="bg-slate-800 text-amber-500 border border-slate-700 rounded px-3 py-1 outline-none text-sm font-bold">
-          <option value="en">English</option>
-          <option value="hi">हिंदी</option>
-          <option value="te">తెలుగు</option>
-        </select>
-        <div class="flex space-x-2 hide-scroll">
-          <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 rounded font-black bg-amber-600 text-white shadow whitespace-nowrap" data-i18n="live_orders">Live Orders</button>
-          <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 py-2 rounded font-black bg-slate-800 text-slate-300 whitespace-nowrap hover:bg-slate-700 transition" data-i18n="menu_stock">Menu / Stock</button>
-          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded font-black bg-slate-800 text-slate-300 whitespace-nowrap hover:bg-slate-700 transition" data-i18n="sales_rev">Sales & Revenue</button>
-        </div>
-      </div>
+      <button class="btn-logout" onclick="location.reload()" data-i18n="lock_screen">Lock Screen</button>
+    </header>
+
+    <div class="financials" id="admin-financials">
+      <div class="fin-card"><h3 data-i18n="cash_earned">Cash Earned</h3><div class="amount">₹<span id="stat-cash">0</span></div></div>
+      <div class="fin-card"><h3 data-i18n="online_earned">Online Earned</h3><div class="amount">₹<span id="stat-online">0</span></div></div>
+      <div class="fin-card"><h3 data-i18n="total_gross">Total Gross</h3><div class="amount">₹<span id="stat-gross">0</span></div></div>
     </div>
-  </header>
 
-  <main class="max-w-7xl mx-auto px-6 py-8">
+    <h2 class="section-title" data-i18n="active_floor">Active Floor Operations</h2>
+    <div class="grid" id="tables-grid"></div>
+  </div>
 
-    <!-- 1. LIVE ORDERS -->
-    <section id="view-orders">
-      <div class="flex justify-between items-end mb-6">
-        <h2 class="text-xl font-black uppercase text-slate-800 tracking-wider" data-i18n="live_tables">Live Tables</h2>
-        <button onclick="forceSyncOrders()" class="flex items-center gap-2 text-xs font-bold text-slate-700 bg-white border border-slate-300 shadow-sm px-4 py-2 rounded-lg hover:bg-slate-50 active:scale-95 transition">
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-          FORCE SYNC
-        </button>
-      </div>
-      <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </section>
+  <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+  <audio id="cash-sound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
 
-    <!-- 2. INVENTORY & MENU -->
-    <section id="view-inventory" class="hidden no-print">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-1">
-          <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-200">
-            <h3 class="text-lg font-black mb-4 uppercase border-b pb-2 text-slate-800" data-i18n="add_new_item">Add New Item</h3>
-            <div class="space-y-3">
-              <input type="text" id="itemName" placeholder="Item Name" class="w-full border rounded-lg p-3 bg-slate-50 font-bold outline-none">
-              <div class="flex space-x-2">
-                <input type="number" id="itemPrice" placeholder="Price ₹" class="w-1/2 border rounded-lg p-3 bg-slate-50 font-bold outline-none">
-                <input type="number" id="itemStock" placeholder="Qty (e.g. 60)" value="60" class="w-1/2 border rounded-lg p-3 bg-slate-50 font-bold outline-none">
-              </div>
-              <select id="itemCategory" class="w-full border rounded-lg p-3 bg-slate-50 font-bold outline-none">
-                <option value="Chicken Mandi">Chicken Mandi</option>
-                <option value="Mutton Mandi">Mutton Mandi</option>
-                <option value="Veg Mandi">Veg Mandi</option>
-                <option value="Specials">Specials</option>
-                <option value="Beverages">Beverages</option>
-              </select>
-              <div class="flex items-center gap-2 p-2 border rounded-lg bg-slate-50">
-                <input type="checkbox" id="itemSpecial" class="w-5 h-5 accent-amber-600">
-                <label for="itemSpecial" class="font-bold text-slate-700" data-i18n="mark_special">Mark as Chef's Special (Top Sort)</label>
-              </div>
-              <input type="text" id="itemImage" placeholder="Image URL (optional)" class="w-full border rounded-lg p-3 bg-slate-50 outline-none">
-              <button onclick="addMenuItem()" class="w-full bg-slate-900 text-amber-500 font-black py-3 rounded-lg hover:bg-slate-800 shadow-md" data-i18n="add_to_menu">Add to Menu</button>
-            </div>
-          </div>
-        </div>
-        <div class="lg:col-span-2">
-          <h3 class="text-lg font-black mb-4 uppercase tracking-wider text-slate-800" data-i18n="stock_control">Stock Control</h3>
-          <div id="inventoryList" class="space-y-3 grid grid-cols-1 gap-3"></div>
-        </div>
-      </div>
-    </section>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+    import { getDatabase, ref, onValue, update, remove, increment } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
-    <!-- 3. DASHBOARD & SALES -->
-    <section id="view-dashboard" class="hidden">
-      <div class="flex justify-between items-center mb-6 no-print">
-        <h2 class="text-xl font-black uppercase tracking-wide" data-i18n="sales_history">Sales & History</h2>
-        <button onclick="window.print()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-bold shadow-lg hover:bg-emerald-700 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg> Print Report
-        </button>
-      </div>
-
-      <div id="printArea" class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200 print-shadow-none">
-        <h1 class="text-3xl font-black text-center mb-2 text-slate-900">Fusion Mandi</h1>
-        <p class="text-center text-slate-500 font-bold mb-8 uppercase tracking-widest">Official Sales Report</p>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-10">
-          <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
-            <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Today's Revenue</p>
-            <p id="tallyDaily" class="text-3xl font-black text-emerald-700">₹0</p>
-          </div>
-          <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
-            <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">This Week</p>
-            <p id="tallyWeekly" class="text-3xl font-black text-blue-700">₹0</p>
-          </div>
-          <div class="bg-amber-50 p-6 rounded-xl border border-amber-100">
-            <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">This Month</p>
-            <p id="tallyMonthly" class="text-3xl font-black text-amber-700">₹0</p>
-          </div>
-          <div class="bg-slate-100 p-6 rounded-xl border border-slate-200">
-            <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">This Year</p>
-            <p id="tallyYearly" class="text-3xl font-black text-slate-800">₹0</p>
-          </div>
-        </div>
-
-        <div class="mb-10">
-          <h3 class="text-lg font-black uppercase text-slate-800 border-b-2 border-slate-200 pb-2 mb-4 tracking-wider">Today's Completed Orders</h3>
-          <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-slate-100 text-slate-500 uppercase font-black text-[10px] tracking-widest">
-              <tr>
-                <th class="p-3 border-b rounded-tl-lg">Time</th>
-                <th class="p-3 border-b">Table</th>
-                <th class="p-3 border-b w-1/2">Items Sold</th>
-                <th class="p-3 border-b text-center">Feedback</th>
-                <th class="p-3 border-b text-right rounded-tr-lg">Amount</th>
-              </tr>
-            </thead>
-            <tbody id="dailyLogsTable" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-
-        <div class="mt-12 pt-6 border-t border-slate-200 text-center no-print">
-          <button onclick="factoryResetSystem()" class="bg-red-100 text-red-600 border border-red-200 px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition">
-            ⚠️ Clear All Data & Load Fusion Mandi Menu
-          </button>
-          <p class="text-xs text-slate-400 mt-2">Will delete old test sales and install the complete 22-item Fusion Mandi database with default 60 stock.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
       authDomain: "fusionmandi999-36066.firebaseapp.com",
@@ -175,373 +114,262 @@
       projectId: "fusionmandi999-36066",
       storageBucket: "fusionmandi999-36066.firebasestorage.app",
       messagingSenderId: "312237706440",
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd",
+      measurementId: "G-1LM1V9NLMB"
     };
-    
-    // UPDATED WEBHOOK FOR FUSION MANDI
-    const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbwXvoOUsaQeKy8tjGuOkYunnK8hau3LJNCt3PUn1g0Ar6pD35jaX32_dZ_7uXRdSQRYUg/exec";
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const fallbackImg = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=80";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwXvoOUsaQeKy8tjGuOkYunnK8hau3LJNCt3PUn1g0Ar6pD35jaX32_dZ_7uXRdSQRYUg/exec";
 
-    // --- Translations ---
-    const i18n = {
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase(app);
+    const alertSound = document.getElementById('alert-sound');
+    const cashSound = document.getElementById('cash-sound');
+
+    // --- Multi-Language Dictionary ---
+    const dict = {
       en: {
-        command_center: "Command Center", live_orders: "Live Orders", menu_stock: "Menu / Stock",
-        sales_rev: "Sales & Revenue", live_tables: "Live Tables", add_new_item: "Add New Item",
-        mark_special: "Mark as Chef's Special (Top Sort)", add_to_menu: "Add to Menu",
-        stock_control: "Stock Control", sales_history: "Sales & History", accept_cook: "Accept & Cook",
-        serve_food: "Serve Food", clear_receipt: "Clear & Send Receipt", update: "Update", special: "Special"
+        pos_access: "POS Access",
+        pin_placeholder: "Enter PIN / Password",
+        login_btn: "Login",
+        login_hint: "Admin (admin123) or Waiter (waiter123)",
+        command_center: "Command Center",
+        lock_screen: "Lock Screen",
+        cash_earned: "Cash Earned",
+        online_earned: "Online Earned",
+        total_gross: "Total Gross",
+        active_floor: "Active Floor Operations",
+        waiting_orders: "Floor is clear. Waiting for orders...",
+        print_kot: "Print KOT",
+        clear_alerts: "Clear Alerts",
+        cash_collected: "Mark Cash Collected",
+        clear_finalize: "Clear & Finalize",
+        plate_empty: "Plate is empty",
+        customer_needs_help: "🚨 Customer Needs Help",
+        total: "Total:",
+        active_status: "Active",
+        verify_upi: "VERIFY UPI📱",
+        cash_pending: "CASH PENDING 🤵",
+        at_counter: "AT COUNTER 🏪",
+        invalid_pass: "Invalid Password",
+        admin_notified: "Admin notified. Please hand cash to the counter."
       },
       hi: {
-        command_center: "कमांड सेंटर", live_orders: "लाइव ऑर्डर", menu_stock: "मेनू / स्टॉक",
-        sales_rev: "बिक्री और राजस्व", live_tables: "लाइव टेबल", add_new_item: "नया आइटम जोड़ें",
-        mark_special: "शेफ स्पेशल के रूप में चिह्नित करें (शीर्ष पर)", add_to_menu: "मेनू में जोड़ें",
-        stock_control: "स्टॉक नियंत्रण", sales_history: "बिक्री और इतिहास", accept_cook: "स्वीकारें और पकाएं",
-        serve_food: "खाना परोसें", clear_receipt: "क्लियर करें और रसीद भेजें", update: "अपडेट", special: "विशेष"
+        pos_access: "POS एक्सेस",
+        pin_placeholder: "पिन / पासवर्ड दर्ज करें",
+        login_btn: "लॉग इन",
+        login_hint: "एडमिन (admin123) या वेटर (waiter123)",
+        command_center: "कमांड सेंटर",
+        lock_screen: "स्क्रीन लॉक करें",
+        cash_earned: "नकद कमाई",
+        online_earned: "ऑनलाइन कमाई",
+        total_gross: "कुल कमाई",
+        active_floor: "सक्रिय फ्लोर",
+        waiting_orders: "फ्लोर खाली है। ऑर्डर की प्रतीक्षा में...",
+        print_kot: "KOT प्रिंट करें",
+        clear_alerts: "अलर्ट हटाएं",
+        cash_collected: "नकद प्राप्त हुआ",
+        clear_finalize: "क्लियर और फाइनल करें",
+        plate_empty: "प्लेट खाली है",
+        customer_needs_help: "🚨 ग्राहक को मदद चाहिए",
+        total: "कुल:",
+        active_status: "सक्रिय",
+        verify_upi: "UPI जांचें📱",
+        cash_pending: "नकद बाकी 🤵",
+        at_counter: "काउंटर पर 🏪",
+        invalid_pass: "अमान्य पासवर्ड",
+        admin_notified: "एडमिन को सूचित कर दिया गया। कृपया काउंटर पर नकद जमा करें।"
       },
       te: {
-        command_center: "కమాండ్ సెంటర్", live_orders: "లైవ్ ఆర్డర్‌లు", menu_stock: "మెనూ / స్టాక్",
-        sales_rev: "సేల్స్ & రెవిన్యూ", live_tables: "లైవ్ టేబుల్స్", add_new_item: "కొత్త అంశాన్ని జోడించండి",
-        mark_special: "షెఫ్ స్పెషల్‌గా గుర్తించండి (టాప్)", add_to_menu: "మెనూకు జోడించండి",
-        stock_control: "స్టాక్ కంట్రోల్", sales_history: "సేల్స్ & హిస్టరీ", accept_cook: "అంగీకరించి వండండి",
-        serve_food: "ఆహారం అందించండి", clear_receipt: "క్లియర్ & రసీదు పంపండి", update: "నవీకరించు", special: "ప్రత్యేక"
+        pos_access: "POS యాక్సెస్",
+        pin_placeholder: "పిన్ / పాస్‌వర్డ్ నమోదు చేయండి",
+        login_btn: "లాగిన్",
+        login_hint: "అడ్మిన్ (admin123) లేదా వెయిటర్ (waiter123)",
+        command_center: "కమాండ్ సెంటర్",
+        lock_screen: "స్క్రీన్ లాక్ చేయండి",
+        cash_earned: "నగదు సంపాదన",
+        online_earned: "ఆన్‌లైన్ సంపాదన",
+        total_gross: "మొత్తం సంపాదన",
+        active_floor: "యాక్టివ్ టేబుల్స్",
+        waiting_orders: "ఫ్లోర్ ఖాళీగా ఉంది. ఆర్డర్ల కోసం వేచి ఉంది...",
+        print_kot: "KOT ప్రింట్ చేయండి",
+        clear_alerts: "అలర్ట్స్ క్లియర్ చేయండి",
+        cash_collected: "నగదు స్వీకరించబడింది",
+        clear_finalize: "క్లియర్ & ఫైనలైజ్",
+        plate_empty: "ప్లేట్ ఖాళీగా ఉంది",
+        customer_needs_help: "🚨 కస్టమర్‌కు సహాయం కావాలి",
+        total: "మొత్తం:",
+        active_status: "యాక్టివ్",
+        verify_upi: "UPI సరిచూసుకోండి📱",
+        cash_pending: "నగదు పెండింగ్ 🤵",
+        at_counter: "కౌంటర్ వద్ద 🏪",
+        invalid_pass: "తప్పు పాస్‌వర్డ్",
+        admin_notified: "అడ్మిన్‌కు తెలియజేయబడింది. దయచేసి నగదును కౌంటర్‌లో ఇవ్వండి."
       }
     };
-    let currentLangAdmin = 'en';
-    const ta = (key) => i18n[currentLangAdmin][key] || key;
 
-    function changeLanguageAdmin(lang) {
-      currentLangAdmin = lang;
-      document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = ta(el.getAttribute('data-i18n')); });
-      forceSyncOrders(); // Re-render grid text
-    }
+    let currentLang = 'en';
+    const t = (key) => dict[currentLang][key] || key;
 
-    // Audio & Wake-Lock Logic
-    let systemActive = false;
-    let wakeLock = null;
-    let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-    
-    async function activateSystem() {
-      alertSound.play().then(() => { alertSound.pause(); alertSound.currentTime = 0; }).catch(()=>{});
-      try { if ('wakeLock' in navigator) { wakeLock = await navigator.wakeLock.request('screen'); } } catch (err) {}
-      systemActive = true;
-      document.getElementById('systemUnlocker').classList.add('hidden');
-    }
+    let globalTableData = null; // Store data to re-render on language change
+    let currentRole = null;
+    let todayDateString = new Date().toISOString().split('T')[0];
 
-    db.ref('.info/connected').on('value', function(snap) {
-      const dot = document.getElementById('connStatus');
-      const text = document.getElementById('connText');
-      if (snap.val() === true) {
-        dot.className = "w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]";
-        text.innerText = "ONLINE & SYNCED"; text.className = "text-[10px] font-bold text-emerald-400 tracking-widest";
-        if(systemActive) forceSyncOrders(); 
+    window.changeLang = (lang) => {
+      currentLang = lang;
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t(el.getAttribute('data-i18n')); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-placeholder')); });
+      if (globalTableData !== null) renderTables(globalTableData);
+    };
+
+    window.changeLang('en');
+
+    // Enter Key Login
+    document.getElementById('pin-input').addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') attemptLogin();
+    });
+
+    window.attemptLogin = () => {
+      const pin = document.getElementById('pin-input').value;
+      if (pin === 'admin123') {
+        currentRole = 'admin';
+        document.getElementById('ui-role-badge').innerText = 'ADMIN';
+        document.getElementById('admin-financials').style.display = 'grid';
+      } else if (pin === 'waiter123') {
+        currentRole = 'waiter';
+        document.getElementById('ui-role-badge').innerText = 'WAITER';
+        document.getElementById('ui-role-badge').style.backgroundColor = 'var(--waiter)';
       } else {
-        dot.className = "w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,1)] animate-pulse";
-        text.innerText = "OFFLINE - RECONNECTING..."; text.className = "text-[10px] font-bold text-red-400 tracking-widest";
+        return alert(t('invalid_pass'));
       }
-    });
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('main-dashboard').style.display = 'block';
+      loadData();
+    };
 
-    function switchTab(tab) {
-      document.getElementById('view-orders').classList.toggle('hidden', tab !== 'orders');
-      document.getElementById('view-inventory').classList.toggle('hidden', tab !== 'inventory');
-      document.getElementById('view-dashboard').classList.toggle('hidden', tab !== 'dashboard');
-      
-      const activeCls = "px-4 py-2 rounded font-black bg-amber-600 text-white shadow whitespace-nowrap";
-      const inactiveCls = "px-4 py-2 rounded font-black bg-slate-800 text-slate-300 whitespace-nowrap hover:bg-slate-700 transition";
-      
-      document.getElementById('tab-orders').className = tab === 'orders' ? activeCls : inactiveCls;
-      document.getElementById('tab-inventory').className = tab === 'inventory' ? activeCls : inactiveCls;
-      document.getElementById('tab-dashboard').className = tab === 'dashboard' ? activeCls : inactiveCls;
+    function loadData() {
+      onValue(ref(db, 'active_tables'), (snapshot) => {
+        globalTableData = snapshot.val();
+        renderTables(globalTableData);
+      });
+
+      if (currentRole === 'admin') {
+        onValue(ref(db, `daily_totals/${todayDateString}`), (snapshot) => {
+          const totals = snapshot.val() || { cash: 0, online: 0, gross: 0 };
+          document.getElementById('stat-cash').innerText = totals.cash;
+          document.getElementById('stat-online').innerText = totals.online;
+          document.getElementById('stat-gross').innerText = totals.gross;
+        });
+      }
     }
 
-    function triggerStrobeAlarm() {
-      const body = document.getElementById('mainBody');
-      body.classList.add('alarm-active');
-      setTimeout(() => body.classList.remove('alarm-active'), 3000); 
-    }
-
-    let customerFeedback = {};
-    db.ref('feedback').on('value', snap => {
-      let data = snap.val() || {};
-      customerFeedback = {};
-      Object.values(data).forEach(fb => { if(fb.orderId) customerFeedback[fb.orderId] = fb.rating; });
-      forceSyncOrders();
-    });
-
-    db.ref('orders').on('child_added', (snap) => {
-       const order = snap.val();
-       if(systemActive && order.status === 'pending') {
-         alertSound.play().catch(e=>{});
-         triggerStrobeAlarm();
-       }
-    });
-
-    function forceSyncOrders() { db.ref('orders').once('value').then(snap => renderGrid(snap)); }
-    db.ref('orders').on('value', snap => { renderGrid(snap); });
-
-    function renderGrid(snap) {
-      const grid = document.getElementById('kitchenGrid');
+    function renderTables(tables) {
+      const grid = document.getElementById('tables-grid');
       grid.innerHTML = '';
-      const orders = snap.val() || {};
-      const sortedOrders = Object.entries(orders).sort((a, b) => a[1].timestamp - b[1].timestamp);
+      let playAlarm = false;
 
-      sortedOrders.forEach(([id, order]) => {
-        if (!order) return;
-        try {
-          let safeTable = order.table || "??";
-          let safeTotal = order.total || 0;
-          let safeItems = (order.items || "").toString().replace(/,/g, '<br><span class="text-slate-300">•</span>');
-          
-          let borderColor = order.status === 'pending' ? 'border-amber-500' : (order.status === 'cooking' ? 'border-blue-500' : 'border-emerald-500');
-          let statusBadge = order.status === 'pending' ? 'bg-amber-100 text-amber-700 animate-pulse' : (order.status === 'cooking' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700');
-          
-          let actionButton = '';
-          if (order.status === 'pending') {
-            actionButton = `<button onclick="updateOrderStatus('${id}', 'cooking')" class="w-full bg-blue-600 text-white py-4 rounded-lg font-black active:scale-95 shadow-lg text-lg tracking-wide transition hover:bg-blue-700">${ta('accept_cook')}</button>`;
-          } else if (order.status === 'cooking') {
-            actionButton = `<button onclick="updateOrderStatus('${id}', 'served')" class="w-full bg-emerald-600 text-white py-4 rounded-lg font-black active:scale-95 shadow-lg text-lg tracking-wide transition hover:bg-emerald-700">${ta('serve_food')}</button>`;
-          } else if (order.status === 'served') {
-            actionButton = `<button onclick="clearAndSaveBill('${id}')" class="w-full bg-slate-900 text-white py-4 rounded-lg font-black border border-emerald-500 active:scale-95 shadow-[0_0_15px_rgba(16,185,129,0.3)] text-lg tracking-wide flex items-center justify-center gap-2 hover:bg-slate-800"><svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> ${ta('clear_receipt')}</button>`;
+      if (tables) {
+        Object.keys(tables).forEach(tableId => {
+          const data = tables[tableId];
+          const hasAlert = data.help_requested || data.bill_requested;
+          if (hasAlert) playAlarm = true;
+
+          let itemsHTML = '';
+          let pendingKOTCount = 0;
+          let itemsTextForSheet = [];
+
+          if (data.items) {
+            Object.keys(data.items).forEach(itemKey => {
+              const i = data.items[itemKey];
+              if (i.kot_status === 'pending') pendingKOTCount++;
+              itemsHTML += `<li class="${i.kot_status === 'pending' ? 'pending-kot' : 'printed-kot'}"><span><b>${i.quantity}x</b> ${i.name} <br><small>${i.variant}</small></span><span style="font-size:1.1rem;">₹${i.subtotal}</span></li>`;
+              itemsTextForSheet.push(`${i.quantity}x ${i.name} (${i.variant})`);
+            });
           }
 
-          let phoneBadge = order.phone && order.phone !== "Not Provided" ? `<span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-1 rounded ml-2 font-mono">📱 ${order.phone}</span>` : '';
-          let timeAgo = order.timestamp ? Math.floor((Date.now() - order.timestamp) / 60000) : 0;
-          if (timeAgo < 0) timeAgo = 0; 
-          let timeString = timeAgo === 0 ? "Just now" : `${timeAgo}m ago`;
+          let cardClass = "table-card";
+          if (hasAlert) cardClass += " alert";
+          let statusText = t('active_status');
+          
+          if (data.payment_method === 'upi') { cardClass += " upi-pending"; statusText = t('verify_upi'); }
+          else if (data.payment_method === 'cash') { cardClass += " cash-pending"; statusText = t('cash_pending'); }
+          else if (data.payment_method === 'counter') { statusText = t('at_counter'); }
 
-          let ratingBadge = '';
-          if (customerFeedback[order.orderId]) {
-            let rating = customerFeedback[order.orderId];
-            let emoji = rating === 'Excellent' ? '😍' : (rating === 'Good' ? '😋' : '😞');
-            ratingBadge = `<div class="mt-3 bg-indigo-50 border border-indigo-100 rounded-lg p-2 flex justify-center items-center gap-2 shadow-inner"><span class="text-xs font-black text-indigo-400 uppercase tracking-widest">Guest Feedback:</span> <span class="text-xl">${emoji}</span></div>`;
-          }
-
-          grid.innerHTML += `
-            <div class="bg-white p-6 rounded-2xl shadow-xl border-t-8 ${borderColor} flex flex-col justify-between h-full transition-all">
-              <div>
-                <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-                  <span class="font-black text-3xl text-slate-800">Table ${safeTable}</span>
-                  <span class="text-xs font-black uppercase ${statusBadge} px-3 py-1.5 rounded-md tracking-wider">${order.status || 'pending'}</span>
-                </div>
-                <div class="mb-4">
-                  <p class="font-bold text-slate-700 text-sm leading-loose">${safeItems}</p>
-                </div>
-                ${ratingBadge}
-              </div>
-              <div class="mt-4 pt-4 border-t border-slate-100">
-                <div class="flex justify-between items-end mb-5">
-                  <div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Wait Time: ${timeString}</span>
-                    ${phoneBadge}
-                  </div>
-                  <div class="text-right">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Total</span>
-                    <span class="font-black text-3xl text-amber-600 leading-none">₹${safeTotal}</span>
-                  </div>
-                </div>
-                ${actionButton}
-              </div>
+          const card = document.createElement('div');
+          card.className = cardClass;
+          card.innerHTML = `
+            <div class="table-header">
+              <h2>${tableId.toUpperCase()}</h2>
+              <span class="status-badge">${statusText}</span>
+            </div>
+            <div style="margin-bottom:12px; color:#aaa; font-size:0.9rem; border-bottom:1px solid #444; padding-bottom:10px;">📞 Mobile: ${data.customer_mobile || 'None'}</div>
+            
+            ${data.help_requested ? `<div style="color:#e74c3c; font-weight:bold; margin-bottom:10px;">${t('customer_needs_help')}</div>` : ''}
+            
+            <ul class="items-list">${itemsHTML || `<li>${t('plate_empty')}</li>`}</ul>
+            
+            <div class="total-row"><span>${t('total')}</span><span>₹${data.running_total || 0}</span></div>
+            
+            <div class="actions">
+              ${pendingKOTCount > 0 ? `<button class="btn-kot" onclick="printKOT('${tableId}')">${t('print_kot')} (${pendingKOTCount})</button>` : ''}
+              ${hasAlert ? `<button class="btn-resolve" onclick="resolveAlerts('${tableId}')">${t('clear_alerts')}</button>` : ''}
+              ${currentRole === 'waiter' && data.payment_method === 'cash' ? `<button class="btn-waiter-cash" style="display:block;" onclick="notifyCashCollected('${tableId}')">${t('cash_collected')}</button>` : ''}
+              ${currentRole === 'admin' ? `<button class="btn-clear" style="display:block;" onclick="clearTable('${tableId}', ${data.running_total \vert{}\vert{} 0}, '${itemsTextForSheet.join(' | ')}', '${data.payment_method \vert{}\vert{} 'unknown'}')">${t('clear_finalize')}</button>` : ''}
             </div>
           `;
-        } catch (err) {}
-      });
-    }
-
-    function updateOrderStatus(id, status) { db.ref('orders/' + id).update({ status: status }); }
-
-    function getTallyKeys() {
-      const d = new Date();
-      const day = d.getDay();
-      const diff = d.getDate() - day;
-      const weekStart = new Date(d.setDate(diff));
-      return {
-        daily: new Date().toISOString().split('T')[0], 
-        weekly: weekStart.toISOString().split('T')[0], 
-        monthly: new Date().toISOString().substring(0,7),
-        yearly: new Date().toISOString().substring(0,4)
-      };
-    }
-
-    async function clearAndSaveBill(id) {
-      const snap = await db.ref('orders/' + id).once('value');
-      const order = snap.val();
-      if (!order) return;
-      
-      let safeTable = order.table || "Unknown";
-      let safeOrderId = order.orderId || id;
-      let safeItems = (order.items || "").split(', ').join('\n');
-      let safeTotal = order.total || 0;
-
-      if (order.phone && order.phone !== "Not Provided" && order.phone.length >= 10) {
-        const cleanPhone = order.phone.replace(/\D/g, '');
-        const finalPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
-        const msg = encodeURIComponent(`*=== FUSION MANDI ===*\nThank you for dining with us today!\n\n*Table:* ${safeTable}\n*Order ID:* ${safeOrderId}\n\n*Items Ordered:*\n${safeItems}\n\n*TOTAL PAID: ₹${safeTotal}*\n\nWe hope to see you again!`);
-        window.open(`https://wa.me/${finalPhone}?text=${msg}`, '_blank');
+          grid.appendChild(card);
+        });
+        if (playAlarm) alertSound.play().catch(()=>{}); else { alertSound.pause(); alertSound.currentTime = 0; }
       } else {
-        let bill = `=== FUSION MANDI ===\nTable: ${safeTable}\nDate: ${new Date().toLocaleString()}\n------------------\n${safeItems}\n------------------\nTOTAL PAID: Rs. ${safeTotal}\n=================`;
-        const blob = new Blob([bill], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `Bill_Table${safeTable}_${safeOrderId}.txt`;
-        a.click();
+        grid.innerHTML = `<p style="color:#aaa; font-size:1.1rem; padding:10px;">${t('waiting_orders')}</p>`;
       }
-
-      const keys = getTallyKeys();
-      const amount = Number(safeTotal);
-      db.ref(`tallies/daily/${keys.daily}`).transaction(val => (val || 0) + amount);
-      db.ref(`tallies/weekly/${keys.weekly}`).transaction(val => (val || 0) + amount);
-      db.ref(`tallies/monthly/${keys.monthly}`).transaction(val => (val || 0) + amount);
-      db.ref(`tallies/yearly/${keys.yearly}`).transaction(val => (val || 0) + amount);
-
-      const timeNow = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
-      const preciseTimestamp = Date.now();
-      db.ref(`daily_logs/${keys.daily}/${safeOrderId}`).set({
-        time: timeNow, table: safeTable, items: safeItems, total: safeTotal, timestamp: preciseTimestamp
-      });
-
-      fetch(GOOGLE_SHEET_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" }, body: JSON.stringify(order) });
-      db.ref('orders/' + id).remove();
     }
 
-    function listenToDashboard() {
-      const keys = getTallyKeys();
-      db.ref(`tallies/daily/${keys.daily}`).on('value', s => document.getElementById('tallyDaily').innerText = `₹${s.val() || 0}`);
-      db.ref(`tallies/weekly/${keys.weekly}`).on('value', s => document.getElementById('tallyWeekly').innerText = `₹${s.val() || 0}`);
-      db.ref(`tallies/monthly/${keys.monthly}`).on('value', s => document.getElementById('tallyMonthly').innerText = `₹${s.val() || 0}`);
-      db.ref(`tallies/yearly/${keys.yearly}`).on('value', s => document.getElementById('tallyYearly').innerText = `₹${s.val() || 0}`);
-
-      db.ref(`daily_logs/${keys.daily}`).on('value', snap => {
-        const table = document.getElementById('dailyLogsTable');
-        table.innerHTML = '';
-        const logs = snap.val() || {};
-        
-        if(Object.keys(logs).length === 0) {
-          table.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold uppercase tracking-widest border-b">No orders completed today yet.</td></tr>`;
-          return;
+    window.printKOT = function(tableId) {
+      const itemsRef = ref(db, `active_tables/${tableId}/items`);
+      onValue(itemsRef, (snap) => {
+        const items = snap.val();
+        if (items) {
+          let updates = {};
+          Object.keys(items).forEach(key => { updates[`${key}/kot_status`] = "printed"; });
+          update(itemsRef, updates);
         }
-        const sortedLogs = Object.entries(logs).sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
-        sortedLogs.forEach(([orderId, log]) => {
-          let fbRating = customerFeedback[orderId];
-          let fbEmoji = fbRating ? (fbRating === 'Excellent' ? '😍' : (fbRating === 'Good' ? '😋' : '😞')) : '--';
-          table.innerHTML += `
-            <tr class="hover:bg-slate-50 transition-colors">
-              <td class="p-3 border-b text-slate-500 font-bold whitespace-nowrap">${log.time || '--'}</td>
-              <td class="p-3 border-b font-black text-slate-800">T-${log.table || '?'}</td>
-              <td class="p-3 border-b text-slate-700 font-semibold">${log.items || ''}</td>
-              <td class="p-3 border-b text-center text-xl">${fbEmoji}</td>
-              <td class="p-3 border-b font-black text-emerald-600 text-right">₹${log.total || 0}</td>
-            </tr>
-          `;
-        });
-      });
-    }
-    listenToDashboard();
+      }, { onlyOnce: true });
+    };
 
-    // Inventory Sync
-    db.ref('menu').on('value', snap => {
-      const list = document.getElementById('inventoryList');
-      list.innerHTML = '';
-      const menuData = snap.val() || {};
+    window.resolveAlerts = function(tableId) {
+      update(ref(db, `active_tables/${tableId}`), { help_requested: false, bill_requested: false });
+    };
 
-      Object.entries(menuData).forEach(([id, item]) => {
-        if(!item) return;
-        let safeName = item.name || "Unknown Item";
-        let safeCat = item.category || "Uncategorized";
-        let safePrice = item.price || 0;
-        let stockCount = item.stock_count || 0;
-        let isSpecial = item.is_special || false;
-        
-        list.innerHTML += `
-          <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="flex items-center space-x-4 w-full md:w-auto">
-              <img src="${item.image || fallbackImg}" onerror="this.src='${fallbackImg}'" class="w-16 h-16 rounded-lg object-cover bg-slate-200 shadow-sm">
-              <div>
-                <h4 class="font-black text-slate-800 leading-tight flex items-center gap-2">
-                  ${safeName}
-                  ${isSpecial ? `<span class="bg-amber-100 text-amber-600 text-[10px] px-2 py-0.5 rounded uppercase tracking-widest">${ta('special')}</span>` : ''}
-                </h4>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${safeCat}</p>
-                <p class="text-amber-600 font-black mt-1">₹${safePrice}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 w-full md:w-auto">
-              <button onclick="toggleSpecial('${id}', ${isSpecial})" class="px-3 py-2 rounded-lg text-sm font-bold border ${isSpecial ? 'bg-amber-50 border-amber-300 text-amber-700' : 'bg-slate-50 border-slate-300 text-slate-600'} transition" title="Toggle Chef's Special">
-                ⭐
-              </button>
-              <div class="flex items-center bg-slate-50 border rounded-lg overflow-hidden">
-                <span class="bg-slate-200 px-3 py-2 text-xs font-bold text-slate-600 uppercase">Qty</span>
-                <input type="number" id="stock-${id}" value="${stockCount}" class="w-20 p-2 font-black outline-none text-center bg-transparent">
-              </div>
-              <button onclick="updateStock('${id}')" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-black text-sm uppercase shadow-sm hover:bg-emerald-700 active:scale-95 transition">
-                ${ta('update')}
-              </button>
-            </div>
-          </div>
-        `;
-      });
-    });
+    window.notifyCashCollected = function(tableId) {
+      alert(t('admin_notified'));
+      update(ref(db, `active_tables/${tableId}`), { payment_method: "cash_collected_by_waiter" });
+    };
 
-    function addMenuItem() {
-      const name = document.getElementById('itemName').value;
-      const price = document.getElementById('itemPrice').value;
-      const stock = document.getElementById('itemStock').value;
-      const category = document.getElementById('itemCategory').value;
-      const isSpecial = document.getElementById('itemSpecial').checked;
-      const image = document.getElementById('itemImage').value || fallbackImg;
+    window.clearTable = async function(tableId, total, itemsDetails, method) {
+      if(!confirm(`Clear Table ${tableId.toUpperCase()}?`)) return;
+      cashSound.play();
+      let finMethod = method === 'upi' ? 'online' : 'cash';
       
-      if(name && price) {
-        db.ref('menu').push({ name: name, price: Number(price), stock_count: Number(stock), category: category, image: image, is_special: isSpecial });
-        document.getElementById('itemName').value = ''; document.getElementById('itemPrice').value = ''; document.getElementById('itemImage').value = ''; document.getElementById('itemSpecial').checked = false;
-      }
-    }
+      const totalsRef = ref(db, `daily_totals/${todayDateString}`);
+      update(totalsRef, { [finMethod]: increment(total), gross: increment(total) });
 
-    function updateStock(id) {
-      const val = parseInt(document.getElementById(`stock-${id}`).value) || 0;
-      db.ref('menu/' + id).update({ stock_count: val });
-    }
-
-    function toggleSpecial(id, currentStatus) {
-      db.ref('menu/' + id).update({ is_special: !currentStatus });
-    }
-
-    function factoryResetSystem() {
-      if(confirm("⚠️ WARNING: This will permanently delete ALL old sales data, clear pending orders, and load the new Fusion Mandi Menu into the database with default 60 stock. Are you sure?")) {
-        
-        db.ref('orders').remove(); db.ref('tallies').remove(); db.ref('daily_logs').remove(); db.ref('feedback').remove();
-
-        const fusionMandiData = {
-          "m1": { name: "Chicken Fry Mandi", category: "Chicken Mandi", price: 270, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1563379091339-03b2184f4f03?auto=format&fit=crop&w=500&q=80" },
-          "m2": { name: "Chicken BBQ Mandi", category: "Chicken Mandi", price: 310, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&w=500&q=80" },
-          "m3": { name: "Chicken AL Faham Mandi", category: "Chicken Mandi", price: 320, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1628294895950-9805252327bc?auto=format&fit=crop&w=500&q=80" },
-          "m4": { name: "Broasted Chicken Mandi", category: "Chicken Mandi", price: 299, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=500&q=80" },
-          "m5": { name: "Chicken F2 Mandi", category: "Chicken Mandi", price: 329, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?auto=format&fit=crop&w=500&q=80" },
-          "m6": { name: "F1 Rara Chicken Mandi", category: "Chicken Mandi", price: 330, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500&q=80" },
-          "m7": { name: "Chicken Juicy Mandi", category: "Chicken Mandi", price: 299, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1544025162-8111142154ea?auto=format&fit=crop&w=500&q=80" },
-          "m8": { name: "Chicken Murg Musallam", category: "Chicken Mandi", price: 329, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=500&q=80" },
-          "m9": { name: "Mutton Juicy Mandi", category: "Mutton Mandi", price: 349, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1626844131082-256783844137?auto=format&fit=crop&w=500&q=80" },
-          "m10": { name: "F1 Rara Mutton Mandi", category: "Mutton Mandi", price: 360, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1543362906-acfc16c67564?auto=format&fit=crop&w=500&q=80" },
-          "m11": { name: "Mutton Fry Mandi", category: "Mutton Mandi", price: 340, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=500&q=80" },
-          "m12": { name: "Mutton F2 Mandi", category: "Mutton Mandi", price: 360, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?auto=format&fit=crop&w=500&q=80" },
-          "m13": { name: "Bhakasura Mandi (4 Person)", category: "Specials", price: 1099, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500&q=80" },
-          "m14": { name: "Chicken Fry Wings Mandi", category: "Chicken Mandi", price: 299, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1626082929543-5a02241b3152?auto=format&fit=crop&w=500&q=80" },
-          "m15": { name: "Chicken Lolly pop Mandi", category: "Chicken Mandi", price: 199, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1606501127027-68b3f2ccad86?auto=format&fit=crop&w=500&q=80" },
-          "m16": { name: "VEG MANDI Mixed Veg", category: "Veg Mandi", price: 260, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=500&q=80" },
-          "m17": { name: "Spl Veg Mandi", category: "Veg Mandi", price: 299, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=500&q=80" },
-          "m18": { name: "Mushroom Mandi", category: "Veg Mandi", price: 249, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1604544203173-2005089c20a5?auto=format&fit=crop&w=500&q=80" },
-          "m19": { name: "Pannner Rara Mandi", category: "Veg Mandi", price: 299, stock_count: 60, is_special: true, image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=500&q=80" },
-          "m20": { name: "Panner Juicy Mandi", category: "Veg Mandi", price: 279, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500&q=80" },
-          "b1": { name: "Mineral Water Bottle", category: "Beverages", price: 20, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=500&q=80" },
-          "b2": { name: "Soft Drinks", category: "Beverages", price: 25, stock_count: 60, is_special: false, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=500&q=80" }
+      try {
+        const payload = {
+          orderId: Date.now().toString(),
+          tableNo: tableId,
+          totalAmount: total,
+          paymentMethod: method.toUpperCase(),
+          itemsDetails: itemsDetails || "Empty"
         };
-
-        db.ref('menu').set(fusionMandiData).then(() => {
-          alert("✅ System Reset Complete! Fusion Mandi Menu Loaded successfully.");
-          window.location.reload();
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
         });
-      }
-    }
+      } catch (err) { console.error("Sheet Log Failed"); }
+      remove(ref(db, `active_tables/${tableId}`));
+    };
   </script>
 </body>
 </html>
