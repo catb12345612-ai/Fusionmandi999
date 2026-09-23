@@ -3,373 +3,282 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mandi POS - Command Center</title>
+  <title>Fusion Mandi - Command Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- USING STABLE FIREBASE 9 COMPAT -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <style>
-    :root { --admin: #e74c3c; --waiter: #3498db; --bg: #1e272e; --card: #2f3640; --text: #f5f6fa; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: var(--text); }
-    
-    /* Top Bar */
-    .top-bar { background: #111; padding: 6px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; font-size: 0.8rem; }
-    .dev-info { color: #00e5ff; text-decoration: none; font-weight: bold; }
-    .lang-selector { background: #333; color: white; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; outline: none; }
-    
-    /* Login */
-    #login-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; }
-    .login-box { background: var(--card); padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-top: 5px solid var(--admin); width: 300px; }
-    .login-box input { width: 100%; padding: 12px; margin: 15px 0; border-radius: 6px; border: none; font-size: 1.1rem; text-align: center; box-sizing: border-box; }
-    .login-box button { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #2ecc71; color: white; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
-    
-    /* Header */
-    header { background: #1a2228; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; }
-    .role-badge { background: var(--admin); padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-    .btn-logout { background: transparent; border: 1px solid #ccc; color: #ccc; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight:bold; }
-    
-    /* Dashboard */
-    .financials { display: none; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 20px; background: #151b20; }
-    .fin-card { background: var(--card); padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #2ecc71; }
-    .fin-card h3 { margin: 0; font-size: 0.9rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
-    .fin-card .amount { font-size: 2rem; font-weight: 900; color: #2ecc71; margin-top: 5px; }
-
-    .section-title { padding: 20px 20px 0; margin: 0; font-size: 1.2rem; color: #aaa; text-transform: uppercase; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 20px; }
-    .table-card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border-top: 5px solid #7f8fa6; position: relative; }
-    .table-card.alert { border-top-color: #e74c3c; animation: flash 1s infinite alternate; }
-    .table-card.upi-pending { border-top-color: #9b59b6; }
-    .table-card.cash-pending { border-top-color: #f1c40f; }
-    
-    .table-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 10px; }
-    .table-header h2 { margin: 0; font-size: 1.5rem; }
-    .status-badge { font-size: 0.8rem; padding: 4px 8px; border-radius: 4px; background: #555; font-weight:bold; }
-    
-    .items-list { margin: 0; padding: 0; list-style: none; max-height: 220px; overflow-y: auto; }
-    .items-list li { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #3d464d; font-size: 0.95rem; }
-    .pending-kot { color: #f39c12; font-weight: bold; }
-    .printed-kot { color: #95a5a6; }
-    
-    .total-row { display: flex; justify-content: space-between; font-size: 1.3rem; font-weight: bold; color: #2ecc71; margin: 15px 0; border-top: 1px solid #444; padding-top: 10px; }
-    
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .actions button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; font-size: 0.95rem; }
-    .btn-kot { background: #e67e22; }
-    .btn-clear { background: #2ecc71; display: none; }
-    .btn-waiter-cash { background: #3498db; display: none; }
-    .btn-resolve { background: #e74c3c; }
-
-    @keyframes flash { from { box-shadow: 0 0 10px #e74c3c; } to { box-shadow: 0 0 25px #e74c3c; } }
+    @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; } .no-print { display: none !important; } }
+    .hide-scroll::-webkit-scrollbar { display: none; }
   </style>
 </head>
-<body>
+<body class="bg-slate-100 font-sans antialiased text-slate-800">
 
-  <div class="top-bar">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="dev-info">
-      Dev: Syed Zeeshaan Ali | High-Fledged Solutions
-    </a>
-    <select class="lang-selector" onchange="changeLang(this.value)">
-      <option value="en">English</option>
-      <option value="hi">हिंदी (Hindi)</option>
-      <option value="te">తెలుగు (Telugu)</option>
-    </select>
-  </div>
-
-  <div id="login-screen">
-    <div class="login-box">
-      <h2 style="margin-top:0;" data-i18n="pos_access">POS Access</h2>
-      <input type="password" id="pin-input" data-i18n-placeholder="pin_placeholder" placeholder="Enter PIN / Password" autofocus>
-      <button onclick="attemptLogin()" data-i18n="login_btn">Login</button>
-      <p style="color:#aaa; font-size:0.85rem; margin-top:15px;" data-i18n="login_hint">Admin (admin123) or Waiter (waiter123)</p>
+  <!-- Login Modal -->
+  <div id="loginScreen" class="fixed inset-0 bg-slate-900/95 z-[100] flex flex-col items-center justify-center p-5">
+    <div class="bg-white p-8 rounded-2xl text-center w-full max-w-sm shadow-2xl border-t-8 border-amber-500">
+      <h2 class="text-2xl font-black text-slate-900 mb-2 uppercase">Fusion Mandi POS</h2>
+      <p class="text-slate-500 font-bold mb-6 text-sm">Enter PIN to activate system</p>
+      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 border-2 border-slate-200 rounded-xl font-black text-xl focus:border-amber-500 outline-none mb-4 tracking-widest">
+      <button onclick="attemptLogin()" class="w-full bg-amber-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">LOGIN</button>
+      <p class="text-xs text-slate-400 mt-4">Admin (admin123) | Waiter (waiter123)</p>
     </div>
   </div>
 
-  <div id="main-dashboard" style="display: none;">
-    <header>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span class="role-badge" id="ui-role-badge">WAITING</span>
-        <strong style="font-size: 1.2rem; letter-spacing:1px;" data-i18n="command_center">Command Center</strong>
+  <!-- Header -->
+  <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 no-print hidden" id="mainHeader">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div>
+          <h1 class="text-2xl font-black uppercase text-amber-500 tracking-wider">Fusion Mandi</h1>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <span id="roleBadge" class="bg-amber-600 text-white px-2 py-0.5 rounded">ADMIN</span> Command Center
+          </p>
+        </div>
       </div>
-      <button class="btn-logout" onclick="location.reload()" data-i18n="lock_screen">Lock Screen</button>
-    </header>
-
-    <div class="financials" id="admin-financials">
-      <div class="fin-card"><h3 data-i18n="cash_earned">Cash Earned</h3><div class="amount">₹<span id="stat-cash">0</span></div></div>
-      <div class="fin-card"><h3 data-i18n="online_earned">Online Earned</h3><div class="amount">₹<span id="stat-online">0</span></div></div>
-      <div class="fin-card"><h3 data-i18n="total_gross">Total Gross</h3><div class="amount">₹<span id="stat-gross">0</span></div></div>
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <select id="langAdmin" onchange="changeLanguageAdmin(this.value)" class="bg-slate-800 text-amber-500 border border-slate-700 rounded px-3 py-2 outline-none text-sm font-bold">
+          <option value="en">English</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
+        </select>
+        <div class="flex space-x-2 overflow-x-auto hide-scroll">
+          <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 rounded font-black bg-amber-600 text-white shadow whitespace-nowrap tab-btn" data-i18n="live_orders">Live Orders</button>
+          <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 py-2 rounded font-black bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap tab-btn admin-only hidden" data-i18n="menu_stock">Menu / Stock</button>
+          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded font-black bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap tab-btn admin-only hidden" data-i18n="sales_rev">Sales Report</button>
+        </div>
+        <button onclick="location.reload()" class="bg-red-600 px-4 py-2 rounded font-black text-white ml-2">Logout</button>
+      </div>
     </div>
+  </header>
 
-    <h2 class="section-title" data-i18n="active_floor">Active Floor Operations</h2>
-    <div class="grid" id="tables-grid"></div>
-  </div>
+  <main class="max-w-7xl mx-auto px-6 py-8 hidden" id="mainContent">
+    <!-- 1. LIVE ORDERS -->
+    <section id="view-orders" class="tab-section">
+      <div class="flex justify-between items-end mb-6">
+        <h2 class="text-xl font-black uppercase text-slate-800 tracking-wider" data-i18n="live_tables">Live Tables</h2>
+      </div>
+      <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
 
-  <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
-  <audio id="cash-sound" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
+    <!-- 2. INVENTORY -->
+    <section id="view-inventory" class="tab-section hidden no-print">
+      <h3 class="text-lg font-black mb-4 uppercase tracking-wider text-slate-800" data-i18n="stock_control">Stock Control</h3>
+      <div id="inventoryList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    </section>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
-    import { getDatabase, ref, onValue, update, remove, increment } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+    <!-- 3. DASHBOARD -->
+    <section id="view-dashboard" class="tab-section hidden">
+      <div class="flex justify-between items-center mb-6 no-print">
+        <h2 class="text-xl font-black uppercase tracking-wide" data-i18n="sales_history">Sales & History</h2>
+        <button onclick="window.print()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-bold shadow-lg">🖨️ Print Report</button>
+      </div>
+      <div id="printArea" class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
+        <h1 class="text-3xl font-black text-center mb-2">Fusion Mandi</h1>
+        <p class="text-center text-slate-500 font-bold mb-8">Official Sales Report</p>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-10">
+          <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
+            <p class="text-[10px] font-black text-emerald-600 uppercase mb-1">Today's Revenue</p>
+            <p id="tallyDaily" class="text-3xl font-black text-emerald-700">₹0</p>
+          </div>
+        </div>
 
+        <div class="mb-10">
+          <table class="w-full text-left text-sm border-collapse">
+            <thead class="bg-slate-100 text-slate-500 uppercase font-black text-[10px] tracking-widest">
+              <tr><th class="p-3 border-b">Time</th><th class="p-3 border-b">Table</th><th class="p-3 border-b w-1/2">Items</th><th class="p-3 border-b text-right">Amount</th></tr>
+            </thead>
+            <tbody id="dailyLogsTable" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+
+        <div class="mt-12 pt-6 border-t border-slate-200 text-center no-print">
+          <button onclick="factoryResetSystem()" class="bg-red-100 text-red-600 border border-red-200 px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition">
+            ⚠️ FACTORY RESET: Load Full 22-Item Fusion Mandi Menu (60 Stock)
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
-      authDomain: "fusionmandi999-36066.firebaseapp.com",
-      databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "fusionmandi999-36066",
-      storageBucket: "fusionmandi999-36066.firebasestorage.app",
-      messagingSenderId: "312237706440",
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd",
-      measurementId: "G-1LM1V9NLMB"
+      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", 
+      authDomain: "fusionmandi999-36066.firebaseapp.com", 
+      databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", 
+      projectId: "fusionmandi999-36066", 
+      storageBucket: "fusionmandi999-36066.firebasestorage.app", 
+      messagingSenderId: "312237706440", 
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
-
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwXvoOUsaQeKy8tjGuOkYunnK8hau3LJNCt3PUn1g0Ar6pD35jaX32_dZ_7uXRdSQRYUg/exec";
 
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const db = getDatabase(app);
-    const alertSound = document.getElementById('alert-sound');
-    const cashSound = document.getElementById('cash-sound');
-
-    // --- Multi-Language Dictionary ---
-    const dict = {
-      en: {
-        pos_access: "POS Access",
-        pin_placeholder: "Enter PIN / Password",
-        login_btn: "Login",
-        login_hint: "Admin (admin123) or Waiter (waiter123)",
-        command_center: "Command Center",
-        lock_screen: "Lock Screen",
-        cash_earned: "Cash Earned",
-        online_earned: "Online Earned",
-        total_gross: "Total Gross",
-        active_floor: "Active Floor Operations",
-        waiting_orders: "Floor is clear. Waiting for orders...",
-        print_kot: "Print KOT",
-        clear_alerts: "Clear Alerts",
-        cash_collected: "Mark Cash Collected",
-        clear_finalize: "Clear & Finalize",
-        plate_empty: "Plate is empty",
-        customer_needs_help: "🚨 Customer Needs Help",
-        total: "Total:",
-        active_status: "Active",
-        verify_upi: "VERIFY UPI📱",
-        cash_pending: "CASH PENDING 🤵",
-        at_counter: "AT COUNTER 🏪",
-        invalid_pass: "Invalid Password",
-        admin_notified: "Admin notified. Please hand cash to the counter."
-      },
-      hi: {
-        pos_access: "POS एक्सेस",
-        pin_placeholder: "पिन / पासवर्ड दर्ज करें",
-        login_btn: "लॉग इन",
-        login_hint: "एडमिन (admin123) या वेटर (waiter123)",
-        command_center: "कमांड सेंटर",
-        lock_screen: "स्क्रीन लॉक करें",
-        cash_earned: "नकद कमाई",
-        online_earned: "ऑनलाइन कमाई",
-        total_gross: "कुल कमाई",
-        active_floor: "सक्रिय फ्लोर",
-        waiting_orders: "फ्लोर खाली है। ऑर्डर की प्रतीक्षा में...",
-        print_kot: "KOT प्रिंट करें",
-        clear_alerts: "अलर्ट हटाएं",
-        cash_collected: "नकद प्राप्त हुआ",
-        clear_finalize: "क्लियर और फाइनल करें",
-        plate_empty: "प्लेट खाली है",
-        customer_needs_help: "🚨 ग्राहक को मदद चाहिए",
-        total: "कुल:",
-        active_status: "सक्रिय",
-        verify_upi: "UPI जांचें📱",
-        cash_pending: "नकद बाकी 🤵",
-        at_counter: "काउंटर पर 🏪",
-        invalid_pass: "अमान्य पासवर्ड",
-        admin_notified: "एडमिन को सूचित कर दिया गया। कृपया काउंटर पर नकद जमा करें।"
-      },
-      te: {
-        pos_access: "POS యాక్సెస్",
-        pin_placeholder: "పిన్ / పాస్‌వర్డ్ నమోదు చేయండి",
-        login_btn: "లాగిన్",
-        login_hint: "అడ్మిన్ (admin123) లేదా వెయిటర్ (waiter123)",
-        command_center: "కమాండ్ సెంటర్",
-        lock_screen: "స్క్రీన్ లాక్ చేయండి",
-        cash_earned: "నగదు సంపాదన",
-        online_earned: "ఆన్‌లైన్ సంపాదన",
-        total_gross: "మొత్తం సంపాదన",
-        active_floor: "యాక్టివ్ టేబుల్స్",
-        waiting_orders: "ఫ్లోర్ ఖాళీగా ఉంది. ఆర్డర్ల కోసం వేచి ఉంది...",
-        print_kot: "KOT ప్రింట్ చేయండి",
-        clear_alerts: "అలర్ట్స్ క్లియర్ చేయండి",
-        cash_collected: "నగదు స్వీకరించబడింది",
-        clear_finalize: "క్లియర్ & ఫైనలైజ్",
-        plate_empty: "ప్లేట్ ఖాళీగా ఉంది",
-        customer_needs_help: "🚨 కస్టమర్‌కు సహాయం కావాలి",
-        total: "మొత్తం:",
-        active_status: "యాక్టివ్",
-        verify_upi: "UPI సరిచూసుకోండి📱",
-        cash_pending: "నగదు పెండింగ్ 🤵",
-        at_counter: "కౌంటర్ వద్ద 🏪",
-        invalid_pass: "తప్పు పాస్‌వర్డ్",
-        admin_notified: "అడ్మిన్‌కు తెలియజేయబడింది. దయచేసి నగదును కౌంటర్‌లో ఇవ్వండి."
-      }
-    };
-
-    let currentLang = 'en';
-    const t = (key) => dict[currentLang][key] || key;
-
-    let globalTableData = null; // Store data to re-render on language change
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
     let currentRole = null;
-    let todayDateString = new Date().toISOString().split('T')[0];
+    let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
-    window.changeLang = (lang) => {
-      currentLang = lang;
-      document.querySelectorAll('[data-i18n]').forEach(el => { el.innerText = t(el.getAttribute('data-i18n')); });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.getAttribute('data-i18n-placeholder')); });
-      if (globalTableData !== null) renderTables(globalTableData);
+    const i18n = {
+      en: { live_orders: "Live Orders", menu_stock: "Menu / Stock", sales_rev: "Sales Report", live_tables: "Live Tables", stock_control: "Stock Control", sales_history: "Sales & History", accept_cook: "Accept & Cook", serve_food: "Serve Food", clear_receipt: "Clear & Send Receipt", update: "Update" },
+      hi: { live_orders: "लाइव ऑर्डर", menu_stock: "मेनू / स्टॉक", sales_rev: "बिक्री रिपोर्ट", live_tables: "लाइव टेबल", stock_control: "स्टॉक नियंत्रण", sales_history: "बिक्री और इतिहास", accept_cook: "स्वीकारें और पकाएं", serve_food: "खाना परोसें", clear_receipt: "क्लियर करें और रसीद भेजें", update: "अपडेट" },
+      te: { live_orders: "లైవ్ ఆర్డర్‌లు", menu_stock: "మెనూ / స్టాక్", sales_rev: "సేల్స్ రిపోర్ట్", live_tables: "లైవ్ టేబుల్స్", stock_control: "స్టాక్ కంట్రోల్", sales_history: "సేల్స్ & హిస్టరీ", accept_cook: "అంగీకరించి వండండి", serve_food: "ఆహారం అందించండి", clear_receipt: "క్లియర్ & రసీదు పంపండి", update: "నవీకరించు" }
     };
+    let lang = 'en';
+    const t = (k) => i18n[lang][k] || k;
 
-    window.changeLang('en');
+    function changeLanguageAdmin(l) {
+      lang = l;
+      document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = t(el.getAttribute('data-i18n')));
+      if(currentRole) loadSystem();
+    }
 
-    // Enter Key Login
-    document.getElementById('pin-input').addEventListener('keypress', function (e) {
-      if (e.key === 'Enter') attemptLogin();
-    });
-
-    window.attemptLogin = () => {
-      const pin = document.getElementById('pin-input').value;
-      if (pin === 'admin123') {
-        currentRole = 'admin';
-        document.getElementById('ui-role-badge').innerText = 'ADMIN';
-        document.getElementById('admin-financials').style.display = 'grid';
-      } else if (pin === 'waiter123') {
-        currentRole = 'waiter';
-        document.getElementById('ui-role-badge').innerText = 'WAITER';
-        document.getElementById('ui-role-badge').style.backgroundColor = 'var(--waiter)';
-      } else {
-        return alert(t('invalid_pass'));
+    function attemptLogin() {
+      const pin = document.getElementById('sysPin').value;
+      if (pin === 'admin123') { currentRole = 'admin'; }
+      else if (pin === 'waiter123') { currentRole = 'waiter'; }
+      else { return alert("Invalid PIN"); }
+      
+      try { alertSound.play().then(()=>{alertSound.pause();alertSound.currentTime=0;}).catch(()=>{}); } catch(e){}
+      
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('mainHeader').classList.remove('hidden');
+      document.getElementById('mainContent').classList.remove('hidden');
+      
+      document.getElementById('roleBadge').innerText = currentRole.toUpperCase();
+      if(currentRole === 'admin') { 
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); 
+      } else { 
+        document.getElementById('roleBadge').classList.replace('bg-amber-600', 'bg-blue-600'); 
       }
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('main-dashboard').style.display = 'block';
-      loadData();
-    };
+      loadSystem();
+    }
 
-    function loadData() {
-      onValue(ref(db, 'active_tables'), (snapshot) => {
-        globalTableData = snapshot.val();
-        renderTables(globalTableData);
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.className = "px-4 py-2 rounded font-black bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap tab-btn admin-only");
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      document.getElementById(`tab-${tab}`).className = "px-4 py-2 rounded font-black bg-amber-600 text-white shadow whitespace-nowrap tab-btn admin-only";
+    }
+
+    function loadSystem() {
+      // Orders
+      db.ref('orders').on('value', snap => {
+        const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
+        const orders = snap.val() || {};
+        Object.entries(orders).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, order]) => {
+          let border = order.status==='pending'?'border-amber-500':(order.status==='cooking'?'border-blue-500':'border-emerald-500');
+          let badge = order.status==='pending'?'bg-amber-100 text-amber-700 animate-pulse':(order.status==='cooking'?'bg-blue-100 text-blue-700':'bg-emerald-100 text-emerald-700');
+          
+          let btn = '';
+          if(order.status === 'pending') { btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-lg font-black" onclick="updateOrder('${id}','cooking')">${t('accept_cook')}</button>`; } 
+          else if(order.status === 'cooking') { btn = `<button class="w-full bg-emerald-600 text-white py-3 rounded-lg font-black" onclick="updateOrder('${id}','served')">${t('serve_food')}</button>`; } 
+          else if(currentRole === 'admin') { btn = `<button class="w-full bg-slate-900 text-white py-3 rounded-lg font-black" onclick="clearBill('${id}')">${t('clear_receipt')}</button>`; } 
+          else { btn = `<button class="w-full bg-slate-300 text-slate-600 py-3 rounded-lg font-black" disabled>Awaiting Admin</button>`; }
+
+          grid.innerHTML += `
+            <div class="bg-white p-5 rounded-2xl shadow-xl border-t-8 ${border} flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center border-b pb-2 mb-3">
+                  <span class="font-black text-2xl">Table ${order.table}</span>
+                  <span class="text-xs font-black uppercase ${badge} px-2 py-1 rounded">${order.status}</span>
+                </div>
+                <p class="font-bold text-slate-700 text-sm leading-relaxed mb-3">${(order.items||"").replace(/,/g,'<br>•')}</p>
+              </div>
+              <div class="mt-4 border-t pt-3">
+                <div class="flex justify-between items-end mb-4">
+                  <span class="text-xs font-bold text-slate-500">📞 ${order.phone}</span>
+                  <span class="font-black text-2xl text-amber-600">₹${order.total}</span>
+                </div>
+                ${btn}
+              </div>
+            </div>`;
+        });
       });
 
-      if (currentRole === 'admin') {
-        onValue(ref(db, `daily_totals/${todayDateString}`), (snapshot) => {
-          const totals = snapshot.val() || { cash: 0, online: 0, gross: 0 };
-          document.getElementById('stat-cash').innerText = totals.cash;
-          document.getElementById('stat-online').innerText = totals.online;
-          document.getElementById('stat-gross').innerText = totals.gross;
+      if(currentRole === 'admin') {
+        // Inventory
+        db.ref('menu').on('value', snap => {
+          const list = document.getElementById('inventoryList'); list.innerHTML = '';
+          Object.entries(snap.val()||{}).forEach(([id, item]) => {
+            list.innerHTML += `
+              <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col gap-2">
+                <div class="flex items-center gap-3 border-b pb-2">
+                  <img src="${item.image_url}" class="w-12 h-12 rounded object-cover">
+                  <div><h4 class="font-black text-sm leading-tight">${item.name}</h4><p class="text-[9px] text-slate-500 uppercase">${item.category}</p></div>
+                </div>
+                <div class="flex items-center justify-between mt-1">
+                  <button onclick="toggleSpec('${id}', ${item.is_special||false})" class="px-2 py-1 rounded text-xs font-bold ${item.is_special?'bg-amber-100 text-amber-700':'bg-slate-100 text-slate-500'}">⭐</button>
+                  <div class="flex items-center border rounded overflow-hidden">
+                    <span class="bg-slate-100 px-2 py-1 text-xs font-bold">Qty</span>
+                    <input type="number" id="stock-${id}" value="${item.stock_count||0}" class="w-14 p-1 font-black text-center outline-none">
+                  </div>
+                  <button onclick="updStock('${id}')" class="bg-emerald-600 text-white px-3 py-1 rounded font-black text-xs">OK</button>
+                </div>
+              </div>`;
+          });
+        });
+
+        // Dashboard
+        const dStr = new Date().toISOString().split('T')[0];
+        db.ref(`tallies/daily/${dStr}`).on('value', s => document.getElementById('tallyDaily').innerText = `₹${s.val()||0}`);
+        db.ref(`daily_logs/${dStr}`).on('value', snap => {
+          const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
+          Object.values(snap.val()||{}).forEach(log => {
+            tb.innerHTML += `<tr class="border-b"><td class="p-2">${log.time}</td><td class="p-2 font-bold">T-${log.table}</td><td class="p-2 text-xs">${log.items}</td><td class="p-2 font-bold text-emerald-600 text-right">₹${log.total}</td></tr>`;
+          });
         });
       }
     }
 
-    function renderTables(tables) {
-      const grid = document.getElementById('tables-grid');
-      grid.innerHTML = '';
-      let playAlarm = false;
+    function updateOrder(id, st) { db.ref('orders/'+id).update({status: st}); }
+    function toggleSpec(id, st) { db.ref('menu/'+id).update({is_special: !st}); }
+    function updStock(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); }
 
-      if (tables) {
-        Object.keys(tables).forEach(tableId => {
-          const data = tables[tableId];
-          const hasAlert = data.help_requested || data.bill_requested;
-          if (hasAlert) playAlarm = true;
-
-          let itemsHTML = '';
-          let pendingKOTCount = 0;
-          let itemsTextForSheet = [];
-
-          if (data.items) {
-            Object.keys(data.items).forEach(itemKey => {
-              const i = data.items[itemKey];
-              if (i.kot_status === 'pending') pendingKOTCount++;
-              itemsHTML += `<li class="${i.kot_status === 'pending' ? 'pending-kot' : 'printed-kot'}"><span><b>${i.quantity}x</b> ${i.name} <br><small>${i.variant}</small></span><span style="font-size:1.1rem;">₹${i.subtotal}</span></li>`;
-              itemsTextForSheet.push(`${i.quantity}x ${i.name} (${i.variant})`);
-            });
-          }
-
-          let cardClass = "table-card";
-          if (hasAlert) cardClass += " alert";
-          let statusText = t('active_status');
-          
-          if (data.payment_method === 'upi') { cardClass += " upi-pending"; statusText = t('verify_upi'); }
-          else if (data.payment_method === 'cash') { cardClass += " cash-pending"; statusText = t('cash_pending'); }
-          else if (data.payment_method === 'counter') { statusText = t('at_counter'); }
-
-          const card = document.createElement('div');
-          card.className = cardClass;
-          card.innerHTML = `
-            <div class="table-header">
-              <h2>${tableId.toUpperCase()}</h2>
-              <span class="status-badge">${statusText}</span>
-            </div>
-            <div style="margin-bottom:12px; color:#aaa; font-size:0.9rem; border-bottom:1px solid #444; padding-bottom:10px;">📞 Mobile: ${data.customer_mobile || 'None'}</div>
-            
-            ${data.help_requested ? `<div style="color:#e74c3c; font-weight:bold; margin-bottom:10px;">${t('customer_needs_help')}</div>` : ''}
-            
-            <ul class="items-list">${itemsHTML || `<li>${t('plate_empty')}</li>`}</ul>
-            
-            <div class="total-row"><span>${t('total')}</span><span>₹${data.running_total || 0}</span></div>
-            
-            <div class="actions">
-              ${pendingKOTCount > 0 ? `<button class="btn-kot" onclick="printKOT('${tableId}')">${t('print_kot')} (${pendingKOTCount})</button>` : ''}
-              ${hasAlert ? `<button class="btn-resolve" onclick="resolveAlerts('${tableId}')">${t('clear_alerts')}</button>` : ''}
-              ${currentRole === 'waiter' && data.payment_method === 'cash' ? `<button class="btn-waiter-cash" style="display:block;" onclick="notifyCashCollected('${tableId}')">${t('cash_collected')}</button>` : ''}
-              ${currentRole === 'admin' ? `<button class="btn-clear" style="display:block;" onclick="clearTable('${tableId}', ${data.running_total \vert{}\vert{} 0}, '${itemsTextForSheet.join(' | ')}', '${data.payment_method \vert{}\vert{} 'unknown'}')">${t('clear_finalize')}</button>` : ''}
-            </div>
-          `;
-          grid.appendChild(card);
-        });
-        if (playAlarm) alertSound.play().catch(()=>{}); else { alertSound.pause(); alertSound.currentTime = 0; }
-      } else {
-        grid.innerHTML = `<p style="color:#aaa; font-size:1.1rem; padding:10px;">${t('waiting_orders')}</p>`;
-      }
-    }
-
-    window.printKOT = function(tableId) {
-      const itemsRef = ref(db, `active_tables/${tableId}/items`);
-      onValue(itemsRef, (snap) => {
-        const items = snap.val();
-        if (items) {
-          let updates = {};
-          Object.keys(items).forEach(key => { updates[`${key}/kot_status`] = "printed"; });
-          update(itemsRef, updates);
-        }
-      }, { onlyOnce: true });
-    };
-
-    window.resolveAlerts = function(tableId) {
-      update(ref(db, `active_tables/${tableId}`), { help_requested: false, bill_requested: false });
-    };
-
-    window.notifyCashCollected = function(tableId) {
-      alert(t('admin_notified'));
-      update(ref(db, `active_tables/${tableId}`), { payment_method: "cash_collected_by_waiter" });
-    };
-
-    window.clearTable = async function(tableId, total, itemsDetails, method) {
-      if(!confirm(`Clear Table ${tableId.toUpperCase()}?`)) return;
-      cashSound.play();
-      let finMethod = method === 'upi' ? 'online' : 'cash';
+    async function clearBill(id) {
+      if(!confirm("Clear table and record payment?")) return;
+      const snap = await db.ref('orders/'+id).once('value'); const order = snap.val(); if(!order) return;
+      const d = new Date().toISOString().split('T')[0];
       
-      const totalsRef = ref(db, `daily_totals/${todayDateString}`);
-      update(totalsRef, { [finMethod]: increment(total), gross: increment(total) });
+      db.ref(`tallies/daily/${d}`).transaction(v => (v||0)+Number(order.total));
+      db.ref(`daily_logs/${d}/${order.orderId}`).set({ time: new Date().toLocaleTimeString(), table: order.table, phone: order.phone, items: order.items, total: order.total });
+      
+      fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(order) });
+      db.ref('orders/'+id).remove();
+    }
 
-      try {
-        const payload = {
-          orderId: Date.now().toString(),
-          tableNo: tableId,
-          totalAmount: total,
-          paymentMethod: method.toUpperCase(),
-          itemsDetails: itemsDetails || "Empty"
+    function factoryResetSystem() {
+      if(confirm("⚠️ THIS DELETES ALL DATA AND LOADS 22 FUSION MANDI ITEMS WITH 60 STOCK. PROCEED?")) {
+        db.ref('orders').remove(); db.ref('tallies').remove(); db.ref('daily_logs').remove();
+        
+        const mandiMenu = {
+          "i01": { name: "Chicken Fry Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1563379091339-03b2184f4f03?w=500&q=80", variants: { v1: { name: "Single", price: 270 }, v2: { name: "Half", price: 499 }, v3: { name: "Triple", price: 729 }, v4: { name: "4 Person", price: 920 }, v5: { name: "Gang", price: 1111 }}},
+          "i02": { name: "Chicken BBQ Mandi", category: "Chicken Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=500&q=80", variants: { v1: { name: "Single", price: 310 }, v2: { name: "Half", price: 560 }, v3: { name: "Triple", price: 837 }, v4: { name: "4 Person", price: 1060 }, v5: { name: "Gang", price: 1299 }}},
+          "i03": { name: "Chicken AL Faham Mandi", category: "Chicken Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1628294895950-9805252327bc?w=500&q=80", variants: { v1: { name: "Single", price: 320 }, v2: { name: "Half", price: 580 }, v3: { name: "Triple", price: 864 }, v4: { name: "4 Person", price: 1099 }, v5: { name: "Gang", price: 1299 }}},
+          "i04": { name: "Broasted Chicken Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=500&q=80", variants: { v1: { name: "Single", price: 299 }, v2: { name: "Half", price: 560 }, v3: { name: "Triple", price: 820 }, v4: { name: "4 Person", price: 1020 }, v5: { name: "Gang", price: 1222 }}},
+          "i05": { name: "Chicken F2 Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=500&q=80", variants: { v1: { name: "Single", price: 329 }, v2: { name: "Half", price: 599 }, v3: { name: "Triple", price: 888 }, v4: { name: "4 Person", price: 1119 }, v5: { name: "Gang", price: 1350 }}},
+          "i06": { name: "F1 Rara Chicken Mandi", category: "Chicken Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500&q=80", variants: { v1: { name: "Single", price: 330 }, v2: { name: "Half", price: 540 }, v3: { name: "Triple", price: 899 }, v4: { name: "4 Person", price: 1122 }, v5: { name: "Gang", price: 1350 }}},
+          "i07": { name: "Chicken Juicy Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80", variants: { v1: { name: "Single", price: 299 }, v2: { name: "Half", price: 540 }, v3: { name: "Triple", price: 820 }, v4: { name: "4 Person", price: 1020 }, v5: { name: "Gang", price: 1222 }}},
+          "i08": { name: "Chicken Murg Musallam Mandi", category: "Chicken Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80", variants: { v1: { name: "Single", price: 329 }, v2: { name: "Half", price: 600 }, v3: { name: "Triple", price: 888 }, v4: { name: "4 Person", price: 1111 }, v5: { name: "Gang", price: 1350 }}},
+          "i09": { name: "Mutton Juicy Mandi", category: "Mutton Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1626844131082-256783844137?w=500&q=80", variants: { v1: { name: "Single", price: 349 }, v2: { name: "Half", price: 699 }, v3: { name: "Triple", price: 950 }, v4: { name: "4 Person", price: 1199 }, v5: { name: "Gang", price: 1450 }}},
+          "i10": { name: "F1 Rara Mutton Mandi", category: "Mutton Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1543362906-acfc16c67564?w=500&q=80", variants: { v1: { name: "Single", price: 360 }, v2: { name: "Half", price: 710 }, v3: { name: "Triple", price: 979 }, v4: { name: "4 Person", price: 1222 }, v5: { name: "Gang", price: 1499 }}},
+          "i11": { name: "Mutton Fry Mandi", category: "Mutton Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80", variants: { v1: { name: "Single", price: 340 }, v2: { name: "Half", price: 699 }, v3: { name: "Triple", price: 920 }, v4: { name: "4 Person", price: 1155 }, v5: { name: "Gang", price: 1399 }}},
+          "i12": { name: "Mutton F2 Mandi", category: "Mutton Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=500&q=80", variants: { v1: { name: "Single", price: 360 }, v2: { name: "Half", price: 710 }, v3: { name: "Triple", price: 979 }, v4: { name: "4 Person", price: 1222 }, v5: { name: "Gang", price: 1499 }}},
+          "i13": { name: "Bhakasura Mandi", category: "Specials", base_price: 1099, stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80" },
+          "i14": { name: "Chicken Fry Wings Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1626082929543-5a02241b3152?w=500&q=80", variants: { v1: { name: "3 Wings", price: 299 }, v2: { name: "5 Wings", price: 580 }, v3: { name: "8 Wings", price: 779 }, v4: { name: "14 Pieces", price: 1200 }}},
+          "i15": { name: "Chicken Lolly pop Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1606501127027-68b3f2ccad86?w=500&q=80", variants: { v1: { name: "2 Pieces", price: 199 }}},
+          "i16": { name: "VEG MANDI Mixed Veg", category: "Veg Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80", variants: { v1: { name: "Single", price: 260 }, v2: { name: "Half", price: 510 }, v3: { name: "Triple", price: 720 }, v4: { name: "4 Person", price: 1000 }, v5: { name: "Gang", price: 1250 }}},
+          "i17": { name: "Spl Veg Mandi", category: "Veg Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80", variants: { v1: { name: "Single", price: 299 }, v2: { name: "Half", price: 540 }, v3: { name: "Triple", price: 750 }, v4: { name: "4 Person", price: 1100 }, v5: { name: "Gang", price: 1375 }}},
+          "i18": { name: "Mushroom Mandi", category: "Veg Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1604544203173-2005089c20a5?w=500&q=80", variants: { v1: { name: "Single", price: 249 }, v2: { name: "Half", price: 520 }, v3: { name: "Triple", price: 710 }, v4: { name: "4 Person", price: 1050 }, v5: { name: "Gang", price: 1320 }}},
+          "i19": { name: "Pannner Rara Mandi", category: "Veg Mandi", stock_count: 60, is_special: true, image_url: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80", variants: { v1: { name: "Single", price: 299 }, v2: { name: "Half", price: 530 }, v3: { name: "Triple", price: 730 }, v4: { name: "4 Person", price: 1199 }, v5: { name: "Gang", price: 1499 }}},
+          "i20": { name: "Panner Juicy Mandi", category: "Veg Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1596797038530-2c107229654b?w=500&q=80", variants: { v1: { name: "Single", price: 279 }, v2: { name: "Half", price: 510 }, v3: { name: "Triple", price: 720 }, v4: { name: "4 Person", price: 1099 }, v5: { name: "Gang", price: 1399 }}},
+          "i21": { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=500&q=80" },
+          "i22": { name: "Soft Drinks", category: "Beverages", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80", variants: { v1: { name: "Regular", price: 25 }, v2: { name: "Large", price: 30 }}}
         };
-        await fetch(WEBHOOK_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload),
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-        });
-      } catch (err) { console.error("Sheet Log Failed"); }
-      remove(ref(db, `active_tables/${tableId}`));
-    };
+        
+        db.ref('menu').set(mandiMenu).then(() => { alert("✅ FUSION MANDI SYSTEM RESET COMPLETE."); window.location.reload(); });
+      }
+    }
   </script>
 </body>
 </html>
