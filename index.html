@@ -3,259 +3,129 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusion Mandi - Ultimate POS & KOT System</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Fusion Mandi - Digital Menu</title>
+  <style>
+    :root { --primary: #ff9800; --dark: #1a1a1a; --light: #f4f4f9; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--light); margin: 0; padding: 0; padding-bottom: 120px; }
+    
+    /* Branding & Header */
+    header { background: linear-gradient(135deg, #111, #333); color: #fff; padding: 1.5rem 1rem; text-align: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .brand-title { font-size: 2rem; font-weight: 900; margin: 0; letter-spacing: 2px; text-transform: uppercase; color: var(--primary); text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+    .table-badge { background: #fff; color: #000; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; margin-top: 10px; display: inline-block; }
+
+    /* Menu Container */
+    .container { padding: 1rem; max-width: 800px; margin: auto; }
+    .special-badge { background: #e74c3c; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; display: inline-block; }
+    
+    .menu-item { background: #fff; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; display: flex; box-shadow: 0 4px 8px rgba(0,0,0,0.05); transition: transform 0.2s; }
+    .menu-item:hover { transform: translateY(-2px); }
+    .menu-item img { width: 110px; height: 110px; border-radius: 8px; object-fit: cover; margin-right: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .item-details { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+    .item-title { font-size: 1.2rem; font-weight: bold; margin: 0 0 0.3rem 0; color: var(--dark); }
+    .item-price { color: #d32f2f; font-weight: 900; font-size: 1.1rem; margin: 0; }
+    
+    /* Star Ratings */
+    .star-rating { color: #f1c40f; font-size: 0.9rem; margin-bottom: 5px; text-shadow: 1px 1px 1px rgba(0,0,0,0.1); }
+    
+    select, button { padding: 0.6rem; margin-top: 0.5rem; width: 100%; border-radius: 6px; border: 1px solid #ddd; font-family: inherit; }
+    .btn-add { background-color: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; box-shadow: 0 2px 5px rgba(255,152,0,0.4); }
+    .btn-add:hover { background-color: #f57c00; }
+    
+    /* Modals (No Refresh Popups) */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(5px); }
+    .modal-content { background: #fff; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .modal-content h3 { margin-top: 0; color: var(--dark); }
+    .qr-container img { margin: 15px auto; border-radius: 8px; border: 2px solid #eee; padding: 10px; }
+    
+    /* Bottom Cart & Actions */
+    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; padding: 1rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 15px rgba(0,0,0,0.1); z-index: 90; }
+    .cart-total { font-size: 1.2rem; font-weight: 900; color: #2e7d32; }
+    .btn-checkout { background: #2e7d32; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(46,125,50,0.3); }
+    
+    .payment-options { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    .btn-pay { background: #f8f9fa; border: 2px solid #ddd; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-pay:hover { border-color: var(--primary); background: #fff3e0; }
+    
+    /* Footer Branding */
+    footer { text-align: center; padding: 25px 15px; background: #111; color: #fff; margin-top: 40px; border-top: 4px solid var(--primary); }
+    .dev-link { color: #00e5ff; text-decoration: none; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .copyright { font-size: 0.8rem; margin-top: 8px; color: #888; }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between">
+<body>
 
-  <!-- TOP NAVIGATION BAR -->
-  <header class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex flex-wrap justify-between items-center sticky top-0 z-50 gap-4">
-    <div class="flex items-center space-x-3">
-      <h1 class="text-2xl font-black text-amber-500 tracking-wider">🔥 FUSION MANDI POS</h1>
-      <span id="db-status" class="text-xs bg-emerald-950 text-emerald-400 px-3 py-1 rounded-full font-bold border border-emerald-800">Live DB Connected</span>
-    </div>
-
-    <!-- Developer & Portfolio Brand Link -->
-    <div class="flex items-center space-x-2">
-      <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-xl transition shadow">
-        <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
-        <span class="text-xs font-bold text-slate-200">Developed by <span class="text-amber-400">Syed Zeeshaan Ali</span></span>
-        <span class="text-xs bg-amber-600/30 text-amber-300 px-2 py-0.5 rounded font-semibold ml-1">High-Fledged Tech ↗</span>
-      </a>
-    </div>
-
-    <div class="flex space-x-2">
-      <button onclick="switchRole('customer')" id="nav-customer" class="bg-amber-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow">Customer View</button>
-      <button onclick="switchRole('waiter')" id="nav-waiter" class="bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl font-bold text-sm">Waiter Portal</button>
-      <button onclick="switchRole('admin')" id="nav-admin" class="bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl font-bold text-sm">Admin & Kitchen</button>
-    </div>
+  <header>
+    <h1 class="brand-title">FUSION MANDI</h1>
+    <div class="table-badge" id="table-display">Loading...</div>
   </header>
 
-  <!-- MAIN APP CONTAINER -->
-  <main class="p-6 max-w-7xl mx-auto flex-1 w-full">
+  <div class="container" id="menu-container">
+    <!-- Menu auto-populates here. Specials sort to the top. -->
+  </div>
 
-    <!-- ================= VIEW 1: CUSTOMER ORDERING INTERFACE ================= -->
-    <div id="view-customer" class="space-y-6">
-      <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex flex-wrap justify-between items-center gap-4">
-        <div class="flex items-center space-x-3">
-          <span class="bg-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-lg text-sm" id="display-table">Table #1</span>
-          <button onclick="connectWiFi()" class="bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-600/40 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
-            <span>📶 Connect Free Wi-Fi (TECNO POVA 3)</span>
-          </button>
-        </div>
-        <div class="flex items-center space-x-2">
-          <input type="tel" id="customer-phone" placeholder="Enter Mobile Number (Required)" class="bg-slate-800 border border-slate-700 px-4 py-2 rounded-xl text-sm focus:outline-none focus:border-amber-500 w-64">
-          <button onclick="saveCustomerPhone()" class="bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded-xl text-sm font-bold transition">Confirm</button>
-        </div>
+  <div class="cart-bar">
+    <div>
+      <div class="cart-total">Tab: ₹<span id="tab-total">0</span></div>
+      <div style="font-size: 0.8rem; color: #666;" id="order-status">Status: Waiting</div>
+    </div>
+    <button class="btn-checkout" onclick="openCheckoutModal()">Pay & Bill 🧾</button>
+  </div>
+
+  <!-- Checkout & Payment Modal -->
+  <div class="modal-overlay" id="checkout-modal">
+    <div class="modal-content">
+      <h3>Select Payment Method</h3>
+      <p>Total Due: <strong style="color: #2e7d32; font-size:1.2rem;">₹<span id="modal-total">0</span></strong></p>
+      
+      <div class="payment-options" id="payment-selection">
+        <button class="btn-pay" onclick="selectPayment('upi')">📱 Pay via PhonePe / UPI</button>
+        <button class="btn-pay" onclick="selectPayment('cash')">🤵 Pay Cash to Waiter</button>
+        <button class="btn-pay" onclick="selectPayment('counter')">🏪 Pay at Counter</button>
       </div>
 
-      <!-- Chef's Specials & 5-Star Pinned Banner -->
-      <div id="specials-wrapper" class="hidden space-y-3">
-        <h2 class="text-lg font-black text-amber-400 flex items-center space-x-2">
-          <span>⭐ 5-Star & Top Rated Chef Specials</span>
-        </h2>
-        <div id="specials-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
+      <div id="upi-section" style="display: none; margin-top: 15px;">
+        <div style="font-weight: bold; color: #333;">Scan to Pay</div>
+        <div class="qr-container">
+          <img id="upi-qr" src="" alt="UPI QR Code" width="180" height="180">
+        </div>
+        <p style="font-size: 0.8rem; color: #666;">Admin will approve clearance once payment hits the bank.</p>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2 space-y-4">
-          <h2 class="text-xl font-bold text-slate-200">Full Menu & Live Stock</h2>
-          <div id="customer-menu-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <p class="text-slate-500 col-span-full text-center py-12">Loading Menu from Firebase...</p>
-          </div>
-        </div>
-
-        <!-- Live Bill Cart -->
-        <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between h-[calc(100vh-220px)] sticky top-24 shadow-2xl">
-          <div>
-            <h2 class="text-lg font-bold pb-3 border-b border-slate-800 flex justify-between items-center">
-              <span>Running Bill Cart</span>
-              <span id="cart-item-count" class="text-xs bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-full">0 Items</span>
-            </h2>
-            <div id="cart-items-list" class="space-y-3 overflow-y-auto max-h-[42vh] pr-1 mt-3">
-              <p class="text-slate-500 text-center py-10">Your cart is empty</p>
-            </div>
-          </div>
-          <div class="border-t border-slate-800 pt-4 space-y-3">
-            <div class="flex justify-between text-2xl font-black">
-              <span>Total:</span>
-              <span id="cart-grand-total" class="text-amber-400">₹0</span>
-            </div>
-            <button onclick="submitCustomerOrder()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-black text-base shadow-lg transition">
-              Place Order to Kitchen 🚀
-            </button>
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="raiseBillRequest()" class="bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 border border-amber-600/40 py-2.5 rounded-xl font-bold text-xs transition">
-                Raise Bill Request 🧾
-              </button>
-              <button onclick="openFeedbackModal()" class="bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-600/40 py-2.5 rounded-xl font-bold text-xs transition">
-                Send Feedback 💬
-              </button>
-            </div>
-          </div>
-        </div>
+      <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button style="background: #ccc; color: #333; flex: 1;" onclick="closeModal('checkout-modal')">Cancel</button>
+        <button style="background: #1976d2; color: #fff; flex: 1;" id="btn-download-bill" onclick="downloadBill()">Download Bill</button>
       </div>
     </div>
+  </div>
 
-    <!-- ================= VIEW 2: WAITER PORTAL ================= -->
-    <div id="view-waiter" class="hidden space-y-6">
-      <div id="waiter-login-box" class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md mx-auto text-center space-y-4">
-        <h2 class="text-2xl font-bold text-amber-400">Waiter Portal Login</h2>
-        <p class="text-xs text-slate-400">Enter passcode (1234) to view table occupancy and bill statuses.</p>
-        <input type="password" id="waiter-passcode" placeholder="Enter Passcode" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-center text-lg tracking-widest">
-        <button onclick="loginWaiter()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-3 rounded-xl transition">Login as Waiter</button>
-      </div>
-
-      <div id="waiter-dashboard" class="hidden space-y-6">
-        <div class="flex justify-between items-center bg-slate-900 p-5 rounded-2xl border border-slate-800">
-          <div>
-            <h2 class="text-xl font-bold text-amber-400">Waiter Table Management</h2>
-            <p class="text-xs text-slate-400">Monitor table occupancy, bill requests, and active status.</p>
-          </div>
-          <button onclick="loadWaiterTables()" class="bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-xl text-xs font-bold">Refresh Tables</button>
-        </div>
-        <div id="waiter-tables-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"></div>
-      </div>
+  <!-- Feedback Modal -->
+  <div class="modal-overlay" id="feedback-modal">
+    <div class="modal-content">
+      <h3>Rate Your Food 🌟</h3>
+      <p style="font-size: 0.9rem; color: #555;">Your review updates the public menu!</p>
+      <select id="rating-score">
+        <option value="5">⭐⭐⭐⭐⭐ - Perfect</option>
+        <option value="4">⭐⭐⭐⭐ - Great</option>
+        <option value="3">⭐⭐⭐ - Good</option>
+        <option value="2">⭐⭐ - Okay</option>
+      </select>
+      <textarea id="rating-comment" placeholder="Any specific feedback for the Admin?" style="width: 100%; margin-top: 10px; padding: 10px; box-sizing: border-box; border-radius: 6px; border: 1px solid #ccc; font-family: inherit; resize: none;" rows="3"></textarea>
+      
+      <button style="background: var(--primary); color: #fff; margin-top: 15px;" onclick="submitFeedback()">Submit Review</button>
     </div>
+  </div>
 
-    <!-- ================= VIEW 3: ADMIN & KITCHEN ================= -->
-    <div id="view-admin" class="hidden space-y-6">
-      <div id="admin-login-box" class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md mx-auto text-center space-y-4">
-        <h2 class="text-2xl font-bold text-amber-500">Admin & Kitchen Login</h2>
-        <p class="text-xs text-slate-400">Enter administrator PIN (9999) to access KOT router, bills, and ledger.</p>
-        <input type="password" id="admin-passcode" placeholder="Enter Admin PIN" class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-center text-lg tracking-widest">
-        <button onclick="loginAdmin()" class="w-full bg-amber-600 hover:bg-amber-500 font-bold py-3 rounded-xl transition">Login as Admin</button>
-      </div>
-
-      <div id="admin-dashboard" class="hidden space-y-6">
-        <div class="flex space-x-2 border-b border-slate-800 pb-4">
-          <button onclick="switchAdminTab('kots')" id="subnav-kots" class="bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Kitchen KOTs & Bills 🍳</button>
-          <button onclick="switchAdminTab('inventory')" id="subnav-inventory" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold">Inventory & Qty 📦</button>
-          <button onclick="switchAdminTab('addProduct')" id="subnav-addProduct" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold">Add Product / Image ➕</button>
-          <button onclick="switchAdminTab('analytics')" id="subnav-analytics" class="bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold">Gross & Sheets Ledger 📊</button>
-        </div>
-
-        <div id="admin-kots-section" class="space-y-4">
-          <h3 class="text-lg font-bold text-amber-400">Active Kitchen Orders & Bill Requests</h3>
-          <div id="admin-kot-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <p class="text-slate-500 col-span-full text-center py-10">No active kitchen orders or bills</p>
-          </div>
-        </div>
-
-        <div id="admin-inventory-section" class="hidden space-y-4">
-          <h3 class="text-lg font-bold text-slate-200">Live Stock Quantity Thresholds (Low Stock Alerts < 5)</h3>
-          <div id="admin-inventory-list" class="space-y-3"></div>
-        </div>
-
-        <div id="admin-addProduct-section" class="hidden bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-4 max-w-2xl">
-          <h3 class="text-xl font-bold text-amber-500">Add Menu Item with WebP Image</h3>
-          <div class="grid grid-cols-1 gap-4">
-            <input type="text" id="prod-key" placeholder="Unique ID (e.g. mutton_mandi)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
-            <input type="text" id="prod-name" placeholder="Item Name (e.g. Special Mutton Mandi)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
-            <input type="text" id="prod-variants" placeholder="Variants & Prices (e.g. Single:280, Full:1100)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
-            <input type="number" id="prod-stock" placeholder="Initial Quantity Stock (e.g. 40)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
-            <input type="text" id="prod-image-url" placeholder="Image URL (WebP or Unsplash link)" class="bg-slate-800 border border-slate-700 p-3 rounded-xl">
-            <div class="flex items-center space-x-4">
-              <label class="flex items-center space-x-2 cursor-pointer">
-                <input type="checkbox" id="prod-special" class="w-4 h-4 accent-amber-500">
-                <span class="text-sm font-semibold text-amber-400">Pin as 5-Star / Chef's Special</span>
-              </label>
-            </div>
-            <button onclick="saveNewProduct()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold py-3 rounded-xl transition">Save Product to Menu</button>
-          </div>
-        </div>
-
-        <div id="admin-analytics-section" class="hidden space-y-4">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-              <p class="text-xs text-slate-400">Total Gross Revenue</p>
-              <p id="stat-gross" class="text-2xl font-black text-emerald-400 mt-1">₹0</p>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-              <p class="text-xs text-slate-400">Online UPI Payments</p>
-              <p id="stat-upi" class="text-2xl font-black text-amber-400 mt-1">₹0</p>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-              <p class="text-xs text-slate-400">Cash Collections</p>
-              <p id="stat-cash" class="text-2xl font-black text-blue-400 mt-1">₹0</p>
-            </div>
-          </div>
-          <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3">
-            <h4 class="font-bold text-slate-200">Google Sheets Daily Auto-Sync Ledger</h4>
-            <p class="text-xs text-slate-400">Paste your Google Apps Script Webhook URL below. Every time a bill payment is cleared, it logs instantly:</p>
-            <div class="flex gap-2">
-              <input type="text" id="sheets-webhook-url" placeholder="https://script.google.com/macros/s/.../exec" class="bg-slate-800 border border-slate-700 p-2.5 rounded-xl text-xs flex-1">
-              <button onclick="saveWebhook()" class="bg-indigo-600 hover:bg-indigo-500 px-4 py-2 rounded-xl text-xs font-bold transition">Save Webhook</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- COPYRIGHT FOOTER -->
-  <footer class="bg-slate-900 border-t border-slate-800 py-6 text-center text-xs text-slate-400 space-y-1">
-    <p>&copy; 2026 Fusion Mandi. All rights reserved.</p>
-    <p>Engineered & Maintained by <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="text-amber-400 font-bold hover:underline">Syed Zeeshaan Ali (High-Fledged Engineering And Digital Tech Solutions)</a>.</p>
+  <footer>
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="dev-link">
+      <span>Developed by Syed Zeeshaan Ali</span>
+      <span>High-Fledged Engineering And Digital Tech Solutions</span>
+    </a>
+    <div class="copyright">© 2026 syedzeeshaanali07 | All Rights Reserved</div>
   </footer>
 
-  <!-- VARIANT MODAL -->
-  <div id="variant-modal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl space-y-4">
-      <h3 id="modal-item-title" class="text-xl font-bold text-amber-400">Select Portion</h3>
-      <div id="modal-variants-list" class="space-y-2"></div>
-      <button onclick="document.getElementById('variant-modal').classList.add('hidden')" class="w-full bg-slate-800 hover:bg-slate-700 py-2.5 rounded-xl text-xs font-bold">Cancel</button>
-    </div>
-  </div>
-
-  <!-- CUSTOMER PAYMENT MODAL (TRIGGERED WHEN ADMIN ACCEPTS BILL) -->
-  <div id="customer-payment-modal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-4 text-center">
-      <h3 class="text-2xl font-black text-amber-400">🧾 Bill Approved by Receptionist</h3>
-      <p id="payment-modal-amount" class="text-xl font-bold text-slate-200">Total Due: ₹0</p>
-      
-      <!-- UPI QR Scanner View -->
-      <div id="upi-qr-section" class="hidden bg-slate-800 p-4 rounded-xl space-y-2">
-        <p class="text-xs text-amber-400 font-bold">Scan QR Code via PhonePe / GPay / Paytm</p>
-        <div class="bg-white p-3 inline-block rounded-xl">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=fusionmandi@ybl&pn=FusionMandi" class="w-36 h-36 mx-auto">
-        </div>
-        <p class="text-xs text-slate-400">UPI ID: fusionmandi@ybl</p>
-        <button onclick="completePayment('UPI')" class="w-full bg-emerald-600 hover:bg-emerald-500 py-2 rounded-lg text-xs font-bold">I Have Paid via UPI ✅</button>
-      </div>
-
-      <!-- Cash / Counter Options -->
-      <div id="cash-options-section" class="grid grid-cols-2 gap-3 pt-2">
-        <button onclick="showUPIQR()" class="bg-amber-600 hover:bg-amber-500 p-4 rounded-xl font-bold flex flex-col items-center justify-center space-y-1 col-span-2">
-          <span>📱 Pay via UPI / PhonePe QR</span>
-          <span class="text-xs font-normal opacity-80">Instant Scanner</span>
-        </button>
-        <button onclick="completePayment('Cash Counter')" class="bg-blue-600 hover:bg-blue-500 p-3 rounded-xl font-bold text-xs">
-          💵 Pay at Counter
-        </button>
-        <button onclick="completePayment('Runner')" class="bg-slate-800 hover:bg-slate-700 p-3 rounded-xl font-bold text-xs text-slate-300">
-          🚶‍♂️ Runner Collects Cash at Table
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FEEDBACK MODAL -->
-  <div id="feedback-modal" class="hidden fixed inset-0 bg-slate-950/80 flex items-center justify-center z-50 p-4">
-    <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl w-full max-w-md shadow-2xl space-y-4">
-      <h3 class="text-xl font-bold text-amber-400">💬 Send Feedback / Rating</h3>
-      <textarea id="feedback-text" placeholder="Tell us about your food and experience..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm h-28"></textarea>
-      <div class="flex space-x-2">
-        <button onclick="submitFeedback()" class="flex-1 bg-amber-600 hover:bg-amber-500 py-2.5 rounded-xl font-bold text-xs">Submit to Management</button>
-        <button onclick="document.getElementById('feedback-modal').classList.add('hidden')" class="bg-slate-800 px-4 py-2.5 rounded-xl text-xs font-bold">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- FIREBASE & APP LOGIC SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+    import { getDatabase, ref, onValue, update, push, get } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
@@ -264,451 +134,240 @@
       projectId: "fusionmandi999-36066",
       storageBucket: "fusionmandi999-36066.firebasestorage.app",
       messagingSenderId: "312237706440",
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd",
-      measurementId: "G-1LM1V9NLMB"
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
 
     const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    const db = getDatabase(app);
 
-    let menuData = {
-      mutton_juicy: { name: "Special Mutton Juicy Mandi", variants: { Single: 350, Full: 1200 }, stock: 35, is_special: true, rating: 5.0, image: "https://images.unsplash.com/photo-1544025162-d76694265947?w=400&auto=format&fit=crop&q=70" },
-      chicken_fry: { name: "Chicken Fry Mandi", variants: { Single: 260, Full: 950 }, stock: 40, is_special: true, rating: 4.9, image: "https://images.unsplash.com/photo-1626777552726-4a6b54c97e46?w=400&auto=format&fit=crop&q=70" },
-      arabic_mix: { name: "Arabic Mixed Platter", variants: { Full: 1800 }, stock: 15, is_special: true, rating: 5.0, image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&auto=format&fit=crop&q=70" },
-      kunafa: { name: "Arabian Cheese Kunafa", variants: { Plate: 220 }, stock: 50, is_special: false, rating: 4.8, image: "https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=400&auto=format&fit=crop&q=70" }
+    const urlParams = new URLSearchParams(window.location.search);
+    const tableId = urlParams.get('table') || 'Takeaway';
+    document.getElementById('table-display').innerText = `Table: ${tableId.toUpperCase()}`;
+    const tableRef = ref(db, `active_tables/${tableId}`);
+
+    let currentCartTotal = 0;
+    let orderedItemsForBill = [];
+
+    // 1. Load Menu & Sort Specials to Top
+    onValue(ref(db, 'menu_items'), (snapshot) => {
+      const menu = snapshot.val();
+      const container = document.getElementById('menu-container');
+      container.innerHTML = '';
+
+      if(menu) {
+        // Convert to array for sorting
+        const menuArray = Object.keys(menu).map(key => ({ id: key, ...menu[key] }));
+        
+        // Sort: Specials first
+        menuArray.sort((a, b) => {
+          if (a.is_special && !b.is_special) return -1;
+          if (!a.is_special && b.is_special) return 1;
+          return 0;
+        });
+
+        menuArray.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'menu-item';
+          
+          let variantHTML = '';
+          if (item.variants && Object.keys(item.variants).length > 0) {
+            variantHTML = `<select id="variant-${item.id}">`;
+            Object.values(item.variants).forEach(v => {
+              variantHTML += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`;
+            });
+            variantHTML += `</select>`;
+          }
+
+          // Calculate Stars
+          let starDisplay = "⭐⭐⭐⭐⭐ 5.0";
+          if (item.rating && item.rating.count > 0) {
+            const avg = (item.rating.sum / item.rating.count).toFixed(1);
+            const stars = "⭐".repeat(Math.round(avg));
+            starDisplay = `${stars} ${avg}`;
+          }
+
+          div.innerHTML = `
+            <img src="${item.image_url || 'https://via.placeholder.com/110?text=Fusion+Mandi'}" alt="${item.name}" loading="lazy">
+            <div class="item-details">
+              ${item.is_special ? `<span class="special-badge">⭐ Chef's Special</span>` : ''}
+              <h3 class="item-title">${item.name}</h3>
+              <div class="star-rating">${starDisplay}</div>
+              ${item.base_price ? `<p class="item-price">₹${item.base_price}</p>` : ''}
+              ${item.is_out_of_stock ? `<p style="color:red; font-weight:bold;">Sold Out</p>` : variantHTML}
+              ${!item.is_out_of_stock ? `<button class="btn-add" onclick="addToOrder('${item.id}', '${item.name}',${item.base_price || 0})">Add to Plate</button>` : ''}
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      }
+    });
+
+    // 2. Listen to Running Tab
+    onValue(tableRef, (snapshot) => {
+      const tableData = snapshot.val();
+      if(tableData) {
+        currentCartTotal = tableData.running_total || 0;
+        document.getElementById('tab-total').innerText = currentCartTotal;
+        document.getElementById('modal-total').innerText = currentCartTotal;
+        document.getElementById('order-status').innerText = `Status: ${tableData.status || 'Ordering'}`;
+        
+        // Store items for the bill download
+        orderedItemsForBill = [];
+        if (tableData.items) {
+          Object.values(tableData.items).forEach(i => {
+            orderedItemsForBill.push(`${i.quantity}x ${i.name} (${i.variant}) - ₹${i.subtotal}`);
+          });
+        }
+      }
+    });
+
+    window.addToOrder = function(itemId, itemName, basePrice) {
+      let finalPrice = basePrice;
+      let variantName = "Regular";
+      const variantSelect = document.getElementById(`variant-${itemId}`);
+      
+      if (variantSelect) {
+        const [vName, vPrice] = variantSelect.value.split('|');
+        variantName = vName;
+        finalPrice = parseInt(vPrice);
+      }
+
+      const cartItem = {
+        menu_item_id: itemId,
+        name: itemName,
+        variant: variantName,
+        price: finalPrice,
+        quantity: 1,
+        subtotal: finalPrice,
+        kot_status: "pending",
+        timestamp: Date.now()
+      };
+
+      push(ref(db, `active_tables/${tableId}/items`), cartItem).then(() => {
+        update(tableRef, {
+          status: "ordering",
+          running_total: currentCartTotal + finalPrice
+        });
+        // Non-intrusive feedback
+        const btn = document.querySelector(`button[onclick="addToOrder('${itemId}', '${itemName}', ${basePrice})"]`);
+        const originalText = btn.innerText;
+        btn.innerText = "✓ Added";
+        btn.style.backgroundColor = "#2ecc71";
+        setTimeout(() => { btn.innerText = originalText; btn.style.backgroundColor = "var(--primary)"; }, 1500);
+      });
     };
 
-    let cart = [];
-    let liveOrders = [];
-    let customerPhoneVal = "";
-    let selectedTable = "Table 1";
-    let activeKey = null;
+    // 3. Modals & Payment Logic
+    window.openCheckoutModal = () => {
+      if (currentCartTotal === 0) return alert("Your plate is empty!");
+      document.getElementById('checkout-modal').style.display = 'flex';
+      document.getElementById('payment-selection').style.display = 'flex';
+      document.getElementById('upi-section').style.display = 'none';
+    };
 
-    function playBeep() {
-      try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.1, ctx.currentTime);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.4);
-      } catch(e) {}
-    }
+    window.closeModal = (id) => { document.getElementById(id).style.display = 'none'; };
 
-    window.connectWiFi = function() {
-      navigator.clipboard.writeText("123456789").then(() => {
-        alert("Wi-Fi Password '123456789' copied! Connecting to TECNO POVA 3");
-      });
-      window.location.href = "WIFI:S:TECNO POVA 3;T:WPA;P:123456789;;";
-    }
-
-    window.switchRole = function(role) {
-      ['customer', 'waiter', 'admin'].forEach(r => {
-        document.getElementById(`view-${r}`).classList.add('hidden');
-        document.getElementById(`nav-${r}`).className = "bg-slate-800 text-slate-300 hover:bg-slate-700 px-4 py-2 rounded-xl font-bold text-sm";
-      });
-      document.getElementById(`view-${role}`).classList.remove('hidden');
-      document.getElementById(`nav-${role}`).className = "bg-amber-600 text-white px-4 py-2 rounded-xl font-bold text-sm shadow";
-    }
-
-    window.loginWaiter = function() {
-      if (document.getElementById("waiter-passcode").value === "1234") {
-        document.getElementById("waiter-login-box").classList.add("hidden");
-        document.getElementById("waiter-dashboard").classList.remove("hidden");
-        loadWaiterTables();
-      } else {
-        alert("Incorrect passcode!");
-      }
-    }
-
-    window.loginAdmin = function() {
-      if (document.getElementById("admin-passcode").value === "9999") {
-        document.getElementById("admin-login-box").classList.add("hidden");
-        document.getElementById("admin-dashboard").classList.remove("hidden");
-        switchAdminTab('kots');
-      } else {
-        alert("Incorrect Admin PIN!");
-      }
-    }
-
-    window.switchAdminTab = function(tab) {
-      ['kots', 'inventory', 'addProduct', 'analytics'].forEach(t => {
-        document.getElementById(`admin-${t}-section`).classList.add('hidden');
-        document.getElementById(`subnav-${t}`).className = "bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold";
-      });
-      document.getElementById(`admin-${tab}-section`).classList.remove('hidden');
-      document.getElementById(`subnav-${tab}`).className = "bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold";
-      if (tab === 'inventory') loadAdminInventory();
-      if (tab === 'analytics') loadAnalytics();
-    }
-
-    async function initMenu() {
-      try {
-        const snap = await getDoc(doc(db, "inventory", "daily_menu"));
-        if (snap.exists()) {
-          menuData = snap.data().items || menuData;
-        } else {
-          await setDoc(doc(db, "inventory", "daily_menu"), { items: menuData });
-        }
-        renderCustomerMenu();
-      } catch (e) {
-        renderCustomerMenu();
-      }
-
-      onSnapshot(collection(db, "orders"), (snapshot) => {
-        const prevCount = liveOrders.length;
-        liveOrders = [];
-        snapshot.forEach((docSnap) => {
-          liveOrders.push({ id: docSnap.id, ...docSnap.data() });
-        });
-
-        if (liveOrders.length > prevCount && prevCount !== 0) {
-          playBeep();
-        }
-
-        if (customerPhoneVal) {
-          const myOrder = liveOrders.find(o => o.phone === customerPhoneVal);
-          if (myOrder && myOrder.status === "Bill Approved") {
-            document.getElementById("payment-modal-amount").innerText = `Total Due: ₹${myOrder.total}`;
-            document.getElementById("customer-payment-modal").classList.remove("hidden");
-          }
-        }
-
-        loadAdminKOTs();
-        loadWaiterTables();
-      });
-    }
-
-    function renderCustomerMenu() {
-      const grid = document.getElementById("customer-menu-grid");
-      const specialsGrid = document.getElementById("specials-grid");
-      const specialsWrapper = document.getElementById("specials-wrapper");
-
-      grid.innerHTML = "";
-      specialsGrid.innerHTML = "";
-      let hasSpecials = false;
-
-      // Sort items so 5-star / special items come first
-      const sortedItems = Object.entries(menuData).sort((a, b) => (b[1].rating || 4.8) - (a[1].rating || 4.8));
-
-      for (const [key, item] of sortedItems) {
-        const stockStatus = item.stock > 0 ? `Stock: ${item.stock}` : `Out of Stock ❌`;
-        const card = `
-          <div onclick="${item.stock > 0 ? `openVariantModal('${key}')` : 'alert(\'Item currently out of stock\')'}" class="bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl overflow-hidden cursor-pointer transition shadow flex flex-col justify-between ${item.stock <= 0 ? 'opacity-50' : ''}">
-            ${item.image ? `<img src="${item.image}" class="h-32 w-full object-cover">` : `<div class="h-32 w-full bg-slate-800 flex items-center justify-center text-xs text-slate-600">No Image</div>`}
-            <div class="p-3.5 space-y-1">
-              <div class="flex justify-between items-start">
-                <h3 class="font-bold text-sm text-slate-100">${item.name}</h3>
-                <span class="text-xs font-bold text-amber-400">${stockStatus}</span>
-              </div>
-              <p class="text-xs text-slate-400">⭐ ${item.rating || '4.8'} (Top Voted)</p>
-            </div>
-          </div>
-        `;
-
-        if (item.is_special || (item.rating && item.rating >= 4.9)) {
-          hasSpecials = true;
-          specialsGrid.innerHTML += card;
-        }
-        grid.innerHTML += card;
-      }
-      if (hasSpecials) specialsWrapper.classList.remove('hidden');
-    }
-
-    window.openVariantModal = function(key) {
-      activeKey = key;
-      const item = menuData[key];
-      document.getElementById("modal-item-title").innerText = item.name;
-      const list = document.getElementById("modal-variants-list");
-      list.innerHTML = "";
-
-      for (const [variant, price] of Object.entries(item.variants)) {
-        list.innerHTML += `
-          <button onclick="addToCart('${variant}', ${price})" class="w-full flex justify-between bg-slate-800 hover:bg-amber-600 p-3.5 rounded-xl font-bold transition text-slate-100">
-            <span>${variant}</span>
-            <span class="text-amber-300">₹${price}</span>
-          </button>
-        `;
-      }
-      document.getElementById("variant-modal").classList.remove("hidden");
-    }
-
-    window.addToCart = function(variant, price) {
-      if (!customerPhoneVal) {
-        alert("Please confirm your mobile number first!");
-        document.getElementById('variant-modal').classList.add('hidden');
-        return;
-      }
-      const item = menuData[activeKey];
-      const existing = cart.find(i => i.name === item.name && i.variant === variant);
-      if (existing) existing.qty++;
-      else cart.push({ name: item.name, variant, price, qty: 1 });
-
-      document.getElementById('variant-modal').classList.add('hidden');
-      renderCart();
-    }
-
-    function renderCart() {
-      const list = document.getElementById("cart-items-list");
-      const totalEl = document.getElementById("cart-grand-total");
-      const countEl = document.getElementById("cart-item-count");
-
-      if (cart.length === 0) {
-        list.innerHTML = `<p class="text-slate-500 text-center py-10">Your cart is empty</p>`;
-        totalEl.innerText = "₹0";
-        countEl.innerText = "0 Items";
-        return;
-      }
-
-      list.innerHTML = "";
-      let total = 0, totalCount = 0;
-      cart.forEach((i, idx) => {
-        total += i.price * i.qty;
-        totalCount += i.qty;
-        list.innerHTML += `
-          <div class="flex justify-between items-center bg-slate-800/60 p-3 rounded-xl border border-slate-800">
-            <div>
-              <p class="font-bold text-sm">${i.name} <span class="text-xs text-amber-400">(${i.variant})</span></p>
-              <p class="text-xs text-slate-400">₹${i.price} × ${i.qty}</p>
-            </div>
-            <button onclick="cart.splice(${idx},1);renderCart()" class="text-rose-400 font-bold px-2">✕</button>
-          </div>
-        `;
-      });
-      totalEl.innerText = `₹${total}`;
-      countEl.innerText = `${totalCount} Items`;
-    }
-
-    window.saveCustomerPhone = function() {
-      const val = document.getElementById("customer-phone").value.trim();
-      if (val.length < 10) return alert("Please enter a valid 10-digit mobile number.");
-      customerPhoneVal = val;
-      alert("Mobile number verified successfully!");
-    }
-
-    window.submitCustomerOrder = async function() {
-      if (cart.length === 0) return alert("Your cart is empty!");
-      if (!customerPhoneVal) return alert("Please confirm your mobile number!");
-
-      try {
-        const orderTotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
-        await addDoc(collection(db, "orders"), {
-          table: selectedTable,
-          phone: customerPhoneVal,
-          items: [...cart],
-          total: orderTotal,
-          status: "Preparing (KOT Sent)",
-          timestamp: serverTimestamp()
-        });
-        alert("Order successfully placed and sent to kitchen KOT!");
-        cart = [];
-        renderCart();
-      } catch (e) {
-        alert("Error placing order: " + e.message);
-      }
-    }
-
-    window.raiseBillRequest = async function() {
-      if (!customerPhoneVal) return alert("Please verify your mobile number first!");
-      const myOrder = liveOrders.find(o => o.phone === customerPhoneVal);
-      if (!myOrder) return alert("No active order found to bill!");
-
-      try {
-        await updateDoc(doc(db, "orders", myOrder.id), { status: "Bill Requested" });
-        alert("Bill request sent to receptionist! Waiting for approval...");
-      } catch(e) {
-        alert("Error sending bill request.");
-      }
-    }
-
-    window.openFeedbackModal = function() {
-      document.getElementById("feedback-modal").classList.remove("hidden");
-    }
-
-    window.submitFeedback = function() {
-      const txt = document.getElementById("feedback-text").value.trim();
-      if (!txt) return alert("Please type your feedback.");
-      alert("Thank you! Your feedback has been sent to management.");
-      document.getElementById("feedback-text").value = "";
-      document.getElementById("feedback-modal").classList.add("hidden");
-    }
-
-    async function loadWaiterTables() {
-      const grid = document.getElementById("waiter-tables-grid");
-      if (!grid) return;
-      grid.innerHTML = "";
+    window.selectPayment = (method) => {
+      let statusMsg = "";
       
-      ["Table 1", "Table 2", "Table 3", "Table 4", "Table 5", "Table 6", "Table 7", "Table 8"].forEach(t => {
-        const tableOrder = liveOrders.find(o => o.table === t);
-        const statusHTML = tableOrder ? `<span class="text-xs bg-amber-950 text-amber-400 px-2 py-0.5 rounded font-bold">${tableOrder.status} (₹${tableOrder.total})</span>` : `<span class="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-bold">Available</span>`;
+      // Update DB with the method the customer selected
+      update(tableRef, { 
+        payment_method: method,
+        bill_requested: true
+      });
+
+      if (method === 'upi') {
+        // Generate dynamic UPI QR using phonepe/gpay format
+        // Replace 'YOUR_UPI_ID' with the actual restaurant UPI ID
+        const upiString = `upi://pay?pa=fusionmandi@ybl&pn=FusionMandi&am=${currentCartTotal}&cu=INR`;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiString)}`;
         
-        grid.innerHTML += `
-          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between space-y-3">
-            <div>
-              <h3 class="text-lg font-bold text-amber-400">${t}</h3>
-              ${statusHTML}
-            </div>
-            <button onclick="alert('Table ${t} status: ${tableOrder ? tableOrder.status : 'Free'}')" class="bg-slate-800 hover:bg-slate-700 py-2 rounded-xl text-xs font-bold">View Status</button>
-          </div>
-        `;
-      });
-    }
+        document.getElementById('payment-selection').style.display = 'none';
+        document.getElementById('upi-section').style.display = 'block';
+        document.getElementById('upi-qr').src = qrUrl;
+        return; // Don't close modal yet, they need to scan
+      } 
+      else if (method === 'cash') {
+        alert("A waiter has been notified to collect cash at your table.");
+      } 
+      else if (method === 'counter') {
+        alert("Please proceed to the counter to complete your payment.");
+      }
 
-    async function loadAdminKOTs() {
-      const container = document.getElementById("admin-kot-container");
-      if (!container) return;
+      closeModal('checkout-modal');
+      openFeedbackModal();
+    };
+
+    // 4. Auto-Download Text Bill
+    window.downloadBill = () => {
+      const date = new Date().toLocaleString();
+      let billText = `==============================\n`;
+      billText += `         FUSION MANDI         \n`;
+      billText += `==============================\n`;
+      billText += `Date: ${date}\n`;
+      billText += `Table: ${tableId.toUpperCase()}\n`;
+      billText += `------------------------------\n`;
       
-      if (liveOrders.length === 0) {
-        container.innerHTML = `<p class="text-slate-500 col-span-full text-center py-10">No active kitchen orders or bill requests</p>`;
-        return;
-      }
+      orderedItemsForBill.forEach(item => { billText += `${item}\n`; });
+      
+      billText += `------------------------------\n`;
+      billText += `TOTAL DUE: Rs. ${currentCartTotal}\n`;
+      billText += `==============================\n`;
+      billText += `Thank you for dining with us!\n`;
+      billText += `Developed by High-Fledged Engineering\n`;
 
-      container.innerHTML = "";
-      liveOrders.forEach((order) => {
-        let itemsList = "";
-        order.items.forEach(i => {
-          itemsList += `<li class="flex justify-between text-sm py-1 border-b border-slate-800"><span>${i.name} (${i.variant})</span> <strong class="text-amber-400">×${i.qty}</strong></li>`;
-        });
+      const blob = new Blob([billText], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `FusionMandi_Bill_${tableId}.txt`;
+      a.click();
+      
+      update(tableRef, { bill_downloaded: true });
+    };
 
-        const isBillReq = order.status === "Bill Requested";
-        const actionBtn = isBillReq 
-          ? `<button onclick="acceptBill('${order.id}')" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-sm transition animate-pulse">Accept Bill Request & Notify Customer 🧾</button>`
-          : `<button onclick="markReady('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-bold text-sm transition">Mark KOT Ready 🍳</button>`;
+    // 5. Feedback Logic (Direct to Admin Draft & Menu Sync)
+    window.openFeedbackModal = () => {
+      setTimeout(() => { document.getElementById('feedback-modal').style.display = 'flex'; }, 500);
+    };
 
-        container.innerHTML += `
-          <div class="bg-slate-900 border ${isBillReq ? 'border-amber-500' : 'border-slate-800'} p-5 rounded-2xl shadow-xl flex flex-col justify-between space-y-4">
-            <div>
-              <div class="flex justify-between items-center mb-3">
-                <span class="text-xs font-bold bg-amber-950 text-amber-400 px-2 py-1 rounded">${order.table || 'Table 1'}</span>
-                <span class="text-xs text-amber-300 font-bold">${order.status}</span>
-              </div>
-              <ul class="space-y-1 mb-2">${itemsList}</ul>
-              <p class="text-xs text-slate-400 font-bold">Total: ₹${order.total}</p>
-            </div>
-            ${actionBtn}
-          </div>
-        `;
+    window.submitFeedback = async () => {
+      const score = parseInt(document.getElementById('rating-score').value);
+      const comment = document.getElementById('rating-comment').value;
+
+      // 1. Send feedback draft direct to Admin
+      push(ref(db, 'admin_feedback'), {
+        table: tableId,
+        score: score,
+        comment: comment,
+        timestamp: Date.now(),
+        cleared: false
       });
-    }
 
-    window.acceptBill = async function(id) {
-      try {
-        await updateDoc(doc(db, "orders", id), { status: "Bill Approved" });
-        alert("Bill approved! Customer payment options unlocked.");
-      } catch(e) {
-        alert("Error approving bill.");
-      }
-    }
-
-    window.markReady = async function(id) {
-      try {
-        await updateDoc(doc(db, "orders", id), { status: "Ready to Serve" });
-        alert("Order marked ready!");
-      } catch(e) {}
-    }
-
-    window.showUPIQR = function() {
-      document.getElementById("upi-qr-section").classList.remove("hidden");
-    }
-
-    window.completePayment = async function(method) {
-      const myOrder = liveOrders.find(o => o.phone === customerPhoneVal);
-      if (!myOrder) return;
-
-      try {
-        let total = myOrder.total;
-        let isOnline = method === "UPI";
-
-        let currentGross = Number(localStorage.getItem("total_gross") || 0) + total;
-        let currentUPI = Number(localStorage.getItem("total_upi") || 0) + (isOnline ? total : 0);
-        let currentCash = Number(localStorage.getItem("total_cash") || 0) + (!isOnline ? total : 0);
-
-        localStorage.setItem("total_gross", currentGross);
-        localStorage.setItem("total_upi", currentUPI);
-        localStorage.setItem("total_cash", currentCash);
-
-        // Daily Google Sheets Instant Sync
-        const webhook = localStorage.getItem("sheets_webhook");
-        if (webhook) {
-          await fetch(webhook, { method: "POST", mode: "no-cors", body: JSON.stringify({ table: myOrder.table, total: "₹" + total, method, timestamp: new Date().toLocaleString() }) });
+      // 2. Update scores for ordered items (calculates average for public menu)
+      // This loops through the active table cart and updates the global menu ratings
+      get(ref(db, `active_tables/${tableId}/items`)).then((snapshot) => {
+        const items = snapshot.val();
+        if (items) {
+          Object.values(items).forEach(cartItem => {
+            const menuId = cartItem.menu_item_id;
+            const ratingRef = ref(db, `menu_items/${menuId}/rating`);
+            
+            get(ratingRef).then((rateSnap) => {
+              let currentData = rateSnap.val() || { sum: 0, count: 0 };
+              update(ref(db, `menu_items/${menuId}`), {
+                rating: {
+                  sum: currentData.sum + score,
+                  count: currentData.count + 1
+                }
+              });
+            });
+          });
         }
-
-        await deleteDoc(doc(db, "orders", myOrder.id));
-        document.getElementById("customer-payment-modal").classList.add("hidden");
-        alert(`Payment of ₹${total} received via ${method}. Bill cleared & logged to Google Sheets!`);
-        customerPhoneVal = "";
-      } catch(e) {
-        alert("Payment completed.");
-      }
-    }
-
-    function loadAnalytics() {
-      document.getElementById("stat-gross").innerText = "₹" + (localStorage.getItem("total_gross") || 0);
-      document.getElementById("stat-upi").innerText = "₹" + (localStorage.getItem("total_upi") || 0);
-      document.getElementById("stat-cash").innerText = "₹" + (localStorage.getItem("total_cash") || 0);
-    }
-
-    function loadAdminInventory() {
-      const list = document.getElementById("admin-inventory-list");
-      if (!list) return;
-      list.innerHTML = "";
-      for (const [key, item] of Object.entries(menuData)) {
-        list.innerHTML += `
-          <div class="flex justify-between items-center bg-slate-900 p-4 rounded-xl border border-slate-800">
-            <div>
-              <p class="font-bold text-slate-100">${item.name}</p>
-              <p class="text-xs text-slate-400">Stock Available: <strong>${item.stock}</strong> portions</p>
-            </div>
-            <div class="space-x-2">
-              <button onclick="adjustStock('${key}', 10)" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded text-xs font-bold">+10</button>
-              <button onclick="adjustStock('${key}', -10)" class="bg-slate-800 hover:bg-slate-700 px-3 py-1 rounded text-xs font-bold">-10</button>
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    window.adjustStock = async function(key, amount) {
-      menuData[key].stock = Math.max(0, (menuData[key].stock || 30) + amount);
-      loadAdminInventory();
-      renderCustomerMenu();
-    }
-
-    window.saveNewProduct = async function() {
-      const key = document.getElementById("prod-key").value.trim();
-      const name = document.getElementById("prod-name").value.trim();
-      const variantsRaw = document.getElementById("prod-variants").value.trim();
-      const stock = Number(document.getElementById("prod-stock").value) || 30;
-      const imageUrl = document.getElementById("prod-image-url").value.trim();
-      const isSpecial = document.getElementById("prod-special").checked;
-
-      if (!key || !name || !variantsRaw) return alert("Please fill all required fields!");
-
-      let variants = {};
-      variantsRaw.split(',').forEach(v => {
-        const [vName, vPrice] = v.split(':');
-        if (vName && vPrice) variants[vName.trim()] = Number(vPrice);
       });
 
-      menuData[key] = { name, variants, stock, is_special: isSpecial, rating: 5.0, image: imageUrl || "https://images.unsplash.com/photo-1544025162-d76694265947?w=400" };
-      await setDoc(doc(db, "inventory", "daily_menu"), { items: menuData });
-      alert("Product saved successfully!");
-      initMenu();
-    }
-
-    window.saveWebhook = function() {
-      const url = document.getElementById("sheets-webhook-url").value.trim();
-      if (url) {
-        localStorage.setItem("sheets_webhook", url);
-        alert("Google Sheets Webhook URL saved successfully!");
-      }
-    }
-
-    initMenu();
+      closeModal('feedback-modal');
+      alert("Thank you! Your feedback helps us maintain 5-star quality.");
+    };
   </script>
 </body>
 </html>
