@@ -3,103 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fusion Mandi - Command Center</title>
+  <title>FoodDesk Admin - Fusion Mandi</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- USING STABLE FIREBASE 9 COMPAT -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { primary: '#ff7529', sidebar: '#1e1e2d', light: '#f4f5f8', card: '#ffffff' }
+        }
+      }
+    }
+  </script>
   <style>
     @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; } .no-print { display: none !important; } }
     .hide-scroll::-webkit-scrollbar { display: none; }
+    .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); }
+    body { background-color: #f4f5f8; }
   </style>
 </head>
-<body class="bg-slate-100 font-sans antialiased text-slate-800">
+<body class="font-sans antialiased text-slate-800">
 
   <!-- Login Modal -->
-  <div id="loginScreen" class="fixed inset-0 bg-slate-900/95 z-[100] flex flex-col items-center justify-center p-5">
-    <div class="bg-white p-8 rounded-2xl text-center w-full max-w-sm shadow-2xl border-t-8 border-amber-500">
-      <h2 class="text-2xl font-black text-slate-900 mb-2 uppercase">Fusion Mandi POS</h2>
-      <p class="text-slate-500 font-bold mb-6 text-sm">Enter PIN to activate system</p>
-      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 border-2 border-slate-200 rounded-xl font-black text-xl focus:border-amber-500 outline-none mb-4 tracking-widest">
-      <button onclick="attemptLogin()" class="w-full bg-amber-600 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition">LOGIN</button>
-      <p class="text-xs text-slate-400 mt-4">Admin (admin123) | Waiter (waiter123)</p>
+  <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
+    <div class="bg-card p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(0,0,0,0.5)]">
+      <div class="w-16 h-16 bg-primary/10 text-primary rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black">FM</div>
+      <h2 class="text-2xl font-black text-slate-900 mb-2">Workspace Login</h2>
+      <p class="text-slate-500 font-semibold mb-6 text-sm">Authentication Required</p>
+      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-light border-none rounded-xl font-black text-xl focus:ring-2 focus:ring-primary/50 outline-none mb-4 tracking-widest transition-all">
+      <button onclick="attemptLogin()" class="w-full bg-primary text-white font-black py-4 rounded-xl shadow-[0_8px_20px_rgba(255,117,41,0.3)] active:scale-95 transition-transform">ACCESS DASHBOARD</button>
+      <p class="text-xs text-slate-400 mt-5 font-medium">Admin: admin123 | Waiter: waiter123</p>
     </div>
   </div>
 
-  <!-- Header -->
-  <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 no-print hidden" id="mainHeader">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row md:justify-between items-center gap-4">
-      <div class="flex items-center gap-3">
+  <div class="flex h-screen overflow-hidden hidden" id="mainLayout">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20">
+      <div class="p-6 flex items-center gap-3 border-b border-white/5">
+        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center font-black text-white shadow-lg">FM</div>
         <div>
-          <h1 class="text-2xl font-black uppercase text-amber-500 tracking-wider">Fusion Mandi</h1>
-          <p class="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-            <span id="roleBadge" class="bg-amber-600 text-white px-2 py-0.5 rounded">ADMIN</span> Command Center
-          </p>
+          <h1 class="font-black text-lg leading-tight tracking-tight">FoodDesk.</h1>
+          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Fusion Mandi Admin</p>
         </div>
       </div>
-      <div class="flex items-center gap-4 w-full md:w-auto">
-        <select id="langAdmin" onchange="changeLanguageAdmin(this.value)" class="bg-slate-800 text-amber-500 border border-slate-700 rounded px-3 py-2 outline-none text-sm font-bold">
-          <option value="en">English</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
-        </select>
-        <div class="flex space-x-2 overflow-x-auto hide-scroll">
-          <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-2 rounded font-black bg-amber-600 text-white shadow whitespace-nowrap tab-btn" data-i18n="live_orders">Live Orders</button>
-          <button onclick="switchTab('inventory')" id="tab-inventory" class="px-4 py-2 rounded font-black bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap tab-btn admin-only hidden" data-i18n="menu_stock">Menu / Stock</button>
-          <button onclick="switchTab('dashboard')" id="tab-dashboard" class="px-4 py-2 rounded font-black bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap tab-btn admin-only hidden" data-i18n="sales_rev">Sales Report</button>
-        </div>
-        <button onclick="location.reload()" class="bg-red-600 px-4 py-2 rounded font-black text-white ml-2">Logout</button>
-      </div>
-    </div>
-  </header>
-
-  <main class="max-w-7xl mx-auto px-6 py-8 hidden" id="mainContent">
-    <!-- 1. LIVE ORDERS -->
-    <section id="view-orders" class="tab-section">
-      <div class="flex justify-between items-end mb-6">
-        <h2 class="text-xl font-black uppercase text-slate-800 tracking-wider" data-i18n="live_tables">Live Tables</h2>
-      </div>
-      <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </section>
-
-    <!-- 2. INVENTORY -->
-    <section id="view-inventory" class="tab-section hidden no-print">
-      <h3 class="text-lg font-black mb-4 uppercase tracking-wider text-slate-800" data-i18n="stock_control">Stock Control</h3>
-      <div id="inventoryList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </section>
-
-    <!-- 3. DASHBOARD -->
-    <section id="view-dashboard" class="tab-section hidden">
-      <div class="flex justify-between items-center mb-6 no-print">
-        <h2 class="text-xl font-black uppercase tracking-wide" data-i18n="sales_history">Sales & History</h2>
-        <button onclick="window.print()" class="bg-emerald-600 text-white px-5 py-2 rounded-lg font-bold shadow-lg">🖨️ Print Report</button>
-      </div>
-      <div id="printArea" class="bg-white p-8 rounded-2xl shadow-lg border border-slate-200">
-        <h1 class="text-3xl font-black text-center mb-2">Fusion Mandi</h1>
-        <p class="text-center text-slate-500 font-bold mb-8">Official Sales Report</p>
-        
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center mb-10">
-          <div class="bg-emerald-50 p-6 rounded-xl border border-emerald-100">
-            <p class="text-[10px] font-black text-emerald-600 uppercase mb-1">Today's Revenue</p>
-            <p id="tallyDaily" class="text-3xl font-black text-emerald-700">₹0</p>
+      <div class="p-4 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-black text-primary" id="roleBadge">AD</div>
+        <div>
+          <p class="text-xs font-bold text-slate-300" id="roleText">Administrator</p>
+          <div class="flex items-center gap-1.5 mt-0.5">
+            <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
           </div>
         </div>
-
-        <div class="mb-10">
-          <table class="w-full text-left text-sm border-collapse">
-            <thead class="bg-slate-100 text-slate-500 uppercase font-black text-[10px] tracking-widest">
-              <tr><th class="p-3 border-b">Time</th><th class="p-3 border-b">Table</th><th class="p-3 border-b w-1/2">Items</th><th class="p-3 border-b text-right">Amount</th></tr>
-            </thead>
-            <tbody id="dailyLogsTable" class="divide-y divide-slate-100"></tbody>
-          </table>
-        </div>
-
-        <div class="mt-12 pt-6 border-t border-slate-200 text-center no-print">
-          <button onclick="factoryResetSystem()" class="bg-red-100 text-red-600 border border-red-200 px-6 py-3 rounded-xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition">
-            ⚠️ FACTORY RESET: Load Full 22-Item Fusion Mandi Menu (60 Stock)
-          </button>
-        </div>
       </div>
-    </section>
-  </main>
+      <nav class="flex-1 px-4 py-4 space-y-2">
+        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 mb-3">Main Menu</p>
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary transition-all tab-btn" data-i18n="live_orders">
+          <span>📦</span> Live Orders
+        </button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only hidden" data-i18n="menu_stock">
+          <span>🍔</span> Menu & Stock
+        </button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only hidden" data-i18n="sales_rev">
+          <span>📈</span> Analytics
+        </button>
+      </nav>
+      <div class="p-4 border-t border-white/5">
+        <select id="langAdmin" onchange="changeLanguageAdmin(this.value)" class="w-full bg-white/5 text-slate-300 border-none rounded-xl px-4 py-3 outline-none text-xs font-bold mb-3 cursor-pointer">
+          <option value="en">English</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
+        </select>
+        <button onclick="location.reload()" class="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm">Log Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
+      <div class="p-8 pb-32">
+        
+        <!-- 1. LIVE ORDERS -->
+        <section id="view-orders" class="tab-section">
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="live_tables">Active Orders</h2>
+              <p class="text-sm font-semibold text-slate-500">Manage kitchen flow and table clearance.</p>
+            </div>
+          </div>
+          <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <!-- 2. INVENTORY -->
+        <section id="view-inventory" class="tab-section hidden no-print">
+          <div class="flex justify-between items-center mb-8">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="stock_control">Inventory Management</h2>
+              <p class="text-sm font-semibold text-slate-500">Update stock levels and feature items.</p>
+            </div>
+          </div>
+          <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- 3. DASHBOARD -->
+        <section id="view-dashboard" class="tab-section hidden">
+          <div class="flex justify-between items-center mb-8 no-print">
+            <div>
+              <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="sales_history">Dashboard & Revenue</h2>
+              <p class="text-sm font-semibold text-slate-500">Daily financial overview.</p>
+            </div>
+            <button onclick="window.print()" class="bg-white text-slate-800 border border-slate-200 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-slate-50">🖨️ Export PDF</button>
+          </div>
+          
+          <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              <div class="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex items-center justify-between">
+                <div>
+                  <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Today's Revenue</p>
+                  <p id="tallyDaily" class="text-3xl font-black text-slate-900">₹0</p>
+                </div>
+                <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl">💰</div>
+              </div>
+            </div>
+
+            <div class="mb-10">
+              <h3 class="text-lg font-black text-slate-900 mb-6 border-b border-slate-100 pb-3">Completed Transactions</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                  <thead class="bg-light text-slate-500 uppercase font-black text-[10px] tracking-widest">
+                    <tr><th class="p-4 rounded-tl-xl">Time</th><th class="p-4">Table</th><th class="p-4 w-1/2">Order Details</th><th class="p-4 text-right rounded-tr-xl">Amount</th></tr>
+                  </thead>
+                  <tbody id="dailyLogsTable" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="mt-16 pt-8 border-t border-slate-100 text-center no-print">
+              <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                ⚠️ FACTORY RESET: Load Full 22-Item Database
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -120,16 +168,16 @@
     let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
 
     const i18n = {
-      en: { live_orders: "Live Orders", menu_stock: "Menu / Stock", sales_rev: "Sales Report", live_tables: "Live Tables", stock_control: "Stock Control", sales_history: "Sales & History", accept_cook: "Accept & Cook", serve_food: "Serve Food", clear_receipt: "Clear & Send Receipt", update: "Update" },
-      hi: { live_orders: "लाइव ऑर्डर", menu_stock: "मेनू / स्टॉक", sales_rev: "बिक्री रिपोर्ट", live_tables: "लाइव टेबल", stock_control: "स्टॉक नियंत्रण", sales_history: "बिक्री और इतिहास", accept_cook: "स्वीकारें और पकाएं", serve_food: "खाना परोसें", clear_receipt: "क्लियर करें और रसीद भेजें", update: "अपडेट" },
-      te: { live_orders: "లైవ్ ఆర్డర్‌లు", menu_stock: "మెనూ / స్టాక్", sales_rev: "సేల్స్ రిపోర్ట్", live_tables: "లైవ్ టేబుల్స్", stock_control: "స్టాక్ కంట్రోల్", sales_history: "సేల్స్ & హిస్టరీ", accept_cook: "అంగీకరించి వండండి", serve_food: "ఆహారం అందించండి", clear_receipt: "క్లియర్ & రసీదు పంపండి", update: "నవీకరించు" }
+      en: { live_orders: "Live Orders", menu_stock: "Menu / Stock", sales_rev: "Analytics", live_tables: "Active Orders", stock_control: "Inventory Management", sales_history: "Dashboard & Revenue", accept_cook: "Accept Order", serve_food: "Serve Food", clear_receipt: "Clear & Log Sale", update: "Save" },
+      hi: { live_orders: "लाइव ऑर्डर", menu_stock: "मेनू / स्टॉक", sales_rev: "एनालिटिक्स", live_tables: "सक्रिय ऑर्डर", stock_control: "स्टॉक प्रबंधन", sales_history: "डैशबोर्ड और राजस्व", accept_cook: "ऑर्डर स्वीकार करें", serve_food: "खाना परोसें", clear_receipt: "क्लियर और लॉग", update: "सेव करें" },
+      te: { live_orders: "లైవ్ ఆర్డర్‌లు", menu_stock: "మెనూ / స్టాక్", sales_rev: "అనలిటిక్స్", live_tables: "యాక్టివ్ ఆర్డర్‌లు", stock_control: "స్టాక్ కంట్రోల్", sales_history: "డ్యాష్‌బోర్డ్ & ఆదాయం", accept_cook: "ఆర్డర్ అంగీకరించు", serve_food: "ఆహారం అందించండి", clear_receipt: "క్లియర్ & లాగ్", update: "సేవ్ చేయి" }
     };
     let lang = 'en';
     const t = (k) => i18n[lang][k] || k;
 
     function changeLanguageAdmin(l) {
       lang = l;
-      document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = t(el.getAttribute('data-i18n')));
+      document.querySelectorAll('[data-i18n]').forEach(el => el.innerHTML = el.innerHTML.replace(/[^<>]+(?=<|$)/, t(el.getAttribute('data-i18n'))));
       if(currentRole) loadSystem();
     }
 
@@ -142,53 +190,63 @@
       try { alertSound.play().then(()=>{alertSound.pause();alertSound.currentTime=0;}).catch(()=>{}); } catch(e){}
       
       document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('mainHeader').classList.remove('hidden');
-      document.getElementById('mainContent').classList.remove('hidden');
+      document.getElementById('mainLayout').classList.remove('hidden');
       
-      document.getElementById('roleBadge').innerText = currentRole.toUpperCase();
+      document.getElementById('roleText').innerText = currentRole === 'admin' ? 'Administrator' : 'Floor Staff';
+      document.getElementById('roleBadge').innerText = currentRole === 'admin' ? 'AD' : 'WT';
+      
       if(currentRole === 'admin') { 
         document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); 
-      } else { 
-        document.getElementById('roleBadge').classList.replace('bg-amber-600', 'bg-blue-600'); 
       }
       loadSystem();
     }
 
     function switchTab(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.className = "px-4 py-2 rounded font-black bg-slate-800 text-slate-300 hover:bg-slate-700 whitespace-nowrap tab-btn admin-only");
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        if(b.id === `tab-${tab}`) b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary transition-all tab-btn";
+        else b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only" + (currentRole !== 'admin' ? ' hidden' : '');
+      });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
-      document.getElementById(`tab-${tab}`).className = "px-4 py-2 rounded font-black bg-amber-600 text-white shadow whitespace-nowrap tab-btn admin-only";
     }
 
     function loadSystem() {
+      db.ref('.info/connected').on('value', snap => {
+        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
+        if (snap.val()) { dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"; txt.innerText="Online"; txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest"; }
+        else { dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; txt.innerText="Offline"; txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest"; }
+      });
+
       // Orders
       db.ref('orders').on('value', snap => {
         const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
         const orders = snap.val() || {};
         Object.entries(orders).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, order]) => {
-          let border = order.status==='pending'?'border-amber-500':(order.status==='cooking'?'border-blue-500':'border-emerald-500');
-          let badge = order.status==='pending'?'bg-amber-100 text-amber-700 animate-pulse':(order.status==='cooking'?'bg-blue-100 text-blue-700':'bg-emerald-100 text-emerald-700');
+          let border = order.status==='pending'?'border-primary':(order.status==='cooking'?'border-blue-500':'border-emerald-500');
+          let badge = order.status==='pending'?'bg-primary/10 text-primary':(order.status==='cooking'?'bg-blue-100 text-blue-600':'bg-emerald-100 text-emerald-600');
           
           let btn = '';
-          if(order.status === 'pending') { btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-lg font-black" onclick="updateOrder('${id}','cooking')">${t('accept_cook')}</button>`; } 
-          else if(order.status === 'cooking') { btn = `<button class="w-full bg-emerald-600 text-white py-3 rounded-lg font-black" onclick="updateOrder('${id}','served')">${t('serve_food')}</button>`; } 
-          else if(currentRole === 'admin') { btn = `<button class="w-full bg-slate-900 text-white py-3 rounded-lg font-black" onclick="clearBill('${id}')">${t('clear_receipt')}</button>`; } 
-          else { btn = `<button class="w-full bg-slate-300 text-slate-600 py-3 rounded-lg font-black" disabled>Awaiting Admin</button>`; }
+          if(order.status === 'pending') { btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-black transition-colors" onclick="updateOrder('${id}','cooking')">${t('accept_cook')}</button>`; } 
+          else if(order.status === 'cooking') { btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-black transition-colors" onclick="updateOrder('${id}','served')">${t('serve_food')}</button>`; } 
+          else if(currentRole === 'admin') { btn = `<button class="w-full bg-dark hover:bg-slate-800 text-white py-3.5 rounded-xl font-black transition-colors border border-emerald-500" onclick="clearBill('${id}')">${t('clear_receipt')}</button>`; } 
+          else { btn = `<button class="w-full bg-light text-slate-400 py-3.5 rounded-xl font-black" disabled>Awaiting Admin</button>`; }
 
           grid.innerHTML += `
-            <div class="bg-white p-5 rounded-2xl shadow-xl border-t-8 ${border} flex flex-col justify-between">
+            <div class="dash-card bg-card p-6 rounded-3xl border-t-4 ${border} flex flex-col justify-between">
               <div>
-                <div class="flex justify-between items-center border-b pb-2 mb-3">
-                  <span class="font-black text-2xl">Table ${order.table}</span>
-                  <span class="text-xs font-black uppercase ${badge} px-2 py-1 rounded">${order.status}</span>
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
+                  <div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
+                    <span class="font-black text-2xl text-slate-900 leading-none">${order.table}</span>
+                  </div>
+                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg">${order.status}</span>
                 </div>
-                <p class="font-bold text-slate-700 text-sm leading-relaxed mb-3">${(order.items||"").replace(/,/g,'<br>•')}</p>
+                <p class="font-semibold text-slate-600 text-sm leading-relaxed mb-4">${(order.items||"").replace(/,/g,'<br>•')}</p>
               </div>
-              <div class="mt-4 border-t pt-3">
-                <div class="flex justify-between items-end mb-4">
-                  <span class="text-xs font-bold text-slate-500">📞 ${order.phone}</span>
-                  <span class="font-black text-2xl text-amber-600">₹${order.total}</span>
+              <div class="mt-2 pt-4 border-t border-slate-100">
+                <div class="flex justify-between items-end mb-5">
+                  <span class="text-xs font-bold text-slate-400 bg-light px-2 py-1 rounded-md">📞 ${order.phone}</span>
+                  <span class="font-black text-2xl text-slate-900 tracking-tight">₹${order.total}</span>
                 </div>
                 ${btn}
               </div>
@@ -202,18 +260,21 @@
           const list = document.getElementById('inventoryList'); list.innerHTML = '';
           Object.entries(snap.val()||{}).forEach(([id, item]) => {
             list.innerHTML += `
-              <div class="bg-white p-4 rounded-xl shadow border border-slate-200 flex flex-col gap-2">
-                <div class="flex items-center gap-3 border-b pb-2">
-                  <img src="${item.image_url}" class="w-12 h-12 rounded object-cover">
-                  <div><h4 class="font-black text-sm leading-tight">${item.name}</h4><p class="text-[9px] text-slate-500 uppercase">${item.category}</p></div>
-                </div>
-                <div class="flex items-center justify-between mt-1">
-                  <button onclick="toggleSpec('${id}', ${item.is_special||false})" class="px-2 py-1 rounded text-xs font-bold ${item.is_special?'bg-amber-100 text-amber-700':'bg-slate-100 text-slate-500'}">⭐</button>
-                  <div class="flex items-center border rounded overflow-hidden">
-                    <span class="bg-slate-100 px-2 py-1 text-xs font-bold">Qty</span>
-                    <input type="number" id="stock-${id}" value="${item.stock_count||0}" class="w-14 p-1 font-black text-center outline-none">
+              <div class="dash-card bg-card p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4 w-full sm:w-auto">
+                  <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover shadow-sm">
+                  <div>
+                    <h4 class="font-black text-sm text-slate-900 leading-tight">${item.name}</h4>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">${item.category}</p>
                   </div>
-                  <button onclick="updStock('${id}')" class="bg-emerald-600 text-white px-3 py-1 rounded font-black text-xs">OK</button>
+                </div>
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                  <button onclick="toggleSpec('${id}', ${item.is_special||false})" class="px-3 py-2 rounded-lg text-xs font-bold transition-colors ${item.is_special?'bg-amber-100 text-amber-700':'bg-light text-slate-500 hover:bg-slate-200'}">⭐</button>
+                  <div class="flex items-center bg-light rounded-lg overflow-hidden border border-slate-100 p-1">
+                    <span class="px-2 text-[10px] font-black text-slate-400 uppercase">Qty</span>
+                    <input type="number" id="stock-${id}" value="${item.stock_count||0}" class="w-12 p-1 font-black text-center text-sm outline-none bg-transparent text-slate-900">
+                  </div>
+                  <button onclick="updStock('${id}')" class="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-black text-xs shadow-sm transition-colors">${t('update')}</button>
                 </div>
               </div>`;
           });
@@ -225,18 +286,18 @@
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
           const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
           Object.values(snap.val()||{}).forEach(log => {
-            tb.innerHTML += `<tr class="border-b"><td class="p-2">${log.time}</td><td class="p-2 font-bold">T-${log.table}</td><td class="p-2 text-xs">${log.items}</td><td class="p-2 font-bold text-emerald-600 text-right">₹${log.total}</td></tr>`;
+            tb.innerHTML += `<tr class="hover:bg-light/50 transition-colors"><td class="p-4 text-slate-500 font-medium">${log.time}</td><td class="p-4 font-black text-slate-900">T-${log.table}</td><td class="p-4 text-slate-600 font-medium">${log.items}</td><td class="p-4 font-black text-slate-900 text-right">₹${log.total}</td></tr>`;
           });
         });
       }
     }
 
-    function updateOrder(id, st) { db.ref('orders/'+id).update({status: st}); }
-    function toggleSpec(id, st) { db.ref('menu/'+id).update({is_special: !st}); }
-    function updStock(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); }
+    window.updateOrder = (id, st) => db.ref('orders/'+id).update({status: st});
+    window.toggleSpec = (id, st) => db.ref('menu/'+id).update({is_special: !st});
+    window.updStock = (id) => db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0});
 
-    async function clearBill(id) {
-      if(!confirm("Clear table and record payment?")) return;
+    window.clearBill = async (id) => {
+      if(!confirm("Clear table and log transaction?")) return;
       const snap = await db.ref('orders/'+id).once('value'); const order = snap.val(); if(!order) return;
       const d = new Date().toISOString().split('T')[0];
       
@@ -247,8 +308,8 @@
       db.ref('orders/'+id).remove();
     }
 
-    function factoryResetSystem() {
-      if(confirm("⚠️ THIS DELETES ALL DATA AND LOADS 22 FUSION MANDI ITEMS WITH 60 STOCK. PROCEED?")) {
+    window.factoryResetSystem = () => {
+      if(confirm("⚠️ PROCEED WITH FACTORY RESET? This loads 22 Fusion Mandi items with 60 stock limits.")) {
         db.ref('orders').remove(); db.ref('tallies').remove(); db.ref('daily_logs').remove();
         
         const mandiMenu = {
@@ -276,7 +337,7 @@
           "i22": { name: "Soft Drinks", category: "Beverages", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80", variants: { v1: { name: "Regular", price: 25 }, v2: { name: "Large", price: 30 }}}
         };
         
-        db.ref('menu').set(mandiMenu).then(() => { alert("✅ FUSION MANDI SYSTEM RESET COMPLETE."); window.location.reload(); });
+        db.ref('menu').set(mandiMenu).then(() => { alert("✅ FUSION MANDI SYSTEM LOADED!"); window.location.reload(); });
       }
     }
   </script>
