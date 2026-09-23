@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Fusion Mandi - Digital Menu</title>
+  <title>Fusion Mandi - Premium Digital Menu</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -26,7 +26,7 @@
 </head>
 <body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
 
-  <!-- Welcome / Login Modal -->
+  <!-- Mobile Login Modal -->
   <div id="loginModal" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-5 welcome-bg">
     <div class="bg-white p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.3)]">
       <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -85,11 +85,19 @@
       </div>
       <p class="text-primary font-black mb-4 text-sm uppercase tracking-wider" data-i18n="scan_pay">Scan to Pay via UPI</p>
       <img id="upiQRCode" src="" class="mx-auto rounded-2xl mb-4 w-44 h-44 bg-white p-3 shadow-lg">
-      <button onclick="downloadCustomerBill()" class="bg-white/10 text-white px-4 py-3 rounded-xl font-bold text-sm w-full hover:bg-white/20 transition-colors border border-white/10" data-i18n="download_bill">Download Offline Bill</button>
     </div>
   </div>
 
-  <!-- Menu Grid (Foodie UI Style) -->
+  <!-- Payment Confirmed Screen (Auto-shows when order is cleared) -->
+  <div id="paymentConfirmedScreen" class="hidden mx-5 mt-4 bg-emerald-50 text-emerald-900 p-6 rounded-3xl shadow-lg border border-emerald-200 text-center">
+    <div class="text-5xl mb-3">✅</div>
+    <h3 class="text-xl font-black uppercase tracking-tight mb-2">Payment Confirmed</h3>
+    <p class="text-sm font-semibold mb-5 text-emerald-700">Thank you for dining at Fusion Mandi. Your receipt has been generated.</p>
+    <button onclick="triggerManualDownload()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-black text-sm mb-3 hover:bg-emerald-700 active:scale-95 transition-transform">Download Receipt</button>
+    <button onclick="triggerManualWhatsApp()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black text-sm hover:bg-[#20bd5a] active:scale-95 transition-transform">Open WhatsApp Receipt</button>
+  </div>
+
+  <!-- Menu Grid -->
   <div id="menuGrid" class="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
     <div class="text-center p-10 text-slate-400 font-bold col-span-full" data-i18n="loading_menu">Loading Menu...</div>
   </div>
@@ -109,23 +117,27 @@
     </button>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js";
-    import { getDatabase } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js";
-
+  <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", 
+      authDomain: "fusionmandi999-36066.firebaseapp.com", 
+      databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", 
+      projectId: "fusionmandi999-36066", 
+      storageBucket: "fusionmandi999-36066.firebasestorage.app", 
+      messagingSenderId: "312237706440", 
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let customerPhone = "";
     let myOrderId = localStorage.getItem('fm_order_id'); let myOrderDetails = null;
+    let autoBillText = "";
 
     const i18n = {
-      en: { welcome: "Fusion Mandi", enter_mobile: "Enter mobile number to view menu.", mobile_placeholder: "10-Digit Mobile", proceed: "PROCEED TO MENU", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "All Menu", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_veg: "Veg", cat_bev: "Drinks", add: "ADD", sold_out: "SOLD OUT", special: "🔥 SPECIAL", total_bill: "Total Bill", confirm_order: "Confirm Order", special_req: "Any special requests?", live_status: "Live Order Status", food_feedback: "Rate your experience", thanks_feedback: "Feedback saved! ❤️", scan_pay: "Scan to Pay via UPI", download_bill: "Download Offline Bill", loading_menu: "Menu is empty. Login to Admin and click Factory Reset." },
-      hi: { welcome: "फ्यूजन मंडी", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_chicken: "चिकन", cat_mutton: "मटन", cat_veg: "वेज", cat_bev: "पेयजल", add: "जोड़ें", sold_out: "ख़त्म", special: "🔥 विशेष", total_bill: "कुल बिल", confirm_order: "ऑर्डर पक्का करें", special_req: "कोई निर्देश?", live_status: "ऑर्डर स्थिति", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! ❤️", scan_pay: "UPI से भुगतान करें", download_bill: "बिल डाउनलोड करें", loading_menu: "मेनू खाली है।" },
-      te: { welcome: "ఫ్యూజన్ మండి", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "🔥 స్పెషల్", total_bill: "మొత్తం బిల్లు", confirm_order: "ఆర్డర్ నిర్ధారించండి", special_req: "ఏదైనా సూచనలు?", live_status: "ఆర్డర్ స్టేటస్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! ❤️", scan_pay: "స్కాన్ చేయండి", download_bill: "బిల్లు డౌన్‌లోడ్ చేయండి", loading_menu: "మెనూ ఖాళీగా ఉంది." }
+      en: { welcome: "Fusion Mandi", enter_mobile: "Enter mobile number to view menu.", mobile_placeholder: "10-Digit Mobile", proceed: "PROCEED TO MENU", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "All Menu", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_veg: "Veg", cat_bev: "Drinks", add: "ADD", sold_out: "SOLD OUT", special: "🔥 SPECIAL", total_bill: "Total Bill", confirm_order: "Confirm Order", special_req: "Any special requests?", live_status: "Live Order Status", food_feedback: "Rate your experience", thanks_feedback: "Feedback saved! ❤️", scan_pay: "Scan to Pay via UPI", loading_menu: "Menu is empty. Login to Admin and click Factory Reset." },
+      hi: { welcome: "फ्यूजन मंडी", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_chicken: "चिकन", cat_mutton: "मटन", cat_veg: "वेज", cat_bev: "पेयजल", add: "जोड़ें", sold_out: "ख़त्म", special: "🔥 विशेष", total_bill: "कुल बिल", confirm_order: "ऑर्डर पक्का करें", special_req: "कोई निर्देश?", live_status: "ऑर्डर स्थिति", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! ❤️", scan_pay: "UPI से भुगतान करें", loading_menu: "मेनू खाली है।" },
+      te: { welcome: "ఫ్యూజన్ మండి", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "🔥 స్పెషల్", total_bill: "మొత్తం బిల్లు", confirm_order: "ఆర్డర్ నిర్ధారించండి", special_req: "ఏదైనా సూచనలు?", live_status: "ఆర్డర్ స్టేటస్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! ❤️", scan_pay: "స్కాన్ చేయండి", loading_menu: "మెనూ ఖాళీగా ఉంది." }
     };
     let lang = 'en'; const t = (k) => i18n[lang][k] || k;
 
@@ -171,7 +183,6 @@
           selectHtml += `</select>`;
         } else { selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`; }
 
-        // Note: Stock quantity text is hidden from the UI per requirements. Customers only see "SOLD OUT" if stock <= 0.
         grid.innerHTML += `
           <div class="food-card bg-card rounded-2xl p-4 flex flex-col relative overflow-hidden border border-slate-100">
             ${stock <= 0 ? `<div class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center"><span class="bg-dark text-white font-black px-4 py-2 rounded-xl shadow-lg">${t('sold_out')}</span></div>` : ''}
@@ -231,23 +242,48 @@
       document.getElementById('feedbackThanks').classList.remove('hidden');
     }
 
-    window.downloadCustomerBill = () => {
-      if(!myOrderDetails) return;
-      let bill = `=== FUSION MANDI ===\nOrder: ${myOrderDetails.orderId}\nTable: ${myOrderDetails.table}\nMobile: ${myOrderDetails.phone}\n------------------\n${myOrderDetails.items.replace(/, /g,'\n')}\n------------------\nTOTAL: Rs. ${myOrderDetails.total}\n=================`;
-      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bill], { type: 'text/plain' })); a.download = `FusionMandi_Bill_${myOrderDetails.orderId}.txt`; a.click();
-      window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(bill)}`, '_blank');
+    // --- AUTO DOWNLOAD & WHATSAPP GENERATOR ---
+    function prepareAutoBill(orderData) {
+      autoBillText = `=== FUSION MANDI ===\nOrder: ${orderData.orderId}\nTable: ${orderData.table}\nMobile: ${orderData.phone}\n------------------\n${orderData.items.replace(/, /g,'\n')}\n------------------\nTOTAL: Rs. ${orderData.total}\n=================`;
     }
+
+    window.triggerManualDownload = () => {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([autoBillText], { type: 'text/plain' })); a.download = `FusionMandi_Bill.txt`; a.click();
+    };
+
+    window.triggerManualWhatsApp = () => {
+      if(myOrderDetails && myOrderDetails.phone) {
+        window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(autoBillText)}`, '_blank');
+      }
+    };
 
     function listenToMyOrder() {
       if (!myOrderId) return;
       db.ref('orders/' + myOrderId).on('value', snap => {
         const order = snap.val(); const tr = document.getElementById('activeTracker'); const st = document.getElementById('orderStatusText'); const ps = document.getElementById('paymentSection');
         if (order) {
-          myOrderDetails = order; tr.classList.remove('hidden');
+          myOrderDetails = order; tr.classList.remove('hidden'); document.getElementById('paymentConfirmedScreen').classList.add('hidden');
+          prepareAutoBill(order); // Prepare the text in case it gets cleared
+          
           if (order.status === 'pending') { tr.className = "mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(30,30,45,0.2)] border-l-4 border-amber-500 relative overflow-hidden"; st.innerText = lang==='en'?"Sent to Kitchen": "किचन भेजा गया"; ps.classList.add('hidden'); } 
           else if (order.status === 'cooking') { tr.className = "mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(30,30,45,0.2)] border-l-4 border-blue-500 relative overflow-hidden"; st.innerText = lang==='en'?"Chef is Cooking": "शेफ बना रहे हैं"; ps.classList.add('hidden'); } 
           else if (order.status === 'served') { tr.className = "mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(30,30,45,0.2)] border-l-4 border-emerald-500 relative overflow-hidden"; st.innerText = lang==='en'?"Food Served": "खाना परोसा गया"; document.getElementById('upiQRCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=Q227869939@ybl&pn=FusionMandi&am=${order.total}`)}`; ps.classList.remove('hidden'); }
-        } else { tr.classList.add('hidden'); localStorage.removeItem('fm_order_id'); myOrderId = null; alert(lang==='en'?"Payment Confirmed!":"भुगतान प्राप्त हुआ!"); }
+        } else { 
+          // ORDER CLEARED BY ADMIN (Trigger Auto-Download & WhatsApp)
+          if(myOrderDetails) {
+            tr.classList.add('hidden');
+            document.getElementById('paymentConfirmedScreen').classList.remove('hidden');
+            
+            // Auto Trigger Text Download
+            triggerManualDownload();
+            
+            // Auto Trigger WhatsApp (Note: Browsers might block this popup if not manually clicked, hence the manual buttons above)
+            setTimeout(() => {
+              window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(autoBillText)}`, '_blank');
+            }, 500);
+          }
+          localStorage.removeItem('fm_order_id'); myOrderId = null; myOrderDetails = null;
+        }
       });
     }
 
