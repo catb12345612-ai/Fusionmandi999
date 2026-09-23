@@ -38,7 +38,6 @@
   </div>
 
   <div class="flex h-screen overflow-hidden hidden" id="mainLayout">
-    
     <!-- Sidebar -->
     <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20">
       <div class="p-6 flex items-center gap-3 border-b border-white/5">
@@ -115,7 +114,6 @@
           </div>
           
           <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
-            
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
               <div class="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex items-center justify-between">
                 <div>
@@ -172,16 +170,15 @@
       hi: { live_orders: "लाइव ऑर्डर", menu_stock: "मेनू / स्टॉक", sales_rev: "एनालिटिक्स", live_tables: "सक्रिय ऑर्डर", stock_control: "स्टॉक प्रबंधन", sales_history: "डैशबोर्ड और राजस्व", accept_cook: "ऑर्डर स्वीकार करें", serve_food: "खाना परोसें", clear_receipt: "क्लियर और लॉग", update: "सेव करें" },
       te: { live_orders: "లైవ్ ఆర్డర్‌లు", menu_stock: "మెనూ / స్టాక్", sales_rev: "అనలిటిక్స్", live_tables: "యాక్టివ్ ఆర్డర్‌లు", stock_control: "స్టాక్ కంట్రోల్", sales_history: "డ్యాష్‌బోర్డ్ & ఆదాయం", accept_cook: "ఆర్డర్ అంగీకరించు", serve_food: "ఆహారం అందించండి", clear_receipt: "క్లియర్ & లాగ్", update: "సేవ్ చేయి" }
     };
-    let lang = 'en';
-    const t = (k) => i18n[lang][k] || k;
+    let lang = 'en'; const t = (k) => i18n[lang][k] || k;
 
-    function changeLanguageAdmin(l) {
+    window.changeLanguageAdmin = function(l) {
       lang = l;
       document.querySelectorAll('[data-i18n]').forEach(el => el.innerHTML = el.innerHTML.replace(/[^<>]+(?=<|$)/, t(el.getAttribute('data-i18n'))));
       if(currentRole) loadSystem();
-    }
+    };
 
-    function attemptLogin() {
+    window.attemptLogin = function() {
       const pin = document.getElementById('sysPin').value;
       if (pin === 'admin123') { currentRole = 'admin'; }
       else if (pin === 'waiter123') { currentRole = 'waiter'; }
@@ -199,16 +196,16 @@
         document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); 
       }
       loadSystem();
-    }
+    };
 
-    function switchTab(tab) {
+    window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(b => {
         if(b.id === `tab-${tab}`) b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary transition-all tab-btn";
         else b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only" + (currentRole !== 'admin' ? ' hidden' : '');
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
-    }
+    };
 
     function loadSystem() {
       db.ref('.info/connected').on('value', snap => {
@@ -289,11 +286,11 @@
       }
     }
 
-    window.updateOrder = (id, st) => db.ref('orders/'+id).update({status: st});
-    window.toggleSpec = (id, st) => db.ref('menu/'+id).update({is_special: !st});
-    window.updStock = (id) => db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0});
+    window.updateOrder = function(id, st) { db.ref('orders/'+id).update({status: st}); };
+    window.toggleSpec = function(id, st) { db.ref('menu/'+id).update({is_special: !st}); };
+    window.updStock = function(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); };
 
-    window.clearBill = async (id) => {
+    window.clearBill = async function(id) {
       if(!confirm("Clear table and log transaction?")) return;
       const snap = await db.ref('orders/'+id).once('value'); const order = snap.val(); if(!order) return;
       const d = new Date().toISOString().split('T')[0];
@@ -301,11 +298,20 @@
       db.ref(`tallies/daily/${d}`).transaction(v => (v||0)+Number(order.total));
       db.ref(`daily_logs/${d}/${order.orderId}`).set({ time: new Date().toLocaleTimeString(), table: order.table, phone: order.phone, items: order.items, total: order.total });
       
-      fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(order) });
+      // Perfectly formatted Webhook Payload for Google Sheets
+      const sheetPayload = {
+        orderId: order.orderId,
+        tableNo: order.table,
+        phone: order.phone,
+        totalAmount: order.total,
+        paymentMethod: "CLEARED",
+        itemsDetails: order.items
+      };
+      fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(sheetPayload) });
       db.ref('orders/'+id).remove();
-    }
+    };
 
-    window.factoryResetSystem = () => {
+    window.factoryResetSystem = function() {
       if(confirm("⚠️ PROCEED WITH FACTORY RESET? This loads 22 Fusion Mandi items with 60 stock limits.")) {
         db.ref('orders').remove(); db.ref('tallies').remove(); db.ref('daily_logs').remove();
         
@@ -336,7 +342,7 @@
         
         db.ref('menu').set(mandiMenu).then(() => { alert("✅ FUSION MANDI SYSTEM LOADED!"); window.location.reload(); });
       }
-    }
+    };
   </script>
 </body>
 </html>
