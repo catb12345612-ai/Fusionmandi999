@@ -60,11 +60,11 @@
 
   <!-- Categories -->
   <div class="px-5 py-4 flex space-x-3 overflow-x-auto hide-scroll sticky top-[68px] z-40 bg-light/95 backdrop-blur-md border-b border-slate-200">
-    <button class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-[0_4px_12px_rgba(255,117,41,0.3)] transition-all whitespace-nowrap" data-cat="All" data-i18n="all_items">All Menu</button>
-    <button class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-cat="Chicken Mandi" data-i18n="cat_chicken">Chicken</button>
-    <button class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-cat="Mutton Mandi" data-i18n="cat_mutton">Mutton</button>
-    <button class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-cat="Veg Mandi" data-i18n="cat_veg">Veg</button>
-    <button class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-cat="Beverages" data-i18n="cat_bev">Drinks</button>
+    <button onclick="filterMenu('All')" class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-[0_4px_12px_rgba(255,117,41,0.3)] transition-all whitespace-nowrap" data-i18n="all_items">All Menu</button>
+    <button onclick="filterMenu('Chicken Mandi')" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-i18n="cat_chicken">Chicken</button>
+    <button onclick="filterMenu('Mutton Mandi')" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-i18n="cat_mutton">Mutton</button>
+    <button onclick="filterMenu('Veg Mandi')" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-i18n="cat_veg">Veg</button>
+    <button onclick="filterMenu('Beverages')" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap" data-i18n="cat_bev">Drinks</button>
   </div>
 
   <!-- Active Order Tracker -->
@@ -85,16 +85,8 @@
       </div>
       <p class="text-primary font-black mb-4 text-sm uppercase tracking-wider" data-i18n="scan_pay">Scan to Pay via UPI</p>
       <img id="upiQRCode" src="" class="mx-auto rounded-2xl mb-4 w-44 h-44 bg-white p-3 shadow-lg">
+      <button onclick="downloadCustomerBill()" class="bg-white/10 text-white px-4 py-3 rounded-xl font-bold text-sm w-full hover:bg-white/20 transition-colors border border-white/10" data-i18n="download_bill">Download Offline Bill</button>
     </div>
-  </div>
-
-  <!-- Payment Confirmed Screen (Auto-shows when order is cleared) -->
-  <div id="paymentConfirmedScreen" class="hidden mx-5 mt-4 bg-emerald-50 text-emerald-900 p-6 rounded-3xl shadow-lg border border-emerald-200 text-center">
-    <div class="text-5xl mb-3">✅</div>
-    <h3 class="text-xl font-black uppercase tracking-tight mb-2">Payment Confirmed</h3>
-    <p class="text-sm font-semibold mb-5 text-emerald-700">Thank you for dining at Fusion Mandi. Your receipt has been generated.</p>
-    <button onclick="triggerManualDownload()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-black text-sm mb-3 hover:bg-emerald-700 active:scale-95 transition-transform">Download Receipt</button>
-    <button onclick="triggerManualWhatsApp()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black text-sm hover:bg-[#20bd5a] active:scale-95 transition-transform">Open WhatsApp Receipt</button>
   </div>
 
   <!-- Menu Grid -->
@@ -119,51 +111,45 @@
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", 
-      authDomain: "fusionmandi999-36066.firebaseapp.com", 
-      databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", 
-      projectId: "fusionmandi999-36066", 
-      storageBucket: "fusionmandi999-36066.firebasestorage.app", 
-      messagingSenderId: "312237706440", 
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let customerPhone = "";
     let myOrderId = localStorage.getItem('fm_order_id'); let myOrderDetails = null;
-    let autoBillText = "";
 
     const i18n = {
-      en: { welcome: "Fusion Mandi", enter_mobile: "Enter mobile number to view menu.", mobile_placeholder: "10-Digit Mobile", proceed: "PROCEED TO MENU", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "All Menu", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_veg: "Veg", cat_bev: "Drinks", add: "ADD", sold_out: "SOLD OUT", special: "🔥 SPECIAL", total_bill: "Total Bill", confirm_order: "Confirm Order", special_req: "Any special requests?", live_status: "Live Order Status", food_feedback: "Rate your experience", thanks_feedback: "Feedback saved! ❤️", scan_pay: "Scan to Pay via UPI", loading_menu: "Menu is empty. Login to Admin and click Factory Reset." },
-      hi: { welcome: "फ्यूजन मंडी", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_chicken: "चिकन", cat_mutton: "मटन", cat_veg: "वेज", cat_bev: "पेयजल", add: "जोड़ें", sold_out: "ख़त्म", special: "🔥 विशेष", total_bill: "कुल बिल", confirm_order: "ऑर्डर पक्का करें", special_req: "कोई निर्देश?", live_status: "ऑर्डर स्थिति", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! ❤️", scan_pay: "UPI से भुगतान करें", loading_menu: "मेनू खाली है।" },
-      te: { welcome: "ఫ్యూజన్ మండి", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "🔥 స్పెషల్", total_bill: "మొత్తం బిల్లు", confirm_order: "ఆర్డర్ నిర్ధారించండి", special_req: "ఏదైనా సూచనలు?", live_status: "ఆర్డర్ స్టేటస్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! ❤️", scan_pay: "స్కాన్ చేయండి", loading_menu: "మెనూ ఖాళీగా ఉంది." }
+      en: { welcome: "Fusion Mandi", enter_mobile: "Enter mobile number to view menu.", mobile_placeholder: "10-Digit Mobile", proceed: "PROCEED TO MENU", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "All Menu", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_veg: "Veg", cat_bev: "Drinks", add: "ADD", sold_out: "SOLD OUT", special: "🔥 SPECIAL", total_bill: "Total Bill", confirm_order: "Confirm Order", special_req: "Any special requests?", live_status: "Live Order Status", food_feedback: "Rate your experience", thanks_feedback: "Feedback saved! ❤️", scan_pay: "Scan to Pay via UPI", download_bill: "Download Offline Bill", loading_menu: "Loading Menu..." },
+      hi: { welcome: "फ्यूजन मंडी", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_chicken: "चिकन", cat_mutton: "मटन", cat_veg: "वेज", cat_bev: "पेयजल", add: "जोड़ें", sold_out: "ख़त्म", special: "🔥 विशेष", total_bill: "कुल बिल", confirm_order: "ऑर्डर पक्का करें", special_req: "कोई निर्देश?", live_status: "ऑर्डर स्थिति", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! ❤️", scan_pay: "UPI से भुगतान करें", download_bill: "बिल डाउनलोड करें", loading_menu: "लोड हो रहा है..." },
+      te: { welcome: "ఫ్యూజన్ మండి", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "🔥 స్పెషల్", total_bill: "మొత్తం బిల్లు", confirm_order: "ఆర్డర్ నిర్ధారించండి", special_req: "ఏదైనా సూచనలు?", live_status: "ఆర్డర్ స్టేటస్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! ❤️", scan_pay: "స్కాన్ చేయండి", download_bill: "బిల్లు డౌన్‌లోడ్ చేయండి", loading_menu: "లోడ్ అవుతోంది..." }
     };
     let lang = 'en'; const t = (k) => i18n[lang][k] || k;
 
-    window.changeLanguage = (l) => {
+    window.changeLanguage = function(l) {
       lang = l;
       document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = t(el.getAttribute('data-i18n')));
       document.querySelectorAll('[data-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-placeholder')));
       renderMenu();
-    }
+    };
 
-    window.registerCustomer = () => {
+    window.registerCustomer = function() {
       const num = document.getElementById('customerMobile').value;
       if (num.length < 10) return alert(lang==='en'?"Invalid Number":"अमान्य नंबर");
       customerPhone = num;
       document.getElementById('loginModal').style.display = 'none';
       document.body.classList.remove('overflow-hidden');
-    }
+    };
 
-    document.querySelectorAll('.category-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        currentFilter = e.target.getAttribute('data-cat');
-        document.querySelectorAll('.category-btn').forEach(b => b.className = "category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap");
-        e.target.className = "category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-[0_4px_12px_rgba(255,117,41,0.3)] transition-all whitespace-nowrap";
-        renderMenu();
+    window.filterMenu = function(cat) {
+      currentFilter = cat;
+      document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.className = btn.innerText.includes(cat.split(' ')[0]) || (cat==='All' && btn.innerText.includes('All'))
+          ? "category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-[0_4px_12px_rgba(255,117,41,0.3)] transition-all whitespace-nowrap"
+          : "category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all whitespace-nowrap";
       });
-    });
+      renderMenu();
+    };
 
     db.ref('menu').on('value', snap => { menuData = snap.val() || {}; renderMenu(); });
 
@@ -193,7 +179,7 @@
             <div class="flex flex-col flex-1">
               <h3 class="font-black text-dark leading-tight text-sm">${item.name}</h3>
               ${selectHtml}
-              <button onclick="window.addToCart('${id}', '${item.name.replace(/'/g,"\\'")}', ${item.base_price||0}, ${stock})" class="w-full mt-auto bg-dark text-white font-black text-xs py-2.5 rounded-xl hover:bg-slate-800 active:scale-95 transition-transform mt-3">
+              <button onclick="addToCart('${id}', '${item.name.replace(/'/g,"\\'")}', ${item.base_price||0}, ${stock})" class="w-full mt-auto bg-dark text-white font-black text-xs py-2.5 rounded-xl hover:bg-slate-800 active:scale-95 transition-transform mt-3">
                 + ${t('add')}
               </button>
             </div>
@@ -202,7 +188,7 @@
       updateCartUI();
     }
 
-    window.addToCart = (id, name, basePrice, maxStock) => {
+    window.addToCart = function(id, name, basePrice, maxStock) {
       let finalPrice = basePrice, varName = "Regular"; const sel = document.getElementById(`var-${id}`);
       if (sel) { const pts = sel.value.split('|'); varName = pts[0]; finalPrice = parseInt(pts[1]); }
       const cartKey = `${id}|${varName}`;
@@ -210,7 +196,7 @@
       if (totalQtyInCart >= maxStock) return alert(lang==='en'?"Item is out of stock!":"आइटम स्टॉक में नहीं है!");
       if(cart[cartKey]) cart[cartKey].qty++; else cart[cartKey] = { id, name, variant: varName, price: finalPrice, qty: 1 };
       renderMenu();
-    }
+    };
 
     function updateCartUI() {
       let total = 0; Object.values(cart).forEach(i => total += (i.price * i.qty));
@@ -218,7 +204,7 @@
       document.getElementById('cartFooter').classList.toggle('hidden', total === 0);
     }
 
-    window.placeOrder = () => {
+    window.placeOrder = function() {
       document.getElementById('placeOrderBtn').disabled = true;
       const orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
       let baseItems = Object.values(cart).map(i => `${i.name} [${i.variant}] (x${i.qty})`).join(', ');
@@ -234,27 +220,19 @@
         cart = {}; document.getElementById('orderNotes').value = ''; renderMenu();
         localStorage.setItem('fm_order_id', orderId); myOrderId = orderId; listenToMyOrder();
       });
-    }
+    };
 
-    window.sendFeedback = (rating) => {
+    window.sendFeedback = function(rating) {
       if(!myOrderDetails) return;
       db.ref('feedback').push({ orderId: myOrderDetails.orderId, table: myOrderDetails.table, rating: rating, timestamp: Date.now() });
       document.getElementById('feedbackThanks').classList.remove('hidden');
-    }
-
-    // --- AUTO DOWNLOAD & WHATSAPP GENERATOR ---
-    function prepareAutoBill(orderData) {
-      autoBillText = `=== FUSION MANDI ===\nOrder: ${orderData.orderId}\nTable: ${orderData.table}\nMobile: ${orderData.phone}\n------------------\n${orderData.items.replace(/, /g,'\n')}\n------------------\nTOTAL: Rs. ${orderData.total}\n=================`;
-    }
-
-    window.triggerManualDownload = () => {
-      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([autoBillText], { type: 'text/plain' })); a.download = `FusionMandi_Bill.txt`; a.click();
     };
 
-    window.triggerManualWhatsApp = () => {
-      if(myOrderDetails && myOrderDetails.phone) {
-        window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(autoBillText)}`, '_blank');
-      }
+    window.downloadCustomerBill = function() {
+      if(!myOrderDetails) return;
+      let bill = `=== FUSION MANDI ===\nOrder: ${myOrderDetails.orderId}\nTable: ${myOrderDetails.table}\nMobile: ${myOrderDetails.phone}\n------------------\n${myOrderDetails.items.replace(/, /g,'\n')}\n------------------\nTOTAL: Rs. ${myOrderDetails.total}\n=================`;
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bill], { type: 'text/plain' })); a.download = `FusionMandi_Bill_${myOrderDetails.orderId}.txt`; a.click();
+      window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(bill)}`, '_blank');
     };
 
     function listenToMyOrder() {
@@ -262,27 +240,18 @@
       db.ref('orders/' + myOrderId).on('value', snap => {
         const order = snap.val(); const tr = document.getElementById('activeTracker'); const st = document.getElementById('orderStatusText'); const ps = document.getElementById('paymentSection');
         if (order) {
-          myOrderDetails = order; tr.classList.remove('hidden'); document.getElementById('paymentConfirmedScreen').classList.add('hidden');
-          prepareAutoBill(order); // Prepare the text in case it gets cleared
-          
+          myOrderDetails = order; tr.classList.remove('hidden');
           if (order.status === 'pending') { tr.className = "mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(30,30,45,0.2)] border-l-4 border-amber-500 relative overflow-hidden"; st.innerText = lang==='en'?"Sent to Kitchen": "किचन भेजा गया"; ps.classList.add('hidden'); } 
           else if (order.status === 'cooking') { tr.className = "mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(30,30,45,0.2)] border-l-4 border-blue-500 relative overflow-hidden"; st.innerText = lang==='en'?"Chef is Cooking": "शेफ बना रहे हैं"; ps.classList.add('hidden'); } 
           else if (order.status === 'served') { tr.className = "mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(30,30,45,0.2)] border-l-4 border-emerald-500 relative overflow-hidden"; st.innerText = lang==='en'?"Food Served": "खाना परोसा गया"; document.getElementById('upiQRCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=Q227869939@ybl&pn=FusionMandi&am=${order.total}`)}`; ps.classList.remove('hidden'); }
         } else { 
-          // ORDER CLEARED BY ADMIN (Trigger Auto-Download & WhatsApp)
+          tr.classList.add('hidden'); localStorage.removeItem('fm_order_id'); myOrderId = null; 
+          alert(lang==='en'?"Payment Confirmed! Receipt downloaded.":"भुगतान प्राप्त हुआ!"); 
           if(myOrderDetails) {
-            tr.classList.add('hidden');
-            document.getElementById('paymentConfirmedScreen').classList.remove('hidden');
-            
-            // Auto Trigger Text Download
-            triggerManualDownload();
-            
-            // Auto Trigger WhatsApp (Note: Browsers might block this popup if not manually clicked, hence the manual buttons above)
-            setTimeout(() => {
-              window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(autoBillText)}`, '_blank');
-            }, 500);
+            let bill = `=== FUSION MANDI ===\nOrder: ${myOrderDetails.orderId}\nTable: ${myOrderDetails.table}\nMobile: ${myOrderDetails.phone}\n------------------\n${myOrderDetails.items.replace(/, /g,'\n')}\n------------------\nTOTAL: Rs. ${myOrderDetails.total}\n=================`;
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([bill], { type: 'text/plain' })); a.download = `FusionMandi_Bill_${myOrderDetails.orderId}.txt`; a.click();
+            window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(bill)}`, '_blank');
           }
-          localStorage.removeItem('fm_order_id'); myOrderId = null; myOrderDetails = null;
         }
       });
     }
