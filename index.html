@@ -2,98 +2,140 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fusion Mandi - Premium Digital Menu</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <style>
-    .glass { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #e2e8f0; }
-    .hide-scroll::-webkit-scrollbar { display: none; }
-    .special-glow { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); border: 2px solid #f59e0b; }
+    :root { --primary: #e67e22; --dark: #1e272e; --light: #f5f6fa; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--light); margin: 0; padding: 0; padding-bottom: 100px; }
+    
+    /* Top Dev & Language Bar */
+    .top-bar { background: #111; padding: 6px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; font-size: 0.8rem; }
+    .dev-info { color: #00e5ff; text-decoration: none; font-weight: bold; letter-spacing: 0.5px; }
+    .lang-selector { background: #333; color: white; border: 1px solid #555; padding: 4px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; outline: none; }
+    
+    /* Header & Branding */
+    header { position: sticky; top: 0; z-index: 100; background: var(--dark); color: white; padding: 12px 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+    .brand-title { margin: 0; font-size: 1.5rem; font-weight: 900; color: var(--primary); letter-spacing: 1px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .wifi-btn { background: #3498db; color: white; border: none; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 0.8rem; cursor: pointer; }
+    .table-badge { background: #fff; color: #000; padding: 5px 12px; border-radius: 15px; font-weight: bold; font-size: 0.9rem; }
+    
+    /* Carousel */
+    .carousel { width: 100%; height: 220px; position: relative; overflow: hidden; }
+    .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 1s ease-in-out; object-fit: cover; }
+    .slide.active { opacity: 1; }
+    .carousel-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 20px; color: white; text-align: center; }
+
+    /* Menu Grid */
+    .container { padding: 15px; max-width: 800px; margin: auto; }
+    .menu-item { background: #fff; border-radius: 15px; padding: 15px; margin-bottom: 15px; display: flex; gap: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); align-items: center; }
+    .item-img { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; }
+    .item-info { flex: 1; }
+    .item-title { font-size: 1.2rem; font-weight: 800; margin: 0 0 5px 0; color: var(--dark); }
+    .item-price { color: #d35400; font-weight: 900; font-size: 1.1rem; margin: 0 0 10px 0; }
+    select.variant-select { padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; width: 100%; font-weight: bold; box-sizing: border-box; }
+    .btn-add { padding: 8px 12px; border-radius: 8px; width: 100%; font-weight: bold; background: var(--light); color: var(--primary); border: 2px solid var(--primary); cursor: pointer; text-transform: uppercase; margin-top: 5px; transition: 0.2s; }
+    .btn-add:hover { background: var(--primary); color: white; }
+
+    /* Modals */
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .modal-content { background: white; padding: 25px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .cart-modal { align-items: flex-end; }
+    .cart-content { background: white; width: 100%; max-height: 85vh; border-radius: 20px 20px 0 0; padding: 20px; box-sizing: border-box; overflow-y: auto; text-align: left; }
+    .cart-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+    
+    /* Cart Bar */
+    .cart-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 90; }
+    .btn-view-cart { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; width: auto; font-size: 1rem; box-shadow: 0 4px 10px rgba(230,126,34,0.4); }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased pb-36 overflow-hidden">
+<body>
 
-  <!-- Mobile Login Modal -->
-  <div id="loginModal" class="fixed inset-0 bg-slate-900/95 z-[100] flex flex-col items-center justify-center p-5">
-    <div class="bg-white p-8 rounded-2xl text-center w-full max-w-sm shadow-2xl">
-      <h2 class="text-2xl font-black text-amber-600 mb-2" data-i18n="welcome">Welcome to Fusion Mandi</h2>
-      <p class="text-slate-500 text-sm font-bold mb-6" data-i18n="enter_mobile">Enter your mobile number to view the menu & receive your digital receipt.</p>
-      <input type="tel" id="customerMobile" data-placeholder="mobile_placeholder" placeholder="10-Digit Mobile Number" class="w-full text-center p-4 border-2 border-slate-200 rounded-xl font-black text-lg focus:border-amber-500 outline-none mb-4">
-      <button onclick="registerCustomer()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition" data-i18n="proceed">PROCEED TO MENU</button>
-    </div>
-  </div>
-
-  <!-- Top Developer & Language Bar -->
-  <div class="bg-slate-900 text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="text-cyan-400 hover:text-cyan-300">Dev: Syed Zeeshaan Ali | High-Fledged Solutions</a>
-    <select onchange="changeLanguage(this.value)" class="bg-slate-800 text-amber-500 border border-slate-700 rounded px-2 py-1 outline-none">
-      <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
+  <!-- Top Dev & Language Bar -->
+  <div class="top-bar">
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="dev-info">
+      Dev: Syed Zeeshaan Ali | High-Fledged Solutions
+    </a>
+    <select class="lang-selector" onchange="changeLang(this.value)">
+      <option value="en">English</option>
+      <option value="hi">हिंदी (Hindi)</option>
+      <option value="te">తెలుగు (Telugu)</option>
     </select>
   </div>
 
-  <!-- Header -->
-  <header class="glass sticky top-0 z-50 px-5 py-4 shadow-sm flex justify-between items-center">
-    <div>
-      <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">Fusion Mandi</h1>
-      <p class="text-xs font-bold text-amber-600 tracking-widest uppercase" data-i18n="smart_dine">Smart Dine-In</p>
-    </div>
-    <div class="bg-white px-3 py-1.5 rounded-xl shadow-sm border border-slate-200 flex items-center space-x-2">
-      <span class="text-xs font-black text-slate-400" data-i18n="table">TABLE</span>
-      <select id="tableNum" class="bg-transparent font-black text-slate-900 outline-none cursor-pointer">
-        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
-        <option value="4">4</option><option value="5">5</option>
-      </select>
+  <header>
+    <h1 class="brand-title">FUSION MANDI</h1>
+    <div class="header-actions">
+      <button class="wifi-btn" onclick="document.getElementById('wifi-modal').style.display='flex'" data-i18n="wifi_btn">WiFi</button>
+      <div class="table-badge" id="table-display">Loading...</div>
     </div>
   </header>
 
-  <!-- Categories -->
-  <div class="px-5 py-4 flex space-x-3 overflow-x-auto hide-scroll sticky top-[72px] z-40 bg-slate-50/95 backdrop-blur-md">
-    <button onclick="filterMenu('All')" class="category-btn active px-6 py-2 rounded-full font-bold text-sm bg-slate-900 text-white shadow-md transition whitespace-nowrap" data-i18n="all_items">All Items</button>
-    <button onclick="filterMenu('Chicken Mandi')" class="category-btn px-6 py-2 rounded-full font-bold text-sm bg-white text-slate-600 border shadow-sm transition whitespace-nowrap" data-i18n="cat_chicken">Chicken Mandi</button>
-    <button onclick="filterMenu('Mutton Mandi')" class="category-btn px-6 py-2 rounded-full font-bold text-sm bg-white text-slate-600 border shadow-sm transition whitespace-nowrap" data-i18n="cat_mutton">Mutton Mandi</button>
-    <button onclick="filterMenu('Veg Mandi')" class="category-btn px-6 py-2 rounded-full font-bold text-sm bg-white text-slate-600 border shadow-sm transition whitespace-nowrap" data-i18n="cat_veg">Veg Mandi</button>
-    <button onclick="filterMenu('Beverages')" class="category-btn px-6 py-2 rounded-full font-bold text-sm bg-white text-slate-600 border shadow-sm transition whitespace-nowrap" data-i18n="cat_bev">Beverages</button>
+  <!-- Login Modal -->
+  <div class="modal" id="login-modal" style="display: flex;">
+    <div class="modal-content">
+      <h2 style="margin-top:0; color:var(--primary);" data-i18n="welcome">Welcome to Fusion Mandi</h2>
+      <p style="color:#666; font-size:0.95rem;" data-i18n="enter_mobile">Please enter your mobile number to view the menu and receive your digital bill.</p>
+      <input type="tel" id="customer-mobile" data-i18n-placeholder="mobile_placeholder" placeholder="10-digit Mobile Number" style="width:100%; padding:12px; margin:15px 0; border:2px solid #ddd; border-radius:8px; font-size:1.1rem; text-align:center; box-sizing:border-box;">
+      <button style="background:var(--primary); color:white; border:none; padding:12px; font-size:1.1rem; border-radius:8px; width:100%; cursor:pointer; font-weight:bold;" onclick="registerCustomer()" data-i18n="proceed">Proceed to Menu</button>
+    </div>
   </div>
 
-  <!-- Active Order Tracker -->
-  <div id="activeTracker" class="hidden mx-5 mb-4 bg-slate-900 text-white p-5 rounded-2xl shadow-xl border-l-4 border-amber-500 transition-all">
-    <h3 class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-1" data-i18n="live_status">Live Order Status</h3>
-    <p id="orderStatusText" class="text-xl font-black text-amber-400 uppercase tracking-wide">Transmitting...</p>
-    
-    <div id="paymentSection" class="hidden mt-4 pt-4 border-t border-slate-700 text-center">
-      <div id="feedbackBox" class="mb-5 pb-5 border-b border-slate-700">
-        <p class="text-xs font-bold uppercase tracking-widest text-slate-300 mb-3" data-i18n="food_feedback">How is the food?</p>
-        <div class="flex justify-center gap-6 text-3xl">
-          <button onclick="sendFeedback('Bad')" class="hover:scale-125 transition-transform">😞</button>
-          <button onclick="sendFeedback('Good')" class="hover:scale-125 transition-transform">😋</button>
-          <button onclick="sendFeedback('Excellent')" class="hover:scale-125 transition-transform">😍</button>
-        </div>
-        <p id="feedbackThanks" class="text-xs font-bold text-emerald-400 mt-3 hidden" data-i18n="thanks_feedback">Thanks for your feedback! ❤️</p>
+  <!-- WiFi Modal -->
+  <div class="modal" id="wifi-modal">
+    <div class="modal-content">
+      <h2 style="margin-top:0;" data-i18n="free_wifi">Free WiFi 📶</h2>
+      <p><strong>Network:</strong> Fusion_Mandi_Guest</p>
+      <p><strong>Password:</strong> fusionmandi2026</p>
+      <button style="background:#333; color:white; border:none; padding:10px 20px; border-radius:6px; margin-top:15px; cursor:pointer;" onclick="document.getElementById('wifi-modal').style.display='none'" data-i18n="close">Close</button>
+    </div>
+  </div>
+
+  <div class="carousel">
+    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80" class="slide active">
+    <img src="https://images.unsplash.com/photo-1544025162-8111142154ea?auto=format&fit=crop&w=800&q=80" class="slide">
+    <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=800&q=80" class="slide">
+    <div class="carousel-overlay">
+      <h2 style="margin:0; text-shadow: 2px 2px 4px #000;" data-i18n="experience">Experience Authentic Mandi</h2>
+    </div>
+  </div>
+
+  <div class="container" id="menu-container"></div>
+
+  <div class="cart-bar">
+    <div>
+      <div style="font-size:0.9rem; color:#aaa;" data-i18n="total_tab">Total Tab</div>
+      <div style="font-size:1.4rem; font-weight:bold;">₹<span id="tab-total">0</span></div>
+    </div>
+    <button class="btn-view-cart" onclick="document.getElementById('cart-modal').style.display='flex'" data-i18n="view_cart">View Cart 🛒</button>
+  </div>
+
+  <div class="modal cart-modal" id="cart-modal">
+    <div class="cart-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+        <h2 style="margin:0;" data-i18n="your_order">Your Order</h2>
+        <span style="font-size:1.8rem; cursor:pointer;" onclick="document.getElementById('cart-modal').style.display='none'">&times;</span>
       </div>
-      <p class="text-emerald-400 font-bold mb-3" data-i18n="scan_pay">Food Served! Scan to pay via PhonePe/GPay</p>
-      <img id="upiQRCode" src="" class="mx-auto rounded-lg mb-3 w-40 h-40 bg-white p-2">
-      <button onclick="downloadCustomerBill()" class="bg-slate-700 text-white px-4 py-2 rounded-lg font-bold text-sm w-full hover:bg-slate-600" data-i18n="download_bill">Download Offline Bill</button>
+      
+      <div id="cart-items-list" style="margin-bottom: 20px;"></div>
+      
+      <div style="display:flex; justify-content:space-between; font-size:1.3rem; font-weight:bold; margin-bottom:25px; padding-top:10px; border-top:2px dashed #ccc;">
+        <span data-i18n="to_pay">To Pay:</span>
+        <span style="color:#2e7d32;">₹<span id="modal-total">0</span></span>
+      </div>
+      
+      <h4 style="margin-bottom:12px; color:#555;" data-i18n="select_payment">Select Payment & Get Bill</h4>
+      <button style="background:#3498db; color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-bottom:10px; font-weight:bold; font-size:1rem; cursor:pointer;" onclick="checkout('upi')" data-i18n="req_upi">Request UPI QR 📱</button>
+      <button style="background:#2ecc71; color:white; border:none; padding:12px; border-radius:8px; width:100%; margin-bottom:10px; font-weight:bold; font-size:1rem; cursor:pointer;" onclick="checkout('cash')" data-i18n="call_waiter">Call Waiter for Cash 🤵</button>
+      <button style="background:#e67e22; color:white; border:none; padding:12px; border-radius:8px; width:100%; font-weight:bold; font-size:1rem; cursor:pointer;" onclick="checkout('counter')" data-i18n="pay_counter">Pay at Counter 🏪</button>
     </div>
   </div>
 
-  <!-- Menu Grid -->
-  <div id="menuGrid" class="px-5 grid grid-cols-1 md:grid-cols-2 gap-4 mt-2"></div>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+    import { getDatabase, ref, onValue, push, update } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
 
-  <!-- Cart Footer -->
-  <div id="cartFooter" class="hidden fixed bottom-6 left-5 right-5 md:left-auto md:right-5 md:w-96 glass rounded-2xl shadow-2xl border border-slate-200 p-4 z-50">
-    <input type="text" id="orderNotes" data-placeholder="special_req" placeholder="Any special requests?" class="w-full mb-3 px-4 py-3 rounded-xl border border-slate-200 font-bold text-slate-800 outline-none bg-white shadow-inner text-sm">
-    <div class="flex justify-between items-center mb-3">
-      <span class="font-bold text-slate-500 text-sm" data-i18n="total_bill">Total Bill</span>
-      <span id="cartTotal" class="text-2xl font-black text-slate-900">₹0</span>
-    </div>
-    <button onclick="placeOrder()" id="placeOrderBtn" class="w-full bg-amber-600 text-white py-4 rounded-xl font-black text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-      <span data-i18n="confirm_order">Confirm & Send to Kitchen</span>
-    </button>
-  </div>
-
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
       authDomain: "fusionmandi999-36066.firebaseapp.com",
@@ -101,237 +143,233 @@
       projectId: "fusionmandi999-36066",
       storageBucket: "fusionmandi999-36066.firebasestorage.app",
       messagingSenderId: "312237706440",
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd",
+      measurementId: "G-1LM1V9NLMB"
     };
 
-    const RESTAURANT_UPI_ID = "Q227869939@ybl"; // Replace with your actual UPI ID
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase(app);
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const tableId = urlParams.get('table') || 'Takeaway';
+    document.getElementById('table-display').innerText = `T: ${tableId.toUpperCase()}`;
+    const tableRef = ref(db, `active_tables/${tableId}`);
 
-    let menuData = {};
-    let cart = {}; // Format: { "itemKey|variantName": { id, name, variant, price, qty } }
-    let currentFilter = 'All';
-    let customerPhone = "";
-    let myOrderId = localStorage.getItem('fusionmandi_order_id');
-    let myOrderDetails = null;
+    let currentCartTotal = 0;
+    let cartItemsData = [];
+    let customerMobile = "";
+    let globalMenu = null;
 
-    const i18n = {
+    // --- Multi-Language Dictionary ---
+    const dict = {
       en: {
-        welcome: "Welcome to Fusion Mandi", enter_mobile: "Enter mobile number to view menu & receive bill.", mobile_placeholder: "10-Digit Mobile", proceed: "PROCEED TO MENU",
-        smart_dine: "Smart Dine-In", table: "TABLE", all_items: "All Items", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_veg: "Veg", cat_bev: "Beverages",
-        add: "ADD", sold_out: "SOLD OUT", special: "⭐ CHEF'S SPECIAL", qty_left: "Left",
-        total_bill: "Total Bill", confirm_order: "Confirm Order", special_req: "Any special requests?",
-        live_status: "Live Order Status", food_feedback: "How is the food?", thanks_feedback: "Thanks for your feedback! ❤️", scan_pay: "Food Served! Scan to pay", download_bill: "Download Offline Bill"
+        welcome: "Welcome to Fusion Mandi",
+        enter_mobile: "Please enter your mobile number to view the menu and receive your digital bill.",
+        mobile_placeholder: "10-digit Mobile Number",
+        proceed: "Proceed to Menu",
+        free_wifi: "Free WiFi 📶",
+        close: "Close",
+        wifi_btn: "WiFi",
+        experience: "Experience Authentic Mandi",
+        total_tab: "Total Tab",
+        view_cart: "View Cart 🛒",
+        your_order: "Your Order",
+        to_pay: "To Pay:",
+        select_payment: "Select Payment & Get Bill",
+        req_upi: "Request UPI QR 📱",
+        call_waiter: "Call Waiter for Cash 🤵",
+        pay_counter: "Pay at Counter 🏪",
+        add_btn: "+ Add",
+        chefs_special: "⭐ Chef's Special",
+        cart_empty: "Cart is empty",
+        alert_mobile: "Please enter a valid 10-digit mobile number.",
+        alert_empty: "Cart is empty",
+        alert_waiter: "Waitstaff notified. Your bill has been downloaded and sent to WhatsApp."
       },
       hi: {
-        welcome: "फ्यूजन मंडी में आपका स्वागत है", enter_mobile: "मेनू देखने और बिल प्राप्त करने के लिए मोबाइल नंबर दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं",
-        smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी आइटम", cat_chicken: "चिकन", cat_mutton: "मटन", cat_veg: "वेज", cat_bev: "पेयजल",
-        add: "जोड़ें", sold_out: "ख़त्म हो गया", special: "⭐ शेफ की पसंद", qty_left: "बचे हैं",
-        total_bill: "कुल बिल", confirm_order: "ऑर्डर पक्का करें", special_req: "कोई विशेष अनुरोध?",
-        live_status: "ऑर्डर की स्थिति", food_feedback: "खाना कैसा है?", thanks_feedback: "धन्यवाद! ❤️", scan_pay: "परोसा गया! भुगतान के लिए स्कैन करें", download_bill: "बिल डाउनलोड करें"
+        welcome: "फ्यूजन मंडी में आपका स्वागत है",
+        enter_mobile: "मेनू देखने और डिजिटल बिल प्राप्त करने के लिए कृपया अपना मोबाइल नंबर दर्ज करें।",
+        mobile_placeholder: "10-अंकीय मोबाइल नंबर",
+        proceed: "मेनू पर जाएं",
+        free_wifi: "मुफ्त वाईफाई 📶",
+        close: "बंद करें",
+        wifi_btn: "वाईफाई",
+        experience: "प्रामाणिक मंडी का अनुभव करें",
+        total_tab: "कुल बिल",
+        view_cart: "कार्ट देखें 🛒",
+        your_order: "आपका ऑर्डर",
+        to_pay: "भुगतान करना है:",
+        select_payment: "भुगतान चुनें और बिल प्राप्त करें",
+        req_upi: "UPI QR का अनुरोध करें 📱",
+        call_waiter: "नकद के लिए वेटर बुलाएं 🤵",
+        pay_counter: "काउंटर पर भुगतान करें 🏪",
+        add_btn: "+ जोड़ें",
+        chefs_special: "⭐ शेफ की पसंद",
+        cart_empty: "कार्ट खाली है",
+        alert_mobile: "कृपया एक वैध 10-अंकीय मोबाइल नंबर दर्ज करें।",
+        alert_empty: "कार्ट खाली है",
+        alert_waiter: "वेटर को सूचित कर दिया गया है। आपका बिल डाउनलोड और व्हाट्सएप पर भेज दिया गया है।"
       },
       te: {
-        welcome: "ఫ్యూజన్ మండికి స్వాగతం", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి",
-        smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు",
-        add: "జోడించు", sold_out: "అయిపోయింది", special: "⭐ షెఫ్ స్పెషల్", qty_left: "మిగిలి ఉన్నాయి",
-        total_bill: "మొత్తం బిల్లు", confirm_order: "ఆర్డర్ నిర్ధారించండి", special_req: "ఏదైనా ప్రత్యేక అభ్యర్థనలు?",
-        live_status: "ఆర్డర్ స్టేటస్", food_feedback: "ఆహారం ఎలా ఉంది?", thanks_feedback: "ధన్యవాదాలు! ❤️", scan_pay: "చెల్లించడానికి స్కాన్ చేయండి", download_bill: "బిల్లు డౌన్‌లోడ్ చేయండి"
+        welcome: "ఫ్యూజన్ మండికి స్వాగతం",
+        enter_mobile: "మెనూ చూడటానికి మరియు డిజిటల్ బిల్లును పొందడానికి మీ మొబైల్ నంబర్‌ను నమోదు చేయండి.",
+        mobile_placeholder: "10-అంకెల మొబైల్ నంబర్",
+        proceed: "మెనూకి వెళ్లండి",
+        free_wifi: "ఉచిత వైఫై 📶",
+        close: "మూసివేయి",
+        wifi_btn: "వైఫై",
+        experience: "అసలైన మండిని అనుభవించండి",
+        total_tab: "మొత్తం బిల్లు",
+        view_cart: "కార్ట్ చూడండి 🛒",
+        your_order: "మీ ఆర్డర్",
+        to_pay: "చెల్లించవలసినది:",
+        select_payment: "చెల్లింపు ఎంచుకోండి & బిల్లు పొందండి",
+        req_upi: "UPI QR అభ్యర్థించండి 📱",
+        call_waiter: "నగదు కోసం వెయిటర్‌ను పిలవండి 🤵",
+        pay_counter: "కౌంటర్ వద్ద చెల్లించండి 🏪",
+        add_btn: "+ జోడించు",
+        chefs_special: "⭐ షెఫ్ స్పెషల్",
+        cart_empty: "కార్ట్ ఖాళీగా ఉంది",
+        alert_mobile: "దయచేసి సరైన 10-అంకెల మొబైల్ నంబర్‌ను నమోదు చేయండి.",
+        alert_empty: "కార్ట్ ఖాళీగా ఉంది",
+        alert_waiter: "వెయిటర్‌కు తెలియజేయబడింది. మీ బిల్లు వాట్సాప్‌కు పంపబడింది."
       }
     };
-    let lang = 'en';
-    const t = (k) => i18n[lang][k] || k;
 
-    window.changeLanguage = (l) => {
-      lang = l;
-      document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = t(el.getAttribute('data-i18n')));
-      document.querySelectorAll('[data-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-placeholder')));
-      renderMenu();
-    };
+    let currentLang = 'en';
+    const t = (key) => dict[currentLang][key] || key;
 
-    window.registerCustomer = () => {
-      const num = document.getElementById('customerMobile').value;
-      if (num.length < 10) return alert(lang==='en'?"Invalid Number":"अमान्य नंबर");
-      customerPhone = num;
-      document.getElementById('loginModal').style.display = 'none';
-      document.body.classList.remove('overflow-hidden');
-    };
-
-    db.ref('menu').on('value', snap => { menuData = snap.val() || {}; renderMenu(); });
-
-    window.filterMenu = (cat) => {
-      currentFilter = cat;
-      document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.className = btn.innerText.includes(cat.split(' ')[0]) || (cat==='All' && btn.innerText.includes('All'))
-          ? "category-btn active px-6 py-2 rounded-full font-bold text-sm bg-slate-900 text-white shadow-md transition whitespace-nowrap"
-          : "category-btn px-6 py-2 rounded-full font-bold text-sm bg-white text-slate-600 border shadow-sm transition whitespace-nowrap";
+    window.changeLang = (lang) => {
+      currentLang = lang;
+      // Update Static Text
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.innerText = t(el.getAttribute('data-i18n'));
       });
-      renderMenu();
+      // Update Placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
+      });
+      // Re-render dynamic content
+      renderMenu(); 
+      updateCartUI(globalCartData);
     };
+
+    // Carousel Logic
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 8000);
+
+    // Registration
+    window.registerCustomer = () => {
+      const num = document.getElementById('customer-mobile').value;
+      if (num.length < 10) return alert(t('alert_mobile'));
+      customerMobile = num;
+      update(tableRef, { customer_mobile: num, status: "browsing" });
+      document.getElementById('login-modal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    };
+
+    document.body.style.overflow = 'hidden'; // Lock behind modal
+    window.changeLang('en'); // Init Language
+
+    // Menu Loader
+    onValue(ref(db, 'menu_items'), (snapshot) => {
+      globalMenu = snapshot.val();
+      renderMenu();
+    });
 
     function renderMenu() {
-      const grid = document.getElementById('menuGrid');
-      grid.innerHTML = '';
-      
-      let items = Object.entries(menuData).sort((a,b) => (b[1].is_special?1:0) - (a[1].is_special?1:0));
+      const container = document.getElementById('menu-container');
+      container.innerHTML = '';
+      if(!globalMenu) return;
 
-      items.forEach(([id, item]) => {
-        if (currentFilter !== 'All' && !item.category.includes(currentFilter.split(' ')[0])) return;
-        const stock = item.stock_count || 0;
-        
-        let selectHtml = '';
-        if (item.variants) {
-          selectHtml = `<select id="var-${id}" class="w-full mt-2 p-1.5 border rounded-lg text-xs font-bold outline-none bg-slate-50">`;
-          Object.values(item.variants).forEach(v => {
-            selectHtml += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`;
-          });
-          selectHtml += `</select>`;
-        } else {
-          selectHtml = `<div class="font-black text-lg text-slate-900 mt-1">₹${item.base_price}</div>`;
+      Object.keys(globalMenu).forEach(key => {
+        const item = globalMenu[key];
+        let varHTML = '';
+        if (item.variants && Object.keys(item.variants).length > 0) {
+          varHTML = `<select id="var-${key}" class="variant-select">`;
+          Object.values(item.variants).forEach(v => { varHTML += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`; });
+          varHTML += `</select>`;
         }
-
-        grid.innerHTML += `
-          <div class="bg-white rounded-2xl p-3 flex shadow-sm border ${item.is_special?'special-glow':'border-slate-100'} gap-4 relative overflow-hidden">
-            ${stock <= 0 ? `<div class="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex items-center justify-center"><span class="bg-red-500 text-white font-black px-3 py-1 rounded shadow-lg">${t('sold_out')}</span></div>` : ''}
-            ${item.is_special ? `<div class="absolute top-2 left-2 bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded shadow z-20">${t('special')}</div>` : ''}
-            <div class="w-28 h-28 rounded-xl bg-slate-200 overflow-hidden flex-shrink-0 shadow-inner mt-4">
-              <img src="${item.image_url}" class="w-full h-full object-cover">
+        container.innerHTML += `
+          <div class="menu-item">
+            <img src="${item.image_url}" class="item-img" loading="lazy" onerror="this.src='https://via.placeholder.com/120?text=Mandi'">
+            <div class="item-info">
+              ${item.is_special ? `<span style="background:#e74c3c;color:white;font-size:0.75rem;padding:3px 6px;border-radius:4px;font-weight:bold;">${t('chefs_special')}</span>` : ''}
+              <h3 class="item-title" style="margin-top:6px;">${item.name}</h3>
+              ${item.base_price ? `<p class="item-price">₹${item.base_price}</p>` : ''}
+              ${varHTML}
+              <button class="btn-add" onclick="addToOrder('${key}', '${item.name.replace(/'/g, "\\'")}', ${item.base_price || 0})">${t('add_btn')}</button>
             </div>
-            <div class="flex flex-col justify-between flex-1 py-1 z-0 mt-4">
-              <div>
-                <h3 class="font-bold text-slate-900 leading-tight text-sm">${item.name}</h3>
-                <p class="text-[10px] font-black text-slate-400 uppercase mt-0.5">${stock} ${t('qty_left')}</p>
-                ${selectHtml}
-              </div>
-              <button onclick="addToCart('${id}', '${item.name.replace(/'/g,"\\'")}', ${item.base_price||0}, ${stock})" class="w-full mt-2 bg-slate-900 text-white font-black text-xs py-2 rounded-lg hover:bg-slate-800 active:scale-95 transition">
-                + ${t('add')}
-              </button>
-            </div>
-          </div>
-        `;
+          </div>`;
       });
-      updateCartUI();
     }
 
-    window.addToCart = (id, name, basePrice, maxStock) => {
-      let finalPrice = basePrice, varName = "Regular";
-      const sel = document.getElementById(`var-${id}`);
-      if (sel) { const pts = sel.value.split('|'); varName = pts[0]; finalPrice = parseInt(pts[1]); }
-      
-      const cartKey = `${id}|${varName}`;
-      const currentQty = cart[cartKey] ? cart[cartKey].qty : 0;
-      
-      // Calculate total quantity of this item across all variants in cart
-      let totalItemQtyInCart = 0;
-      Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) totalItemQtyInCart += cart[k].qty; });
+    let globalCartData = null;
+    // Cart Listener
+    onValue(tableRef, (snapshot) => {
+      globalCartData = snapshot.val();
+      updateCartUI(globalCartData);
+    });
 
-      if (totalItemQtyInCart >= maxStock) return alert(lang==='en'?"Out of stock!":"स्टॉक खत्म!");
-      
-      if(cart[cartKey]) cart[cartKey].qty++;
-      else cart[cartKey] = { id, name, variant: varName, price: finalPrice, qty: 1 };
-      
-      renderMenu();
-    };
-
-    function updateCartUI() {
-      let total = 0;
-      Object.values(cart).forEach(item => total += (item.price * item.qty));
-      document.getElementById('cartTotal').innerText = '₹' + total;
-      document.getElementById('cartFooter').classList.toggle('hidden', total === 0);
+    function updateCartUI(data) {
+      const cartList = document.getElementById('cart-items-list');
+      cartList.innerHTML = '';
+      cartItemsData = [];
+      if(data && data.items) {
+        currentCartTotal = data.running_total || 0;
+        Object.values(data.items).forEach(i => {
+          cartItemsData.push(`${i.quantity}x ${i.name} (${i.variant}) - Rs. ${i.subtotal}`);
+          cartList.innerHTML += `<div class="cart-item"><span><b style="font-size:1.1rem;">${i.quantity}x ${i.name}</b><br><small style="color:#777; font-size:0.9rem;">${i.variant}</small></span><strong style="font-size:1.2rem;">₹${i.subtotal}</strong></div>`;
+        });
+      } else {
+        currentCartTotal = 0;
+        cartList.innerHTML = `<p style="text-align:center; color:#999; font-size:1.1rem; padding:20px;">${t('cart_empty')}</p>`;
+      }
+      document.getElementById('tab-total').innerText = currentCartTotal;
+      document.getElementById('modal-total').innerText = currentCartTotal;
     }
 
-    window.placeOrder = () => {
-      document.getElementById('placeOrderBtn').disabled = true;
-      const orderId = "ORD-" + Math.floor(1000 + Math.random() * 9000);
-      
-      let baseItems = Object.values(cart).map(i => `${i.name} [${i.variant}] (x${i.qty})`).join(', ');
-      let notes = document.getElementById('orderNotes').value.trim();
-      let total = 0;
-      
-      // Prepare Stock Deductions
-      let stockUpdates = {};
-      Object.values(cart).forEach(item => {
-        total += (item.price * item.qty);
-        // We track stock at the base item level, not variant level
-        if(!stockUpdates[item.id]) stockUpdates[item.id] = 0;
-        stockUpdates[item.id] += item.qty;
-      });
-
-      const payload = {
-        orderId: orderId,
-        table: document.getElementById('tableNum').value,
-        phone: customerPhone,
-        items: notes ? `${baseItems}, 📝 Note: ${notes}` : baseItems,
-        total: total,
-        status: 'pending',
-        timestamp: Date.now()
-      };
-
-      // Execute atomic stock deduction
-      Object.keys(stockUpdates).forEach(itemId => {
-        db.ref(`menu/${itemId}/stock_count`).transaction(curr => Math.max(0, (curr||0) - stockUpdates[itemId]));
-      });
-
-      db.ref('orders/' + orderId).set(payload).then(() => {
-        cart = {}; document.getElementById('orderNotes').value = '';
-        renderMenu();
-        localStorage.setItem('fusionmandi_order_id', orderId);
-        myOrderId = orderId; listenToMyOrder();
+    window.addToOrder = (id, name, price) => {
+      let finalPrice = price;
+      let varName = "Regular";
+      const select = document.getElementById(`var-${id}`);
+      if (select) {
+        const parts = select.value.split('|');
+        varName = parts[0]; finalPrice = parseInt(parts[1]);
+      }
+      push(ref(db, `active_tables/${tableId}/items`), { name, variant: varName, price: finalPrice, quantity: 1, subtotal: finalPrice, kot_status: "pending" }).then(() => {
+        update(tableRef, { status: "ordering", running_total: currentCartTotal + finalPrice });
       });
     };
 
-    window.sendFeedback = (rating) => {
-      if(!myOrderDetails) return;
-      db.ref('feedback').push({ orderId: myOrderDetails.orderId, table: myOrderDetails.table, rating: rating, timestamp: Date.now() });
-      document.getElementById('feedbackThanks').classList.remove('hidden');
-    };
-
-    window.downloadCustomerBill = () => {
-      if(!myOrderDetails) return;
-      let bill = `=== FUSION MANDI ===\nOrder: ${myOrderDetails.orderId}\nTable: ${myOrderDetails.table}\nMobile: ${myOrderDetails.phone}\n------------------\n${myOrderDetails.items.replace(/, /g,'\n')}\n------------------\nTOTAL: Rs. ${myOrderDetails.total}\n=================`;
+    window.checkout = (method) => {
+      if(currentCartTotal === 0) return alert(t('alert_empty'));
+      
+      update(tableRef, { payment_method: method, bill_requested: true });
+      
+      // Auto Download Txt Bill
+      let billText = `FUSION MANDI\nTable: ${tableId.toUpperCase()}\nMobile: ${customerMobile}\n----------------------\n`;
+      cartItemsData.forEach(i => billText += `${i}\n`);
+      billText += `----------------------\nTotal Due: Rs. ${currentCartTotal}\nThank you!`;
+      const blob = new Blob([billText], { type: 'text/plain' });
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([bill], { type: 'text/plain' }));
-      a.download = `FusionMandi_Bill_${myOrderDetails.orderId}.txt`;
+      a.href = URL.createObjectURL(blob);
+      a.download = `FusionMandi_Bill_${tableId}.txt`;
       a.click();
       
-      // WhatsApp trigger
-      window.open(`https://wa.me/91${myOrderDetails.phone}?text=${encodeURIComponent(bill)}`, '_blank');
+      // Send WhatsApp
+      const waText = encodeURIComponent(billText);
+      window.open(`https://wa.me/91${customerMobile}?text=${waText}`, '_blank');
+      
+      document.getElementById('cart-modal').style.display = 'none';
+      alert(t('alert_waiter'));
     };
-
-    function listenToMyOrder() {
-      if (!myOrderId) return;
-      db.ref('orders/' + myOrderId).on('value', snap => {
-        const order = snap.val();
-        const tr = document.getElementById('activeTracker');
-        const st = document.getElementById('orderStatusText');
-        const ps = document.getElementById('paymentSection');
-
-        if (order) {
-          myOrderDetails = order;
-          tr.classList.remove('hidden');
-          if (order.status === 'pending') {
-            tr.className = "mx-5 mb-4 bg-slate-900 text-white p-5 rounded-2xl shadow-xl border-l-4 border-amber-500 transition-all";
-            st.innerText = lang==='en'?"Sent to Kitchen": (lang==='hi'?"किचन भेजा गया":"వంటగదికి పంపబడింది");
-            ps.classList.add('hidden');
-          } else if (order.status === 'cooking') {
-            tr.className = "mx-5 mb-4 bg-slate-900 text-white p-5 rounded-2xl shadow-xl border-l-4 border-blue-500 transition-all";
-            st.innerText = lang==='en'?"Chef is Cooking": (lang==='hi'?"शेफ बना रहे हैं":"చెఫ్ వండుతున్నాడు");
-            ps.classList.add('hidden');
-          } else if (order.status === 'served') {
-            tr.className = "mx-5 mb-4 bg-slate-900 text-white p-5 rounded-2xl shadow-xl border-l-4 border-emerald-500 transition-all";
-            st.innerText = lang==='en'?"Food Served": (lang==='hi'?"खाना परोसा गया":"ఆహారం అందించబడింది");
-            document.getElementById('upiQRCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=${RESTAURANT_UPI_ID}&pn=FusionMandi&am=${order.total}`)}`;
-            ps.classList.remove('hidden');
-          }
-        } else {
-          tr.classList.add('hidden'); localStorage.removeItem('fusionmandi_order_id'); myOrderId = null;
-          alert(lang==='en'?"Payment Confirmed!":"भुगतान प्राप्त हुआ!");
-        }
-      });
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('table')) document.getElementById('tableNum').value = params.get('table');
-    changeLanguage('en'); listenToMyOrder();
   </script>
 </body>
 </html>
