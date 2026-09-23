@@ -8,31 +8,31 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { primary: '#ff7529', sidebar: '#1e1e2d', light: '#f4f5f8', card: '#ffffff' }
-        }
-      }
-    }
+    tailwind.config = { theme: { extend: { colors: { primary: '#ff7529', sidebar: '#1e1e2d', light: '#f4f5f8', card: '#ffffff' } } } }
   </script>
   <style>
     @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; } .no-print { display: none !important; } }
     .hide-scroll::-webkit-scrollbar { display: none; }
     .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); }
     body { background-color: #f4f5f8; }
+    
+    @keyframes redBlueFlash {
+      0% { box-shadow: inset 0 0 0 10px #ef4444; border-color: #ef4444; }
+      50% { box-shadow: inset 0 0 0 10px #3b82f6; border-color: #3b82f6; }
+      100% { box-shadow: inset 0 0 0 10px #ef4444; border-color: #ef4444; }
+    }
+    .urgent-alarm { animation: redBlueFlash 1s infinite; }
   </style>
 </head>
 <body class="font-sans antialiased text-slate-800">
 
   <!-- Login Modal -->
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
-    <div class="bg-card p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(0,0,0,0.5)]">
+    <div class="bg-card p-10 rounded-3xl text-center w-full max-w-sm shadow-2xl">
       <div class="w-16 h-16 bg-primary/10 text-primary rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black">FM</div>
       <h2 class="text-2xl font-black text-slate-900 mb-2">Workspace Login</h2>
-      <p class="text-slate-500 font-semibold mb-6 text-sm">Authentication Required</p>
-      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-light border-none rounded-xl font-black text-xl focus:ring-2 focus:ring-primary/50 outline-none mb-4 tracking-widest transition-all">
-      <button onclick="attemptLogin()" class="w-full bg-primary text-white font-black py-4 rounded-xl shadow-[0_8px_20px_rgba(255,117,41,0.3)] active:scale-95 transition-transform">ACCESS DASHBOARD</button>
+      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-light border-none rounded-xl font-black text-xl outline-none mb-4 tracking-widest">
+      <button onclick="attemptLogin()" class="w-full bg-primary text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform">ACCESS DASHBOARD</button>
       <p class="text-xs text-slate-400 mt-5 font-medium">Admin: admin123 | Waiter: waiter123</p>
     </div>
   </div>
@@ -40,106 +40,58 @@
   <div class="flex h-screen overflow-hidden hidden" id="mainLayout">
     <!-- Sidebar -->
     <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20">
-      <div class="p-6 flex items-center gap-3 border-b border-white/5">
-        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center font-black text-white shadow-lg">FM</div>
-        <div>
-          <h1 class="font-black text-lg leading-tight tracking-tight">FoodDesk.</h1>
-          <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Fusion Mandi Admin</p>
-        </div>
-      </div>
-      <div class="p-4 flex items-center gap-3">
-        <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs font-black text-primary" id="roleBadge">AD</div>
-        <div>
-          <p class="text-xs font-bold text-slate-300" id="roleText">Administrator</p>
-          <div class="flex items-center gap-1.5 mt-0.5">
-            <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
-          </div>
-        </div>
+      <div class="p-6 border-b border-white/5">
+        <h1 class="font-black text-lg">Fusion Mandi Admin</h1>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText">Waitstaff</span></p>
       </div>
       <nav class="flex-1 px-4 py-4 space-y-2">
-        <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest pl-2 mb-3">Main Menu</p>
-        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary transition-all tab-btn" data-i18n="live_orders">
-          <span>📦</span> Live Orders
-        </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only hidden" data-i18n="menu_stock">
-          <span>🍔</span> Menu & Stock
-        </button>
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only hidden" data-i18n="sales_rev">
-          <span>📈</span> Analytics
-        </button>
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary tab-btn">📦 Floor Operations</button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🍔 Menu & Stock</button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">📈 Analytics</button>
       </nav>
       <div class="p-4 border-t border-white/5">
-        <select id="langAdmin" onchange="changeLanguageAdmin(this.value)" class="w-full bg-white/5 text-slate-300 border-none rounded-xl px-4 py-3 outline-none text-xs font-bold mb-3 cursor-pointer">
-          <option value="en">English</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
-        </select>
-        <button onclick="location.reload()" class="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm">Log Out</button>
+        <button onclick="location.reload()" class="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl">Log Out</button>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto bg-light relative" id="mainContent">
       <div class="p-8 pb-32">
         
-        <!-- 1. LIVE ORDERS -->
+        <!-- LIVE ORDERS -->
         <section id="view-orders" class="tab-section">
-          <div class="flex justify-between items-center mb-8">
-            <div>
-              <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="live_tables">Active Orders</h2>
-              <p class="text-sm font-semibold text-slate-500">Manage kitchen flow and table clearance.</p>
-            </div>
-          </div>
+          <h2 class="text-2xl font-black text-slate-900 mb-8 tracking-tight">Active Floor (Running Tabs)</h2>
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- 2. INVENTORY -->
+        <!-- INVENTORY -->
         <section id="view-inventory" class="tab-section hidden no-print">
-          <div class="flex justify-between items-center mb-8">
-            <div>
-              <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="stock_control">Inventory Management</h2>
-              <p class="text-sm font-semibold text-slate-500">Update stock levels and feature items.</p>
-            </div>
-          </div>
+          <h2 class="text-2xl font-black text-slate-900 mb-8 tracking-tight">Inventory Management</h2>
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- 3. DASHBOARD -->
+        <!-- DASHBOARD -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print">
-            <div>
-              <h2 class="text-2xl font-black text-slate-900 tracking-tight" data-i18n="sales_history">Dashboard & Revenue</h2>
-              <p class="text-sm font-semibold text-slate-500">Daily financial overview.</p>
-            </div>
-            <button onclick="window.print()" class="bg-white text-slate-800 border border-slate-200 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:bg-slate-50">🖨️ Export PDF</button>
+            <h2 class="text-2xl font-black text-slate-900 tracking-tight">Dashboard & Revenue</h2>
+            <button onclick="window.print()" class="bg-white text-slate-800 border border-slate-200 px-5 py-2.5 rounded-xl font-bold">🖨️ Export PDF</button>
           </div>
-          
           <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-              <div class="bg-primary/10 border border-primary/20 p-6 rounded-2xl flex items-center justify-between">
-                <div>
-                  <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Today's Revenue</p>
-                  <p id="tallyDaily" class="text-3xl font-black text-slate-900">₹0</p>
-                </div>
-                <div class="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center text-xl">💰</div>
-              </div>
+            <div class="mb-10">
+              <p class="text-[10px] font-black text-primary uppercase tracking-widest mb-1">Today's Revenue</p>
+              <p id="tallyDaily" class="text-4xl font-black text-slate-900">₹0</p>
             </div>
-
             <div class="mb-10">
               <h3 class="text-lg font-black text-slate-900 mb-6 border-b border-slate-100 pb-3">Completed Transactions</h3>
-              <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm border-collapse">
-                  <thead class="bg-light text-slate-500 uppercase font-black text-[10px] tracking-widest">
-                    <tr><th class="p-4 rounded-tl-xl">Time</th><th class="p-4">Table</th><th class="p-4 w-1/2">Order Details</th><th class="p-4 text-right rounded-tr-xl">Amount</th></tr>
-                  </thead>
-                  <tbody id="dailyLogsTable" class="divide-y divide-slate-100"></tbody>
-                </table>
-              </div>
+              <table class="w-full text-left text-sm border-collapse">
+                <thead class="bg-light text-slate-500 uppercase font-black text-[10px] tracking-widest">
+                  <tr><th class="p-4">Time</th><th class="p-4">Table</th><th class="p-4 w-1/2">Order Details</th><th class="p-4 text-right">Amount</th></tr>
+                </thead>
+                <tbody id="dailyLogsTable" class="divide-y divide-slate-100"></tbody>
+              </table>
             </div>
-
             <div class="mt-16 pt-8 border-t border-slate-100 text-center no-print">
-              <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                ⚠️ FACTORY RESET: Load Full 22-Item Database
-              </button>
+              <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest">⚠️ FACTORY RESET: Load Full 22-Item Database</button>
             </div>
           </div>
         </section>
@@ -149,34 +101,16 @@
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", 
-      authDomain: "fusionmandi999-36066.firebaseapp.com", 
-      databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", 
-      projectId: "fusionmandi999-36066", 
-      storageBucket: "fusionmandi999-36066.firebasestorage.app", 
-      messagingSenderId: "312237706440", 
-      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwXvoOUsaQeKy8tjGuOkYunnK8hau3LJNCt3PUn1g0Ar6pD35jaX32_dZ_7uXRdSQRYUg/exec";
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbytjijowQXIR4AfQxHtJt4PkYhiy7-RYqEZmp6QTF61QIbTG5xV0R1Aor8-wYqRx1ZVCQ/exec";
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
     let currentRole = null;
     let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-
-    const i18n = {
-      en: { live_orders: "Live Orders", menu_stock: "Menu / Stock", sales_rev: "Analytics", live_tables: "Active Orders", stock_control: "Inventory Management", sales_history: "Dashboard & Revenue", accept_cook: "Accept Order", serve_food: "Serve Food", clear_receipt: "Clear & Log Sale", update: "Save" },
-      hi: { live_orders: "लाइव ऑर्डर", menu_stock: "मेनू / स्टॉक", sales_rev: "एनालिटिक्स", live_tables: "सक्रिय ऑर्डर", stock_control: "स्टॉक प्रबंधन", sales_history: "डैशबोर्ड और राजस्व", accept_cook: "ऑर्डर स्वीकार करें", serve_food: "खाना परोसें", clear_receipt: "क्लियर और लॉग", update: "सेव करें" },
-      te: { live_orders: "లైవ్ ఆర్డర్‌లు", menu_stock: "మెనూ / స్టాక్", sales_rev: "అనలిటిక్స్", live_tables: "యాక్టివ్ ఆర్డర్‌లు", stock_control: "స్టాక్ కంట్రోల్", sales_history: "డ్యాష్‌బోర్డ్ & ఆదాయం", accept_cook: "ఆర్డర్ అంగీకరించు", serve_food: "ఆహారం అందించండి", clear_receipt: "క్లియర్ & లాగ్", update: "సేవ్ చేయి" }
-    };
-    let lang = 'en'; const t = (k) => i18n[lang][k] || k;
-
-    window.changeLanguageAdmin = function(l) {
-      lang = l;
-      document.querySelectorAll('[data-i18n]').forEach(el => el.innerHTML = el.innerHTML.replace(/[^<>]+(?=<|$)/, t(el.getAttribute('data-i18n'))));
-      if(currentRole) loadSystem();
-    };
+    let alarmTimer = null;
 
     window.attemptLogin = function() {
       const pin = document.getElementById('sysPin').value;
@@ -188,66 +122,87 @@
       
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainLayout').classList.remove('hidden');
+      document.getElementById('roleText').innerText = currentRole === 'admin' ? 'Administrator' : 'Floor Waitstaff';
       
-      document.getElementById('roleText').innerText = currentRole === 'admin' ? 'Administrator' : 'Floor Staff';
-      document.getElementById('roleBadge').innerText = currentRole === 'admin' ? 'AD' : 'WT';
-      
-      if(currentRole === 'admin') { 
-        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); 
-      }
+      if(currentRole === 'admin') { document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); }
       loadSystem();
-    };
+    }
 
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(b => {
-        if(b.id === `tab-${tab}`) b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary transition-all tab-btn";
-        else b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 hover:text-white transition-all tab-btn admin-only" + (currentRole !== 'admin' ? ' hidden' : '');
+        if(b.id === `tab-${tab}`) b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary tab-btn";
+        else b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only" + (currentRole !== 'admin' ? ' hidden' : '');
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
-    };
+    }
+
+    function triggerAlarm() {
+      if(currentRole !== 'admin') return;
+      alertSound.play().catch(()=>{});
+      
+      // Stop after 10 seconds
+      setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 10000);
+    }
 
     function loadSystem() {
-      db.ref('.info/connected').on('value', snap => {
-        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
-        if (snap.val()) { dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"; txt.innerText="Online"; txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest"; }
-        else { dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; txt.innerText="Offline"; txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest"; }
-      });
-
-      db.ref('orders').on('value', snap => {
+      db.ref('active_tables').on('value', snap => {
         const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
-        const orders = snap.val() || {};
-        Object.entries(orders).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, order]) => {
-          let border = order.status==='pending'?'border-primary':(order.status==='cooking'?'border-blue-500':'border-emerald-500');
-          let badge = order.status==='pending'?'bg-primary/10 text-primary':(order.status==='cooking'?'bg-blue-100 text-blue-600':'bg-emerald-100 text-emerald-600');
+        const tables = snap.val() || {};
+        let needsAttention = false;
+        
+        Object.entries(tables).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, table]) => {
+          if(table.status === 'pending' || table.status === 'bill_requested') needsAttention = true;
+
+          let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
           
           let btn = '';
-          if(order.status === 'pending') { btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-black transition-colors" onclick="updateOrder('${id}','cooking')">${t('accept_cook')}</button>`; } 
-          else if(order.status === 'cooking') { btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3.5 rounded-xl font-black transition-colors" onclick="updateOrder('${id}','served')">${t('serve_food')}</button>`; } 
-          else if(currentRole === 'admin') { btn = `<button class="w-full bg-dark hover:bg-slate-800 text-white py-3.5 rounded-xl font-black transition-colors border border-emerald-500" onclick="clearBill('${id}')">${t('clear_receipt')}</button>`; } 
-          else { btn = `<button class="w-full bg-light text-slate-400 py-3.5 rounded-xl font-black" disabled>Awaiting Admin</button>`; }
+          if (currentRole === 'admin') {
+            if(table.status === 'pending') { 
+              btn = `<button class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-black" onclick="printKOT('${id}')">Print KOT (Ack Order)</button>`; 
+            } else if(table.status === 'bill_requested') { 
+              btn = `<button class="w-full bg-emerald-500 text-white py-3.5 rounded-xl font-black" onclick="generateBill('${id}')">Show QR Code</button>`; 
+            } else { 
+              btn = `<button class="w-full bg-dark text-white py-3.5 rounded-xl font-black" onclick="clearTable('${id}')">Clear & Log Sale (${table.paymentMethod || 'CASH'})</button>`; 
+            }
+          } else {
+            // Waiter Role Limits
+            if(table.status === 'pending' || table.status === 'cooking') {
+              btn = `<button class="w-full bg-blue-600 text-white py-3.5 rounded-xl font-black" onclick="waiterRequestBill('${id}')">Request Bill</button>`;
+            } else if(table.status === 'bill_requested') {
+              btn = `<button class="w-full bg-emerald-500 text-white py-3.5 rounded-xl font-black" onclick="waiterCashCollect('${id}')">Mark Cash Collected</button>`;
+            } else {
+              btn = `<button class="w-full bg-light text-slate-400 py-3.5 rounded-xl font-black" disabled>Awaiting Admin Clear</button>`;
+            }
+          }
 
           grid.innerHTML += `
-            <div class="dash-card bg-card p-6 rounded-3xl border-t-4 ${border} flex flex-col justify-between">
+            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
               <div>
                 <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-                  <div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
-                    <span class="font-black text-2xl text-slate-900 leading-none">${order.table}</span>
-                  </div>
-                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg">${order.status}</span>
+                  <span class="font-black text-2xl text-slate-900">Table ${table.table}</span>
+                  <span class="text-[10px] font-black uppercase bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg">${table.status.replace('_',' ')}</span>
                 </div>
-                <p class="font-semibold text-slate-600 text-sm leading-relaxed mb-4">${(order.items||"").replace(/,/g,'<br>•')}</p>
+                <p class="font-semibold text-slate-600 text-sm leading-relaxed mb-4">${(table.items||"").replace(/ \| /g,'<br>• ')}</p>
               </div>
               <div class="mt-2 pt-4 border-t border-slate-100">
                 <div class="flex justify-between items-end mb-5">
-                  <span class="text-xs font-bold text-slate-400 bg-light px-2 py-1 rounded-md">📞 ${order.phone}</span>
-                  <span class="font-black text-2xl text-slate-900 tracking-tight">₹${order.total}</span>
+                  <span class="text-xs font-bold text-slate-400 bg-light px-2 py-1 rounded-md">📞 ${table.phone}</span>
+                  <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total}</span>
                 </div>
                 ${btn}
               </div>
             </div>`;
         });
+
+        // 30 Second Reminder Loop for Admins
+        if(needsAttention) {
+          triggerAlarm();
+          if(!alarmTimer) alarmTimer = setInterval(triggerAlarm, 30000);
+        } else {
+          clearInterval(alarmTimer); alarmTimer = null;
+          alertSound.pause(); alertSound.currentTime = 0;
+        }
       });
 
       if(currentRole === 'admin') {
@@ -255,21 +210,21 @@
           const list = document.getElementById('inventoryList'); list.innerHTML = '';
           Object.entries(snap.val()||{}).forEach(([id, item]) => {
             list.innerHTML += `
-              <div class="dash-card bg-card p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-4 w-full sm:w-auto">
+              <div class="dash-card bg-card p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
                   <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover shadow-sm">
                   <div>
-                    <h4 class="font-black text-sm text-slate-900 leading-tight">${item.name}</h4>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-0.5">${item.category}</p>
+                    <h4 class="font-black text-sm text-slate-900">${item.name}</h4>
+                    <p class="text-[10px] font-black text-slate-400 uppercase">${item.category}</p>
                   </div>
                 </div>
-                <div class="flex items-center gap-3 w-full sm:w-auto">
-                  <button onclick="toggleSpec('${id}', ${item.is_special||false})" class="px-3 py-2 rounded-lg text-xs font-bold transition-colors ${item.is_special?'bg-amber-100 text-amber-700':'bg-light text-slate-500 hover:bg-slate-200'}">⭐</button>
-                  <div class="flex items-center bg-light rounded-lg overflow-hidden border border-slate-100 p-1">
-                    <span class="px-2 text-[10px] font-black text-slate-400 uppercase">Qty</span>
-                    <input type="number" id="stock-${id}" value="${item.stock_count||0}" class="w-12 p-1 font-black text-center text-sm outline-none bg-transparent text-slate-900">
+                <div class="flex items-center gap-3">
+                  <button onclick="toggleSpec('${id}', ${item.is_special||false})" class="px-3 py-2 rounded-lg text-xs font-bold ${item.is_special?'bg-amber-100 text-amber-700':'bg-light text-slate-500'}">⭐</button>
+                  <div class="flex items-center bg-light rounded-lg overflow-hidden p-1">
+                    <span class="px-2 text-[10px] font-black text-slate-400">Qty</span>
+                    <input type="number" id="stock-${id}" value="${item.stock_count||0}" class="w-12 p-1 font-black text-center outline-none bg-transparent">
                   </div>
-                  <button onclick="updStock('${id}')" class="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg font-black text-xs shadow-sm transition-colors">${t('update')}</button>
+                  <button onclick="updStock('${id}')" class="bg-primary text-white px-4 py-2.5 rounded-lg font-black text-xs">Save</button>
                 </div>
               </div>`;
           });
@@ -280,40 +235,38 @@
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
           const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
           Object.values(snap.val()||{}).forEach(log => {
-            tb.innerHTML += `<tr class="hover:bg-light/50 transition-colors"><td class="p-4 text-slate-500 font-medium">${log.time}</td><td class="p-4 font-black text-slate-900">T-${log.table}</td><td class="p-4 text-slate-600 font-medium">${log.items}</td><td class="p-4 font-black text-slate-900 text-right">₹${log.total}</td></tr>`;
+            tb.innerHTML += `<tr class="hover:bg-light/50"><td class="p-4 font-medium text-slate-500">${log.time}</td><td class="p-4 font-black">T-${log.table}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total}</td></tr>`;
           });
         });
       }
     }
 
-    window.updateOrder = function(id, st) { db.ref('orders/'+id).update({status: st}); };
+    // Admin Functions
+    window.printKOT = function(id) { db.ref('active_tables/'+id).update({status: 'cooking'}); };
+    window.generateBill = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready'}); };
     window.toggleSpec = function(id, st) { db.ref('menu/'+id).update({is_special: !st}); };
     window.updStock = function(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); };
 
-    window.clearBill = async function(id) {
-      if(!confirm("Clear table and log transaction?")) return;
-      const snap = await db.ref('orders/'+id).once('value'); const order = snap.val(); if(!order) return;
+    window.clearTable = async function(id) {
+      if(!confirm("Finalize Table and Log Revenue?")) return;
+      const snap = await db.ref('active_tables/'+id).once('value'); const tableData = snap.val(); if(!tableData) return;
       const d = new Date().toISOString().split('T')[0];
       
-      db.ref(`tallies/daily/${d}`).transaction(v => (v||0)+Number(order.total));
-      db.ref(`daily_logs/${d}/${order.orderId}`).set({ time: new Date().toLocaleTimeString(), table: order.table, phone: order.phone, items: order.items, total: order.total });
+      db.ref(`tallies/daily/${d}`).transaction(v => (v||0)+Number(tableData.total));
+      db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, phone: tableData.phone, items: tableData.items, total: tableData.total });
       
-      // Perfectly formatted Webhook Payload for Google Sheets
-      const sheetPayload = {
-        orderId: order.orderId,
-        tableNo: order.table,
-        phone: order.phone,
-        totalAmount: order.total,
-        paymentMethod: "CLEARED",
-        itemsDetails: order.items
-      };
+      const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: tableData.paymentMethod || "CASH", itemsDetails: tableData.items };
       fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(sheetPayload) });
-      db.ref('orders/'+id).remove();
-    };
+      db.ref('active_tables/'+id).remove();
+    }
+
+    // Waiter Functions
+    window.waiterRequestBill = function(id) { db.ref('active_tables/'+id).update({status: 'bill_requested', paymentMethod: 'WAITER_COLLECT'}); };
+    window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH_COLLECTED'}); alert("Admin notified of cash collection."); };
 
     window.factoryResetSystem = function() {
-      if(confirm("⚠️ PROCEED WITH FACTORY RESET? This loads 22 Fusion Mandi items with 60 stock limits.")) {
-        db.ref('orders').remove(); db.ref('tallies').remove(); db.ref('daily_logs').remove();
+      if(confirm("⚠️ PROCEED WITH FACTORY RESET? Loads 22 Fusion Mandi items with 60 stock limits.")) {
+        db.ref('active_tables').remove(); db.ref('tallies').remove(); db.ref('daily_logs').remove();
         
         const mandiMenu = {
           "i01": { name: "Chicken Fry Mandi", category: "Chicken Mandi", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1563379091339-03b2184f4f03?w=500&q=80", variants: { v1: { name: "Single", price: 270 }, v2: { name: "Half", price: 499 }, v3: { name: "Triple", price: 729 }, v4: { name: "4 Person", price: 920 }, v5: { name: "Gang", price: 1111 }}},
@@ -339,10 +292,9 @@
           "i21": { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1523362628745-0c100150b504?w=500&q=80" },
           "i22": { name: "Soft Drinks", category: "Beverages", stock_count: 60, is_special: false, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80", variants: { v1: { name: "Regular", price: 25 }, v2: { name: "Large", price: 30 }}}
         };
-        
         db.ref('menu').set(mandiMenu).then(() => { alert("✅ FUSION MANDI SYSTEM LOADED!"); window.location.reload(); });
       }
-    };
+    }
   </script>
 </body>
 </html>
