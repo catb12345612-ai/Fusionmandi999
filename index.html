@@ -360,14 +360,31 @@
             fbSec.classList.remove('hidden'); reqBtn.classList.add('hidden'); paySel.classList.add('hidden');
           }
         } else { 
+          // WHEN BILL IS CLEARED BY ADMIN
           if(activeTableData) {
             tr.classList.add('hidden'); activeTableData = null;
             const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([autoBillText], { type: 'text/plain' })); a.download = `FusionMandi_Bill_${tableId}.txt`; a.click();
             setTimeout(() => { window.open(`https://wa.me/91${customerPhone}?text=${encodeURIComponent(autoBillText)}`, '_blank'); }, 500);
-            alert("Table Cleared! Receipt generated and opened in WhatsApp.");
+            alert("Table Cleared! Receipt generated. Please login again for a new order.");
+            
+            // Auto Logout & Refresh Feature Added Here
+            localStorage.removeItem('fm_cust_phone');
+            customerPhone = "";
+            setTimeout(() => { window.location.reload(); }, 1500); 
           }
         }
       });
+    }
+
+    // Auto-select Table from QR Code URL Parameter (e.g., yourwebsite.com/?table=3)
+    const urlParams = new URLSearchParams(window.location.search);
+    const tableParam = urlParams.get('table');
+    if (tableParam) {
+        const tableSelect = document.getElementById('tableNum');
+        if (tableSelect.querySelector(`option[value="${tableParam}"]`)) {
+            tableSelect.value = tableParam;
+            tableSelect.disabled = true; // Locks the dropdown so the customer cannot change it
+        }
     }
 
     document.getElementById('tableNum').addEventListener('change', () => { listenToRunningTab(); });
