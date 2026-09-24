@@ -52,8 +52,24 @@
     <div class="bg-dark text-white px-3 py-1.5 rounded-xl shadow-md flex items-center gap-2">
       <span class="text-xs font-bold text-slate-300" data-i18n="table">TABLE</span>
       <select id="tableNum" class="bg-transparent font-black text-white outline-none cursor-pointer text-sm">
-        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
-        <option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+        <optgroup label="Standard Tables">
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
+        </optgroup>
+        <optgroup label="R-Section">
+          <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option><option value="R4">R4</option><option value="R5">R5</option><option value="R6">R6</option><option value="R7">R7</option><option value="R8">R8</option><option value="R9">R9</option><option value="R10">R10</option><option value="R11">R11</option>
+        </optgroup>
+        <optgroup label="L-Section">
+          <option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option><option value="L6">L6</option><option value="L7">L7</option>
+        </optgroup>
+        <optgroup label="BH-Section">
+          <option value="BH1">BH1</option><option value="BH2">BH2</option><option value="BH3">BH3</option>
+        </optgroup>
+        <optgroup label="C-Section">
+          <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option><option value="C6">C6</option><option value="C7">C7</option><option value="C8">C8</option>
+        </optgroup>
+        <optgroup label="Takeaway">
+          <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
+        </optgroup>
       </select>
     </div>
   </header>
@@ -371,7 +387,6 @@
             fbSec.classList.remove('hidden'); reqBtn.classList.add('hidden'); paySel.classList.add('hidden');
           }
         } else { 
-          // FLAWLESS CLEARANCE AND LOGOUT LOGIC
           if(activeTableData) {
             tr.classList.add('hidden'); 
             activeTableData = null;
