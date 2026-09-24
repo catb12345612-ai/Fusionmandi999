@@ -34,7 +34,10 @@
   </div>
 
   <div class="bg-slate-950 text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="text-cyan-400 hover:text-cyan-300 transition-colors w-2/3 truncate block cursor-pointer">Dev: Syed Zeeshaan Ali | High-Fledged Solutions</a>
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors w-2/3 truncate cursor-pointer">
+      <img src="WhatsApp Image 2026-09-02 at 2.10.18 AM.jpg" class="h-4 w-4 rounded-full mr-2 object-cover border border-cyan-400">
+      Dev: Syed Zeeshaan Ali | High-Fledged Solutions
+    </a>
     <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-800 text-amber-500 font-black border border-slate-700 rounded px-2 py-1 outline-none">
       <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
     </select>
@@ -102,7 +105,8 @@
       </div>
       <div id="upiArea" class="hidden">
         <p class="text-primary font-black mb-4 text-sm uppercase" data-i18n="scan_pay">Scan to Pay via UPI</p>
-        <img id="upiQRCode" src="" class="mx-auto rounded-2xl mb-4 w-44 h-44 bg-white p-3 shadow-lg">
+        <!-- Updated to use specific custom QR Code image -->
+        <img id="upiQRCode" src="WhatsApp Image 2026-09-06 at 1.18.48 PM.jpeg" class="mx-auto rounded-2xl mb-4 w-44 h-auto bg-white p-3 shadow-lg object-contain">
       </div>
     </div>
   </div>
@@ -152,9 +156,7 @@
 
     window.changeLanguage = function(l) {
       lang = l;
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-          el.innerHTML = el.innerHTML.replace(/[^<>]+(?=<|$)/g, t(el.getAttribute('data-i18n')));
-      });
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = el.innerHTML.replace(/[^<>]+(?=<|$)/g, t(el.getAttribute('data-i18n'))); });
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-i18n-placeholder')));
       renderMenu();
     };
@@ -164,7 +166,6 @@
       if (num.length < 10) return alert(lang==='en'?"Invalid Number":"अमान्य नंबर");
       customerPhone = num; localStorage.setItem('fm_cust_phone', num);
       
-      // Loyalty Check
       db.ref('customers/' + num).once('value', snap => {
           let visits = snap.val() ? snap.val().visits + 1 : 1;
           db.ref('customers/' + num).set({ visits: visits, last_visit: Date.now() });
@@ -176,7 +177,6 @@
       listenToRunningTab();
     };
 
-    // Auto check loyalty if already logged in
     if(customerPhone) {
         db.ref('customers/' + customerPhone).once('value', snap => {
             if(snap.val() && snap.val().visits >= 3) document.getElementById('vipBadge').classList.remove('hidden');
@@ -188,7 +188,6 @@
       document.querySelectorAll('.category-btn').forEach(btn => {
         let isMatch = btn.innerText.includes(cat.split(' ')[0]) || (cat==='All' && btn.innerText.includes('All Menu')) || (cat==='Group' && btn.innerText.includes('4+'));
         if(cat === 'Group' && btn.getAttribute('data-i18n') === 'cat_group') isMatch = true;
-        
         btn.className = isMatch
           ? (cat === 'Group' ? "category-btn active px-6 py-2.5 rounded-xl font-black text-sm bg-amber-500 text-white shadow-md transition whitespace-nowrap" : "category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-md transition whitespace-nowrap")
           : (btn.getAttribute('data-i18n') === 'cat_group' ? "category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200 transition whitespace-nowrap" : "category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition whitespace-nowrap");
@@ -204,25 +203,18 @@
       if(items.length === 0) { grid.innerHTML = `<div class="text-center p-10 font-bold col-span-full">${t('loading_menu')}</div>`; return; }
 
       items.forEach(([id, item]) => {
-        // Group Filter Logic
         if (currentFilter === 'Group') {
             let hasBigPortion = item.base_price > 800 || (item.variants && Object.values(item.variants).some(v => v.name.includes("Gang") || v.name.includes("4")));
             if(!hasBigPortion) return;
-        } else if (currentFilter !== 'All' && !item.category.includes(currentFilter.split(' ')[0])) {
-            return;
-        }
+        } else if (currentFilter !== 'All' && !item.category.includes(currentFilter.split(' ')[0])) { return; }
 
         const stock = item.stock_count || 0;
         let selectHtml = '';
         if (item.variants) {
           selectHtml = `<select id="var-${id}" class="w-full mt-2 p-2 rounded-lg text-xs font-bold bg-slate-100 border border-slate-200 outline-none focus:border-primary">`;
-          Object.values(item.variants).forEach(v => {
-            selectHtml += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`;
-          });
+          Object.values(item.variants).forEach(v => { selectHtml += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`; });
           selectHtml += `</select>`;
-        } else { 
-          selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`; 
-        }
+        } else { selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`; }
 
         let cartQty = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) cartQty += cart[k].qty; });
 
@@ -238,12 +230,12 @@
               ${selectHtml}
               <div class="flex items-center justify-between mt-auto pt-3 z-0">
                  ${cartQty > 0 
-                  ? `<div class="flex items-center bg-slate-100 rounded-lg p-1 w-full justify-between">
+                 ? `<div class="flex items-center bg-slate-100 rounded-lg p-1 w-full justify-between">
                        <button onclick="updateCartQty('${id}', -1,${stock})" class="w-8 h-8 bg-white rounded-md font-black shadow-sm text-slate-800">-</button>
                        <span class="font-black text-sm">${cartQty}</span>
                        <button onclick="updateCartQty('${id}', 1,${stock})" class="w-8 h-8 bg-primary rounded-md font-black shadow-sm text-white">+</button>
                      </div>`
-                  : `<button onclick="updateCartQty('${id}', 1,${stock})" class="w-full bg-dark text-white font-black text-xs py-2.5 rounded-xl active:scale-95 transition-transform">+ ${t('add')}</button>`
+                 : `<button onclick="updateCartQty('${id}', 1,${stock})" class="w-full bg-dark text-white font-black text-xs py-2.5 rounded-xl active:scale-95 transition-transform">+ ${t('add')}</button>`
                  }
               </div>
             </div>
@@ -255,9 +247,7 @@
     window.updateCartQty = function(id, change, maxStock) {
       let finalPrice = menuData[id].base_price || 0, varName = "Regular"; 
       const sel = document.getElementById(`var-${id}`);
-      if (sel) { 
-        const pts = sel.value.split('|'); varName = pts[0]; finalPrice = parseInt(pts[1]) || 0; 
-      }
+      if (sel) { const pts = sel.value.split('|'); varName = pts[0]; finalPrice = parseInt(pts[1]) || 0; }
       
       const cartKey = `${id}|${varName}`;
       let totalQtyOfThisItem = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) totalQtyOfThisItem += cart[k].qty; });
@@ -265,8 +255,7 @@
       if (change > 0 && totalQtyOfThisItem >= maxStock) return alert(lang==='en'?"Out of stock!":"स्टॉक खत्म!");
       
       if(change > 0) {
-        if(cart[cartKey]) cart[cartKey].qty++; 
-        else cart[cartKey] = { id, name: menuData[id].name, variant: varName, price: finalPrice, qty: 1 };
+        if(cart[cartKey]) cart[cartKey].qty++; else cart[cartKey] = { id, name: menuData[id].name, variant: varName, price: finalPrice, qty: 1 };
       } else {
         if(cart[cartKey]) { cart[cartKey].qty--; if(cart[cartKey].qty <= 0) delete cart[cartKey]; }
       }
@@ -301,12 +290,10 @@
         stockUpdates[item.id] += item.qty; 
       });
 
-      // Stock Deductions
       Object.keys(stockUpdates).forEach(itemId => {
         db.ref(`menu/${itemId}/stock_count`).transaction(curr => { return Math.max(0, (curr||0) - stockUpdates[itemId]); });
       });
 
-      // Append to Running Tab
       db.ref(`active_tables/${tableId}`).once('value', snap => {
         let existing = snap.val() || { total: 0, items: "", status: "pending" };
         let updatedItems = existing.items ? existing.items + " | " + newItemsString : newItemsString;
@@ -368,7 +355,6 @@
           } else if (order.status === 'bill_ready') { 
             st.innerText = "Please Pay Bill"; 
             if(order.paymentMethod === 'UPI') {
-                document.getElementById('upiQRCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=Q227869939@ybl&pn=FusionMandi&am=${order.total}`)}`; 
                 upiArea.classList.remove('hidden');
             } else { upiArea.classList.add('hidden'); }
             fbSec.classList.remove('hidden'); reqBtn.classList.add('hidden'); paySel.classList.add('hidden');
