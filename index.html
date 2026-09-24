@@ -75,6 +75,11 @@
     <p id="orderStatusText" class="text-2xl font-black text-white uppercase tracking-tight">Active Session</p>
     
     <div class="mt-4 border-t border-slate-700 pt-4">
+      
+      <!-- ITEM LIST: Customer can see exactly what they ordered -->
+      <div id="customerOrderedItems" class="hidden mb-4 p-4 bg-slate-800/80 rounded-xl text-sm font-medium text-slate-300 max-h-40 overflow-y-auto shadow-inner">
+      </div>
+
       <div class="flex justify-between items-center mb-4">
         <span class="text-slate-400 font-bold text-sm" data-i18n="total_bill">Total Tab:</span>
         <span id="runningTotalDisplay" class="text-3xl font-black text-emerald-400">₹0</span>
@@ -339,6 +344,14 @@
           activeTableData = order; tr.classList.remove('hidden'); 
           document.getElementById('runningTotalDisplay').innerText = `₹${order.total}`;
           autoBillText = `=== FUSION MANDI ===\nTable: ${order.table}\nMobile: ${order.phone}\n------------------\n${order.items.replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${order.total}\n=================`;
+
+          // NEW: Displays itemized list directly to the customer in the active tracker
+          const customerItemsDiv = document.getElementById('customerOrderedItems');
+          if (order.items) {
+             const formattedItems = order.items.split(' | ').map(item => `<div class="py-1.5 border-b border-slate-700/50 last:border-0"><span class="text-primary mr-2">✓</span>${item}</div>`).join('');
+             customerItemsDiv.innerHTML = `<div class="text-[10px] text-slate-500 uppercase tracking-widest mb-2 font-bold border-b border-slate-700/50 pb-1">Items Ordered:</div>` + formattedItems;
+             customerItemsDiv.classList.remove('hidden');
+          }
 
           if (order.status === 'pending') { 
             st.innerText = lang==='en'?"Order Sent!":"ऑर्डर भेजा गया!"; st.className = "text-xl font-black text-amber-400 uppercase tracking-tight";
