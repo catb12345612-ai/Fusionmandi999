@@ -82,8 +82,42 @@
         </section>
 
         <!-- INVENTORY -->
+      <!-- INVENTORY -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Inventory Management</h2>
+          
+          <!-- Add New Dish Module -->
+          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-primary">
+            <h3 class="text-lg font-black text-slate-900 mb-4">➕ Add New Menu Item</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+              <div class="md:col-span-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dish Name</label>
+                <input type="text" id="newDishName" placeholder="e.g. Mutton Mandi" class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
+              </div>
+              <div class="md:col-span-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
+                <select id="newDishCat" class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none cursor-pointer">
+                  <option value="Chicken Mandi">Chicken Mandi</option>
+                  <option value="Mutton Mandi">Mutton Mandi</option>
+                  <option value="Veg Mandi">Veg Mandi</option>
+                  <option value="Specials">Specials</option>
+                  <option value="Beverages">Beverages</option>
+                </select>
+              </div>
+              <div class="md:col-span-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base Price (₹)</label>
+                <input type="number" id="newDishPrice" placeholder="0" class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
+              </div>
+              <div class="md:col-span-1">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Image URL</label>
+                <input type="text" id="newDishImg" placeholder="https://..." class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
+              </div>
+              <div class="md:col-span-1">
+                <button onclick="addNewDish()" class="w-full bg-primary text-white font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform">ADD DISH</button>
+              </div>
+            </div>
+          </div>
+
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
@@ -341,9 +375,41 @@
     }
 
     // Shared Functions
+    // Shared Functions
     window.markServed = function(id) { db.ref('active_tables/'+id).update({status: 'served'}); };
     window.toggleSpec = function(id, st) { db.ref('menu/'+id).update({is_special: !st}); };
     window.updStock = function(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); };
+
+    window.addNewDish = function() {
+      const name = document.getElementById('newDishName').value.trim();
+      const cat = document.getElementById('newDishCat').value;
+      const price = parseInt(document.getElementById('newDishPrice').value);
+      const img = document.getElementById('newDishImg').value.trim();
+
+      if (!name || isNaN(price) || price <= 0) {
+        return alert("Please enter a valid Dish Name and Base Price.");
+      }
+
+      const newItemId = 'item_' + Date.now();
+      
+      const newItemData = {
+        name: name,
+        category: cat,
+        base_price: price,
+        stock_count: 60, 
+        is_special: false,
+        image_url: img || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80" 
+      };
+
+      db.ref('menu/' + newItemId).set(newItemData).then(() => {
+        alert(`✅ ${name} has been added to the menu!`);
+        document.getElementById('newDishName').value = '';
+        document.getElementById('newDishPrice').value = '';
+        document.getElementById('newDishImg').value = '';
+      }).catch(err => {
+        alert("Error adding dish: " + err.message);
+      });
+    };
 
     // Batch Process
     window.markAllServed = function() {
