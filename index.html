@@ -159,6 +159,14 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // 1-TIME WIPE FOR FRESH START (Triggers only once to clear past testing data)
+    if (!localStorage.getItem('fm_data_cleared_once')) {
+        db.ref('active_tables').remove(); // Clears all orders in Firebase
+        localStorage.removeItem('fm_cust_phone'); // Clears local phone memory
+        localStorage.setItem('fm_data_cleared_once', 'true');
+        console.log("Database cleared successfully for a fresh start!");
+    }
+
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let activeTableData = null;
     let customerPhone = localStorage.getItem('fm_cust_phone') || "";
     
@@ -215,24 +223,43 @@
       renderMenu();
     };
 
-    db.ref('menu').on('value', snap => { menuData = snap.val() || {}; renderMenu(); });
+    db.ref('menu').on('value', snap => { 
+      let rawData = snap.val() || {}; 
+      menuData = {};
+      // Filter out any broken/undefined items from the database
+      Object.keys(rawData).forEach(k => {
+        if (rawData[k] && rawData[k].name) {
+          menuData[k] = rawData[k];
+        }
+      });
+      renderMenu(); 
+    });
 
     function renderMenu() {
       const grid = document.getElementById('menuGrid'); grid.innerHTML = '';
+      
       let items = Object.entries(menuData).sort((a,b) => (b[1].is_special?1:0) - (a[1].is_special?1:0));
       if(items.length === 0) { grid.innerHTML = `<div class="text-center p-10 font-bold col-span-full">${t('loading_menu')}</div>`; return; }
 
       items.forEach(([id, item]) => {
+        // Prevent crashes if category is missing
+        let itemCat = item.category || ""; 
+
         if (currentFilter === 'Group') {
-            let hasBigPortion = item.base_price > 800 || (item.variants && Object.values(item.variants).some(v => v.name.includes("Gang") || v.name.includes("4")));
+            let hasBigPortion = item.base_price > 800 || (item.variants && Object.values(item.variants).some(v => v && v.name && (v.name.includes("Gang") || v.name.includes("4"))));
             if(!hasBigPortion) return;
-        } else if (currentFilter !== 'All' && !item.category.includes(currentFilter.split(' ')[0])) { return; }
+        } else if (currentFilter !== 'All' && !itemCat.includes(currentFilter.split(' ')[0])) { return; }
 
         const stock = item.stock_count || 0;
         let selectHtml = '';
         if (item.variants) {
           selectHtml = `<select id="var-${id}" class="w-full mt-2 p-2 rounded-lg text-xs font-bold bg-slate-100 border border-slate-200 outline-none focus:border-primary">`;
-          Object.values(item.variants).forEach(v => { selectHtml += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`; });
+          Object.values(item.variants).forEach(v => { 
+            // Filter out broken variants
+            if (v && v.name) {
+              selectHtml += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`; 
+            }
+          });
           selectHtml += `</select>`;
         } else { selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`; }
 
@@ -267,7 +294,7 @@
     window.updateCartQty = function(id, change, maxStock) {
       let finalPrice = menuData[id].base_price || 0, varName = "Regular"; 
       const sel = document.getElementById(`var-${id}`);
-      if (sel) { const pts = sel.value.split('|'); varName = pts[0]; finalPrice = parseInt(pts[1]) || 0; }
+      if (sel && sel.value) { const pts = sel.value.split('|'); varName = pts[0]; finalPrice = parseInt(pts[1]) || 0; }
       
       const cartKey = `${id}|${varName}`;
       let totalQtyOfThisItem = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) totalQtyOfThisItem += cart[k].qty; });
