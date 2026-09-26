@@ -19,9 +19,6 @@
     .vip-glow { animation: goldPulse 2s infinite; }
     @keyframes goldPulse { 0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); } 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
 
-    /* ============================================================= */
-    /* slide/pop-in animations, tap feedback, print bill styles      */
-    /* ============================================================= */
     @keyframes slideUpBounce {
       0% { transform: translateY(140%); opacity: 0; }
       60% { transform: translateY(-8px); opacity: 1; }
@@ -54,12 +51,10 @@
 </head>
 <body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
 
-  <!-- Connection status banner — real Firebase presence detection, shows only when actually offline -->
   <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[130] bg-red-600 text-white text-center text-xs font-black py-1.5">
     ⚠ Connection lost — reconnecting...
   </div>
 
-  <!-- Mobile Login Modal -->
   <div id="loginModal" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-5 welcome-bg">
     <div class="bg-white p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
       <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🍖</div>
@@ -83,7 +78,6 @@
     </div>
   </div>
 
-  <!-- Header -->
   <header class="glass-nav sticky top-0 z-40 px-5 py-4 shadow-sm flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-black tracking-tighter text-dark leading-none">Fusion <span class="text-primary">Mandi</span></h1>
@@ -114,7 +108,6 @@
     </div>
   </header>
 
-  <!-- Categories -->
   <div class="px-5 py-4 flex space-x-3 overflow-x-auto hide-scroll sticky top-[68px] z-30 bg-light/95 backdrop-blur-md border-b border-slate-200">
     <button onclick="filterMenu('All')" data-cat="All" class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-md transition whitespace-nowrap" data-i18n="all_items">All Menu</button>
     <button onclick="filterMenu('Group')" data-cat="Group" class="category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-amber-100 text-amber-700 border border-amber-300 hover:bg-amber-200 transition whitespace-nowrap" data-i18n="cat_group">👨‍👩‍👧‍👦 4+ People</button>
@@ -124,7 +117,6 @@
     <button onclick="filterMenu('Beverages')" data-cat="Beverages" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition whitespace-nowrap" data-i18n="cat_bev">Drinks</button>
   </div>
 
-  <!-- Active Running Tab -->
   <div id="activeTracker" class="hidden mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-2xl border-l-4 border-amber-500 relative overflow-hidden">
     <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
     <h3 class="text-xs text-primary font-black uppercase tracking-widest mb-1" data-i18n="live_status">Your Running Tab</h3>
@@ -132,7 +124,6 @@
     
     <div class="mt-4 border-t border-slate-700 pt-4">
       
-      <!-- ITEM LIST: Customer can see exactly what they ordered -->
       <div id="customerOrderedItems" class="hidden mb-4 p-4 bg-slate-800/80 rounded-xl text-sm font-medium text-slate-300 max-h-40 overflow-y-auto shadow-inner">
       </div>
 
@@ -141,12 +132,10 @@
         <span id="runningTotalDisplay" class="text-3xl font-black text-emerald-400">₹0</span>
       </div>
 
-      <!-- Always-available manual print — admin/waiter can print the current bill on demand, any time, as many times as needed -->
       <button onclick="printCurrentBill()" class="w-full mb-3 bg-slate-700 hover:bg-slate-600 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition flex items-center justify-center gap-2">
         <span>🖨️</span><span data-i18n="print_bill">Print Bill</span>
       </button>
       
-      <!-- Payment Selection UI -->
       <div id="paymentSelection" class="hidden flex flex-col gap-2 mt-4">
         <p class="text-xs text-slate-300 font-bold uppercase tracking-widest text-center mb-2" data-i18n="select_payment">Select Payment Method</p>
         <div class="grid grid-cols-3 gap-2">
@@ -158,7 +147,6 @@
       <button onclick="showPaymentOptions()" id="reqBillBtn" class="w-full bg-primary text-white py-3 rounded-xl font-black text-sm active:scale-95 transition-transform" data-i18n="request_bill">Request Final Bill</button>
     </div>
 
-    <!-- Rating & UPI -->
     <div id="feedbackSection" class="hidden mt-5 pt-5 border-t border-slate-700 text-center relative z-10">
       <div id="feedbackBox" class="mb-5 pb-5 border-b border-slate-700">
         <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4" data-i18n="food_feedback">Rate your food</p>
@@ -167,21 +155,24 @@
           <button onclick="sendFeedback('Good')" class="hover:scale-110 active:scale-90 transition-transform">😋</button>
           <button onclick="sendFeedback('Excellent')" class="hover:scale-110 active:scale-90 transition-transform">😍</button>
         </div>
+        <textarea id="feedbackText" rows="2" placeholder="Write a few lines about your experience (optional)" class="w-full mt-4 p-3 rounded-xl bg-slate-800 border border-slate-700 text-sm text-white placeholder-slate-500 outline-none focus:border-primary resize-none"></textarea>
+        <button onclick="sendWrittenFeedback()" class="mt-2 w-full bg-primary/90 hover:bg-primary text-white text-xs font-black py-2.5 rounded-xl active:scale-95 transition-transform">Send Written Feedback</button>
         <p id="feedbackThanks" class="text-xs font-black text-emerald-400 mt-4 hidden" data-i18n="thanks_feedback">Feedback saved! ❤️</p>
       </div>
       <div id="upiArea" class="hidden">
         <p class="text-primary font-black mb-4 text-sm uppercase" data-i18n="scan_pay">Scan to Pay via UPI</p>
         <img id="upiQRCode" src="upi-qr-img.jpeg" class="mx-auto rounded-2xl mb-4 w-44 h-auto bg-white p-3 shadow-lg object-contain">
+        <a id="gpayDirectLink" href="#" class="block w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition-transform">📱 Pay Directly via GPay / PhonePe / Paytm</a>
       </div>
     </div>
   </div>
 
-  <!-- Menu Grid -->
   <div id="menuGrid" class="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
     <div class="text-center p-10 text-slate-400 font-bold col-span-full" data-i18n="loading_menu">Loading Menu...</div>
   </div>
 
-  <!-- Cart Footer -->
+  <button onclick="askForHelp()" class="fixed bottom-24 right-4 z-40 bg-dark text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Need help? Message our staff">❓</button>
+
   <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[400px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 z-50">
     <div class="flex items-center gap-3 mb-4">
       <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black">🛒</div>
@@ -197,7 +188,6 @@
     </button>
   </div>
 
-  <!-- Admin PIN Gate Modal -->
   <div id="adminPinModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5">
     <div class="bg-white rounded-3xl p-7 w-full max-w-xs text-center shadow-2xl">
       <div class="text-3xl mb-2">🔒</div>
@@ -212,7 +202,6 @@
     </div>
   </div>
 
-  <!-- Admin Price Editor Modal -->
   <div id="priceEditorModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5">
     <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[80vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
@@ -223,7 +212,6 @@
     </div>
   </div>
 
-  <!-- Print-only paid slip area (invisible on screen, only rendered when printing) -->
   <div id="printBillArea"></div>
 
   <script>
@@ -233,15 +221,19 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // ---- Business config — EDIT THESE 3 LINES BEFORE GOING LIVE ----
+    const UPI_ID = "yourupi@okbank";        // <-- your real UPI VPA (from GPay/PhonePe "Bank account" screen). Powers the direct "Pay via GPay" button.
+    const UPI_PAYEE_NAME = "Fusion Mandi";  // Shown inside GPay/PhonePe when the customer pays
+    const RESTAURANT_HELP_PHONE = "91XXXXXXXXXX"; // <-- WhatsApp number (country code + number, no + or spaces) that receives customer "Need Help" messages
+
     // 1-TIME WIPE FOR FRESH START (Triggers only once to clear past testing data)
     if (!localStorage.getItem('fm_data_cleared_once')) {
-        db.ref('active_tables').remove(); // Clears all orders in Firebase
-        localStorage.removeItem('fm_cust_phone'); // Clears local phone memory
+        db.ref('active_tables').remove();
+        localStorage.removeItem('fm_cust_phone');
         localStorage.setItem('fm_data_cleared_once', 'true');
         console.log("Database cleared successfully for a fresh start!");
     }
 
-    // ---- Real connection status (Firebase's own presence detection) ----
     db.ref('.info/connected').on('value', snap => {
       const banner = document.getElementById('connectionBanner');
       if (snap.val() === false) {
@@ -251,7 +243,6 @@
       }
     });
 
-    // ---- Lightweight SFX + Voice Welcome + Haptics (generated in-browser, no external files/URLs) ----
     let audioCtx = null;
     function getAudioCtx(){
       try{
@@ -275,7 +266,7 @@
         gain.gain.exponentialRampToValueAtTime(0.0001, start + (duration||0.15));
         osc.connect(gain); gain.connect(ctx.destination);
         osc.start(start); osc.stop(start + (duration||0.15) + 0.02);
-      }catch(e){ /* fail silently — sound should never break the app */ }
+      }catch(e){ }
     }
     function playChime(){ playTone(659.25,.15,'sine',.16,0); playTone(783.99,.18,'sine',.16,.12); playTone(987.77,.22,'sine',.14,.24); }
     function playClick(){ playTone(880,.08,'triangle',.12,0); }
@@ -290,10 +281,10 @@
         const msg = new SpeechSynthesisUtterance("Welcome to Fusion Mandi");
         msg.rate = 0.95; msg.pitch = 1.05; msg.volume = 0.9;
         window.speechSynthesis.speak(msg);
-      }catch(e){ /* speech not supported — fail silently */ }
+      }catch(e){ }
     }
     function vibrate(pattern){
-      try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){ /* not supported — fail silently */ }
+      try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){ }
     }
     function printBillSlip(text, tableId){
       try{
@@ -312,16 +303,11 @@
       }catch(e){ console.error('Print failed', e); }
     }
 
-    // ---- Admin Mode ----
-    // NOTE: This PIN is a convenience gate only, visible to anyone who views this page's source.
-    // Real protection for your prices must come from Firebase Realtime Database security rules,
-    // restricting writes to `menu/*` — this PIN alone does not stop a determined bad actor.
     const ADMIN_PIN = "1234";
     let isAdminMode = false;
 
     window.openAdminGate = function(){
       if(isAdminMode){
-        // Already unlocked — tapping again locks it back for safety
         isAdminMode = false;
         document.getElementById('adminGateBtn').classList.remove('bg-emerald-600');
         renderMenu();
@@ -427,7 +413,6 @@
 
     window.registerCustomer = function() {
       const num = document.getElementById('customerMobile').value.trim();
-      // FIX: was only checking length < 10 (letters/symbols could sneak through). Now requires exactly 10 digits.
       if (!/^\d{10}$/.test(num)) return alert(lang==='en'?"Please enter a valid 10-digit mobile number.":"अमान्य नंबर");
       customerPhone = num; localStorage.setItem('fm_cust_phone', num);
 
@@ -468,7 +453,6 @@
       try{
         let rawData = snap.val() || {}; 
         menuData = {};
-        // Filter out any broken/undefined items from the database
         Object.keys(rawData).forEach(k => {
           if (rawData[k] && rawData[k].name) {
             menuData[k] = rawData[k];
@@ -482,10 +466,8 @@
       console.error('Menu listener error (likely a permissions issue)', err);
     });
 
-    // Stock/occupancy badge — uses item.initial_stock for a real percentage if the admin has set
-    // one in Firebase; otherwise falls back to sensible absolute thresholds so it works out of the box.
     function getStockBadge(item, stock){
-      if(stock <= 0) return null; // the SOLD OUT overlay already covers this case
+      if(stock <= 0) return null;
       let pct = null;
       if(item.initial_stock && Number(item.initial_stock) > 0){
         pct = Math.max(0, Math.min(100, Math.round((stock / Number(item.initial_stock)) * 100)));
@@ -504,7 +486,6 @@
       if(items.length === 0) { grid.innerHTML = `<div class="text-center p-10 font-bold col-span-full">${t('loading_menu')}</div>`; return; }
 
       items.forEach(([id, item]) => {
-        // Prevent crashes if category is missing
         let itemCat = item.category || ""; 
 
         if (currentFilter === 'Group') {
@@ -517,7 +498,6 @@
         if (item.variants) {
           selectHtml = `<select id="var-${id}" class="w-full mt-2 p-2 rounded-lg text-xs font-bold bg-slate-100 border border-slate-200 outline-none focus:border-primary">`;
           Object.values(item.variants).forEach(v => { 
-            // Filter out broken variants
             if (v && v.name) {
               selectHtml += `<option value="${v.name}|${v.price}">${v.name} - ₹${v.price}</option>`; 
             }
@@ -593,12 +573,10 @@
       footer.classList.toggle('hidden', !shouldShow);
 
       if (shouldShow && !cartWasVisible) {
-        // First time it appears — slide it up into view with a bounce so it's impossible to miss
         footer.classList.remove('cart-pop-in'); void footer.offsetWidth;
         footer.classList.add('cart-pop-in');
         footer.scrollIntoView({ behavior: 'smooth', block: 'end' });
       } else if (shouldShow) {
-        // Already visible — small pulse so the updated total is noticeable
         footer.classList.remove('pulse-once'); void footer.offsetWidth;
         footer.classList.add('pulse-once');
       }
@@ -606,7 +584,7 @@
     }
 
     window.placeOrder = function() {
-      if(Object.keys(cart).length === 0) return; // nothing to send — guards against accidental/duplicate taps
+      if(Object.keys(cart).length === 0) return;
       const btn = document.getElementById('placeOrderBtn');
       if (!btn) return;
       btn.disabled = true;
@@ -623,9 +601,6 @@
         stockUpdates[item.id] += item.qty; 
       });
 
-      // Atomic transaction on the table's order record instead of a read-then-write.
-      // Guarantees the new total is always added to whatever the true current value is,
-      // even if two people at the same table order within moments of each other.
       db.ref(`active_tables/${tableId}`).transaction(existing => {
         if (!existing) existing = { total: 0, items: "", status: "pending" };
         const updatedItems = existing.items ? existing.items + " | " + newItemsString : newItemsString;
@@ -647,8 +622,6 @@
           return;
         }
         if (committed) {
-          // Stock is only deducted once the order has actually been saved successfully —
-          // prevents stock silently dropping for an order that never got recorded.
           Object.keys(stockUpdates).forEach(itemId => {
             db.ref(`menu/${itemId}/stock_count`).transaction(curr => { return Math.max(0, (curr||0) - stockUpdates[itemId]); });
           });
@@ -671,9 +644,6 @@
         .catch(err => { console.error(err); playError(); alert('Could not request the bill — please check your connection and try again.'); });
     };
 
-    // On-demand print — usable at any point while there's an active order (pending, cooking,
-    // served, bill requested, bill ready, or right when it's marked paid). Can be tapped
-    // repeatedly; it always reflects the latest known total and item list.
     window.printCurrentBill = function(){
       if(!activeTableData){ return; }
       const tableId = `table_${document.getElementById('tableNum').value}`;
@@ -685,9 +655,32 @@
     window.sendFeedback = function(rating) {
       if(!activeTableData) return;
       playClick();
-      db.ref('feedback').push({ table: activeTableData.table, rating: rating, timestamp: Date.now() })
+      const note = (document.getElementById('feedbackText')?.value || '').trim();
+      db.ref('feedback').push({ table: activeTableData.table, phone: activeTableData.phone, rating: rating, note: note, timestamp: Date.now() })
+        .then(() => vibrate(15))
         .catch(err => console.error('Feedback save failed', err));
-      document.getElementById('feedbackBox').innerHTML = `<p class="text-emerald-400 font-bold text-lg text-center mt-4">Feedback saved! ❤️</p>`;
+      document.getElementById('feedbackBox').innerHTML = `<p class="text-emerald-400 font-bold text-lg text-center mt-4">Feedback saved! ❤️ Thank you.</p>`;
+    };
+
+    window.sendWrittenFeedback = function() {
+      if(!activeTableData) return;
+      const note = (document.getElementById('feedbackText').value || '').trim();
+      if(!note){ playError(); return; }
+      playClick();
+      db.ref('feedback').push({ table: activeTableData.table, phone: activeTableData.phone, rating: 'Written', note: note, timestamp: Date.now() })
+        .then(() => vibrate(15))
+        .catch(err => console.error('Feedback save failed', err));
+      document.getElementById('feedbackBox').innerHTML = `<p class="text-emerald-400 font-bold text-lg text-center mt-4">Feedback saved! ❤️ Thank you.</p>`;
+    };
+
+    window.askForHelp = function() {
+      playClick();
+      const tableNo = document.getElementById('tableNum').value;
+      const msg = `Hi, I need help at Table ${tableNo}` + (customerPhone ? ` (Mobile: ${customerPhone})` : '') + `.`;
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/${RESTAURANT_HELP_PHONE}?text=${encodeURIComponent(msg)}`;
+      waLink.target = '_blank'; waLink.rel = 'noopener';
+      document.body.appendChild(waLink); waLink.click(); document.body.removeChild(waLink);
     };
 
     let autoBillText = "";
@@ -742,6 +735,9 @@
             st.innerText = "Please Pay Bill"; 
             if(order.paymentMethod === 'UPI') {
                 upiArea.classList.remove('hidden');
+                const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${order.total}&cu=INR&tn=${encodeURIComponent('Table '+order.table+' Bill')}`;
+                const gpayLink = document.getElementById('gpayDirectLink');
+                if(gpayLink) gpayLink.href = upiLink;
             } else { upiArea.classList.add('hidden'); }
             fbSec.classList.remove('hidden'); reqBtn.classList.add('hidden'); paySel.classList.add('hidden');
           }
@@ -754,7 +750,6 @@
             lastKnownStatus = null;
             playBell();
 
-            // Automatic paid slip print when the table is finally cleared (final receipt)
             printBillSlip(autoBillText, tableId);
 
             const a = document.createElement('a'); 
@@ -764,7 +759,6 @@
             a.click();
             document.body.removeChild(a);
 
-            // Fires immediately via a real anchor click instead of a delayed window.open — removes the lag
             const waLink = document.createElement('a');
             waLink.href = `https://wa.me/91${customerPhone}?text=${encodeURIComponent(autoBillText)}`;
             waLink.target = '_blank';
