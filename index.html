@@ -47,6 +47,19 @@
       #printBillArea, #printBillArea * { visibility: visible; }
       #printBillArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: #fff; }
     }
+
+    /* Fun toast notifications — playful little pop-ups during ordering / payment */
+    .fun-toast {
+      position: fixed; left: 50%; top: 90px; transform: translateX(-50%) translateY(-20px);
+      background: linear-gradient(135deg, #ff7529, #ff9a56);
+      color: #fff; font-weight: 800; font-size: 13px; padding: 12px 22px;
+      border-radius: 999px; box-shadow: 0 10px 30px rgba(255,117,41,0.4);
+      z-index: 9998; opacity: 0; animation: funToastIn .4s cubic-bezier(.34,1.56,.64,1) forwards;
+      max-width: 88vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fun-toast-out { animation: funToastOut .5s ease forwards; }
+    @keyframes funToastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    @keyframes funToastOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
   </style>
 </head>
 <body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
@@ -81,6 +94,7 @@
     <div>
       <h1 class="text-2xl font-black tracking-tighter text-dark leading-none">Fusion <span class="text-primary">Mandi</span></h1>
       <p id="vipBadge" class="hidden text-[10px] font-black bg-amber-400 text-amber-900 px-2 py-0.5 rounded-full mt-1 vip-glow inline-block uppercase tracking-widest">👑 VIP Guest</p>
+      <p id="loyaltyTeaser" class="hidden text-[10px] font-bold text-slate-400 mt-1"></p>
     </div>
     <div class="bg-dark text-white px-3 py-1.5 rounded-xl shadow-md flex items-center gap-2">
       <span class="text-xs font-bold text-slate-300" data-i18n="table">TABLE</span>
@@ -172,6 +186,8 @@
 
   <button onclick="askForHelp()" class="fixed bottom-24 right-4 z-40 bg-dark text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Need help? Message our staff">❓</button>
 
+  <button onclick="shareWithFriends()" class="fixed bottom-24 left-4 z-40 bg-emerald-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Share Fusion Mandi with a friend">📢</button>
+
   <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[400px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 z-50">
     <div class="flex items-center gap-3 mb-4">
       <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black">🛒</div>
@@ -181,6 +197,7 @@
       </div>
     </div>
     <div id="cartListUI" class="mb-3 max-h-32 overflow-y-auto text-sm font-bold text-slate-700 divide-y divide-slate-100"></div>
+    <p id="upsellNudge" class="hidden text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-3">🥤 Add a drink or dessert to complete your meal!</p>
     <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Any special instructions?" class="w-full mb-3 px-4 py-3 rounded-xl bg-light border-none font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-primary/20 text-sm">
     <button onclick="placeOrder()" id="placeOrderBtn" class="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
       <span data-i18n="confirm_order">Send to Kitchen</span>
@@ -278,6 +295,86 @@
       }catch(e){ console.error('Print failed', e); }
     }
 
+    // ---- Fun VFX & business-growth extras (purely cosmetic — never blocks ordering/payment) ----
+    const FUN_LINES = [
+      "Mama ikkada thinte, malli malli ikkade vachi thintavu! 😋",
+      "Order locked in — kitchen ninjas activated! 🔪🔥",
+      "Your taste buds are about to thank you. 🙌",
+      "Once you Mandi, you can't stand-i anywhere else! 😄",
+      "Bill cleared — see you again soon, foodie! 🍽️❤️",
+      "Fusion Mandi loves you back! 💛"
+    ];
+    function randomFunLine(){ return FUN_LINES[Math.floor(Math.random() * FUN_LINES.length)]; }
+
+    function showFunToast(text){
+      try{
+        const toast = document.createElement('div');
+        toast.className = 'fun-toast';
+        toast.innerText = text;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.classList.add('fun-toast-out'); }, 2600);
+        setTimeout(() => { toast.remove(); }, 3200);
+      }catch(e){ /* purely cosmetic, fail silently */ }
+    }
+
+    function fireConfetti(){
+      try{
+        const canvas = document.createElement('canvas');
+        canvas.style.position = 'fixed'; canvas.style.top = '0'; canvas.style.left = '0';
+        canvas.style.width = '100%'; canvas.style.height = '100%';
+        canvas.style.pointerEvents = 'none'; canvas.style.zIndex = '9999';
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        const colors = ['#ff7529', '#10b981', '#3b82f6', '#a855f7', '#f59e0b'];
+        const pieces = Array.from({ length: 70 }, () => ({
+          x: Math.random() * canvas.width,
+          y: -20 - Math.random() * canvas.height * 0.3,
+          r: 4 + Math.random() * 5,
+          c: colors[Math.floor(Math.random() * colors.length)],
+          vy: 2 + Math.random() * 3,
+          vx: -1 + Math.random() * 2,
+          rot: Math.random() * 360,
+          vr: -6 + Math.random() * 12
+        }));
+        let frame = 0; const maxFrames = 110;
+        function draw(){
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          pieces.forEach(p => {
+            p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot * Math.PI / 180);
+            ctx.fillStyle = p.c;
+            ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 1.6);
+            ctx.restore();
+          });
+          frame++;
+          if(frame < maxFrames){ requestAnimationFrame(draw); }
+          else { canvas.remove(); }
+        }
+        draw();
+      }catch(e){ /* purely cosmetic, fail silently */ }
+    }
+
+    function updateLoyaltyTeaser(visits){
+      const el = document.getElementById('loyaltyTeaser');
+      if(!el) return;
+      if(!visits || visits >= 3){ el.classList.add('hidden'); return; }
+      const remaining = 3 - visits;
+      el.innerText = `🎯 ${remaining} more visit${remaining > 1 ? 's' : ''} to unlock VIP perks!`;
+      el.classList.remove('hidden');
+    }
+
+    window.shareWithFriends = function(){
+      playClick();
+      const msg = "I'm at Fusion Mandi and the food is amazing! 🍖🔥 You should try it too!";
+      const waLink = document.createElement('a');
+      waLink.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      waLink.target = '_blank'; waLink.rel = 'noopener';
+      document.body.appendChild(waLink); waLink.click(); document.body.removeChild(waLink);
+    };
+
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let activeTableData = null;
     let cartWasVisible = false; let lastKnownStatus = null;
     let customerPhone = localStorage.getItem('fm_cust_phone') || "";
@@ -324,8 +421,10 @@
           let visits = (snap.val() && typeof snap.val().visits === 'number') ? snap.val().visits + 1 : 1;
           db.ref('customers/' + num).set({ visits: visits, last_visit: Date.now() });
           if(visits >= 3) document.getElementById('vipBadge').classList.remove('hidden');
+          updateLoyaltyTeaser(visits);
       }).catch(err => console.error('Customer lookup failed', err));
 
+      showFunToast("Welcome to Fusion Mandi! 🍖");
       document.getElementById('loginModal').style.display = 'none';
       document.body.classList.remove('overflow-hidden');
       listenToRunningTab();
@@ -333,8 +432,12 @@
 
     if(customerPhone) {
         db.ref('customers/' + customerPhone).once('value', snap => {
-            if(snap.val() && snap.val().visits >= 3) document.getElementById('vipBadge').classList.remove('hidden');
+            const visits = snap.val() ? snap.val().visits : 0;
+            if(visits >= 3) document.getElementById('vipBadge').classList.remove('hidden');
+            updateLoyaltyTeaser(visits);
         }).catch(err => console.error('Customer lookup failed', err));
+        speakWelcome();
+        showFunToast("Welcome back to Fusion Mandi! 👋");
     }
 
     window.filterMenu = function(cat) {
@@ -466,6 +569,7 @@
       });
       document.getElementById('cartTotal').innerText = '₹' + total;
       document.getElementById('cartListUI').innerHTML = uiHtml;
+      document.getElementById('upsellNudge').classList.toggle('hidden', !(total > 0 && total < 300));
 
       const footer = document.getElementById('cartFooter');
       const shouldShow = total > 0;
@@ -525,6 +629,7 @@
             db.ref(`menu/${itemId}/stock_count`).transaction(curr => { return Math.max(0, (curr||0) - stockUpdates[itemId]); });
           });
           playSuccess(); vibrate([30,40,30]);
+          fireConfetti(); showFunToast(randomFunLine());
           cart = {}; document.getElementById('orderNotes').value = ''; 
           renderMenu(); listenToRunningTab();
         }
@@ -554,6 +659,7 @@
     window.sendFeedback = function(rating) {
       if(!activeTableData) return;
       playClick();
+      if(rating === 'Excellent'){ fireConfetti(); }
       const note = (document.getElementById('feedbackText')?.value || '').trim();
       db.ref('feedback').push({ table: activeTableData.table, phone: activeTableData.phone, rating: rating, note: note, timestamp: Date.now() })
         .then(() => vibrate(15))
@@ -648,6 +754,7 @@
             activeTableData = null;
             lastKnownStatus = null;
             playBell();
+            fireConfetti(); showFunToast(randomFunLine());
 
             printBillSlip(autoBillText, tableId);
 
