@@ -71,7 +71,6 @@
       Dev: Syed Zeeshaan Ali | High-Fledged Solutions
     </a>
     <div class="flex items-center gap-2">
-      <button onclick="openAdminGate()" id="adminGateBtn" title="Admin: edit prices" class="bg-slate-800 hover:bg-slate-700 active:scale-90 text-slate-300 font-black border border-slate-700 rounded px-2 py-1 outline-none transition-all">⚙️</button>
       <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-slate-800 text-amber-500 font-black border border-slate-700 rounded px-2 py-1 outline-none">
         <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
       </select>
@@ -188,30 +187,6 @@
     </button>
   </div>
 
-  <div id="adminPinModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5">
-    <div class="bg-white rounded-3xl p-7 w-full max-w-xs text-center shadow-2xl">
-      <div class="text-3xl mb-2">🔒</div>
-      <h3 class="font-black text-lg mb-1">Admin Access</h3>
-      <p class="text-xs text-slate-500 font-semibold mb-4">Enter admin PIN to edit prices.</p>
-      <input type="password" id="adminPinInput" inputmode="numeric" placeholder="PIN" class="w-full text-center p-3 bg-light border border-slate-200 rounded-xl font-black text-xl tracking-widest outline-none focus:border-primary mb-3">
-      <p id="adminPinError" class="hidden text-red-500 text-xs font-bold mb-3">Incorrect PIN. Try again.</p>
-      <div class="flex gap-2">
-        <button onclick="closeAdminGate()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition-transform">Cancel</button>
-        <button onclick="submitAdminPin()" class="flex-1 bg-primary text-white font-black py-3 rounded-xl active:scale-95 transition-transform">Unlock</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="priceEditorModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl max-h-[80vh] overflow-y-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 id="priceEditorTitle" class="font-black text-lg">Edit Price</h3>
-        <button onclick="closePriceEditor()" class="w-8 h-8 bg-slate-100 rounded-full font-black text-slate-500 active:scale-90 transition-transform">✕</button>
-      </div>
-      <div id="priceEditorBody" class="space-y-3"></div>
-    </div>
-  </div>
-
   <div id="printBillArea"></div>
 
   <script>
@@ -302,91 +277,6 @@
         setTimeout(() => { area.innerHTML=''; }, 1000);
       }catch(e){ console.error('Print failed', e); }
     }
-
-    const ADMIN_PIN = "1234";
-    let isAdminMode = false;
-
-    window.openAdminGate = function(){
-      if(isAdminMode){
-        isAdminMode = false;
-        document.getElementById('adminGateBtn').classList.remove('bg-emerald-600');
-        renderMenu();
-        return;
-      }
-      document.getElementById('adminPinModal').classList.remove('hidden');
-      document.getElementById('adminPinError').classList.add('hidden');
-      document.getElementById('adminPinInput').value = '';
-      setTimeout(()=>document.getElementById('adminPinInput').focus(), 50);
-    };
-    window.closeAdminGate = function(){
-      document.getElementById('adminPinModal').classList.add('hidden');
-    };
-    window.submitAdminPin = function(){
-      const val = document.getElementById('adminPinInput').value;
-      if(val === ADMIN_PIN){
-        isAdminMode = true;
-        document.getElementById('adminPinModal').classList.add('hidden');
-        document.getElementById('adminGateBtn').classList.add('bg-emerald-600');
-        playSuccess(); vibrate(20);
-        renderMenu();
-      } else {
-        document.getElementById('adminPinError').classList.remove('hidden');
-        playError();
-      }
-    };
-
-    window.openPriceEditor = function(id){
-      const item = menuData[id];
-      if(!item) return;
-      document.getElementById('priceEditorTitle').innerText = `Edit: ${item.name}`;
-      const body = document.getElementById('priceEditorBody');
-      body.innerHTML = '';
-
-      if(item.variants){
-        Object.entries(item.variants).forEach(([vKey, v]) => {
-          if(!v || !v.name) return;
-          const row = document.createElement('div');
-          row.className = 'flex items-center gap-2 bg-light p-3 rounded-xl';
-          row.innerHTML = `
-            <span class="flex-1 font-bold text-sm">${v.name}</span>
-            <span class="text-slate-400 font-bold text-sm">₹</span>
-            <input type="number" min="0" step="1" value="${v.price}" class="w-20 p-2 rounded-lg border border-slate-200 font-black text-right outline-none focus:border-primary" id="priceInput-${id}-${vKey}">
-            <button class="bg-primary text-white font-black text-xs px-3 py-2 rounded-lg active:scale-95 transition-transform" onclick="saveVariantPrice('${id}','${vKey}')">Save</button>
-          `;
-          body.appendChild(row);
-        });
-      } else {
-        const row = document.createElement('div');
-        row.className = 'flex items-center gap-2 bg-light p-3 rounded-xl';
-        row.innerHTML = `
-          <span class="flex-1 font-bold text-sm">Base Price</span>
-          <span class="text-slate-400 font-bold text-sm">₹</span>
-          <input type="number" min="0" step="1" value="${item.base_price}" class="w-20 p-2 rounded-lg border border-slate-200 font-black text-right outline-none focus:border-primary" id="priceInput-${id}-base">
-          <button class="bg-primary text-white font-black text-xs px-3 py-2 rounded-lg active:scale-95 transition-transform" onclick="saveBasePrice('${id}')">Save</button>
-        `;
-        body.appendChild(row);
-      }
-      document.getElementById('priceEditorModal').classList.remove('hidden');
-    };
-    window.closePriceEditor = function(){
-      document.getElementById('priceEditorModal').classList.add('hidden');
-    };
-    window.saveBasePrice = function(id){
-      const input = document.getElementById(`priceInput-${id}-base`);
-      const newPrice = Math.round(parseFloat(input.value) * 100) / 100;
-      if(isNaN(newPrice) || newPrice <= 0){ playError(); return alert('Enter a valid price above 0.'); }
-      db.ref(`menu/${id}/base_price`).set(newPrice)
-        .then(() => { playSuccess(); vibrate(20); })
-        .catch(err => { console.error(err); playError(); alert('Could not update price — check your connection and try again.'); });
-    };
-    window.saveVariantPrice = function(id, vKey){
-      const input = document.getElementById(`priceInput-${id}-${vKey}`);
-      const newPrice = Math.round(parseFloat(input.value) * 100) / 100;
-      if(isNaN(newPrice) || newPrice <= 0){ playError(); return alert('Enter a valid price above 0.'); }
-      db.ref(`menu/${id}/variants/${vKey}/price`).set(newPrice)
-        .then(() => { playSuccess(); vibrate(20); })
-        .catch(err => { console.error(err); playError(); alert('Could not update price — check your connection and try again.'); });
-    };
 
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let activeTableData = null;
     let cartWasVisible = false; let lastKnownStatus = null;
@@ -543,7 +433,6 @@
                  : `<button onclick="updateCartQty('${id}', 1,${stock})" class="w-full bg-dark text-white font-black text-xs py-2.5 rounded-xl active:scale-95 transition-transform">+ ${t('add')}</button>`
                  }
               </div>
-              ${isAdminMode ? `<button onclick="openPriceEditor('${id}')" class="mt-2 w-full bg-slate-800 text-white text-[10px] font-black py-2 rounded-lg active:scale-95 transition-transform">✏️ EDIT PRICE</button>` : ''}
             </div>
           </div>`;
       });
