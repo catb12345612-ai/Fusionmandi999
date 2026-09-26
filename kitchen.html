@@ -203,7 +203,7 @@
             
             <div class="mt-16 pt-8 border-t border-slate-100 text-center no-print">
               <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                ⚠️ FACTORY RESET: Load Full 22-Item Database
+                ⚠️ FACTORY RESET: Load Full 20-Item Database
               </button>
             </div>
           </div>
@@ -309,26 +309,29 @@
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
     // ---- Dish image catalog — used to auto-fill images for new/matching dishes and for the Sync Images tool ----
+    // Chicken items (fry/BBQ/Al Faham/broasted/F2/rara/juicy/murg musallam/wings/lolly pop) all share ONE image.
+    // Veg-only items (Mixed Veg / Spl Veg / Mushroom) all share ONE rice image.
+    // Paneer items share ONE paneer rice image.
     const menuImages = {
-      "chicken Fry Mandi": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&q=80",
-      "Chickken BBQ": "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=500&q=80",
+      "chicken Fry Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Chickken BBQ": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
       "Chicken AL Faham": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Braosted Chickken": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=500&q=80",
-      "Chicken F2 Mandi": "https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=500&q=80",
-      "F1 Rara Chicken Mandi": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80",
-      "Chicken Juicy Mandi": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500&q=80",
-      "Chicken Murg Musallam Mandi": "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80",
-      "Chickken Fry Wings Mandi": "https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=500&q=80",
-      "Chicken Lolly pop Mandi": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=500&q=80",
+      "Braosted Chickken": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Chicken F2 Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "F1 Rara Chicken Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Chicken Juicy Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Chicken Murg Musallam Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Chickken Fry Wings Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Chicken Lolly pop Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
       "Muttom Juicy Mandi": "https://images.unsplash.com/photo-1633383718081-22ac93e3db65?w=500&q=80",
       "F1 Rara mutton mandi": "https://images.unsplash.com/photo-1543362906-acfc16c67564?w=500&q=80",
       "Mutton Fry Mandi": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&q=80",
       "Mutton F2": "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80",
       "Bhakasura Mandi (1099) 4 perso": "https://images.unsplash.com/photo-1555126634-323283e090fa?w=500&q=80",
       "VEG MANDI Mixed Veg": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
-      "Spl Veg Mandi": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80",
-      "Mushroom Mandi": "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&q=80",
-      "Pannner Rara Mandi": "https://images.unsplash.com/photo-1631452180519-c014fe946bc0?w=500&q=80",
+      "Spl Veg Mandi": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
+      "Mushroom Mandi": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
+      "Pannner Rara Mandi": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80",
       "Panner Juicy Mandi": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80"
     };
 
@@ -1037,11 +1040,40 @@
     // Waiter Actions
     window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH'}); alert("Admin notified of cash collection."); };
     
-    // (Factory reset logic remains unchanged)
+    // ---- Factory Reset — loads the full 20-item default menu (name, category, image, base price + portion pricing) ----
+    // Portion tiers follow the owner's price sheet: Single (base price), Half (2 Pcs), Triple (3 Pcs), 4 Person, Full Mandi Gang.
+    // Items with a non-standard tier structure (Wings, Lolly Pop, Bhakasura combo) use their own labels/prices instead.
+    const factoryMenuData = {
+      'item_chicken_fry_mandi': { name: "chicken Fry Mandi", category: "Chicken Mandi", base_price: 270, stock_count: 60, is_special: false, image_url: menuImages["chicken Fry Mandi"], portions: { "Half (2 Pcs)": 499, "Triple (3 Pcs)": 729, "4 Person": 920, "Full Mandi Gang": 1111 } },
+      'item_chicken_bbq': { name: "Chickken BBQ", category: "Chicken Mandi", base_price: 310, stock_count: 60, is_special: false, image_url: menuImages["Chickken BBQ"], portions: { "Half (2 Pcs)": 560, "Triple (3 Pcs)": 837, "4 Person": 1060, "Full Mandi Gang": 1299 } },
+      'item_chicken_al_faham': { name: "Chicken AL Faham", category: "Chicken Mandi", base_price: 320, stock_count: 60, is_special: false, image_url: menuImages["Chicken AL Faham"], portions: { "Half (2 Pcs)": 580, "Triple (3 Pcs)": 864, "4 Person": 1099, "Full Mandi Gang": 1299 } },
+      'item_broasted_chicken': { name: "Braosted Chickken", category: "Chicken Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Braosted Chickken"], portions: { "Half (2 Pcs)": 560, "Triple (3 Pcs)": 820, "4 Person": 1020, "Full Mandi Gang": 1222 } },
+      'item_chicken_f2_mandi': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 329, stock_count: 60, is_special: false, image_url: menuImages["Chicken F2 Mandi"], portions: { "Half (2 Pcs)": 599, "Triple (3 Pcs)": 888, "4 Person": 1119, "Full Mandi Gang": 1350 } },
+      'item_f1_rara_chicken_mandi': { name: "F1 Rara Chicken Mandi", category: "Chicken Mandi", base_price: 330, stock_count: 60, is_special: false, image_url: menuImages["F1 Rara Chicken Mandi"], portions: { "Half (2 Pcs)": 540, "Triple (3 Pcs)": 899, "4 Person": 1122, "Full Mandi Gang": 1350 } },
+      'item_chicken_juicy_mandi': { name: "Chicken Juicy Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Chicken Juicy Mandi"], portions: { "Half (2 Pcs)": 540, "Triple (3 Pcs)": 820, "4 Person": 1020, "Full Mandi Gang": 1222 } },
+      'item_chicken_murg_musallam_mandi': { name: "Chicken Murg Musallam Mandi", category: "Chicken Mandi", base_price: 329, stock_count: 60, is_special: false, image_url: menuImages["Chicken Murg Musallam Mandi"], portions: { "Half (2 Pcs)": 600, "Triple (3 Pcs)": 888, "4 Person": 1111, "Full Mandi Gang": 1350 } },
+      'item_chicken_fry_wings_mandi': { name: "Chickken Fry Wings Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Chickken Fry Wings Mandi"], portions: { "5 Wings": 580, "8 Wings": 779, "14 Pieces": 1200 } },
+      'item_chicken_lolly_pop_mandi': { name: "Chicken Lolly pop Mandi", category: "Chicken Mandi", base_price: 199, stock_count: 60, is_special: false, image_url: menuImages["Chicken Lolly pop Mandi"], portions: {} },
+      'item_mutton_juicy_mandi': { name: "Muttom Juicy Mandi", category: "Mutton Mandi", base_price: 349, stock_count: 60, is_special: false, image_url: menuImages["Muttom Juicy Mandi"], portions: { "Half (2 Pcs)": 699, "Triple (3 Pcs)": 950, "4 Person": 1199, "Full Mandi Gang": 1450 } },
+      'item_f1_rara_mutton_mandi': { name: "F1 Rara mutton mandi", category: "Mutton Mandi", base_price: 360, stock_count: 60, is_special: false, image_url: menuImages["F1 Rara mutton mandi"], portions: { "Half (2 Pcs)": 710, "Triple (3 Pcs)": 979, "4 Person": 1222, "Full Mandi Gang": 1499 } },
+      'item_mutton_fry_mandi': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 340, stock_count: 60, is_special: false, image_url: menuImages["Mutton Fry Mandi"], portions: { "Half (2 Pcs)": 699, "Triple (3 Pcs)": 920, "4 Person": 1155, "Full Mandi Gang": 1399 } },
+      'item_mutton_f2': { name: "Mutton F2", category: "Mutton Mandi", base_price: 360, stock_count: 60, is_special: false, image_url: menuImages["Mutton F2"], portions: { "Half (2 Pcs)": 710, "Triple (3 Pcs)": 979, "4 Person": 1222, "Full Mandi Gang": 1499 } },
+      'item_bhakasura_mandi': { name: "Bhakasura Mandi (1099) 4 perso", category: "Specials", base_price: 1099, stock_count: 60, is_special: true, image_url: menuImages["Bhakasura Mandi (1099) 4 perso"], portions: {} },
+      'item_veg_mandi_mixed_veg': { name: "VEG MANDI Mixed Veg", category: "Veg Mandi", base_price: 260, stock_count: 60, is_special: false, image_url: menuImages["VEG MANDI Mixed Veg"], portions: { "Half (2 Pcs)": 510, "Triple (3 Pcs)": 720, "4 Person": 1000, "Full Mandi Gang": 1250 } },
+      'item_spl_veg_mandi': { name: "Spl Veg Mandi", category: "Veg Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Spl Veg Mandi"], portions: { "Half (2 Pcs)": 540, "Triple (3 Pcs)": 750, "4 Person": 1100, "Full Mandi Gang": 1375 } },
+      'item_mushroom_mandi': { name: "Mushroom Mandi", category: "Veg Mandi", base_price: 249, stock_count: 60, is_special: false, image_url: menuImages["Mushroom Mandi"], portions: { "Half (2 Pcs)": 520, "Triple (3 Pcs)": 710, "4 Person": 1050, "Full Mandi Gang": 1320 } },
+      'item_paneer_rara_mandi': { name: "Pannner Rara Mandi", category: "Veg Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Pannner Rara Mandi"], portions: { "Half (2 Pcs)": 530, "Triple (3 Pcs)": 730, "4 Person": 1199, "Full Mandi Gang": 1499 } },
+      'item_paneer_juicy_mandi': { name: "Panner Juicy Mandi", category: "Veg Mandi", base_price: 279, stock_count: 60, is_special: false, image_url: menuImages["Panner Juicy Mandi"], portions: { "Half (2 Pcs)": 510, "Triple (3 Pcs)": 720, "4 Person": 1099, "Full Mandi Gang": 1399 } }
+    };
+
     window.factoryResetSystem = function() {
-        // [Existing Factory Reset Logic]
-        alert("Database framework maintained. Run original reset logic if needed.");
-    }
+      if(!db){ return alert('⚠️ Not connected to the database — check your internet connection and reload.'); }
+      const itemCount = Object.keys(factoryMenuData).length;
+      if(!confirm(`⚠️ This will REPLACE the entire live menu with the full ${itemCount}-item default database (all names, images, base prices and portion prices). Any custom items you added will be lost. Continue?`)) return;
+      db.ref('menu').set(factoryMenuData)
+        .then(() => alert(`✅ Factory reset complete — ${itemCount} menu items loaded with prices and images.`))
+        .catch(err => alert('Could not load factory data — check your connection and try again. (' + err.message + ')'));
+    };
   </script>
 </body>
 </html>
