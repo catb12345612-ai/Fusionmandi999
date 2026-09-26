@@ -119,11 +119,28 @@
                 <button onclick="addNewDish()" class="w-full bg-primary text-white font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform">ADD DISH</button>
               </div>
             </div>
+
+            <!-- Portion Pricing Builder -->
+            <div class="mt-5 pt-5 border-t border-slate-100">
+              <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Portion Pricing (optional — leave blank to sell at Base Price only)</label>
+              </div>
+              <div class="flex flex-wrap gap-2 mb-3">
+                <button type="button" onclick="quickAddPortion('newDishPortions','Single')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Single</button>
+                <button type="button" onclick="quickAddPortion('newDishPortions','Half')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Half</button>
+                <button type="button" onclick="quickAddPortion('newDishPortions','2 Pcs')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ 2 Pcs</button>
+                <button type="button" onclick="quickAddPortion('newDishPortions','Triple (3 Pcs)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Triple (3 Pcs)</button>
+                <button type="button" onclick="quickAddPortion('newDishPortions','Full (4 Person Gang)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Full (4 Person Gang)</button>
+                <button type="button" onclick="quickAddPortion('newDishPortions','')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary/20">+ Custom</button>
+              </div>
+              <div id="newDishPortions" class="space-y-2"></div>
+            </div>
           </div>
 
-          <div class="flex items-center gap-3 mb-4">
+          <div class="flex items-center gap-3 mb-4 flex-wrap">
             <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-sm p-3 bg-card border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
             <span id="menuCountLabel" class="text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap"></span>
+            <button onclick="syncCatalogImages()" class="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-3 rounded-xl font-bold text-xs whitespace-nowrap">🔄 Sync Catalog Images</button>
           </div>
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
@@ -263,6 +280,18 @@
             <span class="text-xs font-black text-slate-600">⭐ Mark as Special</span>
           </label>
         </div>
+        <div class="pt-2 border-t border-slate-100">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Portion Pricing (optional)</label>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <button type="button" onclick="quickAddPortion('editItemPortions','Single')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Single</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','Half')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Half</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','2 Pcs')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ 2 Pcs</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','Triple (3 Pcs)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Triple (3 Pcs)</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','Full (4 Person Gang)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Full (4 Person Gang)</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary/20">+ Custom</button>
+          </div>
+          <div id="editItemPortions" class="space-y-2"></div>
+        </div>
       </div>
       <p class="text-[10px] text-slate-400 font-semibold my-4">Raise or lower the price here any time — changes apply to new orders immediately.</p>
       <div class="flex gap-2">
@@ -278,6 +307,38 @@
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
+
+    // ---- Dish image catalog — used to auto-fill images for new/matching dishes and for the Sync Images tool ----
+    const menuImages = {
+      "chicken Fry Mandi": "https://images.unsplash.com/photo-1626074353765-517a681e40be?w=500&q=80",
+      "Chickken BBQ": "https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?w=500&q=80",
+      "Chicken AL Faham": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
+      "Braosted Chickken": "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=500&q=80",
+      "Chicken F2 Mandi": "https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?w=500&q=80",
+      "F1 Rara Chicken Mandi": "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=500&q=80",
+      "Chicken Juicy Mandi": "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=500&q=80",
+      "Chicken Murg Musallam Mandi": "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80",
+      "Chickken Fry Wings Mandi": "https://images.unsplash.com/photo-1564834724105-918b73d1b9e0?w=500&q=80",
+      "Chicken Lolly pop Mandi": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=500&q=80",
+      "Muttom Juicy Mandi": "https://images.unsplash.com/photo-1633383718081-22ac93e3db65?w=500&q=80",
+      "F1 Rara mutton mandi": "https://images.unsplash.com/photo-1543362906-acfc16c67564?w=500&q=80",
+      "Mutton Fry Mandi": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&q=80",
+      "Mutton F2": "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80",
+      "Bhakasura Mandi (1099) 4 perso": "https://images.unsplash.com/photo-1555126634-323283e090fa?w=500&q=80",
+      "VEG MANDI Mixed Veg": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
+      "Spl Veg Mandi": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80",
+      "Mushroom Mandi": "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=500&q=80",
+      "Pannner Rara Mandi": "https://images.unsplash.com/photo-1631452180519-c014fe946bc0?w=500&q=80",
+      "Panner Juicy Mandi": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80"
+    };
+
+    // Case/space-insensitive lookup so "chicken fry mandi " still matches "chicken Fry Mandi"
+    function findCatalogImage(dishName){
+      if(!dishName) return null;
+      const target = dishName.trim().toLowerCase();
+      const foundKey = Object.keys(menuImages).find(k => k.trim().toLowerCase() === target);
+      return foundKey ? menuImages[foundKey] : null;
+    }
 
     // ---- Global error safety net — shows failures on-screen instead of only in the console ----
     function showGlobalError(msg){
@@ -669,6 +730,95 @@
     window.toggleSpec = function(id, st) { db.ref('menu/'+id).update({is_special: !st}); };
     window.updStock = function(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); };
 
+    // ---- Portion Pricing builder — shared by Add New Dish and Edit Item ----
+    // Each row is a small flex div with a label input + price input + remove button, tagged with data-portion-row.
+    let portionRowSeq = 0;
+    function addPortionRow(containerId, label, price){
+      const container = document.getElementById(containerId);
+      if(!container) return;
+      const rowId = 'prow_' + (portionRowSeq++);
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2';
+      row.setAttribute('data-portion-row', rowId);
+      row.innerHTML = `
+        <input type="text" placeholder="Portion name (e.g. Half)" value="${(label||'').replace(/"/g,'&quot;')}" data-portion-label class="flex-1 p-2.5 bg-light border-none rounded-lg font-bold text-xs outline-none">
+        <span class="text-slate-400 font-black text-xs">₹</span>
+        <input type="number" min="0" placeholder="Price" value="${price===undefined||price===null||price===''?'':price}" data-portion-price class="w-24 p-2.5 bg-light border-none rounded-lg font-black text-xs outline-none">
+        <button type="button" onclick="removePortionRow('${containerId}','${rowId}')" class="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400 rounded-lg text-xs font-black active:scale-90 transition-transform">✕</button>`;
+      container.appendChild(row);
+    }
+    window.removePortionRow = function(containerId, rowId){
+      const container = document.getElementById(containerId);
+      if(!container) return;
+      const row = container.querySelector(`[data-portion-row="${rowId}"]`);
+      if(row) row.remove();
+    };
+    // Quick-add a preset portion (Single/Half/etc). If that label already has a row, just focus its price field instead of duplicating.
+    window.quickAddPortion = function(containerId, presetLabel){
+      const container = document.getElementById(containerId);
+      if(!container) return;
+      if(presetLabel){
+        const existingRow = Array.from(container.querySelectorAll('[data-portion-row]')).find(r => {
+          const labelInput = r.querySelector('[data-portion-label]');
+          return labelInput && labelInput.value.trim().toLowerCase() === presetLabel.trim().toLowerCase();
+        });
+        if(existingRow){ existingRow.querySelector('[data-portion-price]').focus(); return; }
+      }
+      addPortionRow(containerId, presetLabel, '');
+      const rows = container.querySelectorAll('[data-portion-row]');
+      const last = rows[rows.length-1];
+      if(last){ const input = presetLabel ? last.querySelector('[data-portion-price]') : last.querySelector('[data-portion-label]'); if(input) input.focus(); }
+    };
+    // Clears and repopulates a portions container from a saved {label: price} object
+    function renderPortionRows(containerId, portionsObj){
+      const container = document.getElementById(containerId);
+      if(!container) return;
+      container.innerHTML = '';
+      Object.entries(portionsObj||{}).forEach(([label, price]) => addPortionRow(containerId, label, price));
+    }
+    // Reads all rows in a container, validates them, and returns { ok, portions, error }.
+    // Blank rows (no label typed) are silently skipped rather than treated as errors.
+    function collectPortions(containerId){
+      const container = document.getElementById(containerId);
+      if(!container) return { ok: true, portions: {} };
+      const portions = {};
+      const seenLabels = new Set();
+      const rows = Array.from(container.querySelectorAll('[data-portion-row]'));
+      for(const row of rows){
+        const labelInput = row.querySelector('[data-portion-label]');
+        const priceInput = row.querySelector('[data-portion-price]');
+        const label = (labelInput?.value || '').trim();
+        const priceRaw = priceInput?.value;
+        if(!label && (priceRaw === '' || priceRaw === undefined)) continue; // fully empty row, skip
+        if(!label){ return { ok: false, error: 'Every portion row needs a name (e.g. Single, Half, Full).' }; }
+        const price = parseFloat(priceRaw);
+        if(priceRaw === '' || priceRaw === undefined || isNaN(price) || price < 0){
+          return { ok: false, error: `Enter a valid price (0 or more) for portion "${label}".` };
+        }
+        const key = label.toLowerCase();
+        if(seenLabels.has(key)){ return { ok: false, error: `Duplicate portion name "${label}" — each portion must be unique.` }; }
+        seenLabels.add(key);
+        portions[label] = Math.round(price * 100) / 100;
+      }
+      return { ok: true, portions };
+    }
+
+    // ---- Sync Catalog Images (Admin only) — matches menu item names to the built-in image catalog and updates Firebase ----
+    window.syncCatalogImages = function(){
+      if(!db){ return alert('Not connected to the database.'); }
+      const updates = {};
+      let matchCount = 0;
+      Object.entries(menuCache).forEach(([id, item]) => {
+        const match = findCatalogImage(item.name);
+        if(match && match !== item.image_url){ updates[`menu/${id}/image_url`] = match; matchCount++; }
+      });
+      if(matchCount === 0){ return alert('No menu items matched the image catalog names — nothing to update.'); }
+      if(!confirm(`This will update images for ${matchCount} matching menu item(s) from the built-in catalog. Continue?`)) return;
+      db.ref().update(updates)
+        .then(() => alert(`✅ Updated images for ${matchCount} item(s).`))
+        .catch(err => alert('Could not sync images — check your connection and try again.'));
+    };
+
     // ---- Edit Order (Admin only) — self-service order correction, no code changes needed ----
     window.openEditOrder = function(id){
       const table = (window.currentTables || {})[id];
@@ -712,13 +862,18 @@
       entries.forEach(([id, item]) => {
         const stock = item.stock_count || 0;
         const lowStock = stock <= 5;
+        const portionEntries = Object.entries(item.portions || {});
+        const portionBadges = portionEntries.map(([label, price]) =>
+          `<span class="inline-block bg-light text-slate-600 text-[9px] font-black px-2 py-1 rounded-md mr-1 mt-1">${label} · ₹${price}</span>`
+        ).join('');
         list.innerHTML += `
           <div class="dash-card bg-card p-4 rounded-2xl flex items-center justify-between gap-4 flex-wrap">
             <div class="flex items-center gap-4">
               <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1544025162-8111142154ea?w=200&q=80'">
               <div>
                 <h4 class="font-black text-sm text-slate-900">${item.name}</h4>
-                <p class="text-[10px] font-black text-slate-400 uppercase">${item.category} · ₹${item.base_price||0}</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase">${item.category} · Base ₹${item.base_price||0}</p>
+                <div>${portionBadges}</div>
                 ${lowStock ? '<span class="text-[9px] font-black text-red-500 uppercase tracking-widest">⚠️ Low Stock</span>' : ''}
               </div>
             </div>
@@ -746,6 +901,7 @@
       document.getElementById('editItemImg').value = item.image_url || '';
       document.getElementById('editItemStock').value = item.stock_count || 0;
       document.getElementById('editItemSpecial').checked = !!item.is_special;
+      renderPortionRows('editItemPortions', item.portions || {});
       document.getElementById('editItemModal').classList.remove('hidden');
     };
     window.closeEditItem = function(){
@@ -758,13 +914,16 @@
       const price = parseFloat(document.getElementById('editItemPrice').value);
       if(!name){ return alert('Dish name cannot be empty.'); }
       if(isNaN(price) || price < 0){ return alert('Enter a valid price (0 or more).'); }
+      const portionResult = collectPortions('editItemPortions');
+      if(!portionResult.ok){ return alert(portionResult.error); }
       const updated = {
         name: name,
         category: document.getElementById('editItemCat').value,
         base_price: price,
         image_url: document.getElementById('editItemImg').value.trim() || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80",
         stock_count: parseInt(document.getElementById('editItemStock').value) || 0,
-        is_special: document.getElementById('editItemSpecial').checked
+        is_special: document.getElementById('editItemSpecial').checked,
+        portions: portionResult.portions
       };
       db.ref('menu/'+editItemId).update(updated)
         .then(()=> closeEditItem())
@@ -808,15 +967,21 @@
         return alert("Please enter a valid Dish Name and Base Price.");
       }
 
+      const portionResult = collectPortions('newDishPortions');
+      if(!portionResult.ok){ return alert(portionResult.error); }
+
       const newItemId = 'item_' + Date.now();
-      
+      // Auto-match a catalog image by dish name when no Image URL was typed in
+      const resolvedImg = img || findCatalogImage(name) || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
+
       const newItemData = {
         name: name,
         category: cat,
         base_price: price,
         stock_count: 60, 
         is_special: false,
-        image_url: img || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80" 
+        image_url: resolvedImg,
+        portions: portionResult.portions
       };
 
       db.ref('menu/' + newItemId).set(newItemData).then(() => {
@@ -824,6 +989,7 @@
         document.getElementById('newDishName').value = '';
         document.getElementById('newDishPrice').value = '';
         document.getElementById('newDishImg').value = '';
+        document.getElementById('newDishPortions').innerHTML = '';
       }).catch(err => {
         alert("Error adding dish: " + err.message);
       });
