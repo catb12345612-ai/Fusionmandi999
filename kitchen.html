@@ -32,10 +32,8 @@
 </head>
 <body class="font-sans antialiased text-slate-800">
 
-  <!-- Global Error Banner: shows script/Firebase failures on-screen, not just the console -->
   <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg"></div>
 
-  <!-- Login Modal -->
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
     <div class="bg-card p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(0,0,0,0.5)] border-t-4 border-primary">
       <div class="w-16 h-16 bg-primary/10 text-primary rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black">FM</div>
@@ -54,7 +52,6 @@
   </div>
 
   <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden" id="mainLayout">
-    <!-- Sidebar -->
     <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20">
       <div class="p-6 border-b border-white/5">
         <h1 class="font-black text-xl leading-tight tracking-tight text-primary">Fusion Mandi</h1>
@@ -76,21 +73,17 @@
       </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
       <div class="p-8 pb-32">
         
-        <!-- LIVE ORDERS -->
         <section id="view-orders" class="tab-section">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Floor Operations</h2>
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- INVENTORY -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Inventory Management</h2>
           
-          <!-- Add New Dish Module -->
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-primary">
             <h3 class="text-lg font-black text-slate-900 mb-4">➕ Add New Menu Item</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
@@ -121,7 +114,6 @@
               </div>
             </div>
 
-            <!-- Portion Pricing Builder -->
             <div class="mt-5 pt-5 border-t border-slate-100">
               <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Portion Pricing (optional — leave blank to sell at Base Price only)</label>
@@ -146,7 +138,6 @@
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- DASHBOARD (PRINTABLE) -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print">
             <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard & Revenue</h2>
@@ -172,7 +163,6 @@
             
             <h2 class="text-2xl font-black text-slate-900 mb-6 text-center border-b pb-4">Fusion Mandi - Daily Revenue Report</h2>
             
-            <!-- Exact Separated Revenue Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               <div class="bg-slate-900 text-white p-6 rounded-2xl print-card-bg">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Gross</p>
@@ -210,7 +200,6 @@
           </div>
         </section>
 
-        <!-- FEEDBACK -->
         <section id="view-feedback" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight">Customer Feedback</h2>
           <div id="feedbackSummary" class="dash-card bg-card p-5 rounded-2xl mb-6 flex flex-wrap gap-6"></div>
@@ -220,7 +209,6 @@
     </main>
   </div>
 
-  <!-- Edit Order Modal (Admin only) -->
   <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5 no-print">
     <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
@@ -239,7 +227,6 @@
     </div>
   </div>
 
-  <!-- Edit Menu Item Modal (Admin only) -->
   <div id="editItemModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5 no-print">
     <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
@@ -309,7 +296,6 @@
     };
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
-    // ---- Dish image catalog — used to auto-fill images for new/matching dishes and for the Sync Images tool ----
     const menuImages = {
       "chicken Fry Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
       "Chickken BBQ": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
@@ -371,7 +357,6 @@
     let revenueDataByDate = {};
     let loginInFlight = false;
 
-    // Fires once the Firebase Realtime Database client actually confirms a socket connection.
     let dbConnected = false;
     if (db) {
       db.ref('.info/connected').on('value', snap => { dbConnected = !!snap.val(); });
@@ -455,24 +440,51 @@
       setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000); 
     }
 
-    // FIX: takes only the safe internal id and looks the order up live from
-    // window.currentTables — nothing dynamic (item names, table labels) is ever
-    // interpolated into an onclick/HTML attribute anymore, so special characters
-    // in a dish name can no longer corrupt the button or blank out the KOT.
+    // ---- ROBUST PRINTING: uses a hidden iframe instead of window.open()+document.write().
+    // print() only fires on the iframe's onload event, so the ticket's HTML is
+    // guaranteed to be fully parsed first — this is what was causing blank KOT items.
+    function printViaIframe(htmlDoc){
+      try{
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('aria-hidden', 'true');
+        iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
+        document.body.appendChild(iframe);
+
+        const cleanup = () => { setTimeout(() => { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1500); };
+
+        iframe.onload = function(){
+          try{
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+          }catch(e){
+            console.error('Print failed', e);
+            alert('Could not open the print dialog. Please check your browser\'s print / popup settings and try again.');
+          }
+          cleanup();
+        };
+
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write(htmlDoc);
+        doc.close();
+      }catch(e){
+        console.error('printViaIframe failed', e);
+        alert('Could not prepare the print — please try again.');
+      }
+    }
+
     window.printKOTReceipt = function(tableId) {
         const table = (window.currentTables || {})[tableId];
         if(!table){ return alert('Could not find this order — it may have already been cleared. Please refresh the page and try again.'); }
 
         db.ref('active_tables/'+tableId).update({status: 'cooking'});
 
-        const printWindow = window.open('', '_blank', 'width=400,height=600');
-        if(!printWindow){ return alert('Popup blocked — please allow popups for this site so the KOT can print.'); }
-
         const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const safeItems = esc(table.items || 'No items recorded for this order.');
+        const rawItems = (table.items || '').trim();
+        const safeItems = esc(rawItems ? rawItems : 'No items recorded for this order.');
         const safeTableNo = esc(table.table);
 
-        printWindow.document.write(`
+        const html = `
             <html><head><style>
                 @page { margin: 0; }
                 body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; text-align: left; }
@@ -487,12 +499,9 @@
                 <p>Time: ${new Date().toLocaleTimeString()}</p>
                 <div class="items">${safeItems.replace(/ \| /g, '<br>• ')}</div>
                 <div class="end">End of Order</div>
-                <script>
-                    setTimeout(() => { window.print(); window.close(); }, 500);
-                <\/script>
-            </body></html>
-        `);
-        printWindow.document.close();
+            </body></html>`;
+
+        printViaIframe(html);
     };
 
     function buildFinalBillText(tableData){
@@ -501,10 +510,8 @@
 
     function printFinalBillReceipt(billText){
       try{
-        const printWindow = window.open('', '_blank', 'width=400,height=600');
-        if(!printWindow) return;
         const safe = String(billText).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        printWindow.document.write(`
+        const html = `
             <html><head><style>
                 @page { margin: 0; }
                 body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; }
@@ -513,12 +520,8 @@
             </style></head><body>
                 <h2>FINAL BILL</h2>
                 <pre>${safe}</pre>
-                <script>
-                    setTimeout(() => { window.print(); window.close(); }, 500);
-                <\/script>
-            </body></html>
-        `);
-        printWindow.document.close();
+            </body></html>`;
+        printViaIframe(html);
       }catch(e){ console.error('Admin bill print failed', e); }
     }
 
@@ -571,9 +574,6 @@
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
 
           let btn = '';
-          // FIX: printKOTReceipt / clearTable / cancelOrder now only ever receive the
-          // safe internal `id` — item text, table labels and payment method are looked
-          // up live inside those functions instead of being embedded in the onclick string.
           if (currentRole === 'admin') {
             if(table.status === 'pending') { 
               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT (Kitchen)</button>`; 
@@ -1028,9 +1028,6 @@
         .catch(err => alert('Could not delete item — check your connection and try again.'));
     };
 
-    // FIX: only takes the safe `id`; the table number is looked up live for the
-    // confirm dialog and the cancelled-order log, so a table label or item list
-    // containing special characters can never break this button either.
     window.cancelOrder = function(id){
       if(currentRole !== 'admin') return;
       const table = (window.currentTables || {})[id];
@@ -1097,16 +1094,12 @@
         });
     }
 
-    // FIX: now only takes `id`. It looks up the table's own paymentMethod itself
-    // (instead of trusting a value that used to be smuggled through the onclick
-    // string, which was "undefined" whenever that field hadn't been set yet).
-    // The admin PIN check is trimmed and no longer leaks the PIN in the prompt text.
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
       if(!tableData){ return alert('Could not find this order — it may have already been cleared. Please refresh the page and try again.'); }
 
       const pinInput = prompt("Enter Admin PIN to clear this table:");
-      if(pinInput === null) return; // user cancelled — do nothing
+      if(pinInput === null) return;
       const pin = pinInput.trim();
       if(pin !== "admin123" && pin !== "1234") return alert("Access Denied: Invalid PIN.");
 
