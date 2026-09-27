@@ -442,6 +442,63 @@
         printWindow.document.close();
     };
 
+    // ---- Final Bill helpers — used only when an ADMIN clears a table ----
+    // These build/print/download/send the customer's final receipt. WhatsApp send lives here only —
+    // it is intentionally NOT present in the customer-facing menu app anymore.
+    function buildFinalBillText(tableData){
+      return `=== FUSION MANDI ===\nTable: ${tableData.table}\nMobile: ${tableData.phone}\n------------------\n${(tableData.items||'').replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${tableData.total}\n=================`;
+    }
+
+    // Auto-prints a clean customer bill receipt on the admin's device (separate from the KOT ticket)
+    function printFinalBillReceipt(billText){
+      try{
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if(!printWindow) return; // popup blocked — download & WhatsApp send below still proceed
+        const safe = String(billText).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        printWindow.document.write(`
+            <html><head><style>
+                @page { margin: 0; }
+                body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; }
+                h2 { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-size: 18px; }
+                pre { white-space: pre-wrap; font-size: 13px; line-height: 1.6; margin: 0; }
+            </style></head><body>
+                <h2>FINAL BILL</h2>
+                <pre>${safe}</pre>
+                <script>
+                    setTimeout(() => { window.print(); window.close(); }, 500);
+                <\/script>
+            </body></html>
+        `);
+        printWindow.document.close();
+      }catch(e){ console.error('Admin bill print failed', e); }
+    }
+
+    // Auto-downloads a .txt copy of the bill onto the admin's own device
+    function downloadFinalBillFile(billText, tableId){
+      try{
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
+        a.download = `FusionMandi_Bill_${tableId}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }catch(e){ console.error('Admin bill download failed', e); }
+    }
+
+    // Admin/Kitchen-only: sends the final bill to the CUSTOMER's WhatsApp number
+    function sendBillToCustomerWhatsApp(tableData, billText){
+      try{
+        if(!tableData || !tableData.phone) return;
+        const waLink = document.createElement('a');
+        waLink.href = `https://wa.me/91${tableData.phone}?text=${encodeURIComponent(billText)}`;
+        waLink.target = '_blank';
+        waLink.rel = 'noopener';
+        document.body.appendChild(waLink);
+        waLink.click();
+        document.body.removeChild(waLink);
+      }catch(e){ console.error('WhatsApp bill send failed', e); }
+    }
+
     function loadSystem() {
       if(!db){ showGlobalError('Cannot load data — no database connection.'); return; }
 
@@ -1033,6 +1090,12 @@
       
       const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: pMethod.toUpperCase(), itemsDetails: tableData.items };
       fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(sheetPayload) }).catch(e=>console.log(e));
+
+      // Build the receipt once and reuse for print / download / WhatsApp
+      const billText = buildFinalBillText(tableData);
+      printFinalBillReceipt(billText);                   // auto print — admin copy
+      downloadFinalBillFile(billText, id);                 // auto download — admin copy
+      sendBillToCustomerWhatsApp(tableData, billText);     // admin/kitchen sends the bill to the customer via WhatsApp
       
       db.ref('active_tables/'+id).remove();
     }
