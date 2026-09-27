@@ -765,14 +765,6 @@
             a.click();
             document.body.removeChild(a);
 
-            const waLink = document.createElement('a');
-            waLink.href = `https://wa.me/91${customerPhone}?text=${encodeURIComponent(autoBillText)}`;
-            waLink.target = '_blank';
-            waLink.rel = 'noopener';
-            document.body.appendChild(waLink);
-            waLink.click();
-            document.body.removeChild(waLink);
-            
             alert("Table Cleared! Receipt generated. Please login again for a new order.");
             
             localStorage.removeItem('fm_cust_phone');
