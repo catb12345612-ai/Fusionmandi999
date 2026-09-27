@@ -296,6 +296,20 @@
     };
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
+    // --- FIX: SAFE ITEMS STRING NORMALIZER ---
+    // If the customer app pushes items as an array/object instead of a string, this safely formats them
+    // to prevent crashes, blank KOTs, or "[object Object]" bugs.
+    function getSafeItemsStr(items) {
+        if (!items) return '';
+        if (typeof items === 'string') return items.trim();
+        if (Array.isArray(items)) {
+            return items.map(i => typeof i === 'object' ? `${i.qty||1}x ${i.name||i.item||'Item'}` : String(i)).join(' | ');
+        } else if (typeof items === 'object') {
+            return Object.values(items).map(i => typeof i === 'object' ? `${i.qty||1}x ${i.name||i.item||'Item'}` : String(i)).join(' | ');
+        }
+        return String(items).trim();
+    }
+
     const menuImages = {
       "chicken Fry Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
       "Chickken BBQ": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
@@ -440,9 +454,9 @@
       setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000); 
     }
 
-    // ---- ROBUST PRINTING: uses a hidden iframe instead of window.open()+document.write().
-    // print() only fires on the iframe's onload event, so the ticket's HTML is
-    // guaranteed to be fully parsed first — this is what was causing blank KOT items.
+    // --- FIX: ROBUST PRINTING ---
+    // Added a 500ms delay to prevent blank KOT prints. Chrome/Safari sometimes fail 
+    // to paint the hidden iframe before the print command goes through.
     function printViaIframe(htmlDoc){
       try{
         const iframe = document.createElement('iframe');
@@ -450,22 +464,24 @@
         iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
         document.body.appendChild(iframe);
 
-        const cleanup = () => { setTimeout(() => { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1500); };
+        const cleanup = () => { setTimeout(() => { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 2000); };
 
         iframe.onload = function(){
-          try{
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-          }catch(e){
-            console.error('Print failed', e);
-            alert('Could not open the print dialog. Please check your browser\'s print / popup settings and try again.');
-          }
-          cleanup();
+          setTimeout(() => {
+            try{
+              iframe.contentWindow.focus();
+              iframe.contentWindow.print();
+            }catch(e){
+              console.error('Print failed', e);
+              alert('Could not open the print dialog. Please check your browser\'s print / popup settings and try again.');
+            }
+            cleanup();
+          }, 500); // Wait 500ms for DOM layout to paint to prevent blank KOT
         };
 
         const doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.open();
-        doc.write(htmlDoc);
+        doc.write('<!DOCTYPE html>' + htmlDoc);
         doc.close();
       }catch(e){
         console.error('printViaIframe failed', e);
@@ -480,8 +496,11 @@
         db.ref('active_tables/'+tableId).update({status: 'cooking'});
 
         const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const rawItems = (table.items || '').trim();
+        
+        // FIX: Utilize robust string converter to prevent crash and properly display bullets
+        const rawItems = getSafeItemsStr(table.items);
         const safeItems = esc(rawItems ? rawItems : 'No items recorded for this order.');
+        const itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
         const safeTableNo = esc(table.table);
 
         const html = `
@@ -497,7 +516,7 @@
                 <h2>*** K O T ***<br>FUSION MANDI</h2>
                 <h3>Table: ${safeTableNo}</h3>
                 <p>Time: ${new Date().toLocaleTimeString()}</p>
-                <div class="items">${safeItems.replace(/ \| /g, '<br>• ')}</div>
+                <div class="items">${itemsHtml}</div>
                 <div class="end">End of Order</div>
             </body></html>`;
 
@@ -505,7 +524,8 @@
     };
 
     function buildFinalBillText(tableData){
-      return `=== FUSION MANDI ===\nTable: ${tableData.table}\nMobile: ${tableData.phone}\n------------------\n${(tableData.items||'').replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${tableData.total}\n=================`;
+      const itemsStr = getSafeItemsStr(tableData.items);
+      return `=== FUSION MANDI ===\nTable: ${tableData.table}\nMobile: ${tableData.phone}\n------------------\n${itemsStr.replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${tableData.total}\n=================`;
     }
 
     function printFinalBillReceipt(billText){
@@ -606,6 +626,10 @@
 
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
 
+          // FIX: Utilize robust items normalizer for dashboard display
+          const itemsStr = getSafeItemsStr(table.items);
+          const formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
+
           grid.innerHTML += `
             <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
               <div>
@@ -617,7 +641,7 @@
                   <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg">${table.status.replace('_',' ')}</span>
                 </div>
                 <div class="max-h-40 overflow-y-auto pr-2 mb-2">
-                  <p class="font-semibold text-slate-600 text-sm leading-relaxed">${(table.items||"").replace(/ \| /g,'<br>• ')}</p>
+                  <p class="font-semibold text-slate-600 text-sm leading-relaxed">${formattedItems}</p>
                 </div>
               </div>
               <div class="mt-2 pt-4 border-t border-slate-100">
@@ -782,7 +806,9 @@
       });
     }
 
+    // FIX: Using the string normalizer directly to prevent bugs mapping items
     function parseOrderItems(itemsStr){
+      itemsStr = getSafeItemsStr(itemsStr);
       if(!itemsStr) return [];
       return itemsStr.split('|').map(s => s.trim()).filter(Boolean).map(entry => {
         let clean = entry.replace(/[₹(][^)]*[₹)]?/g, '').replace(/\(.*?\)/g, '').trim();
@@ -917,7 +943,7 @@
       if(!table) return;
       editOrderId = id;
       document.getElementById('editOrderTableLabel').innerText = `Table ${table.table}`;
-      document.getElementById('editOrderItems').value = (table.items||'').split(' | ').join('\n');
+      document.getElementById('editOrderItems').value = getSafeItemsStr(table.items).split(' | ').join('\n');
       document.getElementById('editOrderTotal').value = table.total;
       document.getElementById('editOrderModal').classList.remove('hidden');
     };
@@ -1038,7 +1064,7 @@
         time: new Date().toLocaleTimeString(),
         table: table.table || '',
         phone: table.phone || '',
-        items: table.items || '',
+        items: getSafeItemsStr(table.items),
         total: table.total || 0,
         cancelledBy: currentRole
       }).catch(()=>{});
@@ -1115,9 +1141,10 @@
           return curr;
       });
 
-      db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, phone: tableData.phone, items: tableData.items, total: tableData.total, method: pMethod.toUpperCase() });
+      const itemsStr = getSafeItemsStr(tableData.items);
+      db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, phone: tableData.phone, items: itemsStr, total: tableData.total, method: pMethod.toUpperCase() });
       
-      const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: pMethod.toUpperCase(), itemsDetails: tableData.items };
+      const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: pMethod.toUpperCase(), itemsDetails: itemsStr };
       fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(sheetPayload) }).catch(e=>console.log(e));
 
       const billText = buildFinalBillText(tableData);
