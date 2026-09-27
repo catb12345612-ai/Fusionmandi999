@@ -41,7 +41,8 @@
       <div class="w-16 h-16 bg-primary/10 text-primary rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black">FM</div>
       <h2 class="text-2xl font-black text-slate-900 mb-2">Workspace Login</h2>
       <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-light border-none rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
-      <button onclick="attemptLogin()" class="w-full bg-primary text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform">ACCESS DASHBOARD</button>
+      <button id="loginBtn" onclick="attemptLogin()" class="w-full bg-primary text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform">ACCESS DASHBOARD</button>
+      <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
     </div>
   </div>
 
@@ -309,9 +310,6 @@
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
     // ---- Dish image catalog — used to auto-fill images for new/matching dishes and for the Sync Images tool ----
-    // Chicken items (fry/BBQ/Al Faham/broasted/F2/rara/juicy/murg musallam/wings/lolly pop) all share ONE image.
-    // Veg-only items (Mixed Veg / Spl Veg / Mushroom) all share ONE rice image.
-    // Paneer items share ONE paneer rice image.
     const menuImages = {
       "chicken Fry Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
       "Chickken BBQ": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
@@ -335,7 +333,6 @@
       "Panner Juicy Mandi": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80"
     };
 
-    // Case/space-insensitive lookup so "chicken fry mandi " still matches "chicken Fry Mandi"
     function findCatalogImage(dishName){
       if(!dishName) return null;
       const target = dishName.trim().toLowerCase();
@@ -343,7 +340,6 @@
       return foundKey ? menuImages[foundKey] : null;
     }
 
-    // ---- Global error safety net — shows failures on-screen instead of only in the console ----
     function showGlobalError(msg){
       const banner = document.getElementById('globalErrorBanner');
       if(banner){ banner.textContent = '⚠️ ' + msg; banner.classList.remove('hidden'); }
@@ -356,9 +352,6 @@
       showGlobalError('A background request failed (' + (e.reason && e.reason.message ? e.reason.message : e.reason) + ').');
     });
 
-    // Firebase init is wrapped so that if it fails (blocked script, network issue, bad config)
-    // the error is caught here instead of throwing and silently killing every function defined below it —
-    // which previously included the login button itself.
     let db = null;
     try {
       firebase.initializeApp(firebaseConfig);
@@ -376,29 +369,76 @@
     let editItemId = null;
     let revenueChart = null, paymentChart = null, topItemsChart = null;
     let revenueDataByDate = {};
+    let loginInFlight = false;
 
-    window.attemptLogin = function() {
-      const pin = document.getElementById('sysPin').value;
-      if (pin === 'admin123') { currentRole = 'admin'; }
-      else if (pin === 'waiter123') { currentRole = 'waiter'; }
-      else if (pin === 'kitchen123') { currentRole = 'kitchen'; }
-      else { return alert("Invalid PIN"); }
+    // Fires once the Firebase Realtime Database client actually confirms a socket connection.
+    let dbConnected = false;
+    if (db) {
+      db.ref('.info/connected').on('value', snap => { dbConnected = !!snap.val(); });
+    }
+
+    function waitForDbConnection(timeoutMs){
+      return new Promise(resolve => {
+        if (dbConnected) return resolve(true);
+        const start = Date.now();
+        const iv = setInterval(() => {
+          if (dbConnected) { clearInterval(iv); resolve(true); }
+          else if (Date.now() - start > timeoutMs) { clearInterval(iv); resolve(false); }
+        }, 150);
+      });
+    }
+
+    window.attemptLogin = async function() {
+      if (loginInFlight) return;
+      const pinRaw = document.getElementById('sysPin').value;
+      const pin = pinRaw.trim();
+      const statusEl = document.getElementById('loginStatusMsg');
+      const btn = document.getElementById('loginBtn');
+
+      let role = null;
+      if (pin === 'admin123') role = 'admin';
+      else if (pin === 'waiter123') role = 'waiter';
+      else if (pin === 'kitchen123') role = 'kitchen';
+      else { if(statusEl) statusEl.textContent = ''; return alert("Invalid PIN"); }
 
       if(!db){
-        return alert("⚠️ Not connected to the database yet (Firebase failed to load). Check your internet connection and reload the page. If this keeps happening, press F12 and check the Console tab for the exact error.");
+        return alert("⚠️ Not connected to the database (Firebase failed to load). Check your internet connection and reload the page. If this keeps happening, press F12 and check the Console tab for the exact error.");
       }
-      
+
+      loginInFlight = true;
+      if (btn) { btn.disabled = true; btn.textContent = 'CONNECTING...'; }
+      if (statusEl) statusEl.textContent = 'Connecting to the database…';
+
+      const connected = dbConnected || await waitForDbConnection(6000);
+
+      if (!connected) {
+        loginInFlight = false;
+        if (btn) { btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD'; }
+        if (statusEl) statusEl.textContent = '';
+        return alert("⚠️ Could not reach the database (still offline after 6s). Check your internet connection and try again.");
+      }
+
+      currentRole = role;
       try { alertSound.play().then(()=>{alertSound.pause();alertSound.currentTime=0;}).catch(()=>{}); } catch(e){}
-      
+
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainLayout').classList.remove('hidden');
       document.getElementById('roleText').innerText = currentRole.toUpperCase();
-      
+
       if(currentRole === 'admin') { document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); }
       if(currentRole === 'admin' || currentRole === 'kitchen' || currentRole === 'waiter') { document.querySelectorAll('.kitchen-waiter-only').forEach(el => el.classList.remove('hidden')); }
-      
+
       loadSystem();
     };
+
+    document.addEventListener('DOMContentLoaded', function(){
+      const pinInput = document.getElementById('sysPin');
+      if (pinInput) {
+        pinInput.addEventListener('keydown', function(e){
+          if (e.key === 'Enter') { e.preventDefault(); attemptLogin(); }
+        });
+      }
+    });
 
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
@@ -415,7 +455,6 @@
       setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000); 
     }
 
-    // Advanced KOT Printing for Thermal Hardware
     window.printKOTReceipt = function(tableId, tableNo, items) {
         db.ref('active_tables/'+tableId).update({status: 'cooking'});
         const printWindow = window.open('', '_blank', 'width=400,height=600');
@@ -442,18 +481,14 @@
         printWindow.document.close();
     };
 
-    // ---- Final Bill helpers — used only when an ADMIN clears a table ----
-    // These build/print/download/send the customer's final receipt. WhatsApp send lives here only —
-    // it is intentionally NOT present in the customer-facing menu app anymore.
     function buildFinalBillText(tableData){
       return `=== FUSION MANDI ===\nTable: ${tableData.table}\nMobile: ${tableData.phone}\n------------------\n${(tableData.items||'').replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${tableData.total}\n=================`;
     }
 
-    // Auto-prints a clean customer bill receipt on the admin's device (separate from the KOT ticket)
     function printFinalBillReceipt(billText){
       try{
         const printWindow = window.open('', '_blank', 'width=400,height=600');
-        if(!printWindow) return; // popup blocked — download & WhatsApp send below still proceed
+        if(!printWindow) return;
         const safe = String(billText).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         printWindow.document.write(`
             <html><head><style>
@@ -473,7 +508,6 @@
       }catch(e){ console.error('Admin bill print failed', e); }
     }
 
-    // Auto-downloads a .txt copy of the bill onto the admin's own device
     function downloadFinalBillFile(billText, tableId){
       try{
         const a = document.createElement('a');
@@ -485,7 +519,6 @@
       }catch(e){ console.error('Admin bill download failed', e); }
     }
 
-    // Admin/Kitchen-only: sends the final bill to the CUSTOMER's WhatsApp number
     function sendBillToCustomerWhatsApp(tableData, billText){
       try{
         if(!tableData || !tableData.phone) return;
@@ -502,7 +535,6 @@
     function loadSystem() {
       if(!db){ showGlobalError('Cannot load data — no database connection.'); return; }
 
-      // Live cache of visit counts, used to flag VIP guests (3+ visits) across the floor + feedback views
       db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; }, err => showGlobalError('customers listener: ' + err.message));
 
       db.ref('.info/connected').on('value', snap => {
@@ -514,7 +546,7 @@
       db.ref('active_tables').on('value', snap => {
         const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
         const tables = snap.val() || {};
-        window.currentTables = tables; // cached so Edit Order can look up the latest items/total by id
+        window.currentTables = tables;
         let needsAttention = false;
         
         Object.entries(tables).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, table]) => {
@@ -532,9 +564,9 @@
             } else if (table.status === 'cooking') {
               btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
             } else if(table.status === 'bill_requested') { 
-              btn = `<button class="w-full bg-dark hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md border border-amber-500" onclick="clearTable('${id}', '${table.paymentMethod}')">Clear & Bill (${table.paymentMethod})</button>`; 
+              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md border border-amber-500" onclick="clearTable('${id}', '${table.paymentMethod}')">Clear & Bill (${table.paymentMethod})</button>`; 
             } else { 
-              btn = `<button class="w-full bg-dark hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="clearTable('${id}', '${table.paymentMethod || 'CASH'}')">Clear Table & Receipt</button>`; 
+              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="clearTable('${id}', '${table.paymentMethod || 'CASH'}')">Clear Table & Receipt</button>`; 
             }
           } else if (currentRole === 'kitchen') {
              if(table.status === 'pending') {
@@ -545,7 +577,6 @@
                btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>Awaiting Checkout</button>`;
              }
           } else {
-            // WAITER ROLE
             if(table.status === 'pending') {
               btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}', '${table.table}', '${table.items}')">Print KOT</button>`;
             } else if(table.status === 'cooking') {
@@ -624,7 +655,6 @@
           renderTopItemsChart(logs);
         }, err => showGlobalError('daily_logs listener: ' + err.message));
 
-        // Live customer feedback feed — shows rating, any written note, and flags VIP guests
         db.ref('feedback').limitToLast(100).on('value', snap => {
           const list = document.getElementById('feedbackListAdmin');
           const summary = document.getElementById('feedbackSummary');
@@ -664,18 +694,15 @@
       }
     }
 
-    // ---- Feedback moderation (Admin only) ----
     window.deleteFeedback = function(id){
       if(!confirm('Delete this feedback entry? This cannot be undone.')) return;
       db.ref('feedback/'+id).remove().catch(err => alert('Could not delete feedback — check your connection and try again.'));
     };
 
-    // ---- Analytics (Admin only) — 3 live Chart.js charts ----
     function initAnalytics(todayStr){
-      if(window.analyticsInit) return; // only wire the 7-day listeners once per session
+      if(window.analyticsInit) return;
       window.analyticsInit = true;
 
-      // Build the last 7 calendar dates (including today) and listen to each day's tally live
       for(let i = 6; i >= 0; i--){
         const d = new Date();
         d.setDate(d.getDate() - i);
@@ -739,8 +766,6 @@
       });
     }
 
-    // Parses a pipe-separated items string (e.g. "2x Chicken Mandi | Mutton Biryani x1") into {name, qty} pairs.
-    // Falls back to qty 1 when no quantity marker is present, and strips any trailing price text.
     function parseOrderItems(itemsStr){
       if(!itemsStr) return [];
       return itemsStr.split('|').map(s => s.trim()).filter(Boolean).map(entry => {
@@ -785,13 +810,10 @@
       });
     }
 
-    // Shared Functions
     window.markServed = function(id) { db.ref('active_tables/'+id).update({status: 'served'}); };
     window.toggleSpec = function(id, st) { db.ref('menu/'+id).update({is_special: !st}); };
     window.updStock = function(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); };
 
-    // ---- Portion Pricing builder — shared by Add New Dish and Edit Item ----
-    // Each row is a small flex div with a label input + price input + remove button, tagged with data-portion-row.
     let portionRowSeq = 0;
     function addPortionRow(containerId, label, price){
       const container = document.getElementById(containerId);
@@ -813,7 +835,6 @@
       const row = container.querySelector(`[data-portion-row="${rowId}"]`);
       if(row) row.remove();
     };
-    // Quick-add a preset portion (Single/Half/etc). If that label already has a row, just focus its price field instead of duplicating.
     window.quickAddPortion = function(containerId, presetLabel){
       const container = document.getElementById(containerId);
       if(!container) return;
@@ -829,15 +850,12 @@
       const last = rows[rows.length-1];
       if(last){ const input = presetLabel ? last.querySelector('[data-portion-price]') : last.querySelector('[data-portion-label]'); if(input) input.focus(); }
     };
-    // Clears and repopulates a portions container from a saved {label: price} object
     function renderPortionRows(containerId, portionsObj){
       const container = document.getElementById(containerId);
       if(!container) return;
       container.innerHTML = '';
       Object.entries(portionsObj||{}).forEach(([label, price]) => addPortionRow(containerId, label, price));
     }
-    // Reads all rows in a container, validates them, and returns { ok, portions, error }.
-    // Blank rows (no label typed) are silently skipped rather than treated as errors.
     function collectPortions(containerId){
       const container = document.getElementById(containerId);
       if(!container) return { ok: true, portions: {} };
@@ -849,7 +867,7 @@
         const priceInput = row.querySelector('[data-portion-price]');
         const label = (labelInput?.value || '').trim();
         const priceRaw = priceInput?.value;
-        if(!label && (priceRaw === '' || priceRaw === undefined)) continue; // fully empty row, skip
+        if(!label && (priceRaw === '' || priceRaw === undefined)) continue;
         if(!label){ return { ok: false, error: 'Every portion row needs a name (e.g. Single, Half, Full).' }; }
         const price = parseFloat(priceRaw);
         if(priceRaw === '' || priceRaw === undefined || isNaN(price) || price < 0){
@@ -863,7 +881,6 @@
       return { ok: true, portions };
     }
 
-    // ---- Sync Catalog Images (Admin only) — matches menu item names to the built-in image catalog and updates Firebase ----
     window.syncCatalogImages = function(){
       if(!db){ return alert('Not connected to the database.'); }
       const updates = {};
@@ -879,7 +896,6 @@
         .catch(err => alert('Could not sync images — check your connection and try again.'));
     };
 
-    // ---- Edit Order (Admin only) — self-service order correction, no code changes needed ----
     window.openEditOrder = function(id){
       const table = (window.currentTables || {})[id];
       if(!table) return;
@@ -904,7 +920,6 @@
         .catch(err=>{ console.error(err); alert('Could not save changes — check your connection and try again.'); });
     };
 
-    // ---- Inventory rendering, with live search filter and a low-stock badge ----
     window.renderInventory = function(){
       const list = document.getElementById('inventoryList');
       if(!list) return;
@@ -950,7 +965,6 @@
       });
     };
 
-    // ---- Full Edit Item modal (Admin only) — name, category, price, image, stock, special, delete ----
     window.openEditItem = function(id){
       const item = menuCache[id];
       if(!item) return;
@@ -998,13 +1012,11 @@
         .catch(err => alert('Could not delete item — check your connection and try again.'));
     };
 
-    // ---- Cancel Order (Admin only) — voids a live order with no revenue impact ----
     window.cancelOrder = function(id, tableNo){
       if(currentRole !== 'admin') return;
       if(!confirm(`Cancel the entire order for Table ${tableNo}? This removes it from the floor without recording any revenue.`)) return;
       const d = new Date().toISOString().split('T')[0];
       const table = (window.currentTables || {})[id] || {};
-      // Keep a lightweight audit trail of cancellations, separate from paid revenue logs
       db.ref(`cancelled_logs/${d}`).push({
         time: new Date().toLocaleTimeString(),
         table: tableNo,
@@ -1031,7 +1043,6 @@
       if(!portionResult.ok){ return alert(portionResult.error); }
 
       const newItemId = 'item_' + Date.now();
-      // Auto-match a catalog image by dish name when no Image URL was typed in
       const resolvedImg = img || findCatalogImage(name) || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
 
       const newItemData = {
@@ -1055,7 +1066,6 @@
       });
     };
 
-    // Batch Process
     window.markAllServed = function() {
         db.ref('active_tables').once('value', snap => {
             const tables = snap.val() || {};
@@ -1067,7 +1077,6 @@
         });
     }
 
-    // Financial Cleared Data
     window.clearTable = async function(id, method) {
       const pin = prompt("Enter 4-Digit Admin PIN to clear table (1234):");
       if(pin !== "1234" && pin !== "admin123") return alert("Access Denied: Invalid PIN.");
@@ -1091,21 +1100,16 @@
       const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: pMethod.toUpperCase(), itemsDetails: tableData.items };
       fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(sheetPayload) }).catch(e=>console.log(e));
 
-      // Build the receipt once and reuse for print / download / WhatsApp
       const billText = buildFinalBillText(tableData);
-      printFinalBillReceipt(billText);                   // auto print — admin copy
-      downloadFinalBillFile(billText, id);                 // auto download — admin copy
-      sendBillToCustomerWhatsApp(tableData, billText);     // admin/kitchen sends the bill to the customer via WhatsApp
+      printFinalBillReceipt(billText);
+      downloadFinalBillFile(billText, id);
+      sendBillToCustomerWhatsApp(tableData, billText);
       
       db.ref('active_tables/'+id).remove();
     }
 
-    // Waiter Actions
     window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH'}); alert("Admin notified of cash collection."); };
     
-    // ---- Factory Reset — loads the full 20-item default menu (name, category, image, base price + portion pricing) ----
-    // Portion tiers follow the owner's price sheet: Single (base price), Half (2 Pcs), Triple (3 Pcs), 4 Person, Full Mandi Gang.
-    // Items with a non-standard tier structure (Wings, Lolly Pop, Bhakasura combo) use their own labels/prices instead.
     const factoryMenuData = {
       'item_chicken_fry_mandi': { name: "chicken Fry Mandi", category: "Chicken Mandi", base_price: 270, stock_count: 60, is_special: false, image_url: menuImages["chicken Fry Mandi"], portions: { "Half (2 Pcs)": 499, "Triple (3 Pcs)": 729, "4 Person": 920, "Full Mandi Gang": 1111 } },
       'item_chicken_bbq': { name: "Chickken BBQ", category: "Chicken Mandi", base_price: 310, stock_count: 60, is_special: false, image_url: menuImages["Chickken BBQ"], portions: { "Half (2 Pcs)": 560, "Triple (3 Pcs)": 837, "4 Person": 1060, "Full Mandi Gang": 1299 } },
