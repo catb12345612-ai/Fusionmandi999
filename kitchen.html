@@ -296,17 +296,56 @@
     };
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
-    // --- FIX: SAFE ITEMS STRING NORMALIZER ---
-    // If the customer app pushes items as an array/object instead of a string, this safely formats them
-    // to prevent crashes, blank KOTs, or "[object Object]" bugs.
-    function getSafeItemsStr(items) {
-        if (!items) return '';
-        if (typeof items === 'string') return items.trim();
-        if (Array.isArray(items)) {
-            return items.map(i => typeof i === 'object' ? `${i.qty||1}x ${i.name||i.item||'Item'}` : String(i)).join(' | ');
-        } else if (typeof items === 'object') {
-            return Object.values(items).map(i => typeof i === 'object' ? `${i.qty||1}x ${i.name||i.item||'Item'}` : String(i)).join(' | ');
+    // --- UNIVERSAL DATA EXTRACTOR ---
+    // Actively hunts down the order items regardless of the property name or format the customer app uses.
+    function extractOrderItemsStr(table) {
+        if (!table) return '';
+        
+        // 1. Identify the data source (checks standard keys first)
+        let rawData = table.items || table.cart || table.orderDetails || table.orderItems || table.products || table.dishes;
+        
+        // 2. Fallback brute-force search if standard keys are entirely missing
+        if (rawData === undefined || rawData === null || rawData === '') {
+            for (let key in table) {
+                if (['table', 'status', 'total', 'timestamp', 'phone', 'paymentMethod', 'orderId'].includes(key)) continue;
+                const val = table[key];
+                if (val && (typeof val === 'object' || Array.isArray(val))) {
+                    rawData = val; break;
+                }
+                if (typeof val === 'string' && (key.toLowerCase().match(/item|cart|order|dish/) || val.includes('x '))) {
+                    rawData = val; break;
+                }
+            }
         }
+        
+        if (!rawData) return '';
+
+        // 3. Attempt JSON parse if the app sends a stringified array/object
+        let items = rawData;
+        if (typeof items === 'string') {
+            const trimmed = items.trim();
+            if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
+                try { items = JSON.parse(trimmed); } catch(e) {}
+            }
+        }
+
+        // 4. Format into bullet text
+        if (typeof items === 'string') return items.trim();
+        
+        const formatItem = (i) => {
+            if (typeof i !== 'object' || i === null) return String(i);
+            const q = i.qty || i.quantity || i.count || 1;
+            let n = i.name || i.item || i.title || i.dish || i.dishName || i.product || 'Item';
+            if (typeof n === 'object' && n !== null) n = n.name || n.title || 'Item'; 
+            return `${q}x ${n}`;
+        };
+
+        if (Array.isArray(items)) {
+            return items.map(formatItem).join(' | ');
+        } else if (typeof items === 'object' && items !== null) {
+            return Object.values(items).map(formatItem).join(' | ');
+        }
+        
         return String(items).trim();
     }
 
@@ -454,9 +493,6 @@
       setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000); 
     }
 
-    // --- FIX: ROBUST PRINTING ---
-    // Added a 500ms delay to prevent blank KOT prints. Chrome/Safari sometimes fail 
-    // to paint the hidden iframe before the print command goes through.
     function printViaIframe(htmlDoc){
       try{
         const iframe = document.createElement('iframe');
@@ -476,7 +512,7 @@
               alert('Could not open the print dialog. Please check your browser\'s print / popup settings and try again.');
             }
             cleanup();
-          }, 500); // Wait 500ms for DOM layout to paint to prevent blank KOT
+          }, 500); 
         };
 
         const doc = iframe.contentDocument || iframe.contentWindow.document;
@@ -497,8 +533,7 @@
 
         const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
         
-        // FIX: Utilize robust string converter to prevent crash and properly display bullets
-        const rawItems = getSafeItemsStr(table.items);
+        const rawItems = extractOrderItemsStr(table);
         const safeItems = esc(rawItems ? rawItems : 'No items recorded for this order.');
         const itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
         const safeTableNo = esc(table.table);
@@ -510,7 +545,7 @@
                 h2 { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-size: 20px;}
                 h3 { margin: 5px 0; font-size: 18px; }
                 p { margin: 5px 0; font-size: 14px; }
-                .items { margin-top: 15px; font-size: 16px; font-weight: bold; border-top: 1px solid #000; padding-top: 10px; line-height: 1.5; }
+                .items { margin-top: 15px; font-size: 16px; font-weight: bold; border-top: 2px dashed #000; padding-top: 10px; line-height: 1.5; }
                 .end { text-align: center; margin-top: 20px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
             </style></head><body>
                 <h2>*** K O T ***<br>FUSION MANDI</h2>
@@ -524,7 +559,7 @@
     };
 
     function buildFinalBillText(tableData){
-      const itemsStr = getSafeItemsStr(tableData.items);
+      const itemsStr = extractOrderItemsStr(tableData);
       return `=== FUSION MANDI ===\nTable: ${tableData.table}\nMobile: ${tableData.phone}\n------------------\n${itemsStr.replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${tableData.total}\n=================`;
     }
 
@@ -626,8 +661,7 @@
 
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
 
-          // FIX: Utilize robust items normalizer for dashboard display
-          const itemsStr = getSafeItemsStr(table.items);
+          const itemsStr = extractOrderItemsStr(table);
           const formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
 
           grid.innerHTML += `
@@ -806,9 +840,8 @@
       });
     }
 
-    // FIX: Using the string normalizer directly to prevent bugs mapping items
-    function parseOrderItems(itemsStr){
-      itemsStr = getSafeItemsStr(itemsStr);
+    function parseOrderItems(rawInput){
+      const itemsStr = typeof rawInput === 'string' ? rawInput : extractOrderItemsStr({items: rawInput});
       if(!itemsStr) return [];
       return itemsStr.split('|').map(s => s.trim()).filter(Boolean).map(entry => {
         let clean = entry.replace(/[₹(][^)]*[₹)]?/g, '').replace(/\(.*?\)/g, '').trim();
@@ -943,7 +976,7 @@
       if(!table) return;
       editOrderId = id;
       document.getElementById('editOrderTableLabel').innerText = `Table ${table.table}`;
-      document.getElementById('editOrderItems').value = getSafeItemsStr(table.items).split(' | ').join('\n');
+      document.getElementById('editOrderItems').value = extractOrderItemsStr(table).split(' | ').join('\n');
       document.getElementById('editOrderTotal').value = table.total;
       document.getElementById('editOrderModal').classList.remove('hidden');
     };
@@ -1064,7 +1097,7 @@
         time: new Date().toLocaleTimeString(),
         table: table.table || '',
         phone: table.phone || '',
-        items: getSafeItemsStr(table.items),
+        items: extractOrderItemsStr(table),
         total: table.total || 0,
         cancelledBy: currentRole
       }).catch(()=>{});
@@ -1141,7 +1174,7 @@
           return curr;
       });
 
-      const itemsStr = getSafeItemsStr(tableData.items);
+      const itemsStr = extractOrderItemsStr(tableData);
       db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, phone: tableData.phone, items: itemsStr, total: tableData.total, method: pMethod.toUpperCase() });
       
       const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: pMethod.toUpperCase(), itemsDetails: itemsStr };
