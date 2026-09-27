@@ -72,7 +72,7 @@
       <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">🍖</div>
       <h2 class="text-3xl font-black text-dark mb-2 tracking-tight" data-i18n="welcome">Fusion Mandi</h2>
       <p class="text-slate-500 text-sm font-semibold mb-6" data-i18n="enter_mobile">Enter mobile number to unlock menu & digital receipt.</p>
-      <input type="tel" id="customerMobile" data-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" class="w-full text-center p-4 bg-light border border-slate-200 rounded-2xl font-black text-xl focus:border-primary outline-none mb-4 transition-all">
+      <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="20" data-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" class="w-full text-center p-4 bg-light border border-slate-200 rounded-2xl font-black text-xl focus:border-primary outline-none mb-4 transition-all">
       <button onclick="registerCustomer()" class="w-full bg-primary text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-transform" data-i18n="proceed">PROCEED TO MENU</button>
     </div>
   </div>
@@ -410,13 +410,10 @@
     window.registerCustomer = function() {
       const rawInput = document.getElementById('customerMobile').value;
 
-      // FIX (this update): strip everything that isn't a digit first — this makes the check
-      // forgiving of real-world phone input: pasted contacts with a "+91" country code,
-      // spaces or dashes ("903 220 8086"), and invisible formatting characters some mobile
-      // keyboards insert, which were all causing valid numbers to be wrongly rejected before.
+      // The field itself now sanitizes on every keystroke (see oninput on the input above),
+      // so by the time we get here rawInput should already be clean digits. This is kept
+      // as a second, independent safety net in case the value was set programmatically.
       let digits = rawInput.replace(/\D/g, '');
-      // If a country code slipped in (e.g. 12 digits: 91XXXXXXXXXX, or 11 digits: 0XXXXXXXXXX),
-      // keep just the last 10 digits — that's always the actual subscriber number in India.
       if (digits.length > 10) digits = digits.slice(-10);
 
       if (digits.length !== 10) {
@@ -424,7 +421,7 @@
         return alert(lang==='en' ? "Please enter a valid 10-digit mobile number." : "अमान्य नंबर");
       }
       const num = digits;
-      document.getElementById('customerMobile').value = num; // reflect the cleaned-up number back to the field
+      document.getElementById('customerMobile').value = num;
 
       customerPhone = num; localStorage.setItem('fm_cust_phone', num);
 
