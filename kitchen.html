@@ -455,9 +455,23 @@
       setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000); 
     }
 
-    window.printKOTReceipt = function(tableId, tableNo, items) {
+    // FIX: takes only the safe internal id and looks the order up live from
+    // window.currentTables — nothing dynamic (item names, table labels) is ever
+    // interpolated into an onclick/HTML attribute anymore, so special characters
+    // in a dish name can no longer corrupt the button or blank out the KOT.
+    window.printKOTReceipt = function(tableId) {
+        const table = (window.currentTables || {})[tableId];
+        if(!table){ return alert('Could not find this order — it may have already been cleared. Please refresh the page and try again.'); }
+
         db.ref('active_tables/'+tableId).update({status: 'cooking'});
+
         const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if(!printWindow){ return alert('Popup blocked — please allow popups for this site so the KOT can print.'); }
+
+        const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const safeItems = esc(table.items || 'No items recorded for this order.');
+        const safeTableNo = esc(table.table);
+
         printWindow.document.write(`
             <html><head><style>
                 @page { margin: 0; }
@@ -469,9 +483,9 @@
                 .end { text-align: center; margin-top: 20px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
             </style></head><body>
                 <h2>*** K O T ***<br>FUSION MANDI</h2>
-                <h3>Table: ${tableNo}</h3>
+                <h3>Table: ${safeTableNo}</h3>
                 <p>Time: ${new Date().toLocaleTimeString()}</p>
-                <div class="items">${items.replace(/ \| /g, '<br>• ')}</div>
+                <div class="items">${safeItems.replace(/ \| /g, '<br>• ')}</div>
                 <div class="end">End of Order</div>
                 <script>
                     setTimeout(() => { window.print(); window.close(); }, 500);
@@ -557,20 +571,22 @@
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
 
           let btn = '';
-          
+          // FIX: printKOTReceipt / clearTable / cancelOrder now only ever receive the
+          // safe internal `id` — item text, table labels and payment method are looked
+          // up live inside those functions instead of being embedded in the onclick string.
           if (currentRole === 'admin') {
             if(table.status === 'pending') { 
-              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="printKOTReceipt('${id}', '${table.table}', '${table.items}')">🖨️ Print KOT (Kitchen)</button>`; 
+              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT (Kitchen)</button>`; 
             } else if (table.status === 'cooking') {
               btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
             } else if(table.status === 'bill_requested') { 
-              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md border border-amber-500" onclick="clearTable('${id}', '${table.paymentMethod}')">Clear & Bill (${table.paymentMethod})</button>`; 
+              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md border border-amber-500" onclick="clearTable('${id}')">Clear & Bill (${table.paymentMethod || 'CASH'})</button>`; 
             } else { 
-              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="clearTable('${id}', '${table.paymentMethod || 'CASH'}')">Clear Table & Receipt</button>`; 
+              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="clearTable('${id}')">Clear Table & Receipt</button>`; 
             }
           } else if (currentRole === 'kitchen') {
              if(table.status === 'pending') {
-               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}', '${table.table}', '${table.items}')">🖨️ Print KOT</button>`;
+               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT</button>`;
              } else if (table.status === 'cooking') {
                btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`;
              } else {
@@ -578,7 +594,7 @@
              }
           } else {
             if(table.status === 'pending') {
-              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}', '${table.table}', '${table.items}')">Print KOT</button>`;
+              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">Print KOT</button>`;
             } else if(table.status === 'cooking') {
               btn = `<button class="w-full bg-emerald-500 text-white py-4 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Confirm Served</button>`;
             } else if(table.status === 'bill_requested') {
@@ -612,7 +628,7 @@
                 ${currentRole==='admin' ? `
                 <div class="flex gap-2 mb-2">
                   <button onclick="openEditOrder('${id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-transform">✏️ Edit Order</button>
-                  <button onclick="cancelOrder('${id}', '${table.table}')" class="flex-1 bg-red-50 hover:bg-red-100 text-red-500 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-transform">🗑️ Cancel Order</button>
+                  <button onclick="cancelOrder('${id}')" class="flex-1 bg-red-50 hover:bg-red-100 text-red-500 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-transform">🗑️ Cancel Order</button>
                 </div>` : ''}
                 ${btn}
               </div>
@@ -1012,14 +1028,18 @@
         .catch(err => alert('Could not delete item — check your connection and try again.'));
     };
 
-    window.cancelOrder = function(id, tableNo){
+    // FIX: only takes the safe `id`; the table number is looked up live for the
+    // confirm dialog and the cancelled-order log, so a table label or item list
+    // containing special characters can never break this button either.
+    window.cancelOrder = function(id){
       if(currentRole !== 'admin') return;
-      if(!confirm(`Cancel the entire order for Table ${tableNo}? This removes it from the floor without recording any revenue.`)) return;
+      const table = (window.currentTables || {})[id];
+      if(!table){ return alert('Could not find this order — it may have already been cleared. Please refresh.'); }
+      if(!confirm(`Cancel the entire order for Table ${table.table}? This removes it from the floor without recording any revenue.`)) return;
       const d = new Date().toISOString().split('T')[0];
-      const table = (window.currentTables || {})[id] || {};
       db.ref(`cancelled_logs/${d}`).push({
         time: new Date().toLocaleTimeString(),
-        table: tableNo,
+        table: table.table || '',
         phone: table.phone || '',
         items: table.items || '',
         total: table.total || 0,
@@ -1077,14 +1097,21 @@
         });
     }
 
-    window.clearTable = async function(id, method) {
-      const pin = prompt("Enter 4-Digit Admin PIN to clear table (1234):");
-      if(pin !== "1234" && pin !== "admin123") return alert("Access Denied: Invalid PIN.");
+    // FIX: now only takes `id`. It looks up the table's own paymentMethod itself
+    // (instead of trusting a value that used to be smuggled through the onclick
+    // string, which was "undefined" whenever that field hadn't been set yet).
+    // The admin PIN check is trimmed and no longer leaks the PIN in the prompt text.
+    window.clearTable = async function(id) {
+      const tableData = (window.currentTables || {})[id];
+      if(!tableData){ return alert('Could not find this order — it may have already been cleared. Please refresh the page and try again.'); }
 
-      const snap = await db.ref('active_tables/'+id).once('value'); const tableData = snap.val(); if(!tableData) return;
+      const pinInput = prompt("Enter Admin PIN to clear this table:");
+      if(pinInput === null) return; // user cancelled — do nothing
+      const pin = pinInput.trim();
+      if(pin !== "admin123" && pin !== "1234") return alert("Access Denied: Invalid PIN.");
+
       const d = new Date().toISOString().split('T')[0];
-      
-      const pMethod = method || "CASH";
+      const pMethod = tableData.paymentMethod || "CASH";
       let key = pMethod.toLowerCase();
       if(!['cash', 'upi', 'card'].includes(key)) key = 'cash';
 
@@ -1105,7 +1132,8 @@
       downloadFinalBillFile(billText, id);
       sendBillToCustomerWhatsApp(tableData, billText);
       
-      db.ref('active_tables/'+id).remove();
+      db.ref('active_tables/'+id).remove()
+        .catch(err => alert('The bill was recorded, but the table could not be removed from the live floor — please refresh. (' + err.message + ')'));
     }
 
     window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH'}); alert("Admin notified of cash collection."); };
