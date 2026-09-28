@@ -199,7 +199,7 @@
         <p id="cartTotal" class="text-2xl font-black text-dark leading-none">₹0</p>
       </div>
     </div>
-    <div id="cartListUI" class="mb-3 max-h-32 overflow-y-auto text-sm font-bold text-slate-700 divide-y divide-slate-100"></div>
+    <div id="cartListUI" class="mb-3 max-h-48 overflow-y-auto"></div>
     <p id="upsellNudge" class="hidden text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-3">🥤 Add a drink or dessert to complete your meal!</p>
     <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Any special instructions?" class="w-full mb-3 px-4 py-3 rounded-xl bg-light border-none font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-primary/20 text-sm">
     <button onclick="placeOrder()" id="placeOrderBtn" class="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
@@ -410,9 +410,6 @@
     window.registerCustomer = function() {
       const rawInput = document.getElementById('customerMobile').value;
 
-      // The field itself now sanitizes on every keystroke (see oninput on the input above),
-      // so by the time we get here rawInput should already be clean digits. This is kept
-      // as a second, independent safety net in case the value was set programmatically.
       let digits = rawInput.replace(/\D/g, '');
       if (digits.length > 10) digits = digits.slice(-10);
 
@@ -535,8 +532,7 @@
             <div class="flex flex-col flex-1">
               <h3 class="font-black text-dark leading-tight text-sm">${item.name}</h3>
               ${stockBadge ? `<div class="mt-1.5">
-                <span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full ${stockBadge.cls}">${stockBadge.text}</span>
-                ${stockBadge.pct !== null ? `<div class="w-full h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden"><div class="h-full ${stockBadge.pct<=20?'bg-red-500':'bg-amber-500'} rounded-full transition-all" style="width:${stockBadge.pct}%"></div></div>` : ''}
+                <span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full ${stockBadge.cls}">${stockBadge.text}</span>${stockBadge.pct !== null ? `<div class="w-full h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden"><div class="h-full ${stockBadge.pct<=20?'bg-red-500':'bg-amber-500'} rounded-full transition-all" style="width:${stockBadge.pct}%"></div></div>` : ''}
               </div>` : ''}
               ${selectHtml}
               <div class="flex items-center justify-between mt-auto pt-3 z-0">
@@ -574,11 +570,40 @@
       renderMenu();
     };
 
+    window.updateCartQtyFromCart = function(id, variant, change) {
+      const cartKey = `${id}|${variant}`;
+      if(cart[cartKey]) {
+        const maxStock = menuData[id]?.stock_count || 0;
+        let totalQtyOfThisItem = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) totalQtyOfThisItem += cart[k].qty; });
+        
+        if(change > 0) {
+          if(totalQtyOfThisItem >= maxStock) { playError(); return alert(lang==='en'?"Out of stock!":"स्टॉक खत्म!"); }
+          cart[cartKey].qty++;
+        } else {
+          cart[cartKey].qty--;
+          if(cart[cartKey].qty <= 0) delete cart[cartKey];
+        }
+        playClick(); vibrate(15);
+        updateCartUI();
+        renderMenu();
+      }
+    };
+
     function updateCartUI() {
       let total = 0; let uiHtml = '';
       Object.values(cart).forEach(i => {
         total += (Number(i.price)||0) * (Number(i.qty)||0);
-        uiHtml += `<div class="py-2 flex justify-between border-b border-slate-100 last:border-0 text-sm"><span>${i.qty}x <b>${i.name}</b> <small class="text-slate-400">(${i.variant})</small></span><span>₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span></div>`;
+        uiHtml += `<div class="py-3 flex items-center justify-between border-b border-slate-100 last:border-0 text-sm">
+          <div class="flex flex-col flex-1 pr-2">
+            <span class="font-bold text-slate-800 leading-tight">${i.name} <small class="text-slate-400 font-semibold block">${i.variant}</small></span>
+            <span class="text-primary font-black mt-0.5">₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span>
+          </div>
+          <div class="flex items-center bg-slate-100 rounded-lg p-1 shrink-0">
+            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', -1)" class="w-8 h-8 bg-white rounded-md font-black shadow-sm text-slate-800 active:scale-90 transition-transform">-</button>
+            <span class="font-black text-sm w-8 text-center">${i.qty}</span>
+            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', 1)" class="w-8 h-8 bg-primary rounded-md font-black shadow-sm text-white active:scale-90 transition-transform">+</button>
+          </div>
+        </div>`;
       });
       total = Math.round(total * 100) / 100;
       document.getElementById('cartTotal').innerText = '₹' + total;
@@ -598,6 +623,23 @@
         footer.classList.add('pulse-once');
       }
       cartWasVisible = shouldShow;
+    }
+
+    function buildItemsString(lineItemsObj) {
+      if (!lineItemsObj) return "";
+      return Object.values(lineItemsObj)
+          .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
+          .map(li => {
+              let base = `${li.qty}x ${li.name}`;
+              if (li.variant && li.variant !== 'Regular') {
+                  base += ` (${li.variant})`;
+              }
+              if (li.note) {
+                  base += ` - Note: ${li.note}`;
+              }
+              return li.cancelled ? `${base} [CANCELLED]` : base;
+          })
+          .join(' | ');
     }
 
     function buildLineItemsArray(order){
@@ -683,13 +725,15 @@
         if (!existing) existing = { table: document.getElementById('tableNum').value, phone: customerPhone, status: 'pending', line_items: {} };
         const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
         return {
-          orderId: tableId,
+          orderId: existing.orderId || tableId,
           table: document.getElementById('tableNum').value,
           phone: customerPhone,
           line_items: mergedLineItems,
+          items: buildItemsString(mergedLineItems),
           total: computeOrderTotal(mergedLineItems),
           status: 'pending',
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          paymentMethod: existing.paymentMethod || ''
         };
       }, (error, committed) => {
         if (error) {
@@ -718,7 +762,9 @@
         if(!existing || !existing.line_items || !existing.line_items[lineItemKey]) return existing;
         if(existing.status !== 'pending') return existing;
         if(existing.line_items[lineItemKey].cancelled) return existing;
+        
         existing.line_items[lineItemKey].cancelled = true;
+        existing.items = buildItemsString(existing.line_items);
         existing.total = computeOrderTotal(existing.line_items);
         return existing;
       }, (error, committed, snapshot) => {
