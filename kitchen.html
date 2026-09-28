@@ -32,7 +32,7 @@
 </head>
 <body class="font-sans antialiased text-slate-800">
 
-  <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg"></div>
+  <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
 
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
     <div class="bg-card p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(0,0,0,0.5)] border-t-4 border-primary">
@@ -61,8 +61,12 @@
             <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
         </div>
       </div>
-      <nav class="flex-1 px-4 py-4 space-y-2">
+      <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary tab-btn">📦 Active Floor</button>
+        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
+            <div class="flex items-center gap-3">🛎️ Service Req</div>
+            <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
+        </button>
         <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🍔 Menu & Stock</button>
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">📈 Analytics</button>
         <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">💬 Feedback</button>
@@ -79,6 +83,11 @@
         <section id="view-orders" class="tab-section">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Floor Operations</h2>
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <section id="view-services" class="tab-section hidden no-print">
+          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Customer Requests</h2>
+          <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
         <section id="view-inventory" class="tab-section hidden no-print">
@@ -297,14 +306,11 @@
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
     // --- UNIVERSAL DATA EXTRACTOR ---
-    // Actively hunts down the order items regardless of the property name or format the customer app uses.
     function extractOrderItemsStr(table) {
         if (!table) return '';
         
-        // 1. Identify the data source (checks standard keys first)
         let rawData = table.items || table.cart || table.orderDetails || table.orderItems || table.products || table.dishes;
         
-        // 2. Fallback brute-force search if standard keys are entirely missing
         if (rawData === undefined || rawData === null || rawData === '') {
             for (let key in table) {
                 if (['table', 'status', 'total', 'timestamp', 'phone', 'paymentMethod', 'orderId'].includes(key)) continue;
@@ -320,7 +326,6 @@
         
         if (!rawData) return '';
 
-        // 3. Attempt JSON parse if the app sends a stringified array/object
         let items = rawData;
         if (typeof items === 'string') {
             const trimmed = items.trim();
@@ -329,7 +334,6 @@
             }
         }
 
-        // 4. Format into bullet text
         if (typeof items === 'string') return items.trim();
         
         const formatItem = (i) => {
@@ -379,16 +383,23 @@
       return foundKey ? menuImages[foundKey] : null;
     }
 
-    function showGlobalError(msg){
+    function showGlobalToast(msg, type='error'){
       const banner = document.getElementById('globalErrorBanner');
-      if(banner){ banner.textContent = '⚠️ ' + msg; banner.classList.remove('hidden'); }
-      console.error(msg);
+      if(banner){ 
+        banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg; 
+        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-blue-600'}`;
+        banner.classList.remove('hidden'); 
+        setTimeout(() => { banner.classList.add('hidden'); }, 5000);
+      }
+      if(type==='error') console.error(msg);
+      else console.log(msg);
     }
+    
     window.addEventListener('error', function(e){
-      showGlobalError('A script error occurred (' + (e.message || 'unknown') + '). Press F12 to open the browser console for the full error.');
+      showGlobalToast('A script error occurred (' + (e.message || 'unknown') + '). Press F12 to open the browser console for the full error.', 'error');
     });
     window.addEventListener('unhandledrejection', function(e){
-      showGlobalError('A background request failed (' + (e.reason && e.reason.message ? e.reason.message : e.reason) + ').');
+      showGlobalToast('A background request failed (' + (e.reason && e.reason.message ? e.reason.message : e.reason) + ').', 'error');
     });
 
     let db = null;
@@ -396,11 +407,12 @@
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
     } catch(e) {
-      showGlobalError('Could not connect to Firebase: ' + e.message + '. Check your internet connection and reload.');
+      showGlobalToast('Could not connect to Firebase: ' + e.message + '. Check your internet connection and reload.', 'error');
     }
     
     let currentRole = null;
     let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    let serviceSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3'); // Notification chime
     let alarmTimer = null;
     let customersCache = {};
     let editOrderId = null;
@@ -458,12 +470,14 @@
 
       currentRole = role;
       try { alertSound.play().then(()=>{alertSound.pause();alertSound.currentTime=0;}).catch(()=>{}); } catch(e){}
+      try { serviceSound.play().then(()=>{serviceSound.pause();serviceSound.currentTime=0;}).catch(()=>{}); } catch(e){}
 
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainLayout').classList.remove('hidden');
       document.getElementById('roleText').innerText = currentRole.toUpperCase();
 
       if(currentRole === 'admin') { document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); }
+      if(currentRole === 'admin' || currentRole === 'waiter') { document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden')); }
       if(currentRole === 'admin' || currentRole === 'kitchen' || currentRole === 'waiter') { document.querySelectorAll('.kitchen-waiter-only').forEach(el => el.classList.remove('hidden')); }
 
       loadSystem();
@@ -481,8 +495,15 @@
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(b => {
-        if(b.id === `tab-${tab}`) b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary transition-all tab-btn";
-        else b.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 transition-all tab-btn admin-only" + (currentRole !== 'admin' ? ' hidden' : '');
+        let isMatch = b.id === `tab-${tab}`;
+        
+        if (isMatch) {
+            b.classList.remove('text-slate-400', 'hover:bg-white/5');
+            b.classList.add('bg-primary/10', 'text-primary');
+        } else {
+            b.classList.remove('bg-primary/10', 'text-primary');
+            b.classList.add('text-slate-400', 'hover:bg-white/5');
+        }
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
     };
@@ -611,9 +632,9 @@
     }
 
     function loadSystem() {
-      if(!db){ showGlobalError('Cannot load data — no database connection.'); return; }
+      if(!db){ showGlobalToast('Cannot load data — no database connection.', 'error'); return; }
 
-      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; }, err => showGlobalError('customers listener: ' + err.message));
+      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; }, err => showGlobalToast('customers listener: ' + err.message, 'error'));
 
       db.ref('.info/connected').on('value', snap => {
         const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
@@ -621,6 +642,7 @@
         else { dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; txt.innerText="Offline"; txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest"; }
       });
 
+      // --- Floor Operations Listener ---
       db.ref('active_tables').on('value', snap => {
         const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
         const tables = snap.val() || {};
@@ -712,13 +734,78 @@
           clearInterval(alarmTimer); alarmTimer = null;
           alertSound.pause(); alertSound.currentTime = 0;
         }
-      }, err => showGlobalError('active_tables listener: ' + err.message));
+      }, err => showGlobalToast('active_tables listener: ' + err.message, 'error'));
+
+      // --- Service Requests Listener ---
+      if (currentRole === 'admin' || currentRole === 'waiter') {
+          let firstServiceLoad = true;
+          let knownPendingServices = new Set();
+
+          db.ref('service_requests').on('value', snap => {
+              const reqs = snap.val() || {};
+              const grid = document.getElementById('serviceRequestsGrid');
+              const badge = document.getElementById('serviceBadge');
+              if(!grid || !badge) return;
+
+              grid.innerHTML = '';
+              let pendingCount = 0;
+              let newIncoming = false;
+
+              Object.entries(reqs).sort((a,b)=> b[1].timestamp - a[1].timestamp).forEach(([id, req]) => {
+                  if (req.status === 'pending') {
+                      pendingCount++;
+                      if (!firstServiceLoad && !knownPendingServices.has(id)) {
+                          newIncoming = true;
+                      }
+                      knownPendingServices.add(id);
+
+                      const timeStr = new Date(req.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                      let icon = '🛎️';
+                      if(req.request_type === 'Water Refill') icon = '💧';
+                      if(req.request_type === 'Clean Table') icon = '🧽';
+                      if(req.request_type === 'Cutlery Needed') icon = '🍴';
+                      if(req.request_type === 'Call Waiter') icon = '👤';
+
+                      grid.innerHTML += `
+                          <div class="dash-card bg-card p-5 rounded-3xl border-2 border-blue-400 flex flex-col justify-between shadow-lg relative overflow-hidden">
+                              <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-2xl opacity-50">${icon}</div>
+                              <div>
+                                  <div class="flex justify-between items-center mb-3">
+                                      <span class="text-xs font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-md">${req.request_type}</span>
+                                      <span class="text-[10px] font-bold text-slate-400">${timeStr}</span>
+                                  </div>
+                                  <h3 class="font-black text-2xl text-slate-900 mb-1">Table ${req.table}</h3>
+                                  ${req.phone ? `<p class="text-xs font-bold text-slate-500 mb-3">📞 ${req.phone}</p>` : ''}
+                                  ${req.note ? `<p class="text-sm font-semibold text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 italic">"${req.note}"</p>` : ''}
+                              </div>
+                              <button onclick="resolveService('${id}')" class="w-full mt-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-200 py-3 rounded-xl font-black transition-colors active:scale-95">✅ Mark Resolved</button>
+                          </div>
+                      `;
+                  }
+              });
+
+              if (pendingCount === 0) {
+                  grid.innerHTML = `<div class="col-span-full text-center p-10"><p class="text-slate-400 font-bold">No active customer requests at the moment.</p></div>`;
+                  badge.classList.add('hidden');
+              } else {
+                  badge.innerText = pendingCount;
+                  badge.classList.remove('hidden');
+              }
+
+              if (newIncoming) {
+                  serviceSound.play().catch(()=>{});
+                  showGlobalToast(`New Service Request from Table! Check the Requests tab.`, 'info');
+              }
+
+              firstServiceLoad = false;
+          }, err => showGlobalToast('service_requests listener: ' + err.message, 'error'));
+      }
 
       if(currentRole === 'admin') {
         db.ref('menu').on('value', snap => {
           menuCache = snap.val() || {};
           renderInventory();
-        }, err => showGlobalError('menu listener: ' + err.message));
+        }, err => showGlobalToast('menu listener: ' + err.message, 'error'));
 
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
@@ -730,7 +817,7 @@
             renderPaymentSplitChart(data.cash || 0, data.upi || 0, data.card || 0);
             revenueDataByDate[dStr] = data.total || 0;
             renderRevenueTrendChart();
-        }, err => showGlobalError('tallies listener: ' + err.message));
+        }, err => showGlobalToast('tallies listener: ' + err.message, 'error'));
         
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
           const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
@@ -739,7 +826,7 @@
             tb.innerHTML += `<tr class="hover:bg-light/50"><td class="p-4 font-medium text-slate-500">${log.time}</td><td class="p-4 font-black">T-${log.table}</td><td class="p-4 font-bold text-slate-600 text-xs">${log.method}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total}</td></tr>`;
           });
           renderTopItemsChart(logs);
-        }, err => showGlobalError('daily_logs listener: ' + err.message));
+        }, err => showGlobalToast('daily_logs listener: ' + err.message, 'error'));
 
         db.ref('feedback').limitToLast(100).on('value', snap => {
           const list = document.getElementById('feedbackListAdmin');
@@ -774,10 +861,15 @@
                 <p class="text-[10px] text-slate-400 font-bold mt-2">${f.timestamp ? new Date(f.timestamp).toLocaleString() : ''} ${f.phone ? '· 📞 '+f.phone : ''}</p>
               </div>`;
           });
-        }, err => showGlobalError('feedback listener: ' + err.message));
+        }, err => showGlobalToast('feedback listener: ' + err.message, 'error'));
 
         initAnalytics(dStr);
       }
+    }
+
+    window.resolveService = function(id) {
+        db.ref('service_requests/'+id).update({status: 'resolved'})
+          .catch(err => alert('Failed to resolve request. Check connection.'));
     }
 
     window.deleteFeedback = function(id){
