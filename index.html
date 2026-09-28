@@ -187,24 +187,71 @@
     <div class="text-center p-10 text-slate-400 font-bold col-span-full" data-i18n="loading_menu">Loading Menu...</div>
   </div>
 
+  <!-- FLOATING ACTION BUTTONS -->
+  <button onclick="openServiceModal()" class="fixed bottom-[164px] right-4 z-40 bg-blue-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Call Waiter / Service Request">🛎️</button>
+  
   <button onclick="askForHelp()" class="fixed bottom-24 right-4 z-40 bg-dark text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Need help? Message our staff">❓</button>
 
   <button onclick="shareWithFriends()" class="fixed bottom-24 left-4 z-40 bg-emerald-600 text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Share Fusion Mandi with a friend">📢</button>
 
-  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[400px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 z-50">
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black">🛒</div>
-      <div>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="cart_total">New Items</p>
-        <p id="cartTotal" class="text-2xl font-black text-dark leading-none">₹0</p>
+  <!-- SERVICE REQUEST MODAL (CALL WAITER) -->
+  <div id="serviceModal" class="fixed inset-0 z-[150] flex flex-col justify-end hidden transition-opacity">
+    <div class="absolute inset-0 bg-dark/60 backdrop-blur-sm" onclick="closeServiceModal()"></div>
+    <div id="serviceModalContent" class="relative bg-white w-full rounded-t-3xl p-6 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transform translate-y-full transition-transform duration-300 ease-out">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-xl font-black text-dark tracking-tight">🛎️ Request Service</h3>
+        <button onclick="closeServiceModal()" class="text-slate-400 hover:text-slate-600 text-3xl font-black leading-none">&times;</button>
+      </div>
+      <p class="text-sm text-slate-500 mb-5 font-semibold">How can we help you at Table <span id="serviceTableDisplay" class="text-primary font-black"></span>?</p>
+      
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <button onclick="submitServiceRequest('Water Refill')" class="bg-blue-50 text-blue-600 border border-blue-200 py-3.5 rounded-xl font-bold active:scale-95 transition-transform flex flex-col items-center justify-center gap-1">
+          <span class="text-2xl">💧</span> <span class="text-xs">Water</span>
+        </button>
+        <button onclick="submitServiceRequest('Clean Table')" class="bg-emerald-50 text-emerald-600 border border-emerald-200 py-3.5 rounded-xl font-bold active:scale-95 transition-transform flex flex-col items-center justify-center gap-1">
+          <span class="text-2xl">🧽</span> <span class="text-xs">Clean Table</span>
+        </button>
+        <button onclick="submitServiceRequest('Cutlery Needed')" class="bg-slate-50 text-slate-600 border border-slate-200 py-3.5 rounded-xl font-bold active:scale-95 transition-transform flex flex-col items-center justify-center gap-1">
+          <span class="text-2xl">🍴</span> <span class="text-xs">Cutlery</span>
+        </button>
+        <button onclick="submitServiceRequest('Call Waiter')" class="bg-amber-50 text-amber-600 border border-amber-200 py-3.5 rounded-xl font-bold active:scale-95 transition-transform flex flex-col items-center justify-center gap-1">
+          <span class="text-2xl">👤</span> <span class="text-xs">Call Waiter</span>
+        </button>
+      </div>
+      
+      <textarea id="serviceNotes" rows="2" placeholder="Have another concern or specific request?" class="w-full mb-3 p-3 rounded-xl bg-light border border-slate-200 text-sm text-dark font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"></textarea>
+      <button onclick="submitServiceRequest('Other')" class="w-full bg-dark text-white py-4 rounded-xl font-black shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+        Send Custom Request
+      </button>
+    </div>
+  </div>
+
+  <!-- COLLAPSIBLE CART UPDATE -->
+  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[400px] bg-white rounded-3xl shadow-2xl border border-slate-100 p-5 z-50 transition-all duration-300">
+    <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCart()">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-black relative">
+          🛒
+          <span id="cartBadgeCount" class="hidden absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white">0</span>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest" data-i18n="cart_total">New Items</p>
+          <p id="cartTotal" class="text-2xl font-black text-dark leading-none">₹0</p>
+        </div>
+      </div>
+      <div id="cartToggleIcon" class="w-8 h-8 flex items-center justify-center bg-slate-50 text-slate-500 rounded-full font-black text-sm transition-transform duration-300 shadow-sm border border-slate-100">
+        ▼
       </div>
     </div>
-    <div id="cartListUI" class="mb-3 max-h-48 overflow-y-auto"></div>
-    <p id="upsellNudge" class="hidden text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-3">🥤 Add a drink or dessert to complete your meal!</p>
-    <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Any special instructions?" class="w-full mb-3 px-4 py-3 rounded-xl bg-light border-none font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-primary/20 text-sm">
-    <button onclick="placeOrder()" id="placeOrderBtn" class="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-      <span data-i18n="confirm_order">Send to Kitchen</span>
-    </button>
+    
+    <div id="cartExpandedContent" class="overflow-hidden transition-all duration-300" style="max-height: 500px; opacity: 1; margin-top: 1rem;">
+      <div id="cartListUI" class="mb-3 max-h-48 overflow-y-auto"></div>
+      <p id="upsellNudge" class="hidden text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mb-3">🥤 Add a drink or dessert to complete your meal!</p>
+      <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Any special instructions?" class="w-full mb-3 px-4 py-3 rounded-xl bg-light border-none font-semibold text-slate-800 outline-none focus:ring-2 focus:ring-primary/20 text-sm">
+      <button onclick="placeOrder()" id="placeOrderBtn" class="w-full bg-primary text-white py-4 rounded-xl font-black text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+        <span data-i18n="confirm_order">Send to Kitchen</span>
+      </button>
+    </div>
   </div>
 
   <div id="printBillArea"></div>
@@ -378,6 +425,87 @@
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let activeTableData = null;
     let cartWasVisible = false; let lastKnownStatus = null;
     let customerPhone = localStorage.getItem('fm_cust_phone') || "";
+    
+    // Collapsible cart state
+    let cartExpanded = true;
+    window.toggleCart = function() {
+      cartExpanded = !cartExpanded;
+      const content = document.getElementById('cartExpandedContent');
+      const icon = document.getElementById('cartToggleIcon');
+      
+      if(cartExpanded) {
+        content.style.maxHeight = "500px";
+        content.style.opacity = "1";
+        content.style.marginTop = "1rem";
+        icon.style.transform = "rotate(0deg)";
+      } else {
+        content.style.maxHeight = "0px";
+        content.style.opacity = "0";
+        content.style.marginTop = "0px";
+        icon.style.transform = "rotate(180deg)";
+      }
+    };
+
+    // Service Modal Functions
+    window.openServiceModal = function() {
+        playClick();
+        const tableVal = document.getElementById('tableNum').value;
+        document.getElementById('serviceTableDisplay').innerText = tableVal;
+        
+        const modal = document.getElementById('serviceModal');
+        const content = document.getElementById('serviceModalContent');
+        modal.classList.remove('hidden');
+        
+        // Slight delay to allow display:block to apply before animating transform
+        setTimeout(() => {
+            content.classList.remove('translate-y-full');
+            content.classList.add('translate-y-0');
+        }, 10);
+    };
+
+    window.closeServiceModal = function() {
+        const modal = document.getElementById('serviceModal');
+        const content = document.getElementById('serviceModalContent');
+        
+        content.classList.remove('translate-y-0');
+        content.classList.add('translate-y-full');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300); // Matches duration-300
+    };
+
+    window.submitServiceRequest = function(type) {
+        playClick();
+        const tableVal = document.getElementById('tableNum').value;
+        const phone = customerPhone || 'Guest';
+        let note = document.getElementById('serviceNotes').value.trim();
+
+        if (type === 'Other') {
+            if (!note) {
+                type = 'Call Waiter'; // Fallback if they just hit submit with empty text
+            }
+        }
+
+        db.ref('service_requests').push({
+            table: tableVal,
+            phone: phone,
+            request_type: type,
+            note: note,
+            status: 'pending',
+            timestamp: Date.now()
+        }).then(() => {
+            playNotify();
+            vibrate([30, 50, 30]);
+            showFunToast(`🛎️ Request sent to staff!`);
+            closeServiceModal();
+            document.getElementById('serviceNotes').value = '';
+        }).catch(err => {
+            console.error(err);
+            playError();
+            alert('Failed to send request. Please check connection.');
+        });
+    };
     
     if (customerPhone && customerPhone.length >= 10) {
         document.getElementById('loginModal').style.display = 'none';
@@ -591,8 +719,10 @@
 
     function updateCartUI() {
       let total = 0; let uiHtml = '';
+      let totalQty = 0;
       Object.values(cart).forEach(i => {
         total += (Number(i.price)||0) * (Number(i.qty)||0);
+        totalQty += (Number(i.qty)||0);
         uiHtml += `<div class="py-3 flex items-center justify-between border-b border-slate-100 last:border-0 text-sm">
           <div class="flex flex-col flex-1 pr-2">
             <span class="font-bold text-slate-800 leading-tight">${i.name} <small class="text-slate-400 font-semibold block">${i.variant}</small></span>
@@ -606,18 +736,33 @@
         </div>`;
       });
       total = Math.round(total * 100) / 100;
-      document.getElementById('cartTotal').innerText = '₹' + total;
-      document.getElementById('cartListUI').innerHTML = uiHtml;
-      document.getElementById('upsellNudge').classList.toggle('hidden', !(total > 0 && total < 300));
+      
+      const totalEl = document.getElementById('cartTotal');
+      if (totalEl) totalEl.innerText = '₹' + total;
+      
+      const cartList = document.getElementById('cartListUI');
+      if (cartList) cartList.innerHTML = uiHtml;
+      
+      const upsell = document.getElementById('upsellNudge');
+      if (upsell) upsell.classList.toggle('hidden', !(total > 0 && total < 300));
+      
+      const badge = document.getElementById('cartBadgeCount');
+      if (badge) {
+        if (totalQty > 0) { badge.innerText = totalQty; badge.classList.remove('hidden'); }
+        else { badge.classList.add('hidden'); }
+      }
 
       const footer = document.getElementById('cartFooter');
       const shouldShow = total > 0;
-      footer.classList.toggle('hidden', !shouldShow);
+      if (footer) footer.classList.toggle('hidden', !shouldShow);
 
       if (shouldShow && !cartWasVisible) {
         footer.classList.remove('cart-pop-in'); void footer.offsetWidth;
         footer.classList.add('cart-pop-in');
         footer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        
+        // Auto-expand if popped up while collapsed
+        if (!cartExpanded) toggleCart();
       } else if (shouldShow) {
         footer.classList.remove('pulse-once'); void footer.offsetWidth;
         footer.classList.add('pulse-once');
@@ -750,6 +895,9 @@
           playSuccess(); vibrate([30,40,30]);
           fireConfetti(); showFunToast(randomFunLine());
           cart = {}; document.getElementById('orderNotes').value = ''; 
+          // Auto-collapse cart after placing order
+          if(cartExpanded) toggleCart();
+          
           renderMenu(); listenToRunningTab();
         }
         btn.disabled = false;
