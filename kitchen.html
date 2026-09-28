@@ -219,7 +219,7 @@
       <textarea id="editOrderItems" rows="6" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-medium text-sm outline-none focus:border-primary mb-4"></textarea>
       <p class="text-xs text-slate-400 font-bold mb-2 uppercase tracking-widest">Total (₹)</p>
       <input type="number" id="editOrderTotal" min="0" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-black text-lg outline-none focus:border-primary mb-4">
-      <p class="text-[10px] text-slate-400 font-semibold mb-4">Editing here overwrites the order exactly as typed — recalculate the total yourself after changing items.</p>
+      <p class="text-[10px] text-slate-400 font-semibold mb-4">Editing here overwrites the order. Removed items will automatically be marked as [CANCELLED] for the kitchen to see. Recalculate the total yourself.</p>
       <div class="flex gap-2">
         <button onclick="closeEditOrder()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition-transform">Cancel</button>
         <button onclick="saveEditOrder()" class="flex-1 bg-primary text-white font-black py-3 rounded-xl active:scale-95 transition-transform">Save Changes</button>
@@ -535,7 +535,13 @@
         
         const rawItems = extractOrderItemsStr(table);
         const safeItems = esc(rawItems ? rawItems : 'No items recorded for this order.');
-        const itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
+        
+        // Highlight cancelled items with a strikethrough in print format
+        let itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
+        itemsHtml = itemsHtml.split('<br>').map(line => {
+            return line.match(/CANCELLED/i) ? `<span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${line}</span>` : line;
+        }).join('<br>');
+
         const safeTableNo = esc(table.table);
 
         const html = `
@@ -633,7 +639,8 @@
             if(table.status === 'pending') { 
               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT (Kitchen)</button>`; 
             } else if (table.status === 'cooking') {
-              btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
+              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black transition-colors shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
+                     <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black transition-colors shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
             } else if(table.status === 'bill_requested') { 
               btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md border border-amber-500" onclick="clearTable('${id}')">Clear & Bill (${table.paymentMethod || 'CASH'})</button>`; 
             } else { 
@@ -643,7 +650,8 @@
              if(table.status === 'pending') {
                btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT</button>`;
              } else if (table.status === 'cooking') {
-               btn = `<button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-4 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`;
+               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
+                      <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`;
              } else {
                btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>Awaiting Checkout</button>`;
              }
@@ -651,7 +659,8 @@
             if(table.status === 'pending') {
               btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">Print KOT</button>`;
             } else if(table.status === 'cooking') {
-              btn = `<button class="w-full bg-emerald-500 text-white py-4 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Confirm Served</button>`;
+              btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">Re-Print KOT</button>
+                     <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Confirm Served</button>`;
             } else if(table.status === 'bill_requested') {
               btn = `<button class="w-full bg-amber-500 text-white py-4 rounded-xl font-black shadow-md" onclick="waiterCashCollect('${id}')">Mark Cash Collected</button>`;
             } else {
@@ -662,7 +671,10 @@
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
 
           const itemsStr = extractOrderItemsStr(table);
-          const formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
+          let formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
+          formattedItems = formattedItems.split('<br>').map(line => {
+              return line.match(/CANCELLED/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line;
+          }).join('<br>');
 
           grid.innerHTML += `
             <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
@@ -986,10 +998,25 @@
     };
     window.saveEditOrder = function(){
       if(!editOrderId) return;
-      const rawLines = document.getElementById('editOrderItems').value.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
+      const table = (window.currentTables || {})[editOrderId];
+      if(!table) return;
+
+      const oldLines = extractOrderItemsStr(table).split(' | ').map(l=>l.trim()).filter(l=>l.length>0);
+      let rawLines = document.getElementById('editOrderItems').value.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
       const newTotal = Math.round(parseFloat(document.getElementById('editOrderTotal').value)*100)/100;
+
       if(rawLines.length===0){ return alert('Order must have at least one item.'); }
       if(isNaN(newTotal) || newTotal < 0){ return alert('Enter a valid total (0 or more).'); }
+
+      // Auto-detect removed items and mark them cancelled for the kitchen
+      const newLinesClean = rawLines.map(l => l.replace(/\[?CANCELLED\]?/gi, '').trim());
+      oldLines.forEach(oldItem => {
+         const cleanOld = oldItem.replace(/\[?CANCELLED\]?/gi, '').trim();
+         if (!newLinesClean.includes(cleanOld) && !oldItem.match(/CANCELLED/i)) {
+             rawLines.push(cleanOld + " [CANCELLED]");
+         }
+      });
+
       db.ref('active_tables/'+editOrderId).update({ items: rawLines.join(' | '), total: newTotal })
         .then(()=>{ closeEditOrder(); })
         .catch(err=>{ console.error(err); alert('Could not save changes — check your connection and try again.'); });
