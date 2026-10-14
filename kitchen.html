@@ -40,7 +40,7 @@
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
     <div class="bg-[#141414] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
       <div class="w-16 h-16 gold-gradient text-black rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg">MC</div>
-      <h2 class="text-2xl font-black text-white mb-2 tracking-tight">Admin Login</h2>
+      <h2 class="text-2xl font-black text-white mb-2 tracking-tight">System Login</h2>
       <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
       <button id="loginBtn" onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">ACCESS WORKSPACE</button>
       <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
@@ -48,10 +48,15 @@
   </div>
 
   <div class="bg-dark text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20" style="background:#0a0a0a;">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-2/3 truncate cursor-pointer">
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-1/2 truncate cursor-pointer">
       <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary">
       Dev: Syed Zeeshaan Ali | High-Fledged AI
     </a>
+    <div class="flex items-center gap-2">
+      <select id="adminLangSelect" onchange="changeAdminLanguage(this.value)" class="bg-dark text-primary font-black border border-primary/30 rounded px-2 py-1 outline-none">
+        <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
+      </select>
+    </div>
   </div>
 
   <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden" id="mainLayout">
@@ -65,18 +70,18 @@
         </div>
       </div>
       <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn">📦 Active Floor</button>
-        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">🧾 POS Order</button>
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn" data-i18n="nav_floor">📦 Active Floor</button>
+        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
         <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
-            <div class="flex items-center gap-3">🛎️ Service Req</div>
+            <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
             <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🍔 Menu & Stock</button>
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">📈 Analytics</button>
-        <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">💬 Feedback</button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Stock</button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
+        <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_feedback">💬 Feedback</button>
       </nav>
       <div class="p-4 border-t border-white/10">
-        <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm uppercase tracking-widest">Log Out</button>
+        <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm uppercase tracking-widest" data-i18n="logout">Log Out</button>
       </div>
     </aside>
 
@@ -85,31 +90,29 @@
         
         <!-- Floor Operations -->
         <section id="view-orders" class="tab-section">
-          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight">Floor Operations</h2>
+          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_floor">Floor Operations</h2>
           
-          <!-- Table Occupancy Map (Admin/Waiter only) -->
+          <!-- Table Occupancy Map -->
           <div class="mb-8 admin-waiter-only hidden bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
-              <h3 class="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest">Live Table Occupancy</h3>
+              <h3 class="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy</h3>
               <div id="occupancyMap" class="flex flex-wrap gap-2"></div>
           </div>
 
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- POS / Direct Order (Admin/Waiter) -->
+        <!-- POS / Direct Order -->
         <section id="view-pos" class="tab-section hidden no-print">
-            <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight">POS / Direct Order</h2>
+            <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <!-- POS Menu -->
                 <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[70vh] flex flex-col">
                     <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
                     <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
                 </div>
 
-                <!-- POS Cart -->
                 <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[70vh] flex flex-col">
-                    <h3 class="text-lg font-black text-slate-900 mb-4 border-b pb-2">New Order</h3>
+                    <h3 class="text-lg font-black text-slate-900 mb-4 border-b pb-2" data-i18n="new_order">New Order</h3>
                     
                     <div class="flex gap-2 mb-4">
                         <select id="posTableNum" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
@@ -127,7 +130,7 @@
                         <div class="flex justify-between font-black text-lg mb-4">
                             <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
                         </div>
-                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-4 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md">Send to Kitchen</button>
+                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-4 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
                     </div>
                 </div>
             </div>
@@ -135,13 +138,13 @@
 
         <!-- Customer Requests -->
         <section id="view-services" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Customer Requests</h2>
+          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight" data-i18n="title_service">Customer Requests</h2>
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
         <!-- Inventory -->
         <section id="view-inventory" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Inventory Management</h2>
+          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight" data-i18n="title_menu">Inventory Management</h2>
           
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-primary">
             <h3 class="text-lg font-black text-slate-900 mb-4">➕ Add New Menu Item</h3>
@@ -206,7 +209,7 @@
         <!-- Dashboard -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard & Revenue</h2>
+            <h2 class="text-3xl font-black text-slate-900 tracking-tight" data-i18n="title_analytics">Dashboard & Revenue</h2>
             <button onclick="window.print()" class="bg-white text-slate-800 border border-slate-200 px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-slate-50">🖨️ Export PDF Report</button>
           </div>
 
@@ -269,7 +272,7 @@
         <!-- Feedback -->
         <section id="view-feedback" class="tab-section hidden no-print">
           <div class="flex justify-between items-center mb-6">
-              <h2 class="text-3xl font-black text-slate-900 tracking-tight">Customer Feedback</h2>
+              <h2 class="text-3xl font-black text-slate-900 tracking-tight" data-i18n="title_feedback">Customer Feedback</h2>
               <button onclick="clearAllFeedback()" class="bg-red-50 text-red-500 border border-red-200 px-4 py-2 rounded-xl font-bold text-xs hover:bg-red-500 hover:text-white transition-colors">🗑️ Clear All Feedback</button>
           </div>
           <div id="feedbackSummary" class="dash-card bg-card p-5 rounded-2xl mb-6 flex flex-wrap gap-6 border-t-2 border-primary"></div>
@@ -372,6 +375,96 @@
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
 
+    // --- AUTO TRANSLATION ENGINE FOR ADMIN ---
+    const adminDict = {
+      'hi': {
+        'nav_floor': '📦 एक्टिव फ्लोर', 'nav_pos': '🧾 पीओएस ऑर्डर', 'nav_service': '🛎️ सर्विस रिक्वेस्ट',
+        'nav_menu': '🍔 मेनू और स्टॉक', 'nav_analytics': '📈 एनालिटिक्स', 'nav_feedback': '💬 फीडबैक',
+        'logout': 'लॉग आउट', 'title_floor': 'फ्लोर संचालन', 'occupancy': 'टेबल ऑक्यूपेंसी',
+        'title_pos': 'पीओएस / डायरेक्ट ऑर्डर', 'new_order': 'नया ऑर्डर', 'btn_send_kitchen': 'किचन में भेजें',
+        'title_service': 'ग्राहक अनुरोध', 'title_menu': 'इन्वेंटरी प्रबंधन', 'title_analytics': 'डैशबोर्ड और आय',
+        'title_feedback': 'ग्राहक फीडबैक',
+        
+        // Item Translations
+        'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
+        'special': 'स्पेशल', 'juicy': 'जूसी', 'mixed': 'मिक्स्ड', 'paneer': 'पनीर', 'mushroom': 'मशरूम',
+        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस', 
+        'pcs': 'पीस', 'half': 'हाफ', 'full': 'फुल', 'regular': 'रेगुलर', 'single': 'सिंगल', 'triple': 'ट्रिपल',
+        'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'bhakasura': 'बकासुर',
+        
+        // KOT & Actions
+        'Print KOT (Kitchen)': 'केओटी प्रिंट करें', 'Re-Print KOT': 'दोबारा प्रिंट करें',
+        'Mark Food Served': 'परोसा गया', 'Clear Table': 'टेबल खाली करें', 'Cancel Order': 'ऑर्डर रद्द करें',
+        'Sent to Kitchen': 'किचन में भेजा गया', 'Confirm Served': 'सर्व कंफर्म करें', 'Mark Cash Collected': 'कैश लिया गया',
+        'Awaiting Admin Clear': 'एडमिन का इंतज़ार', 'pending': 'पेंडिंग', 'cooking': 'पक रहा है', 
+        'served': 'परोसा गया', 'bill_requested': 'बिल माँगा गया', 'bill_ready': 'बिल तैयार'
+      },
+      'te': {
+        'nav_floor': '📦 యాక్టివ్ ఫ్లోర్', 'nav_pos': '🧾 POS ఆర్డర్', 'nav_service': '🛎️ సర్వీస్ రిక్వెస్ట్',
+        'nav_menu': '🍔 మెనూ & స్టాక్', 'nav_analytics': '📈 విశ్లేషణలు', 'nav_feedback': '💬 ఫీడ్‌బ్యాక్',
+        'logout': 'లాగ్ అవుట్', 'title_floor': 'ఫ్లోర్ ఆపరేషన్స్', 'occupancy': 'టేబుల్ ఆక్యుపెన్సీ',
+        'title_pos': 'POS / డైరెక్ట్ ఆర్డర్', 'new_order': 'కొత్త ఆర్డర్', 'btn_send_kitchen': 'వంటగదికి పంపండి',
+        'title_service': 'కస్టమర్ అభ్యర్థనలు', 'title_menu': 'ఇన్వెంటరీ మేనేజ్‌మెంట్', 'title_analytics': 'డ్యాష్‌బోర్డ్ & ఆదాయం',
+        'title_feedback': 'కస్టమర్ ఫీడ్‌బ్యాక్',
+        
+        // Item Translations
+        'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
+        'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
+        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్', 
+        'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
+        'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర',
+        
+        // KOT & Actions
+        'Print KOT (Kitchen)': 'KOT ప్రింట్ చేయండి', 'Re-Print KOT': 'KOT మళ్ళీ ప్రింట్ చేయండి',
+        'Mark Food Served': 'వడ్డించినట్లు మార్క్ చేయండి', 'Clear Table': 'టేబుల్ క్లియర్ చేయండి', 'Cancel Order': 'ఆర్డర్ రద్దు చేయండి',
+        'Sent to Kitchen': 'వంటగదికి పంపబడింది', 'Confirm Served': 'వడ్డించినట్లు నిర్ధారించండి', 'Mark Cash Collected': 'నగదు తీసుకున్నట్లు మార్క్ చేయండి',
+        'Awaiting Admin Clear': 'అడ్మిన్ కోసం వేచి ఉంది', 'pending': 'పెండింగ్', 'cooking': 'వంటలో ఉంది', 
+        'served': 'వడ్డించారు', 'bill_requested': 'బిల్లు అడిగారు', 'bill_ready': 'బిల్లు సిద్ధంగా ఉంది'
+      }
+    };
+    
+    let adminLang = 'en';
+
+    window.changeAdminLanguage = function(lang) {
+        adminLang = lang;
+        
+        // Static UI Translations
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if(adminDict[adminLang] && adminDict[adminLang][key]) {
+                const label = adminDict[adminLang][key];
+                let node = el.lastChild;
+                if (node && node.nodeType === Node.TEXT_NODE) node.textContent = label;
+                else el.appendChild(document.createTextNode(label));
+            } else if (lang === 'en') {
+                // Simplified revert logic for English fallback if needed.
+                // Assuming original English text is encoded in logic or manual refresh required.
+            }
+        });
+
+        // Trigger re-renders to translate dynamic content
+        if (document.getElementById('view-orders').classList.contains('hidden') === false && window.currentTables) {
+            // Re-render floor by simulating database update
+            renderFloorGrid(window.currentTables);
+        }
+        if (document.getElementById('view-pos').classList.contains('hidden') === false) {
+            renderPosMenu();
+            updatePosCartUI();
+        }
+    };
+
+    function translateText(text) {
+        if (adminLang === 'en' || !text) return text;
+        let res = text.toString();
+        const curDict = adminDict[adminLang] || {};
+        const keys = Object.keys(curDict).sort((a,b) => b.length - a.length);
+        keys.forEach(k => {
+            const regex = new RegExp(`\\b${k}\\b`, 'gi');
+            res = res.replace(regex, curDict[k]);
+        });
+        return res;
+    }
+
     function extractOrderItemsStr(table) {
         if (!table) return '';
         let rawData = table.items || table.line_items;
@@ -399,7 +492,6 @@
     }
     
     // --- SMART IMAGE UPLOAD ENGINE ---
-    // Compresses the image on the device itself so it fits perfectly in the Firebase Realtime Database
     window.processImageUpload = function(inputElem, hiddenUrlId, previewId, textId) {
         const file = inputElem.files[0];
         if (!file) return;
@@ -414,9 +506,8 @@
         reader.onload = (event) => {
             const img = new Image();
             img.onload = () => {
-                // Compress image logic
                 const canvas = document.createElement('canvas');
-                const maxSize = 400; // Optimal size for menu items to keep database fast
+                const maxSize = 400; 
                 let width = img.width;
                 let height = img.height;
 
@@ -429,10 +520,8 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Convert to compressed Base64 string
                 const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
                 
-                // Set the UI and hidden input
                 previewEl.src = compressedDataUrl;
                 previewEl.classList.remove('hidden');
                 urlEl.value = compressedDataUrl;
@@ -525,22 +614,6 @@
       loadSystem();
     };
 
-    window.switchTab = function(tab) {
-      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(b => {
-        let isMatch = b.id === `tab-${tab}`;
-        if (isMatch) {
-            b.classList.remove('text-slate-400', 'hover:bg-white/5');
-            b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
-        } else {
-            b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
-            b.classList.add('text-slate-400', 'hover:bg-white/5');
-        }
-      });
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-      if (tab === 'pos') renderPosMenu();
-    };
-
     function triggerAlarm() {
       if(currentRole !== 'admin' && currentRole !== 'kitchen') return;
       alertSound.play().catch(()=>{});
@@ -571,12 +644,16 @@
       db.ref('active_tables/'+tableId).update({status: 'cooking'});
 
       const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      const rawItems = extractOrderItemsStr(table);
-      const safeItems = esc(rawItems ? rawItems : 'No items recorded.');
       
-      let itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
+      // Auto translate items for KOT
+      const rawItems = extractOrderItemsStr(table);
+      let transItems = rawItems.split('|').map(p => translateText(p.trim())).join(' | ');
+
+      const safeItems = esc(transItems ? transItems : 'No items recorded.');
+      
+      let itemsHtml = transItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
       itemsHtml = itemsHtml.split('<br>').map(line => {
-          return line.match(/CANCELLED/i) ? `<span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${line}</span>` : line;
+          return line.match(/CANCELLED|रद्द|రద్దు/i) ? `<span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${line}</span>` : line;
       }).join('<br>');
 
       const html = `
@@ -598,24 +675,12 @@
       printViaIframe(html);
     };
 
-    function loadSystem() {
-      if(!db) return;
-
-      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; });
-
-      db.ref('.info/connected').on('value', snap => {
-        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
-        if (snap.val()) { dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"; txt.innerText="Online"; txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest"; }
-        else { dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; txt.innerText="Offline"; txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest"; }
-      });
-
-      // --- Floor Operations Listener & Occupancy Map ---
-      db.ref('active_tables').on('value', snap => {
-        const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
-        const tables = snap.val() || {};
-        window.currentTables = tables;
+    function renderFloorGrid(tables) {
+        const grid = document.getElementById('kitchenGrid'); 
+        if(!grid) return;
+        grid.innerHTML = '';
         let needsAttention = false;
-        
+
         // Render Occupancy Map
         const occMap = document.getElementById('occupancyMap');
         if(occMap) {
@@ -635,6 +700,9 @@
           if(table.status === 'pending' || table.status === 'bill_requested') needsAttention = true;
           let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
           if(table.status==='served') border = 'border-emerald-500';
+          
+          let statusText = translateText(table.status);
+          
           let badge = table.status==='pending'?'bg-primary/20 text-primary':(table.status==='bill_requested'?'bg-amber-100 text-amber-600 animate-pulse':'bg-emerald-100 text-emerald-600');
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
 
@@ -642,41 +710,45 @@
           
           if (currentRole === 'admin') {
             if(table.status === 'pending') { 
-              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT (Kitchen)</button>`; 
+              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Print KOT (Kitchen)')}</button>`; 
             } else if (table.status === 'cooking') {
-              btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
-                     <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
+              btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Re-Print KOT')}</button>
+                     <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ ${translateText('Mark Food Served')}</button>`; 
             } else if(table.status === 'bill_requested') { 
-              btn = `<button class="w-full bg-dark text-primary border border-primary/50 py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">Clear & Bill (${table.paymentMethod || 'CASH'})</button>`; 
+              btn = `<button class="w-full bg-dark text-primary border border-primary/50 py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">${translateText('Clear Table')} (${table.paymentMethod || 'CASH'})</button>`; 
             } else { 
-              btn = `<button class="w-full bg-dark text-white py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">Clear Table</button>`; 
+              btn = `<button class="w-full bg-dark text-white py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">${translateText('Clear Table')}</button>`; 
             }
           } else if (currentRole === 'kitchen') {
              if(table.status === 'pending') {
-               btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT</button>`;
+               btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Print KOT (Kitchen)')}</button>`;
              } else if (table.status === 'cooking') {
-               btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
-                      <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`;
+               btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Re-Print KOT')}</button>
+                      <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ ${translateText('Mark Food Served')}</button>`;
              } else {
-               btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>Awaiting Checkout</button>`;
+               btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>${translateText('Awaiting Admin Clear')}</button>`;
              }
           } else {
             // Waiter
             if(table.status === 'pending') {
-              btn = `<button class="w-full bg-light text-slate-500 py-4 rounded-xl font-black shadow-sm" disabled>Sent to Kitchen</button>`;
+              btn = `<button class="w-full bg-light text-slate-500 py-4 rounded-xl font-black shadow-sm" disabled>${translateText('Sent to Kitchen')}</button>`;
             } else if(table.status === 'cooking') {
-              btn = `<button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Confirm Served</button>`;
+              btn = `<button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ ${translateText('Confirm Served')}</button>`;
             } else if(table.status === 'bill_requested') {
-              btn = `<button class="w-full bg-amber-500 text-white py-4 rounded-xl font-black shadow-md" onclick="waiterCashCollect('${id}')">Mark Cash Collected</button>`;
+              btn = `<button class="w-full bg-amber-500 text-white py-4 rounded-xl font-black shadow-md" onclick="waiterCashCollect('${id}')">${translateText('Mark Cash Collected')}</button>`;
             } else {
-              btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>Awaiting Admin Clear</button>`;
+              btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>${translateText('Awaiting Admin Clear')}</button>`;
             }
           }
 
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
-          const itemsStr = extractOrderItemsStr(table);
+          
+          const rawItemsStr = extractOrderItemsStr(table);
+          // Apply auto-translation to order items
+          const itemsStr = rawItemsStr.split('|').map(p => translateText(p.trim())).join(' | ');
+
           let formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
-          formattedItems = formattedItems.split('<br>').map(line => line.match(/CANCELLED/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line).join('<br>');
+          formattedItems = formattedItems.split('<br>').map(line => line.match(/CANCELLED|रद्द|రద్దు/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line).join('<br>');
 
           grid.innerHTML += `
             <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
@@ -686,7 +758,7 @@
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
                     <span class="font-black text-2xl text-slate-900 leading-none">${table.table}</span>
                   </div>
-                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg border border-current">${table.status.replace('_',' ')}</span>
+                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg border border-current">${statusText.replace('_',' ')}</span>
                 </div>
                 <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-600 font-semibold leading-relaxed">
                   ${formattedItems}
@@ -700,7 +772,7 @@
                 ${currentRole==='admin' ? `
                 <div class="flex gap-2 mb-2">
                   <button onclick="openEditOrder('${id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs">✏️ Edit Order</button>
-                  <button onclick="cancelOrder('${id}')" class="flex-1 bg-red-50 text-red-500 py-2.5 rounded-xl font-bold text-xs">🗑️ Cancel Order</button>
+                  <button onclick="cancelOrder('${id}')" class="flex-1 bg-red-50 text-red-500 py-2.5 rounded-xl font-bold text-xs">🗑️ ${translateText('Cancel Order')}</button>
                 </div>` : ''}
                 ${btn}
               </div>
@@ -714,6 +786,17 @@
           clearInterval(alarmTimer); alarmTimer = null;
           alertSound.pause(); alertSound.currentTime = 0;
         }
+    }
+
+    function loadSystem() {
+      if(!db) return;
+
+      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; });
+
+      // --- Floor Operations Listener ---
+      db.ref('active_tables').on('value', snap => {
+        window.currentTables = snap.val() || {};
+        renderFloorGrid(window.currentTables);
       });
 
       // --- Service Requests Listener ---
@@ -769,7 +852,6 @@
           renderInventory();
           renderPosMenu(); 
           
-          // Low Stock Alert
           let lowItems = [];
           for (let k in menuCache) {
              if (menuCache[k].stock_count <= 5 && !alertedLowStock.has(k)) {
@@ -834,7 +916,7 @@
       }
     }
 
-    // Admin Pos Logic
+    // Admin Pos Logic with Translation Applied to Names
     window.renderPosMenu = function() {
         const grid = document.getElementById('posMenuGrid');
         if(!grid) return;
@@ -842,18 +924,21 @@
         grid.innerHTML = '';
         
         Object.entries(menuCache).forEach(([id, item]) => {
-            if(q && !item.name.toLowerCase().includes(q) && !item.category.toLowerCase().includes(q)) return;
+            const transName = translateText(item.name);
+            if(q && !transName.toLowerCase().includes(q) && !item.category.toLowerCase().includes(q)) return;
             
             let varSelect = '';
             if (item.portions && Object.keys(item.portions).length > 0) {
-              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-50 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">Base - ₹${item.base_price}</option>`;
-              Object.entries(item.portions).forEach(([pName, pPrice]) => { varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`; });
+              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-50 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">${translateText('Regular')} - ₹${item.base_price}</option>`;
+              Object.entries(item.portions).forEach(([pName, pPrice]) => { 
+                  varSelect += `<option value="${pName}|${pPrice}">${translateText(pName)} - ₹${pPrice}</option>`; 
+              });
               varSelect += `</select>`;
             } else { varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`; }
 
             grid.innerHTML += `
               <div class="border rounded-xl p-3 bg-white flex flex-col justify-between shadow-sm">
-                <h4 class="font-bold text-xs text-slate-800 leading-tight mb-1">${item.name}</h4>
+                <h4 class="font-bold text-xs text-slate-800 leading-tight mb-1">${transName}</h4>
                 ${varSelect}
                 <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 text-primary py-1.5 rounded-lg text-xs font-black">+ ADD</button>
               </div>
@@ -893,8 +978,8 @@
             list.innerHTML += `
                 <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
                     <div class="flex-1 pr-2 leading-tight">
-                        <span class="font-bold text-xs">${item.name}</span>
-                        <span class="text-[9px] text-slate-400 block">${item.variant}</span>
+                        <span class="font-bold text-xs">${translateText(item.name)}</span>
+                        <span class="text-[9px] text-slate-400 block">${translateText(item.variant)}</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <button onclick="changePosCartQty('${key}', -1)" class="w-6 h-6 bg-slate-100 rounded text-xs font-black">-</button>
@@ -1090,7 +1175,7 @@
             <div class="flex items-center gap-4">
               <img src="${item.image_url}" class="w-12 h-12 rounded object-cover shadow-sm">
               <div>
-                <h4 class="font-black text-sm">${item.name}</h4>
+                <h4 class="font-black text-sm">${translateText(item.name)}</h4>
                 <p class="text-[10px] text-slate-400">Base: ₹${item.base_price}</p>
               </div>
             </div>
@@ -1202,6 +1287,8 @@
         };
         db.ref('menu').set(mockData).then(() => alert("Factory Reset Complete."));
     }
+
+    changeAdminLanguage('en');
   </script>
 </body>
 </html>
