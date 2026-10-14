@@ -106,31 +106,54 @@
             <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[70vh] flex flex-col">
+                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
                     <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
                     <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
                 </div>
 
-                <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[70vh] flex flex-col">
+                <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[75vh] flex flex-col">
                     <h3 class="text-lg font-black text-slate-900 mb-4 border-b pb-2" data-i18n="new_order">New Order</h3>
                     
                     <div class="flex gap-2 mb-4">
                         <select id="posTableNum" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
                             <option value="" disabled selected>Select Table</option>
                             <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
-                            <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option>
-                            <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option>
+                            <option value="6">Table 6</option><option value="7">Table 7</option><option value="8">Table 8</option><option value="9">Table 9</option><option value="10">Table 10</option>
+                            <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option><option value="R4">R4</option><option value="R5">R5</option>
+                            <option value="L1">L1</option><option value="L2">L2</option><option value="BH1">BH1</option><option value="C1">C1</option>
+                            <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
                         </select>
                         <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
                     </div>
 
-                    <div id="posCartList" class="flex-1 overflow-y-auto mb-4 border border-slate-100 rounded-xl p-2 hide-scroll"></div>
+                    <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-slate-100 rounded-xl p-2 hide-scroll"></div>
                     
-                    <div class="mt-auto pt-4 border-t border-slate-200">
-                        <div class="flex justify-between font-black text-lg mb-4">
+                    <!-- POS Discount & Split Controls -->
+                    <div class="bg-light p-3 rounded-2xl border border-slate-200 mb-3 space-y-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-black uppercase text-slate-500 w-16">Discount:</span>
+                            <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" placeholder="0" class="w-20 p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs outline-none">
+                            <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs outline-none">
+                                <option value="flat">₹ Flat</option>
+                                <option value="percent">% Off</option>
+                            </select>
+                            <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs uppercase outline-none">
+                        </div>
+                        <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                            <span class="text-[10px] font-black uppercase text-slate-500">Split Bill:</span>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 bg-white border border-slate-200 rounded-lg font-black text-xs text-center outline-none">
+                                <span class="text-[10px] font-bold text-slate-500">Persons</span>
+                                <span id="posSplitEach" class="text-xs font-black text-emerald-600 ml-1">₹0/each</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-auto pt-2 border-t border-slate-200">
+                        <div class="flex justify-between font-black text-lg mb-3">
                             <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
                         </div>
-                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-4 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
+                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
                     </div>
                 </div>
             </div>
@@ -142,10 +165,45 @@
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- Inventory -->
+        <!-- Inventory & Coupon Management -->
         <section id="view-inventory" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight" data-i18n="title_menu">Inventory Management</h2>
+          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight" data-i18n="title_menu">Inventory & Coupons</h2>
           
+          <!-- Coupon Generator Card -->
+          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-emerald-500">
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <div>
+                <h3 class="text-lg font-black text-slate-900">🎟️ Customer Coupon Codes</h3>
+                <p class="text-xs text-slate-400 font-bold">Customers can enter these codes on their phone to get a discount, or you can apply a direct discount from Edit Order.</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-4">
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Coupon Code</label>
+                <input type="text" id="newCouponCode" placeholder="e.g. ROYAL10" class="w-full p-3 bg-light rounded-xl font-black text-sm uppercase outline-none border border-slate-200 focus:border-primary">
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Type</label>
+                <select id="newCouponType" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-slate-200 cursor-pointer">
+                  <option value="percent">Percentage (%)</option>
+                  <option value="flat">Flat Amount (₹)</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Value</label>
+                <input type="number" id="newCouponVal" min="1" placeholder="e.g. 10 or 100" class="w-full p-3 bg-light rounded-xl font-black text-sm outline-none border border-slate-200 focus:border-primary">
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Min Bill (₹ Optional)</label>
+                <input type="number" id="newCouponMin" min="0" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-slate-200 focus:border-primary">
+              </div>
+              <div>
+                <button onclick="saveCouponCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform h-[46px] uppercase tracking-wider text-xs">+ Save Coupon</button>
+              </div>
+            </div>
+            <div id="couponsListAdmin" class="flex flex-wrap gap-2 pt-2 border-t border-slate-100"></div>
+          </div>
+
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-primary">
             <h3 class="text-lg font-black text-slate-900 mb-4">➕ Add New Menu Item</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
@@ -282,32 +340,70 @@
     </main>
   </div>
 
-  <!-- Interactive Edit Order Modal (With Live Menu Picker & Auto Calculator) -->
+  <!-- Interactive Edit Order Modal (With Live Menu Picker, Direct Admin Discount & Split Bill Calculator) -->
   <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
-    <div class="bg-card rounded-3xl p-6 w-full max-w-4xl shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[90vh] flex flex-col">
+    <div class="bg-card rounded-3xl p-6 w-full max-w-4xl shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[92vh] flex flex-col">
       <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
         <div>
-          <h3 class="font-black text-xl text-slate-900">✏️ Edit Order — <span id="editOrderTableLabel" class="text-primary"></span></h3>
-          <p class="text-[11px] font-bold text-slate-400">Add, reduce, or remove items below — customer bill & total update automatically.</p>
+          <h3 class="font-black text-xl text-slate-900">✏️ Edit Order, Discount & Split — <span id="editOrderTableLabel" class="text-primary"></span></h3>
+          <p class="text-[11px] font-bold text-slate-400">Modify items, grant direct admin discount/coupon, or split bill — syncs live to customer phone.</p>
         </div>
         <button onclick="closeEditOrder()" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full font-black text-slate-600 active:scale-90 transition-transform">✕</button>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto flex-1 pr-1">
-        <!-- Left Column: Current Order Items & Calculator -->
+        <!-- Left Column: Current Order Items, Admin Discount & Split Calculator -->
         <div class="flex flex-col bg-light p-4 rounded-2xl border border-slate-200">
           <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-black text-slate-600 uppercase tracking-widest">🛒 Current Order Items</span>
-            <button onclick="recalcEditOrderTotal()" class="text-[10px] font-black text-primary bg-dark px-2.5 py-1 rounded-lg">🔄 Auto-Calc Total</button>
+            <button onclick="recalcEditOrderTotal()" class="text-[10px] font-black text-primary bg-dark px-2.5 py-1 rounded-lg">🔄 Recalculate</button>
           </div>
-          <div id="editOrderCartList" class="flex-1 space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+          <div id="editOrderCartList" class="flex-1 space-y-2 max-h-48 overflow-y-auto pr-1"></div>
 
-          <div class="mt-4 pt-3 border-t border-slate-200">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Calculated Bill Total (₹)</span>
+          <!-- Admin Direct Discount & Coupon Box -->
+          <div class="mt-3 pt-3 border-t border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between text-xs font-bold text-slate-500">
+              <span>Items Subtotal:</span>
+              <span id="editOrderSubtotalLabel" class="font-black text-slate-800">₹0</span>
+            </div>
+
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">🏷️ Admin Discount / Coupon</span>
+                <button type="button" onclick="clearEditOrderDiscount()" class="text-[10px] font-bold text-red-500 hover:underline">Clear Discount</button>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="editOrderDiscVal" min="0" value="0" oninput="renderEditOrderCartList(true)" placeholder="0" class="w-20 p-2 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none focus:border-primary">
+                <select id="editOrderDiscType" onchange="renderEditOrderCartList(true)" class="p-2 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none cursor-pointer">
+                  <option value="flat">₹ Flat Off</option>
+                  <option value="percent">% Percent Off</option>
+                </select>
+                <input type="text" id="editOrderCouponCode" oninput="applyEditModalCoupon(this.value)" placeholder="Coupon / Reason" class="flex-1 p-2 bg-light border border-slate-200 rounded-lg font-black text-xs uppercase outline-none focus:border-primary">
+              </div>
+              <div class="flex justify-between items-center text-[11px] font-bold text-emerald-600">
+                <span>Discount Applied:</span>
+                <span id="editOrderDiscSaved">- ₹0</span>
+              </div>
+            </div>
+
+            <!-- Split Bill Calculator -->
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block">👥 Split Bill Equally</span>
+                <span id="editOrderSplitPreview" class="text-xs font-black text-primary">₹0 / person</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="adjustEditSplit(-1)" class="w-7 h-7 bg-slate-100 rounded-lg font-black text-xs">-</button>
+                <input type="number" id="editOrderSplitCount" min="1" max="50" value="1" oninput="updateEditSplitPreview()" class="w-12 p-1 text-center font-black text-xs bg-light border border-slate-200 rounded-lg outline-none">
+                <button type="button" onclick="adjustEditSplit(1)" class="w-7 h-7 bg-dark text-primary rounded-lg font-black text-xs">+</button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Final Payable Bill (₹)</span>
               <span id="editOrderAutoSum" class="text-xs font-bold text-emerald-600">Auto: ₹0</span>
             </div>
-            <input type="number" id="editOrderTotal" min="0" class="w-full p-3 bg-white border border-primary/40 rounded-xl font-black text-2xl text-slate-900 outline-none focus:border-primary">
+            <input type="number" id="editOrderTotal" min="0" oninput="updateEditSplitPreview()" class="w-full p-2.5 bg-white border border-primary/40 rounded-xl font-black text-xl text-slate-900 outline-none focus:border-primary">
           </div>
         </div>
 
@@ -315,7 +411,7 @@
         <div class="flex flex-col bg-light p-4 rounded-2xl border border-slate-200">
           <span class="text-xs font-black text-slate-600 uppercase tracking-widest mb-2">➕ Add Dish from Menu</span>
           <input type="text" id="editOrderMenuSearch" oninput="renderEditOrderMenuPicker()" placeholder="🔍 Search dish to add..." class="w-full p-2.5 mb-3 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-primary">
-          <div id="editOrderMenuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1"></div>
+          <div id="editOrderMenuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto pr-1"></div>
         </div>
       </div>
 
@@ -517,7 +613,20 @@
 
     function buildFinalBillText(tableData){
       const itemsStr = extractOrderItemsStr(tableData);
-      return `=== MANDI CROODS ===\nTable: ${tableData.table}\nMobile: ${tableData.phone || 'Walk-in'}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${itemsStr ? itemsStr.replace(/ \| /g,'\n') : '(no items)'}\n------------------\nTOTAL: Rs. ${tableData.total}\nPayment: ${(tableData.paymentMethod || 'CASH').toUpperCase()}\n==================\nThank you for dining with Mandi Croods! 👑`;
+      const subTotal = Number(tableData.subtotal) || Number(tableData.total) || 0;
+      const discAmt = Number(tableData.discountAmount) || 0;
+      const splitCount = Math.max(1, parseInt(tableData.splitCount) || 1);
+      const splitAmt = Math.ceil((Number(tableData.total) || 0) / splitCount);
+
+      let extraLines = '';
+      if (discAmt > 0) {
+        extraLines += `Subtotal: Rs. ${subTotal}\nDiscount${tableData.couponCode ? ' (' + tableData.couponCode + ')' : ''}: -Rs. ${discAmt}\n`;
+      }
+      if (splitCount > 1) {
+        extraLines += `Split Bill (${splitCount} Persons): Rs. ${splitAmt} / person\n`;
+      }
+
+      return `=== MANDI CROODS ===\nTable: ${tableData.table}\nMobile: ${tableData.phone || 'Walk-in'}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${itemsStr ? itemsStr.replace(/ \| /g,'\n') : '(no items)'}\n------------------\n${extraLines}TOTAL: Rs. ${tableData.total}\nPayment: ${(tableData.paymentMethod || 'CASH').toUpperCase()}\n==================\nThank you for dining with Mandi Croods! 👑`;
     }
 
     function downloadFinalBillFile(billText, tableId){
@@ -617,6 +726,7 @@
     let serviceSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3'); 
     let alarmTimer = null;
     let customersCache = {};
+    let couponsCache = {};
     let editOrderId = null;
     let editOrderLineItems = {};
     let menuCache = {};
@@ -841,6 +951,10 @@
           let formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
           formattedItems = formattedItems.split('<br>').map(line => line.match(/CANCELLED|रद्द|రద్దు/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line).join('<br>');
 
+          const discAmount = Number(table.discountAmount) || 0;
+          const splitCount = Math.max(1, parseInt(table.splitCount) || 1);
+          const perPerson = Math.ceil((Number(table.total) || 0) / splitCount);
+
           grid.innerHTML += `
             <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
               <div>
@@ -856,13 +970,24 @@
                 </div>
               </div>
               <div class="mt-2 pt-4 border-t border-slate-100">
+                ${discAmount > 0 ? `<div class="flex justify-between items-center text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg mb-2 border border-emerald-200">
+                  <span>🏷️ Discount ${table.couponCode ? `(${table.couponCode})` : '(Admin)'}</span>
+                  <span>-₹${discAmount}</span>
+                </div>` : ''}
+                ${splitCount > 1 ? `<div class="flex justify-between items-center text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg mb-2 border border-blue-200">
+                  <span>👥 Split (${splitCount} Persons)</span>
+                  <span>₹${perPerson} / each</span>
+                </div>` : ''}
                 <div class="flex justify-between items-end mb-5">
                   <span class="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}${isVip ? ' <span class="text-primary ml-1">👑 VIP</span>' : ''}</span>
-                  <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total}</span>
+                  <div class="text-right">
+                    ${discAmount > 0 && table.subtotal ? `<span class="text-xs text-slate-400 line-through font-bold block">₹${table.subtotal}</span>` : ''}
+                    <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total}</span>
+                  </div>
                 </div>
                 ${currentRole==='admin' ? `
                 <div class="flex gap-2 mb-2">
-                  <button onclick="openEditOrder('${id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs">✏️ Edit Order</button>
+                  <button onclick="openEditOrder('${id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs">✏️ Edit / Discount / Split</button>
                   <button onclick="cancelOrder('${id}')" class="flex-1 bg-red-50 text-red-500 py-2.5 rounded-xl font-bold text-xs">🗑️ ${translateText('Cancel Order')}</button>
                 </div>` : ''}
                 ${btn}
@@ -883,6 +1008,12 @@
       if(!db) return;
 
       db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; });
+
+      // Load Coupons for Admin & POS
+      db.ref('coupons').on('value', snap => {
+        couponsCache = snap.val() || {};
+        renderCouponsAdmin();
+      });
 
       // Always load menu for Admin and Waiter so POS and Edit Order Modal have full menu items
       db.ref('menu').on('value', snap => {
@@ -1009,6 +1140,56 @@
       }
     }
 
+    // --- COUPON MANAGEMENT FUNCTIONS ---
+    window.saveCouponCode = function() {
+      const code = (document.getElementById('newCouponCode').value || '').trim().toUpperCase().replace(/\s+/g, '');
+      const type = document.getElementById('newCouponType').value;
+      const val = parseFloat(document.getElementById('newCouponVal').value);
+      const minOrder = parseFloat(document.getElementById('newCouponMin').value) || 0;
+
+      if (!code || isNaN(val) || val <= 0) return alert("Please enter a valid Coupon Code and Discount Value.");
+      if (type === 'percent' && val > 100) return alert("Percentage discount cannot exceed 100%.");
+
+      db.ref(`coupons/${code}`).set({
+        code, type, value: val, minOrder, active: true, createdAt: Date.now()
+      }).then(() => {
+        document.getElementById('newCouponCode').value = '';
+        document.getElementById('newCouponVal').value = '';
+        document.getElementById('newCouponMin').value = '';
+        showGlobalToast(`Coupon ${code} created!`, 'info');
+      });
+    };
+
+    window.deleteCouponCode = function(code) {
+      if (confirm(`Delete coupon "${code}"?`)) {
+        db.ref(`coupons/${code}`).remove();
+      }
+    };
+
+    function renderCouponsAdmin() {
+      const box = document.getElementById('couponsListAdmin');
+      if (!box) return;
+      const list = Object.values(couponsCache);
+      if (list.length === 0) {
+        box.innerHTML = `<span class="text-xs text-slate-400 font-bold">No active coupons created yet.</span>`;
+        return;
+      }
+      box.innerHTML = list.map(c => `
+        <div class="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-900 px-3 py-1.5 rounded-xl text-xs font-black">
+          <span>🎟️ ${c.code} (${c.type === 'percent' ? c.value + '% OFF' : '₹' + c.value + ' OFF'}${c.minOrder ? ' · Min ₹' + c.minOrder : ''})</span>
+          <button onclick="deleteCouponCode('${c.code}')" class="text-red-500 hover:text-red-700 font-black ml-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function calculateDiscountAmount(subtotal, discType, discVal) {
+      const sub = Math.max(0, Number(subtotal) || 0);
+      const val = Math.max(0, Number(discVal) || 0);
+      if (!val || sub <= 0) return 0;
+      let d = discType === 'percent' ? Math.round((sub * Math.min(100, val)) / 100) : val;
+      return Math.min(sub, Math.round(d * 100) / 100);
+    }
+
     // Admin Pos Logic with Translation Applied to Names
     window.renderPosMenu = function() {
         const grid = document.getElementById('posMenuGrid');
@@ -1060,14 +1241,24 @@
         }
     };
 
+    window.applyPosCouponCode = function(rawCode) {
+        const code = (rawCode || '').trim().toUpperCase();
+        if (couponsCache[code]) {
+            const c = couponsCache[code];
+            document.getElementById('posDiscType').value = c.type;
+            document.getElementById('posDiscVal').value = c.value;
+        }
+        updatePosCartUI();
+    };
+
     window.updatePosCartUI = function() {
         const list = document.getElementById('posCartList');
         if(!list) return;
         list.innerHTML = '';
-        let total = 0;
+        let subtotal = 0;
         
         Object.entries(posCart).forEach(([key, item]) => {
-            total += item.price * item.qty;
+            subtotal += item.price * item.qty;
             list.innerHTML += `
                 <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
                     <div class="flex-1 pr-2 leading-tight">
@@ -1082,7 +1273,17 @@
                 </div>
             `;
         });
-        document.getElementById('posTotal').innerText = `₹${total}`;
+
+        const discType = document.getElementById('posDiscType')?.value || 'flat';
+        const discVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
+        const discAmt = calculateDiscountAmount(subtotal, discType, discVal);
+        const finalTotal = Math.max(0, subtotal - discAmt);
+        const splitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
+        const perPerson = Math.ceil(finalTotal / splitCount);
+
+        document.getElementById('posTotal').innerText = `₹${finalTotal}`;
+        const splitEl = document.getElementById('posSplitEach');
+        if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
     };
 
     window.submitPosOrder = function() {
@@ -1094,6 +1295,11 @@
         const tableId = `table_${tNum}`;
         const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
         
+        const posDiscType = document.getElementById('posDiscType')?.value || 'flat';
+        const posDiscVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
+        const posCoupon = (document.getElementById('posCouponCode')?.value || '').trim().toUpperCase();
+        const posSplitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
+
         const newLineItems = {};
         Object.values(posCart).forEach((item, idx) => {
             newLineItems[`${batchId}_${idx}`] = {
@@ -1107,18 +1313,31 @@
             const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
             
             const buildStr = (liObj) => Object.values(liObj).map(i => `${i.qty}x ${i.name} ${i.variant!=='Regular'?'('+i.variant+')':''}`).join(' | ');
-            const getTot = (liObj) => Object.values(liObj).reduce((s,i)=>s+(i.cancelled?0:i.price*i.qty), 0);
+            const subTot = Object.values(mergedLineItems).reduce((s,i)=>s+(i.cancelled?0:i.price*i.qty), 0);
+
+            const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
+            const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
+            const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
+            const dAmt = calculateDiscountAmount(subTot, dType, dVal);
+            const finalTot = Math.max(0, subTot - dAmt);
+            const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
 
             return {
                 orderId: existing.orderId || tableId, table: tNum, phone: phone,
                 line_items: mergedLineItems, items: buildStr(mergedLineItems),
-                total: getTot(mergedLineItems), status: 'pending',
+                subtotal: subTot, discountType: dType, discountValue: dVal,
+                discountAmount: dAmt, couponCode: cCode, splitCount: sCount,
+                total: finalTot, status: 'pending',
                 timestamp: Date.now(), paymentMethod: existing.paymentMethod || ''
             };
         }, (error, committed) => {
             if(error) return alert("Failed to send order.");
             if(committed) {
-                posCart = {}; updatePosCartUI();
+                posCart = {};
+                if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
+                if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
+                if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
+                updatePosCartUI();
                 document.getElementById('posTableNum').value = "";
                 document.getElementById('posPhone').value = "";
                 showGlobalToast("Direct Order sent successfully to Kitchen!", "info");
@@ -1240,7 +1459,7 @@
       return { ok: true, portions };
     }
 
-    // --- INTERACTIVE EDIT ORDER MODAL WITH LIVE MENU & AUTO-CALCULATOR ---
+    // --- INTERACTIVE EDIT ORDER MODAL WITH LIVE MENU, DIRECT DISCOUNT & SPLIT BILL ---
     window.openEditOrder = function(id){
       const table = (window.currentTables || {})[id];
       if(!table) return;
@@ -1253,10 +1472,9 @@
           editOrderLineItems[k] = { ...li, qty: Number(li.qty) || 1, price: Number(li.price) || 0 };
         });
       } else if (table.items) {
-        // Parse legacy items string if line_items was missing
         String(table.items).split('|').map(s => s.trim()).filter(Boolean).forEach((part, idx) => {
-          const isCanc = /[CANCELLED]/i.test(part);
-          const clean = part.replace(/[CANCELLED]/gi, '').trim();
+          const isCanc = /\[CANCELLED\]/i.test(part);
+          const clean = part.replace(/\[CANCELLED\]/gi, '').trim();
           const m = clean.match(/^(\d+)\s*[xX]\s*(.+)$/);
           const qty = m ? parseInt(m[1]) || 1 : 1;
           let rest = m ? m[2].trim() : clean;
@@ -1281,6 +1499,11 @@
         });
       }
 
+      document.getElementById('editOrderDiscType').value = table.discountType || 'flat';
+      document.getElementById('editOrderDiscVal').value = Number(table.discountValue) || 0;
+      document.getElementById('editOrderCouponCode').value = table.couponCode || '';
+      document.getElementById('editOrderSplitCount').value = Math.max(1, parseInt(table.splitCount) || 1);
+
       document.getElementById('editOrderMenuSearch').value = '';
       renderEditOrderCartList(true);
       renderEditOrderMenuPicker();
@@ -1293,13 +1516,46 @@
       editOrderLineItems = {};
     };
 
+    window.applyEditModalCoupon = function(rawCode) {
+      const code = (rawCode || '').trim().toUpperCase();
+      if (couponsCache[code]) {
+        const c = couponsCache[code];
+        document.getElementById('editOrderDiscType').value = c.type;
+        document.getElementById('editOrderDiscVal').value = c.value;
+      }
+      renderEditOrderCartList(true);
+    };
+
+    window.clearEditOrderDiscount = function() {
+      document.getElementById('editOrderDiscVal').value = 0;
+      document.getElementById('editOrderCouponCode').value = '';
+      renderEditOrderCartList(true);
+    };
+
+    window.adjustEditSplit = function(delta) {
+      const inp = document.getElementById('editOrderSplitCount');
+      let v = (parseInt(inp.value) || 1) + delta;
+      if (v < 1) v = 1;
+      if (v > 50) v = 50;
+      inp.value = v;
+      updateEditSplitPreview();
+    };
+
+    window.updateEditSplitPreview = function() {
+      const tot = Math.max(0, parseFloat(document.getElementById('editOrderTotal')?.value) || 0);
+      const count = Math.max(1, parseInt(document.getElementById('editOrderSplitCount')?.value) || 1);
+      const perPerson = Math.ceil(tot / count);
+      const el = document.getElementById('editOrderSplitPreview');
+      if (el) el.innerText = `₹${perPerson} / person (${count} ${count > 1 ? 'ways' : 'way'})`;
+    };
+
     window.renderEditOrderCartList = function(autoUpdateTotal = true){
       const list = document.getElementById('editOrderCartList');
       if(!list) return;
       list.innerHTML = '';
 
       const entries = Object.entries(editOrderLineItems).sort((a,b) => (a[1].addedAt||0) - (b[1].addedAt||0));
-      let calcTotal = 0;
+      let subtotal = 0;
 
       if (entries.length === 0) {
         list.innerHTML = `<p class="text-xs text-slate-400 font-bold text-center py-6">No items in order. Add dishes from the menu on the right.</p>`;
@@ -1308,7 +1564,7 @@
       entries.forEach(([key, li]) => {
         const isCanc = !!li.cancelled;
         const lineSum = (Number(li.price)||0) * (Number(li.qty)||0);
-        if (!isCanc) calcTotal += lineSum;
+        if (!isCanc) subtotal += lineSum;
 
         list.innerHTML += `
           <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border ${isCanc ? 'border-red-200 opacity-60' : 'border-slate-200'} shadow-sm gap-2">
@@ -1332,12 +1588,24 @@
           </div>`;
       });
 
-      calcTotal = Math.round(calcTotal * 100) / 100;
+      subtotal = Math.round(subtotal * 100) / 100;
+      const subLbl = document.getElementById('editOrderSubtotalLabel');
+      if (subLbl) subLbl.innerText = `₹${subtotal}`;
+
+      const discType = document.getElementById('editOrderDiscType')?.value || 'flat';
+      const discVal = parseFloat(document.getElementById('editOrderDiscVal')?.value) || 0;
+      const discAmt = calculateDiscountAmount(subtotal, discType, discVal);
+      const finalTotal = Math.max(0, Math.round((subtotal - discAmt) * 100) / 100);
+
+      const discSavedEl = document.getElementById('editOrderDiscSaved');
+      if (discSavedEl) discSavedEl.innerText = `- ₹${discAmt}`;
+
       const sumBadge = document.getElementById('editOrderAutoSum');
-      if (sumBadge) sumBadge.innerText = `Auto: ₹${calcTotal}`;
+      if (sumBadge) sumBadge.innerText = `Auto: ₹${finalTotal}`;
       if (autoUpdateTotal) {
-        document.getElementById('editOrderTotal').value = calcTotal;
+        document.getElementById('editOrderTotal').value = finalTotal;
       }
+      updateEditSplitPreview();
     };
 
     window.recalcEditOrderTotal = function(){
@@ -1407,7 +1675,6 @@
         price = parseFloat(pts[1]) || 0;
       }
 
-      // Check if an active (un-cancelled) line item with same itemId + variant already exists
       const existingEntry = Object.entries(editOrderLineItems).find(([, li]) => !li.cancelled && li.name === item.name && (li.variant || 'Regular') === variant);
       if (existingEntry) {
         existingEntry[1].qty = (Number(existingEntry[1].qty) || 1) + 1;
@@ -1431,6 +1698,19 @@
       const newTotal = Math.round((parseFloat(document.getElementById('editOrderTotal').value) || 0) * 100) / 100;
       if(isNaN(newTotal) || newTotal < 0) return alert('Please enter a valid total amount.');
 
+      let subtotal = 0;
+      Object.values(editOrderLineItems).forEach(li => {
+        if (!li.cancelled) subtotal += (Number(li.price)||0) * (Number(li.qty)||0);
+      });
+      subtotal = Math.round(subtotal * 100) / 100;
+
+      const discType = document.getElementById('editOrderDiscType').value || 'flat';
+      const discVal = parseFloat(document.getElementById('editOrderDiscVal').value) || 0;
+      const discAmt = Math.max(0, Math.round((subtotal - newTotal) * 100) / 100);
+      const couponRaw = (document.getElementById('editOrderCouponCode').value || '').trim().toUpperCase();
+      const couponCode = discAmt > 0 ? (couponRaw || 'ADMIN PRIVILEGE') : '';
+      const splitCount = Math.max(1, parseInt(document.getElementById('editOrderSplitCount').value) || 1);
+
       const formattedItems = Object.values(editOrderLineItems)
         .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
         .map(li => {
@@ -1444,9 +1724,15 @@
       db.ref('active_tables/' + editOrderId).update({
         line_items: editOrderLineItems,
         items: formattedItems,
+        subtotal: subtotal,
+        discountType: discType,
+        discountValue: discVal,
+        discountAmount: discAmt,
+        couponCode: couponCode,
+        splitCount: splitCount,
         total: newTotal
       }).then(() => {
-        showGlobalToast("Order & Customer Bill updated!", "success");
+        showGlobalToast("Order, Discount & Split Bill synced to Customer!", "success");
         closeEditOrder();
       }).catch(err => alert("Failed to update order: " + err.message));
     };
@@ -1570,6 +1856,10 @@
           table: tableData.table,
           phone: tableData.phone || 'Walk-in',
           items: itemsSummary,
+          subtotal: Number(tableData.subtotal) || Number(tableData.total) || 0,
+          discountAmount: Number(tableData.discountAmount) || 0,
+          couponCode: tableData.couponCode || '',
+          splitCount: Math.max(1, parseInt(tableData.splitCount) || 1),
           total: Number(tableData.total) || 0,
           paymentMethod: pMethod.toUpperCase(),
           method: pMethod.toUpperCase()
@@ -1589,7 +1879,13 @@
           curr.total += Number(tableData.total); curr[key] += Number(tableData.total); return curr;
       });
 
-      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set({ time: timeStr, table: tableData.table, items: itemsSummary, total: tableData.total, method: pMethod.toUpperCase() });
+      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set({
+        time: timeStr,
+        table: tableData.table,
+        items: itemsSummary + (tableData.discountAmount ? ` [Disc: -₹${tableData.discountAmount}]` : ''),
+        total: tableData.total,
+        method: pMethod.toUpperCase()
+      });
       db.ref('active_tables/'+id).remove();
     }
 
