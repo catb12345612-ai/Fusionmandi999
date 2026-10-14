@@ -401,6 +401,8 @@
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
 
+    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
+
     // --- FRESH START PROTOCOL ---
     if (!localStorage.getItem('mc_admin_wiped_v4')) {
         localStorage.clear();
@@ -1253,8 +1255,8 @@
       } else if (table.items) {
         // Parse legacy items string if line_items was missing
         String(table.items).split('|').map(s => s.trim()).filter(Boolean).forEach((part, idx) => {
-          const isCanc = /\[CANCELLED\]/i.test(part);
-          const clean = part.replace(/\[CANCELLED\]/gi, '').trim();
+          const isCanc = /[CANCELLED]/i.test(part);
+          const clean = part.replace(/[CANCELLED]/gi, '').trim();
           const m = clean.match(/^(\d+)\s*[xX]\s*(.+)$/);
           const qty = m ? parseInt(m[1]) || 1 : 1;
           let rest = m ? m[2].trim() : clean;
@@ -1554,15 +1556,40 @@
       sendBillToCustomerWhatsApp(tableData, billText);
 
       const d = new Date().toISOString().split('T')[0];
+      const timeStr = new Date().toLocaleTimeString();
       const pMethod = tableData.paymentMethod || "CASH";
       let key = pMethod.toLowerCase(); if(!['cash', 'upi', 'card'].includes(key)) key = 'cash';
+      const itemsSummary = extractOrderItemsStr(tableData);
+
+      // --- SEND ORDER PARTICULARS TO GOOGLE SHEET ---
+      try {
+        const sheetPayload = {
+          orderId: tableData.orderId || id,
+          date: d,
+          time: timeStr,
+          table: tableData.table,
+          phone: tableData.phone || 'Walk-in',
+          items: itemsSummary,
+          total: Number(tableData.total) || 0,
+          paymentMethod: pMethod.toUpperCase(),
+          method: pMethod.toUpperCase()
+        };
+        fetch(GOOGLE_SHEET_WEBHOOK_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(sheetPayload)
+        }).catch(err => console.error('Google Sheet Sync Error:', err));
+      } catch(e) {
+        console.error('Google Sheet Sync Exception:', e);
+      }
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
           let curr = data || { total: 0, cash: 0, upi: 0, card: 0 };
           curr.total += Number(tableData.total); curr[key] += Number(tableData.total); return curr;
       });
 
-      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, items: extractOrderItemsStr(tableData), total: tableData.total, method: pMethod.toUpperCase() });
+      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set({ time: timeStr, table: tableData.table, items: itemsSummary, total: tableData.total, method: pMethod.toUpperCase() });
       db.ref('active_tables/'+id).remove();
     }
 
