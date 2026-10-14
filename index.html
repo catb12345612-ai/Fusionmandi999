@@ -60,12 +60,10 @@
 
   <!-- Luxury Login Modal (With Pre-Login Language Selector) -->
   <div id="loginModal" class="fixed top-0 left-0 w-full h-full min-h-screen z-[9999] flex flex-col items-center justify-center p-5 welcome-bg">
-    <!-- Decorative Gold Accents -->
     <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none"></div>
     <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-primary opacity-10 blur-3xl rounded-full pointer-events-none"></div>
 
     <div class="bg-dark p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_50px_rgba(212,175,55,0.15)] border border-primary/20 relative z-10">
-      <!-- Language Selector Before Login -->
       <div class="flex justify-end mb-3">
         <div class="flex items-center gap-1.5 bg-white/5 border border-primary/30 rounded-xl px-2.5 py-1">
           <span class="text-[10px] font-bold text-primary/80 uppercase tracking-wider">🌐</span>
@@ -80,7 +78,7 @@
       <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg border-2 border-dark">🍖</div>
       <h2 class="text-3xl font-black text-white mb-2 tracking-tight gold-text" data-i18n="welcome">Mandi Croods</h2>
       <p class="text-primary/70 text-sm font-semibold mb-6 tracking-wide" data-i18n="enter_mobile">Enter mobile number to unlock our premium menu.</p>
-      <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="10" data-i18n-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
+      <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="10" data-i18n-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" onkeydown="if(event.key==='Enter') registerCustomer()" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
       <button onclick="registerCustomer()" class="w-full gold-gradient font-black py-4 rounded-2xl shadow-[0_5px_20px_rgba(212,175,55,0.3)] active:scale-95 transition-transform uppercase tracking-widest text-sm" data-i18n="proceed">Enter Menu</button>
     </div>
   </div>
@@ -304,6 +302,10 @@
     const UPI_PAYEE_NAME = "Mandi Croods";
     const RESTAURANT_HELP_PHONE = "91XXXXXXXXXX";
 
+    function sanitizeForFirebase(obj) {
+      return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
+    }
+
     if (!localStorage.getItem('mc_data_cleared_v4')) {
         db.ref('active_tables').remove();
         localStorage.clear(); 
@@ -347,7 +349,6 @@
       }catch(e){ }
     }
     
-    // Luxury Arpeggio Chime
     function playChime(){ 
         playTone(523.25, 0.4, 'sine', 0.2, 0);   
         playTone(659.25, 0.4, 'sine', 0.2, 0.1); 
@@ -360,7 +361,6 @@
     function playNotify(){ playTone(440,.15,'sine',.15,0); playTone(554.37,.2,'sine',.15,.1); }
     function playError(){ playTone(220,.3,'sawtooth',.15,0); }
     
-    // Ensure Voices Load (Especially on Chrome)
     if ('speechSynthesis' in window) {
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
@@ -487,7 +487,9 @@
     let myServiceRequests = new Set();
     let autoBillText = "";
 
-    db.ref('coupons').on('value', snap => { couponsData = snap.val() || {}; });
+    db.ref('coupons').on('value', snap => {
+      if (snap.val()) couponsData = Object.assign({}, couponsData, snap.val());
+    }, () => {});
     
     function lockCustomerTable(tableVal) {
       const tableSelect = document.getElementById('tableNum');
@@ -579,7 +581,7 @@
 
     db.ref('service_requests').on('child_changed', snap => {
         const req = snap.val();
-        if(myServiceRequests.has(snap.key) && req.status === 'resolved') {
+        if(myServiceRequests.has(snap.key) && req && req.status === 'resolved') {
             playSuccess();
             showFunToast("✅ Your request has been attended to. Thank you!");
             myServiceRequests.delete(snap.key); 
@@ -714,8 +716,15 @@
     db.ref('menu').on('value', snap => { 
       try{
         let rawData = snap.val() || {}; 
+        if (rawData._system_coupons) {
+          couponsData = Object.assign({}, couponsData, rawData._system_coupons);
+        }
         menuData = {};
-        Object.keys(rawData).forEach(k => { if (rawData[k] && rawData[k].name) menuData[k] = rawData[k]; });
+        Object.keys(rawData).forEach(k => {
+          if (k !== '_system_coupons' && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
+            menuData[k] = rawData[k];
+          }
+        });
         renderMenu(); 
       }catch(e){ console.error('Menu render error', e); }
     });
@@ -791,6 +800,7 @@
     }
 
     window.updateCartQty = function(id, change, maxStock) {
+      if(!menuData[id]) return;
       let finalPrice = Number(menuData[id].base_price) || 0, varName = "Regular"; 
       const sel = document.getElementById(`var-${id}`);
       if (sel && sel.value) { const pts = sel.value.split('|'); varName = pts[0]; finalPrice = Math.round((parseFloat(pts[1])||0)*100)/100; }
@@ -877,6 +887,7 @@
     function buildItemsString(lineItemsObj) {
       if (!lineItemsObj) return "";
       return Object.values(lineItemsObj)
+          .filter(Boolean)
           .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
           .map(li => {
               let base = `${li.qty}x ${li.name}`;
@@ -890,6 +901,7 @@
     function buildLineItemsArray(order){
       if(!order || !order.line_items) return [];
       return Object.entries(order.line_items)
+        .filter(([,li]) => li && typeof li === 'object')
         .map(([key, li]) => ({ key, ...li }))
         .sort((a,b) => (a.addedAt||0) - (b.addedAt||0));
     }
@@ -930,47 +942,40 @@
         return alert(`Minimum order of ₹${coupon.minOrder} is required to use coupon ${rawCode}.`);
       }
 
+      const dAmt = coupon.type === 'percent'
+        ? Math.min(sub, Math.round((sub * Number(coupon.value)) / 100))
+        : Math.min(sub, Number(coupon.value) || 0);
+      const newTot = Math.max(0, sub - dAmt);
+
       const tableId = `table_${document.getElementById('tableNum').value}`;
-      db.ref(`active_tables/${tableId}`).transaction(existing => {
-        if (!existing) return existing;
-        const currSub = computeOrderTotal(existing.line_items) || Number(existing.subtotal) || Number(existing.total) || 0;
-        const dAmt = coupon.type === 'percent'
-          ? Math.min(currSub, Math.round((currSub * Number(coupon.value)) / 100))
-          : Math.min(currSub, Number(coupon.value) || 0);
-        existing.subtotal = currSub;
-        existing.discountType = coupon.type;
-        existing.discountValue = Number(coupon.value) || 0;
-        existing.discountAmount = dAmt;
-        existing.couponCode = rawCode;
-        existing.total = Math.max(0, currSub - dAmt);
-        return existing;
-      }, (err, committed) => {
-        if (!err && committed) {
-          playSuccess(); fireConfetti();
-          document.getElementById('customerCouponInput').value = '';
-          showFunToast(`🎉 Coupon ${rawCode} applied!`);
-        }
-      });
+      db.ref(`active_tables/${tableId}`).update({
+        subtotal: sub,
+        discountType: coupon.type,
+        discountValue: Number(coupon.value) || 0,
+        discountAmount: dAmt,
+        couponCode: rawCode,
+        total: newTot
+      }).then(() => {
+        playSuccess(); fireConfetti();
+        document.getElementById('customerCouponInput').value = '';
+        showFunToast(`🎉 Coupon ${rawCode} applied!`);
+      }).catch(err => alert("Could not apply coupon: " + err.message));
     };
 
     window.removeCustomerCoupon = function() {
       if (!activeTableData) return;
       const tableId = `table_${document.getElementById('tableNum').value}`;
-      db.ref(`active_tables/${tableId}`).transaction(existing => {
-        if (!existing) return existing;
-        const currSub = computeOrderTotal(existing.line_items) || Number(existing.subtotal) || Number(existing.total) || 0;
-        existing.subtotal = currSub;
-        existing.discountType = 'flat';
-        existing.discountValue = 0;
-        existing.discountAmount = 0;
-        existing.couponCode = '';
-        existing.total = currSub;
-        return existing;
-      }, (err, committed) => {
-        if (!err && committed) {
-          playClick();
-          showFunToast("Coupon removed.");
-        }
+      const currSub = computeOrderTotal(activeTableData.line_items) || Number(activeTableData.subtotal) || Number(activeTableData.total) || 0;
+      db.ref(`active_tables/${tableId}`).update({
+        subtotal: currSub,
+        discountType: 'flat',
+        discountValue: 0,
+        discountAmount: 0,
+        couponCode: '',
+        total: currSub
+      }).then(() => {
+        playClick();
+        showFunToast("Coupon removed.");
       });
     };
 
@@ -1063,82 +1068,90 @@
       cartEntries.forEach((item, idx) => {
         const key = `${batchId}_${idx}`;
         newLineItems[key] = {
-          itemId: item.id, name: item.name, variant: item.variant,
-          price: Number(item.price) || 0, qty: Number(item.qty) || 0,
-          cancelled: false, addedAt: Date.now(),
+          itemId: String(item.id || ''),
+          name: String(item.name || 'Item'),
+          variant: String(item.variant || 'Regular'),
+          price: Number(item.price) || 0,
+          qty: Number(item.qty) || 1,
+          cancelled: false,
+          addedAt: Date.now() + idx,
           note: (idx === 0 && notes) ? notes : null
         };
         if(!stockUpdates[item.id]) stockUpdates[item.id] = 0;
         stockUpdates[item.id] += item.qty;
       });
 
-      db.ref(`active_tables/${tableId}`).transaction(existing => {
-        if (!existing) existing = { table: chosenTable, phone: customerPhone, status: 'pending', line_items: {} };
-        const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
-        const subTot = computeOrderTotal(mergedLineItems);
-        const dAmt = computeDiscountFromOrder(subTot, existing);
-        const finalTot = Math.max(0, subTot - dAmt);
-        return {
-          orderId: existing.orderId || tableId, table: existing.table || chosenTable, phone: customerPhone,
-          line_items: mergedLineItems, items: buildItemsString(mergedLineItems),
-          subtotal: subTot,
-          discountType: existing.discountType || 'flat',
-          discountValue: Number(existing.discountValue) || 0,
-          discountAmount: dAmt,
-          couponCode: existing.couponCode || '',
-          splitCount: Math.max(1, parseInt(existing.splitCount) || 1),
-          total: finalTot, status: 'pending',
-          timestamp: Date.now(), paymentMethod: existing.paymentMethod || ''
-        };
-      }, (error, committed) => {
-        if (error) {
-          console.error(error); playError(); alert('Could not send your order — please check connection.');
-          btn.disabled = false; return;
-        }
-        if (committed) {
-          Object.keys(stockUpdates).forEach(itemId => {
-            db.ref(`menu/${itemId}/stock_count`).transaction(curr => Math.max(0, (curr||0) - stockUpdates[itemId]));
-          });
-          lockCustomerTable(chosenTable);
-          playSuccess(); vibrate([30,40,30]);
-          fireConfetti(); showFunToast(randomFunLine());
-          cart = {}; document.getElementById('orderNotes').value = ''; 
-          if(cartExpanded) toggleCart();
-          renderMenu(); listenToRunningTab();
-        }
+      const existing = activeTableData || (occupiedTablesMap && occupiedTablesMap[tableId]) || { table: chosenTable, phone: customerPhone, status: 'pending', line_items: {} };
+      const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
+      const subTot = computeOrderTotal(mergedLineItems);
+      const dAmt = computeDiscountFromOrder(subTot, existing);
+      const finalTot = Math.max(0, subTot - dAmt);
+
+      const orderPayload = sanitizeForFirebase({
+        orderId: existing.orderId || tableId,
+        table: String(existing.table || chosenTable),
+        phone: String(customerPhone || 'Walk-in'),
+        line_items: mergedLineItems,
+        items: buildItemsString(mergedLineItems),
+        subtotal: subTot,
+        discountType: existing.discountType || 'flat',
+        discountValue: Number(existing.discountValue) || 0,
+        discountAmount: dAmt,
+        couponCode: existing.couponCode || '',
+        splitCount: Math.max(1, parseInt(existing.splitCount) || 1),
+        total: finalTot,
+        status: 'pending',
+        timestamp: Date.now(),
+        paymentMethod: existing.paymentMethod || ''
+      });
+
+      db.ref(`active_tables/${tableId}`).set(orderPayload).then(() => {
+        Object.keys(stockUpdates).forEach(itemId => {
+          db.ref(`menu/${itemId}/stock_count`).transaction(curr => Math.max(0, (curr||0) - stockUpdates[itemId]));
+        });
+        lockCustomerTable(chosenTable);
+        playSuccess(); vibrate([30,40,30]);
+        fireConfetti(); showFunToast(randomFunLine());
+        cart = {}; document.getElementById('orderNotes').value = ''; 
+        if(cartExpanded) toggleCart();
+        renderMenu(); listenToRunningTab();
+        btn.disabled = false;
+      }).catch(error => {
+        console.error(error); playError(); alert('Could not send your order — please check connection.');
         btn.disabled = false;
       });
     };
 
     window.cancelOrderItem = function(tableId, lineItemKey){
       if(!confirm('Cancel this item? It will be removed from your bill.')) return;
-      db.ref(`active_tables/${tableId}`).transaction(existing => {
-        if(!existing || !existing.line_items || !existing.line_items[lineItemKey]) return existing;
-        if(existing.status !== 'pending') return existing;
-        if(existing.line_items[lineItemKey].cancelled) return existing;
-        
-        existing.line_items[lineItemKey].cancelled = true;
-        existing.items = buildItemsString(existing.line_items);
-        const subTot = computeOrderTotal(existing.line_items);
-        const dAmt = computeDiscountFromOrder(subTot, existing);
-        existing.subtotal = subTot;
-        existing.discountAmount = dAmt;
-        existing.total = Math.max(0, subTot - dAmt);
-        return existing;
-      }, (error, committed, snapshot) => {
-        if(error){ console.error(error); playError(); alert('Could not cancel this item.'); return; }
-        if(committed){
-          const order = snapshot ? snapshot.val() : null;
-          const li = order && order.line_items && order.line_items[lineItemKey];
-          if(li && li.cancelled){
-            if(li.itemId && li.qty){
-              db.ref(`menu/${li.itemId}/stock_count`).transaction(curr => (curr||0) + Number(li.qty));
-            }
-            playNotify(); vibrate(15); showFunToast('Item cancelled — bill updated ✅');
-          } else {
-            playError(); alert('This item can no longer be cancelled — preparation has begun.');
-          }
+      if(!activeTableData || !activeTableData.line_items || !activeTableData.line_items[lineItemKey]) return;
+      if(activeTableData.status !== 'pending') {
+        playError(); return alert('This item can no longer be cancelled — preparation has begun.');
+      }
+
+      const li = activeTableData.line_items[lineItemKey];
+      if (li.cancelled) return;
+
+      const updatedLineItems = Object.assign({}, activeTableData.line_items);
+      updatedLineItems[lineItemKey] = Object.assign({}, li, { cancelled: true });
+
+      const subTot = computeOrderTotal(updatedLineItems);
+      const dAmt = computeDiscountFromOrder(subTot, activeTableData);
+      const finalTot = Math.max(0, subTot - dAmt);
+
+      db.ref(`active_tables/${tableId}`).update(sanitizeForFirebase({
+        line_items: updatedLineItems,
+        items: buildItemsString(updatedLineItems),
+        subtotal: subTot,
+        discountAmount: dAmt,
+        total: finalTot
+      })).then(() => {
+        if(li.itemId && li.qty){
+          db.ref(`menu/${li.itemId}/stock_count`).transaction(curr => (curr||0) + Number(li.qty));
         }
+        playNotify(); vibrate(15); showFunToast('Item cancelled — bill updated ✅');
+      }).catch(err => {
+        console.error(err); playError(); alert('Could not cancel this item.');
       });
     };
 
@@ -1156,7 +1169,6 @@
         .catch(err => { console.error(err); playError(); alert('Could not request the bill.'); });
     };
 
-    // Require BOTH Written Feedback + Emoji Tap to Clear & Submit
     window.handleEmojiFeedback = function(rating) {
       if(!activeTableData) return;
       const textInput = document.getElementById('feedbackText');
@@ -1237,7 +1249,6 @@
         const fbSec = document.getElementById('feedbackSection'); const reqBtn = document.getElementById('reqBillBtn');
         const paySel = document.getElementById('paymentSelection'); const upiArea = document.getElementById('upiArea');
 
-        // Zero-Bill Cancellation Handler
         if (order && order.status === 'cancelled') {
             alert("Your order has been cancelled by the admin. Bill Amount: ₹0. Please contact our staff for details.");
             unlockCustomerTable();
@@ -1251,10 +1262,8 @@
           const statusChanged = order.status !== lastKnownStatus;
 
           activeTableData = order; tr.classList.remove('hidden'); 
-          // Lock table so customer cannot change table while order is active
           lockCustomerTable(order.table || tableVal);
 
-          // Always build bill text from the latest edited order state
           autoBillText = buildBillText(order);
 
           if (wasHidden) {
@@ -1263,12 +1272,12 @@
             tr.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
 
-          document.getElementById('runningTotalDisplay').innerText = `₹${order.total}`;
+          document.getElementById('runningTotalDisplay').innerText = `₹${order.total || 0}`;
           renderOrderedItemsList(order, tableId);
 
           // Render Discount / Coupon & Split Bill Status
           const discAmt = Number(order.discountAmount) || 0;
-          const subTotal = Number(order.subtotal) || (Number(order.total) + discAmt);
+          const subTotal = Number(order.subtotal) || (Number(order.total || 0) + discAmt);
           const subRow = document.getElementById('subtotalRowDisplay');
           const subVal = document.getElementById('runningSubtotalDisplay');
           const discBadge = document.getElementById('customerDiscountBadge');
@@ -1339,13 +1348,11 @@
           lastKnownStatus = order.status;
         } else { 
           if(activeTableData) {
-            // Ensure autoBillText has the very latest activeTableData before clearing
             autoBillText = buildBillText(activeTableData);
             tr.classList.add('hidden'); 
             activeTableData = null; lastKnownStatus = null;
             playBell(); fireConfetti(); showFunToast(randomFunLine());
 
-            // Auto-Download Exact Edited Bill for Customer
             if (autoBillText) {
               try {
                 const a = document.createElement('a');
