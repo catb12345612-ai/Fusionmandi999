@@ -41,7 +41,7 @@
     <div class="bg-[#141414] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
       <div class="w-16 h-16 gold-gradient text-black rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg">MC</div>
       <h2 class="text-2xl font-black text-white mb-2 tracking-tight">System Login</h2>
-      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
+      <input type="password" id="sysPin" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') attemptLogin()" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
       <button id="loginBtn" onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">ACCESS WORKSPACE</button>
       <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
     </div>
@@ -499,6 +499,11 @@
 
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
+    // --- HELPER: SANITIZE OBJECTS FOR FIREBASE (PREVENTS UNDEFINED ERRORS) ---
+    function sanitizeForFirebase(obj) {
+      return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
+    }
+
     // --- FRESH START PROTOCOL ---
     if (!localStorage.getItem('mc_admin_wiped_v4')) {
         localStorage.clear();
@@ -596,8 +601,9 @@
         if (!table) return '';
         if (table.line_items && typeof table.line_items === 'object') {
             return Object.values(table.line_items)
+                .filter(Boolean)
                 .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
-                .map(i => `${i.qty||1}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`)
+                .map(i => `${i.qty||1}x ${i.name||'Item'}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`)
                 .join(' | ');
         }
         let rawData = table.items;
@@ -891,7 +897,7 @@
             const allTableList = ["1","2","3","4","5","6","7","8","9","10","R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11","L1","L2","L3","L4","L5","L6","L7","BH1","BH2","BH3","C1","C2","C3","C4","C5","C6","C7","C8"];
             
             let occupiedSet = new Set();
-            for(let key in tables) { occupiedSet.add(tables[key].table); }
+            for(let key in tables) { if(tables[key]) occupiedSet.add(String(tables[key].table)); }
 
             allTableList.forEach(tName => {
                 const isOcc = occupiedSet.has(tName);
@@ -899,12 +905,12 @@
             });
         }
 
-        Object.entries(tables).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, table]) => {
+        Object.entries(tables).filter(([,t]) => t && typeof t === 'object').sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0)).forEach(([id, table]) => {
           if(table.status === 'pending' || table.status === 'bill_requested') needsAttention = true;
           let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
           if(table.status==='served') border = 'border-emerald-500';
           
-          let statusText = translateText(table.status);
+          let statusText = translateText(table.status || 'pending');
           
           let badge = table.status==='pending'?'bg-primary/20 text-primary':(table.status==='bill_requested'?'bg-amber-100 text-amber-600 animate-pulse':'bg-emerald-100 text-emerald-600');
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
@@ -982,7 +988,7 @@
                   <span class="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}${isVip ? ' <span class="text-primary ml-1">👑 VIP</span>' : ''}</span>
                   <div class="text-right">
                     ${discAmount > 0 && table.subtotal ? `<span class="text-xs text-slate-400 line-through font-bold block">₹${table.subtotal}</span>` : ''}
-                    <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total}</span>
+                    <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total || 0}</span>
                   </div>
                 </div>
                 ${currentRole==='admin' ? `
@@ -1007,17 +1013,30 @@
     function loadSystem() {
       if(!db) return;
 
-      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; });
+      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; }, err => console.warn(err));
 
-      // Load Coupons for Admin & POS
+      // Load Coupons from both menu/_system_coupons (guaranteed permission) and root /coupons
       db.ref('coupons').on('value', snap => {
-        couponsCache = snap.val() || {};
-        renderCouponsAdmin();
-      });
+        if (snap.val()) {
+          couponsCache = Object.assign({}, couponsCache, snap.val());
+          renderCouponsAdmin();
+        }
+      }, () => {});
 
       // Always load menu for Admin and Waiter so POS and Edit Order Modal have full menu items
       db.ref('menu').on('value', snap => {
-        menuCache = snap.val() || {};
+        const rawMenu = snap.val() || {};
+        if (rawMenu._system_coupons) {
+          couponsCache = Object.assign({}, rawMenu._system_coupons);
+          renderCouponsAdmin();
+        }
+        menuCache = {};
+        Object.keys(rawMenu).forEach(k => {
+          if (k !== '_system_coupons' && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
+            menuCache[k] = rawMenu[k];
+          }
+        });
+
         if(currentRole === 'admin') {
           renderInventory();
           let lowItems = [];
@@ -1051,10 +1070,10 @@
               grid.innerHTML = '';
               let pendingCount = 0;
 
-              Object.entries(reqs).sort((a,b)=> b[1].timestamp - a[1].timestamp).forEach(([id, req]) => {
+              Object.entries(reqs).filter(([,r]) => r && typeof r === 'object').sort((a,b)=> (b[1].timestamp||0) - (a[1].timestamp||0)).forEach(([id, req]) => {
                   if (req.status === 'pending') {
                       pendingCount++;
-                      const timeStr = new Date(req.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                      const timeStr = new Date(req.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                       let icon = '🛎️';
                       if(req.request_type === 'Water Refill') icon = '💧';
                       if(req.request_type === 'Clean Table') icon = '🧽';
@@ -1104,7 +1123,8 @@
           const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
           const logs = Object.values(snap.val()||{});
           logs.forEach(log => {
-            tb.innerHTML += `<tr class="border-b border-slate-100"><td class="p-4 text-xs text-slate-500">${log.time}</td><td class="p-4 font-black">T-${log.table}</td><td class="p-4 font-bold text-slate-600 text-[10px] uppercase">${log.method}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total}</td></tr>`;
+            if(!log) return;
+            tb.innerHTML += `<tr class="border-b border-slate-100"><td class="p-4 text-xs text-slate-500">${log.time||''}</td><td class="p-4 font-black">T-${log.table||''}</td><td class="p-4 font-bold text-slate-600 text-[10px] uppercase">${log.method||''}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items||''}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total||0}</td></tr>`;
           });
           renderTopItemsChart(logs);
         });
@@ -1114,7 +1134,7 @@
           const summary = document.getElementById('feedbackSummary');
           if(!list) return;
           list.innerHTML = '';
-          const entries = Object.entries(snap.val()||{}).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
+          const entries = Object.entries(snap.val()||{}).filter(([,f]) => f && typeof f === 'object').sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
 
           if(summary){
             const counts = { Excellent: 0, Good: 0, Bad: 0 };
@@ -1142,34 +1162,41 @@
 
     // --- COUPON MANAGEMENT FUNCTIONS ---
     window.saveCouponCode = function() {
-      const code = (document.getElementById('newCouponCode').value || '').trim().toUpperCase().replace(/\s+/g, '');
+      const code = (document.getElementById('newCouponCode').value || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '');
       const type = document.getElementById('newCouponType').value;
       const val = parseFloat(document.getElementById('newCouponVal').value);
       const minOrder = parseFloat(document.getElementById('newCouponMin').value) || 0;
 
-      if (!code || isNaN(val) || val <= 0) return alert("Please enter a valid Coupon Code and Discount Value.");
+      if (!code || isNaN(val) || val <= 0) return alert("Please enter a valid alphanumeric Coupon Code and Discount Value.");
       if (type === 'percent' && val > 100) return alert("Percentage discount cannot exceed 100%.");
 
-      db.ref(`coupons/${code}`).set({
-        code, type, value: val, minOrder, active: true, createdAt: Date.now()
-      }).then(() => {
+      const couponObj = { code, type, value: val, minOrder, active: true, createdAt: Date.now() };
+      couponsCache[code] = couponObj;
+      renderCouponsAdmin();
+
+      // Store in menu/_system_coupons (guaranteed write access) and coupons/
+      db.ref(`menu/_system_coupons/${code}`).set(couponObj).then(() => {
+        db.ref(`coupons/${code}`).set(couponObj).catch(()=>{});
         document.getElementById('newCouponCode').value = '';
         document.getElementById('newCouponVal').value = '';
         document.getElementById('newCouponMin').value = '';
         showGlobalToast(`Coupon ${code} created!`, 'info');
-      });
+      }).catch(err => alert("Could not save coupon: " + err.message));
     };
 
     window.deleteCouponCode = function(code) {
       if (confirm(`Delete coupon "${code}"?`)) {
-        db.ref(`coupons/${code}`).remove();
+        delete couponsCache[code];
+        renderCouponsAdmin();
+        db.ref(`menu/_system_coupons/${code}`).remove().catch(()=>{});
+        db.ref(`coupons/${code}`).remove().catch(()=>{});
       }
     };
 
     function renderCouponsAdmin() {
       const box = document.getElementById('couponsListAdmin');
       if (!box) return;
-      const list = Object.values(couponsCache);
+      const list = Object.values(couponsCache).filter(c => c && c.code);
       if (list.length === 0) {
         box.innerHTML = `<span class="text-xs text-slate-400 font-bold">No active coupons created yet.</span>`;
         return;
@@ -1198,8 +1225,9 @@
         grid.innerHTML = '';
         
         Object.entries(menuCache).forEach(([id, item]) => {
+            if(!item || !item.name) return;
             const transName = translateText(item.name);
-            if(q && !transName.toLowerCase().includes(q) && !item.category.toLowerCase().includes(q)) return;
+            if(q && !transName.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
             
             let varSelect = '';
             if (item.portions && Object.keys(item.portions).length > 0) {
@@ -1222,9 +1250,10 @@
     };
 
     window.addToPosCart = function(id) {
-        let price = Number(menuCache[id].base_price), variant = "Regular"; 
+        if(!menuCache[id]) return;
+        let price = Number(menuCache[id].base_price) || 0, variant = "Regular"; 
         const sel = document.getElementById(`posVar-${id}`);
-        if (sel && sel.value) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]); }
+        if (sel && sel.value) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]) || 0; }
         
         const key = `${id}|${variant}`;
         if(posCart[key]) posCart[key].qty++;
@@ -1258,7 +1287,7 @@
         let subtotal = 0;
         
         Object.entries(posCart).forEach(([key, item]) => {
-            subtotal += item.price * item.qty;
+            subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
             list.innerHTML += `
                 <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
                     <div class="flex-1 pr-2 leading-tight">
@@ -1303,58 +1332,70 @@
         const newLineItems = {};
         Object.values(posCart).forEach((item, idx) => {
             newLineItems[`${batchId}_${idx}`] = {
-                itemId: item.id, name: item.name, variant: item.variant,
-                price: item.price, qty: item.qty, cancelled: false, addedAt: Date.now()
+                itemId: String(item.id || ''),
+                name: String(item.name || 'Item'),
+                variant: String(item.variant || 'Regular'),
+                price: Number(item.price) || 0,
+                qty: Number(item.qty) || 1,
+                cancelled: false,
+                addedAt: Date.now() + idx
             };
         });
 
-        db.ref(`active_tables/${tableId}`).transaction(existing => {
-            if (!existing) existing = { table: tNum, phone: phone, status: 'pending', line_items: {} };
-            const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
-            
-            const buildStr = (liObj) => Object.values(liObj).map(i => `${i.qty}x ${i.name} ${i.variant!=='Regular'?'('+i.variant+')':''}`).join(' | ');
-            const subTot = Object.values(mergedLineItems).reduce((s,i)=>s+(i.cancelled?0:i.price*i.qty), 0);
+        const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : { table: tNum, phone: phone, status: 'pending', line_items: {} };
+        const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
+        const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
+        const subTot = Object.values(mergedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
 
-            const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
-            const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
-            const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
-            const dAmt = calculateDiscountAmount(subTot, dType, dVal);
-            const finalTot = Math.max(0, subTot - dAmt);
-            const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
+        const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
+        const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
+        const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
+        const dAmt = calculateDiscountAmount(subTot, dType, dVal);
+        const finalTot = Math.max(0, subTot - dAmt);
+        const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
 
-            return {
-                orderId: existing.orderId || tableId, table: tNum, phone: phone,
-                line_items: mergedLineItems, items: buildStr(mergedLineItems),
-                subtotal: subTot, discountType: dType, discountValue: dVal,
-                discountAmount: dAmt, couponCode: cCode, splitCount: sCount,
-                total: finalTot, status: 'pending',
-                timestamp: Date.now(), paymentMethod: existing.paymentMethod || ''
-            };
-        }, (error, committed) => {
-            if(error) return alert("Failed to send order.");
-            if(committed) {
-                posCart = {};
-                if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
-                if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
-                if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
-                updatePosCartUI();
-                document.getElementById('posTableNum').value = "";
-                document.getElementById('posPhone').value = "";
-                showGlobalToast("Direct Order sent successfully to Kitchen!", "info");
-                switchTab('orders');
-            }
+        const payload = sanitizeForFirebase({
+            orderId: existing.orderId || tableId,
+            table: String(tNum),
+            phone: String(phone),
+            line_items: mergedLineItems,
+            items: buildStr(mergedLineItems),
+            subtotal: subTot,
+            discountType: dType,
+            discountValue: dVal,
+            discountAmount: dAmt,
+            couponCode: cCode,
+            splitCount: sCount,
+            total: finalTot,
+            status: 'pending',
+            timestamp: Date.now(),
+            paymentMethod: existing.paymentMethod || ''
+        });
+
+        db.ref(`active_tables/${tableId}`).set(payload).then(() => {
+            posCart = {};
+            if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
+            if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
+            if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
+            updatePosCartUI();
+            document.getElementById('posTableNum').value = "";
+            document.getElementById('posPhone').value = "";
+            showGlobalToast("Direct Order sent successfully to Kitchen!", "info");
+            switchTab('orders');
+        }).catch(err => {
+            alert("Failed to send order: " + err.message);
         });
     };
 
     window.resolveService = function(id) {
         db.ref('service_requests/'+id).update({status: 'resolved'});
-    }
+    };
 
     window.clearAllFeedback = function() {
         if(confirm("Are you sure you want to permanently delete all feedback?")) {
             db.ref('feedback').remove();
         }
-    }
+    };
 
     function initAnalytics(todayStr){
       if(window.analyticsInit) return; window.analyticsInit = true;
@@ -1408,7 +1449,7 @@
       const itemsStr = typeof rawInput === 'string' ? rawInput : extractOrderItemsStr({items: rawInput});
       if(!itemsStr) return [];
       return itemsStr.split('|').map(s => s.trim()).filter(Boolean).map(entry => {
-        let clean = entry.replace(/[₹(][^)]*[₹)]?/g, '').replace(/\(.*?\)/g, '').trim();
+        let clean = entry.replace(/[₹(][^)]*[₹)]?/g, '').replace(/\(.*?\)/g, '').replace(/\[.*?\]/g, '').trim();
         let qty = 1, name = clean;
         let m = clean.match(/^(\d+)\s*[xX]\s*(.+)$/);
         if(m){ qty = parseInt(m[1]) || 1; name = m[2].trim(); }
@@ -1420,7 +1461,7 @@
       const canvas = document.getElementById('topItemsChart');
       if(!canvas || typeof Chart === 'undefined') return;
       const counts = {};
-      logs.forEach(log => { parseOrderItems(log.items).forEach(({ name, qty }) => { counts[name] = (counts[name] || 0) + qty; }); });
+      logs.forEach(log => { if(log) parseOrderItems(log.items).forEach(({ name, qty }) => { counts[name] = (counts[name] || 0) + qty; }); });
       const top5 = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
       const labels = top5.map(([name]) => name);
       const values = top5.map(([,qty]) => qty);
@@ -1448,7 +1489,7 @@
         <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold px-2">X</button>`;
       container.appendChild(row);
     }
-    window.quickAddPortion = function(cid, lbl) { addPortionRow(cid, lbl, ''); }
+    window.quickAddPortion = function(cid, lbl) { addPortionRow(cid, lbl, ''); };
     function collectPortions(cid){
       const portions = {};
       document.querySelectorAll(`#${cid} .portion-row`).forEach(row => {
@@ -1469,7 +1510,17 @@
       editOrderLineItems = {};
       if (table.line_items && Object.keys(table.line_items).length > 0) {
         Object.entries(table.line_items).forEach(([k, li]) => {
-          editOrderLineItems[k] = { ...li, qty: Number(li.qty) || 1, price: Number(li.price) || 0 };
+          if (!li) return;
+          editOrderLineItems[k] = {
+            itemId: String(li.itemId || ''),
+            name: String(li.name || 'Item'),
+            variant: String(li.variant || 'Regular'),
+            price: Number(li.price) || 0,
+            qty: Number(li.qty) || 1,
+            cancelled: Boolean(li.cancelled),
+            addedAt: Number(li.addedAt) || Date.now(),
+            note: li.note ? String(li.note) : null
+          };
         });
       } else if (table.items) {
         String(table.items).split('|').map(s => s.trim()).filter(Boolean).forEach((part, idx) => {
@@ -1482,19 +1533,20 @@
           const vm = rest.match(/^(.+?)\s*\(([^)]+)\)$/);
           if (vm) { rest = vm[1].trim(); variant = vm[2].trim(); }
           let unitPrice = 0;
-          const foundMenu = Object.entries(menuCache).find(([, it]) => it.name && it.name.toLowerCase() === rest.toLowerCase());
+          const foundMenu = Object.entries(menuCache).find(([, it]) => it && it.name && it.name.toLowerCase() === rest.toLowerCase());
           if (foundMenu) {
             const [, mItem] = foundMenu;
             unitPrice = (variant !== 'Regular' && mItem.portions && mItem.portions[variant]) ? Number(mItem.portions[variant]) : Number(mItem.base_price) || 0;
           }
           editOrderLineItems[`legacy_${idx}`] = {
-            itemId: foundMenu ? foundMenu[0] : '',
-            name: rest,
-            variant: variant,
-            price: unitPrice,
-            qty: qty,
-            cancelled: isCanc,
-            addedAt: Date.now() + idx
+            itemId: foundMenu ? String(foundMenu[0]) : '',
+            name: String(rest || 'Item'),
+            variant: String(variant || 'Regular'),
+            price: Number(unitPrice) || 0,
+            qty: Number(qty) || 1,
+            cancelled: Boolean(isCanc),
+            addedAt: Date.now() + idx,
+            note: null
           };
         });
       }
@@ -1554,7 +1606,7 @@
       if(!list) return;
       list.innerHTML = '';
 
-      const entries = Object.entries(editOrderLineItems).sort((a,b) => (a[1].addedAt||0) - (b[1].addedAt||0));
+      const entries = Object.entries(editOrderLineItems).filter(([,li]) => li).sort((a,b) => (a[1].addedAt||0) - (b[1].addedAt||0));
       let subtotal = 0;
 
       if (entries.length === 0) {
@@ -1637,6 +1689,7 @@
       grid.innerHTML = '';
 
       Object.entries(menuCache).forEach(([id, item]) => {
+        if(!item || !item.name) return;
         const transName = translateText(item.name);
         if (q && !transName.toLowerCase().includes(q) && !(item.name||'').toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
 
@@ -1675,19 +1728,20 @@
         price = parseFloat(pts[1]) || 0;
       }
 
-      const existingEntry = Object.entries(editOrderLineItems).find(([, li]) => !li.cancelled && li.name === item.name && (li.variant || 'Regular') === variant);
+      const existingEntry = Object.entries(editOrderLineItems).find(([, li]) => li && !li.cancelled && li.name === item.name && (li.variant || 'Regular') === variant);
       if (existingEntry) {
         existingEntry[1].qty = (Number(existingEntry[1].qty) || 1) + 1;
       } else {
         const newKey = `admin_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
         editOrderLineItems[newKey] = {
-          itemId: id,
-          name: item.name,
-          variant: variant,
-          price: price,
+          itemId: String(id),
+          name: String(item.name || 'Item'),
+          variant: String(variant || 'Regular'),
+          price: Number(price) || 0,
           qty: 1,
           cancelled: false,
-          addedAt: Date.now()
+          addedAt: Date.now(),
+          note: null
         };
       }
       renderEditOrderCartList(true);
@@ -1700,7 +1754,7 @@
 
       let subtotal = 0;
       Object.values(editOrderLineItems).forEach(li => {
-        if (!li.cancelled) subtotal += (Number(li.price)||0) * (Number(li.qty)||0);
+        if (li && !li.cancelled) subtotal += (Number(li.price)||0) * (Number(li.qty)||0);
       });
       subtotal = Math.round(subtotal * 100) / 100;
 
@@ -1712,6 +1766,7 @@
       const splitCount = Math.max(1, parseInt(document.getElementById('editOrderSplitCount').value) || 1);
 
       const formattedItems = Object.values(editOrderLineItems)
+        .filter(Boolean)
         .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
         .map(li => {
           let base = `${li.qty}x ${li.name}`;
@@ -1721,7 +1776,7 @@
         })
         .join(' | ');
 
-      db.ref('active_tables/' + editOrderId).update({
+      const updatePayload = sanitizeForFirebase({
         line_items: editOrderLineItems,
         items: formattedItems,
         subtotal: subtotal,
@@ -1731,7 +1786,9 @@
         couponCode: couponCode,
         splitCount: splitCount,
         total: newTotal
-      }).then(() => {
+      });
+
+      db.ref('active_tables/' + editOrderId).update(updatePayload).then(() => {
         showGlobalToast("Order, Discount & Split Bill synced to Customer!", "success");
         closeEditOrder();
       }).catch(err => alert("Failed to update order: " + err.message));
@@ -1741,7 +1798,7 @@
       const list = document.getElementById('inventoryList');
       if(!list) return;
       const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
-      const entries = Object.entries(menuCache).filter(([id, item]) => !q || item.name.toLowerCase().includes(q));
+      const entries = Object.entries(menuCache).filter(([id, item]) => item && item.name && (!q || item.name.toLowerCase().includes(q)));
       document.getElementById('menuCountLabel').innerText = `${entries.length} items`;
       list.innerHTML = entries.map(([id, item]) => `
           <div class="dash-card bg-card p-4 rounded-xl flex items-center justify-between gap-4">
@@ -1762,17 +1819,19 @@
     };
 
     window.openEditItem = function(id){
-      const item = menuCache[id]; editItemId = id;
-      document.getElementById('editItemName').value = item.name;
-      document.getElementById('editItemCat').value = item.category;
-      document.getElementById('editItemPrice').value = item.base_price;
+      const item = menuCache[id];
+      if(!item) return;
+      editItemId = id;
+      document.getElementById('editItemName').value = item.name || '';
+      document.getElementById('editItemCat').value = item.category || 'Chicken Mandi';
+      document.getElementById('editItemPrice').value = item.base_price || 0;
       
-      document.getElementById('editItemImgUrl').value = item.image_url;
+      document.getElementById('editItemImgUrl').value = item.image_url || '';
       const prev = document.getElementById('editItemImgPreview');
-      prev.src = item.image_url;
+      prev.src = item.image_url || '';
       prev.classList.remove('hidden');
 
-      document.getElementById('editItemStock').value = item.stock_count;
+      document.getElementById('editItemStock').value = item.stock_count || 0;
       document.getElementById('editItemSpecial').checked = !!item.is_special;
       const pC = document.getElementById('editItemPortions'); pC.innerHTML='';
       Object.entries(item.portions||{}).forEach(([l,p]) => addPortionRow('editItemPortions', l, p));
@@ -1781,15 +1840,15 @@
     window.closeEditItem = function(){ document.getElementById('editItemModal').classList.add('hidden'); };
     
     window.saveEditItem = function(){
-      const updated = {
+      const updated = sanitizeForFirebase({
         name: document.getElementById('editItemName').value.trim(),
         category: document.getElementById('editItemCat').value,
-        base_price: parseFloat(document.getElementById('editItemPrice').value),
+        base_price: parseFloat(document.getElementById('editItemPrice').value) || 0,
         image_url: document.getElementById('editItemImgUrl').value.trim() || document.getElementById('editItemImgPreview').src,
-        stock_count: parseInt(document.getElementById('editItemStock').value),
+        stock_count: parseInt(document.getElementById('editItemStock').value) || 0,
         is_special: document.getElementById('editItemSpecial').checked,
         portions: collectPortions('editItemPortions').portions
-      };
+      });
       db.ref('menu/'+editItemId).update(updated).then(()=>closeEditItem());
     };
     window.deleteMenuItem = function() { if(confirm('Delete item?')) db.ref('menu/'+editItemId).remove().then(()=>closeEditItem()); };
@@ -1802,11 +1861,11 @@
       const imgUrl = document.getElementById('newDishImgUrl').value || document.getElementById('newDishImgPreview').src || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
 
       const newItemId = 'item_' + Date.now();
-      db.ref('menu/' + newItemId).set({
+      db.ref('menu/' + newItemId).set(sanitizeForFirebase({
         name, base_price: price, category: document.getElementById('newDishCat').value,
         image_url: imgUrl,
         stock_count: 50, portions: collectPortions('newDishPortions').portions
-      }).then(() => {
+      })).then(() => {
           alert('Dish Added!');
           document.getElementById('newDishName').value = '';
           document.getElementById('newDishPrice').value = '';
@@ -1876,18 +1935,20 @@
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
           let curr = data || { total: 0, cash: 0, upi: 0, card: 0 };
-          curr.total += Number(tableData.total); curr[key] += Number(tableData.total); return curr;
+          curr.total = (Number(curr.total)||0) + (Number(tableData.total)||0);
+          curr[key] = (Number(curr[key])||0) + (Number(tableData.total)||0);
+          return curr;
       });
 
-      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set({
+      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set(sanitizeForFirebase({
         time: timeStr,
         table: tableData.table,
         items: itemsSummary + (tableData.discountAmount ? ` [Disc: -₹${tableData.discountAmount}]` : ''),
-        total: tableData.total,
+        total: Number(tableData.total) || 0,
         method: pMethod.toUpperCase()
-      });
+      }));
       db.ref('active_tables/'+id).remove();
-    }
+    };
 
     window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH'}); };
     
@@ -1896,10 +1957,11 @@
         const mockData = {
           'm1': { name: "Chicken Mandi", category: "Chicken Mandi", base_price: 300, stock_count: 50, is_special: true, portions: {"Half": 500, "Full": 900}, image_url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80" },
           'm2': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 400, stock_count: 50, is_special: true, portions: {"Half": 700}, image_url: "https://images.unsplash.com/photo-1633383718081-22ac93e3db65?w=500&q=80" },
-          'm3': { name: "Veg Mandi", category: "Veg Mandi", base_price: 250, stock_count: 50, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80" }
+          'm3': { name: "Veg Mandi", category: "Veg Mandi", base_price: 250, stock_count: 50, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80" },
+          '_system_coupons': couponsCache || {}
         };
         db.ref('menu').set(mockData).then(() => alert("Factory Reset Complete."));
-    }
+    };
 
     changeAdminLanguage('en');
   </script>
