@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FoodDesk Admin - Fusion Mandi</title>
+  <title>Admin - Mandi Croods</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: '#ff7529', sidebar: '#1e1e2d', light: '#f4f5f8', card: '#ffffff' } } } }
+    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', sidebar: '#0F1014', light: '#f8f9fa', card: '#ffffff' } } } }
   </script>
   <style>
     @media print { 
@@ -20,14 +20,17 @@
         .dash-card { box-shadow: none !important; border: 1px solid #ccc !important; }
     }
     .hide-scroll::-webkit-scrollbar { display: none; }
-    .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); }
-    body { background-color: #f4f5f8; }
+    .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); transition: transform 0.2s; }
+    body { background-color: #f8f9fa; }
     @keyframes redBlueFlash {
-      0% { box-shadow: inset 0 0 0 10px #ef4444; border-color: #ef4444; }
-      50% { box-shadow: inset 0 0 0 10px #3b82f6; border-color: #3b82f6; }
-      100% { box-shadow: inset 0 0 0 10px #ef4444; border-color: #ef4444; }
+      0% { box-shadow: inset 0 0 0 5px #ef4444; border-color: #ef4444; }
+      50% { box-shadow: inset 0 0 0 5px #f59e0b; border-color: #f59e0b; }
+      100% { box-shadow: inset 0 0 0 5px #ef4444; border-color: #ef4444; }
     }
-    .urgent-alarm { animation: redBlueFlash 0.8s infinite; }
+    .urgent-alarm { animation: redBlueFlash 1s infinite; }
+    
+    .gold-gradient { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); }
+    .gold-text { background: linear-gradient(135deg, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   </style>
 </head>
 <body class="font-sans antialiased text-slate-800">
@@ -35,34 +38,35 @@
   <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
 
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
-    <div class="bg-card p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(0,0,0,0.5)] border-t-4 border-primary">
-      <div class="w-16 h-16 bg-primary/10 text-primary rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black">FM</div>
-      <h2 class="text-2xl font-black text-slate-900 mb-2">Workspace Login</h2>
-      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-light border-none rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
-      <button id="loginBtn" onclick="attemptLogin()" class="w-full bg-primary text-white font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform">ACCESS DASHBOARD</button>
+    <div class="bg-[#141414] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
+      <div class="w-16 h-16 gold-gradient text-black rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg">MC</div>
+      <h2 class="text-2xl font-black text-white mb-2 tracking-tight">Admin Login</h2>
+      <input type="password" id="sysPin" placeholder="Enter PIN" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
+      <button id="loginBtn" onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">ACCESS WORKSPACE</button>
       <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
     </div>
   </div>
 
-  <div class="bg-slate-950 text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-cyan-400 hover:text-cyan-300 transition-colors w-2/3 truncate cursor-pointer">
-      <img src="WhatsApp Image 2026-09-02 at 2.10.18 AM.jpg" class="h-4 w-4 rounded-full mr-2 object-cover border border-cyan-400">
-      Dev: Syed Zeeshaan Ali | High-Fledged Solutions
+  <div class="bg-dark text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20" style="background:#0a0a0a;">
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-2/3 truncate cursor-pointer">
+      <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary">
+      Dev: Syed Zeeshaan Ali | High-Fledged AI
     </a>
   </div>
 
   <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden" id="mainLayout">
     <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20">
-      <div class="p-6 border-b border-white/5">
-        <h1 class="font-black text-xl leading-tight tracking-tight text-primary">Fusion Mandi</h1>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-white">Waitstaff</span></p>
+      <div class="p-6 border-b border-white/10">
+        <h1 class="font-black text-xl leading-tight tracking-tight gold-text">Mandi Croods</h1>
+        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
         <div class="flex items-center gap-1.5 mt-3">
             <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
             <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
         </div>
       </div>
       <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/10 text-primary tab-btn">📦 Active Floor</button>
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn">📦 Active Floor</button>
+        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">🧾 POS Order</button>
         <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
             <div class="flex items-center gap-3">🛎️ Service Req</div>
             <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
@@ -71,25 +75,71 @@
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">📈 Analytics</button>
         <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">💬 Feedback</button>
       </nav>
-      <div class="p-4 border-t border-white/5">
-        <button onclick="markAllServed()" class="w-full bg-emerald-500/20 text-emerald-500 font-black py-3 mb-3 rounded-xl hover:bg-emerald-500 hover:text-white transition-all text-xs uppercase tracking-widest no-print kitchen-waiter-only hidden">Mark ALL Served</button>
-        <button onclick="location.reload()" class="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm">Log Out</button>
+      <div class="p-4 border-t border-white/10">
+        <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm uppercase tracking-widest">Log Out</button>
       </div>
     </aside>
 
     <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
       <div class="p-8 pb-32">
         
+        <!-- Floor Operations -->
         <section id="view-orders" class="tab-section">
-          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Floor Operations</h2>
+          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight">Floor Operations</h2>
+          
+          <!-- Table Occupancy Map (Admin/Waiter only) -->
+          <div class="mb-8 admin-waiter-only hidden bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
+              <h3 class="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest">Live Table Occupancy</h3>
+              <div id="occupancyMap" class="flex flex-wrap gap-2"></div>
+          </div>
+
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
+        <!-- POS / Direct Order (Admin/Waiter) -->
+        <section id="view-pos" class="tab-section hidden no-print">
+            <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight">POS / Direct Order</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- POS Menu -->
+                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[70vh] flex flex-col">
+                    <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
+                    <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
+                </div>
+
+                <!-- POS Cart -->
+                <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[70vh] flex flex-col">
+                    <h3 class="text-lg font-black text-slate-900 mb-4 border-b pb-2">New Order</h3>
+                    
+                    <div class="flex gap-2 mb-4">
+                        <select id="posTableNum" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
+                            <option value="" disabled selected>Select Table</option>
+                            <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
+                            <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option>
+                            <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option>
+                        </select>
+                        <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
+                    </div>
+
+                    <div id="posCartList" class="flex-1 overflow-y-auto mb-4 border border-slate-100 rounded-xl p-2 hide-scroll"></div>
+                    
+                    <div class="mt-auto pt-4 border-t border-slate-200">
+                        <div class="flex justify-between font-black text-lg mb-4">
+                            <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
+                        </div>
+                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-4 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md">Send to Kitchen</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customer Requests -->
         <section id="view-services" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Customer Requests</h2>
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
+        <!-- Inventory -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight">Inventory Management</h2>
           
@@ -119,13 +169,13 @@
                 <input type="text" id="newDishImg" placeholder="https://..." class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
               </div>
               <div class="md:col-span-1">
-                <button onclick="addNewDish()" class="w-full bg-primary text-white font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform">ADD DISH</button>
+                <button onclick="addNewDish()" class="w-full gold-gradient text-black font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform">ADD DISH</button>
               </div>
             </div>
 
             <div class="mt-5 pt-5 border-t border-slate-100">
               <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Portion Pricing (optional — leave blank to sell at Base Price only)</label>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Portion Pricing (optional)</label>
               </div>
               <div class="flex flex-wrap gap-2 mb-3">
                 <button type="button" onclick="quickAddPortion('newDishPortions','Single')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Single</button>
@@ -133,7 +183,6 @@
                 <button type="button" onclick="quickAddPortion('newDishPortions','2 Pcs')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ 2 Pcs</button>
                 <button type="button" onclick="quickAddPortion('newDishPortions','Triple (3 Pcs)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Triple (3 Pcs)</button>
                 <button type="button" onclick="quickAddPortion('newDishPortions','Full (4 Person Gang)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Full (4 Person Gang)</button>
-                <button type="button" onclick="quickAddPortion('newDishPortions','')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary/20">+ Custom</button>
               </div>
               <div id="newDishPortions" class="space-y-2"></div>
             </div>
@@ -142,11 +191,11 @@
           <div class="flex items-center gap-3 mb-4 flex-wrap">
             <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-sm p-3 bg-card border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
             <span id="menuCountLabel" class="text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap"></span>
-            <button onclick="syncCatalogImages()" class="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-4 py-3 rounded-xl font-bold text-xs whitespace-nowrap">🔄 Sync Catalog Images</button>
           </div>
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
+        <!-- Dashboard -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print">
             <h2 class="text-3xl font-black text-slate-900 tracking-tight">Dashboard & Revenue</h2>
@@ -154,15 +203,15 @@
           </div>
 
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 no-print">
-            <div class="dash-card bg-card p-5 rounded-3xl lg:col-span-2">
+            <div class="dash-card bg-card p-5 rounded-3xl lg:col-span-2 border-t-2 border-primary">
               <h3 class="text-sm font-black text-slate-900 mb-4">Revenue — Last 7 Days</h3>
               <div class="h-64"><canvas id="revenueTrendChart"></canvas></div>
             </div>
-            <div class="dash-card bg-card p-5 rounded-3xl">
+            <div class="dash-card bg-card p-5 rounded-3xl border-t-2 border-primary">
               <h3 class="text-sm font-black text-slate-900 mb-4">Today's Payment Split</h3>
               <div class="h-64"><canvas id="paymentSplitChart"></canvas></div>
             </div>
-            <div class="dash-card bg-card p-5 rounded-3xl lg:col-span-3">
+            <div class="dash-card bg-card p-5 rounded-3xl lg:col-span-3 border-t-2 border-primary">
               <h3 class="text-sm font-black text-slate-900 mb-4">Top 5 Best Sellers Today</h3>
               <div class="h-64"><canvas id="topItemsChart"></canvas></div>
             </div>
@@ -170,12 +219,12 @@
 
           <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
             
-            <h2 class="text-2xl font-black text-slate-900 mb-6 text-center border-b pb-4">Fusion Mandi - Daily Revenue Report</h2>
+            <h2 class="text-2xl font-black text-slate-900 mb-6 text-center border-b pb-4">Mandi Croods - Daily Revenue</h2>
             
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-              <div class="bg-slate-900 text-white p-6 rounded-2xl print-card-bg">
-                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Gross</p>
-                <p id="tallyTotal" class="text-3xl font-black text-white">₹0</p>
+              <div class="bg-dark text-primary p-6 rounded-2xl print-card-bg border border-primary/30">
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Total Gross</p>
+                <p id="tallyTotal" class="text-3xl font-black text-primary">₹0</p>
               </div>
               <div class="bg-emerald-50 text-emerald-900 border border-emerald-100 p-6 rounded-2xl print-card-bg">
                 <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">CASH Revenue</p>
@@ -203,41 +252,45 @@
             
             <div class="mt-16 pt-8 border-t border-slate-100 text-center no-print">
               <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                ⚠️ FACTORY RESET: Load Full 20-Item Database
+                ⚠️ FACTORY RESET: Load Full Default DB
               </button>
             </div>
           </div>
         </section>
 
+        <!-- Feedback -->
         <section id="view-feedback" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight">Customer Feedback</h2>
-          <div id="feedbackSummary" class="dash-card bg-card p-5 rounded-2xl mb-6 flex flex-wrap gap-6"></div>
+          <div class="flex justify-between items-center mb-6">
+              <h2 class="text-3xl font-black text-slate-900 tracking-tight">Customer Feedback</h2>
+              <button onclick="clearAllFeedback()" class="bg-red-50 text-red-500 border border-red-200 px-4 py-2 rounded-xl font-bold text-xs hover:bg-red-500 hover:text-white transition-colors">🗑️ Clear All Feedback</button>
+          </div>
+          <div id="feedbackSummary" class="dash-card bg-card p-5 rounded-2xl mb-6 flex flex-wrap gap-6 border-t-2 border-primary"></div>
           <div id="feedbackListAdmin" class="space-y-3"></div>
         </section>
       </div>
     </main>
   </div>
 
-  <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5 no-print">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
+  <!-- Modals (Edit Order, Edit Item) -->
+  <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-5 no-print">
+    <div class="bg-card rounded-3xl p-6 w-full max-w-lg shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[85vh] overflow-y-auto">
       <div class="flex items-center justify-between mb-4">
-        <h3 class="font-black text-lg">✏️ Edit Order — <span id="editOrderTableLabel"></span></h3>
+        <h3 class="font-black text-lg text-slate-900">✏️ Edit Order — <span id="editOrderTableLabel" class="text-primary"></span></h3>
         <button onclick="closeEditOrder()" class="w-8 h-8 bg-slate-100 rounded-full font-black text-slate-500 active:scale-90 transition-transform">✕</button>
       </div>
       <p class="text-xs text-slate-400 font-bold mb-2 uppercase tracking-widest">Items (one line each)</p>
       <textarea id="editOrderItems" rows="6" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-medium text-sm outline-none focus:border-primary mb-4"></textarea>
       <p class="text-xs text-slate-400 font-bold mb-2 uppercase tracking-widest">Total (₹)</p>
       <input type="number" id="editOrderTotal" min="0" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-black text-lg outline-none focus:border-primary mb-4">
-      <p class="text-[10px] text-slate-400 font-semibold mb-4">Editing here overwrites the order. Removed items will automatically be marked as [CANCELLED] for the kitchen to see. Recalculate the total yourself.</p>
-      <div class="flex gap-2">
+      <div class="flex gap-2 mt-4">
         <button onclick="closeEditOrder()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition-transform">Cancel</button>
-        <button onclick="saveEditOrder()" class="flex-1 bg-primary text-white font-black py-3 rounded-xl active:scale-95 transition-transform">Save Changes</button>
+        <button onclick="saveEditOrder()" class="flex-1 gold-gradient text-black font-black py-3 rounded-xl active:scale-95 transition-transform">Save Changes</button>
       </div>
     </div>
   </div>
 
-  <div id="editItemModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-5 no-print">
-    <div class="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
+  <div id="editItemModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-5 no-print">
+    <div class="bg-card rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto border border-primary/30">
       <div class="flex items-center justify-between mb-4">
         <h3 class="font-black text-lg">✏️ Edit Menu Item</h3>
         <button onclick="closeEditItem()" class="w-8 h-8 bg-slate-100 rounded-full font-black text-slate-500 active:scale-90 transition-transform">✕</button>
@@ -278,23 +331,19 @@
           </label>
         </div>
         <div class="pt-2 border-t border-slate-100">
-          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Portion Pricing (optional)</label>
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Portion Pricing</label>
           <div class="flex flex-wrap gap-2 mb-3">
-            <button type="button" onclick="quickAddPortion('editItemPortions','Single')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Single</button>
             <button type="button" onclick="quickAddPortion('editItemPortions','Half')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Half</button>
-            <button type="button" onclick="quickAddPortion('editItemPortions','2 Pcs')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ 2 Pcs</button>
-            <button type="button" onclick="quickAddPortion('editItemPortions','Triple (3 Pcs)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Triple (3 Pcs)</button>
-            <button type="button" onclick="quickAddPortion('editItemPortions','Full (4 Person Gang)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Full (4 Person Gang)</button>
-            <button type="button" onclick="quickAddPortion('editItemPortions','')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-primary/10 text-primary hover:bg-primary/20">+ Custom</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','Triple (3 Pcs)')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-light text-slate-600 hover:bg-slate-200">+ Triple</button>
+            <button type="button" onclick="quickAddPortion('editItemPortions','')" class="px-3 py-1.5 rounded-lg text-[11px] font-bold bg-primary/20 text-primary hover:bg-primary/30">+ Custom</button>
           </div>
           <div id="editItemPortions" class="space-y-2"></div>
         </div>
       </div>
-      <p class="text-[10px] text-slate-400 font-semibold my-4">Raise or lower the price here any time — changes apply to new orders immediately.</p>
-      <div class="flex gap-2">
+      <div class="flex gap-2 mt-6">
         <button onclick="deleteMenuItem()" class="bg-red-50 hover:bg-red-100 text-red-500 font-bold py-3 px-4 rounded-xl active:scale-95 transition-transform">🗑️ Delete</button>
         <button onclick="closeEditItem()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition-transform">Cancel</button>
-        <button onclick="saveEditItem()" class="flex-1 bg-primary text-white font-black py-3 rounded-xl active:scale-95 transition-transform">Save Changes</button>
+        <button onclick="saveEditItem()" class="flex-1 gold-gradient text-black font-black py-3 rounded-xl active:scale-95 transition-transform">Save Changes</button>
       </div>
     </div>
   </div>
@@ -303,116 +352,44 @@
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
-    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
-    // --- UNIVERSAL DATA EXTRACTOR ---
     function extractOrderItemsStr(table) {
         if (!table) return '';
-        
-        let rawData = table.items || table.cart || table.orderDetails || table.orderItems || table.products || table.dishes;
-        
-        if (rawData === undefined || rawData === null || rawData === '') {
+        let rawData = table.items || table.line_items;
+        if (!rawData) {
             for (let key in table) {
                 if (['table', 'status', 'total', 'timestamp', 'phone', 'paymentMethod', 'orderId'].includes(key)) continue;
-                const val = table[key];
-                if (val && (typeof val === 'object' || Array.isArray(val))) {
-                    rawData = val; break;
-                }
-                if (typeof val === 'string' && (key.toLowerCase().match(/item|cart|order|dish/) || val.includes('x '))) {
-                    rawData = val; break;
-                }
+                if (typeof table[key] === 'string' && table[key].includes('x ')) { rawData = table[key]; break; }
             }
         }
-        
-        if (!rawData) return '';
-
-        let items = rawData;
-        if (typeof items === 'string') {
-            const trimmed = items.trim();
-            if (trimmed.startsWith('[') || trimmed.startsWith('{')) {
-                try { items = JSON.parse(trimmed); } catch(e) {}
-            }
+        if (typeof rawData === 'string') return rawData.trim();
+        if (typeof rawData === 'object' && rawData !== null) {
+            return Object.values(rawData).map(i => `${i.qty||1}x ${i.name} ${i.variant && i.variant!=='Regular'?'('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
         }
-
-        if (typeof items === 'string') return items.trim();
-        
-        const formatItem = (i) => {
-            if (typeof i !== 'object' || i === null) return String(i);
-            const q = i.qty || i.quantity || i.count || 1;
-            let n = i.name || i.item || i.title || i.dish || i.dishName || i.product || 'Item';
-            if (typeof n === 'object' && n !== null) n = n.name || n.title || 'Item'; 
-            return `${q}x ${n}`;
-        };
-
-        if (Array.isArray(items)) {
-            return items.map(formatItem).join(' | ');
-        } else if (typeof items === 'object' && items !== null) {
-            return Object.values(items).map(formatItem).join(' | ');
-        }
-        
-        return String(items).trim();
-    }
-
-    const menuImages = {
-      "chicken Fry Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chickken BBQ": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chicken AL Faham": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Braosted Chickken": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chicken F2 Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "F1 Rara Chicken Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chicken Juicy Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chicken Murg Musallam Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chickken Fry Wings Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Chicken Lolly pop Mandi": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80",
-      "Muttom Juicy Mandi": "https://images.unsplash.com/photo-1633383718081-22ac93e3db65?w=500&q=80",
-      "F1 Rara mutton mandi": "https://images.unsplash.com/photo-1543362906-acfc16c67564?w=500&q=80",
-      "Mutton Fry Mandi": "https://images.unsplash.com/photo-1603360946369-dc9bb6258143?w=500&q=80",
-      "Mutton F2": "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80",
-      "Bhakasura Mandi (1099) 4 perso": "https://images.unsplash.com/photo-1555126634-323283e090fa?w=500&q=80",
-      "VEG MANDI Mixed Veg": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
-      "Spl Veg Mandi": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
-      "Mushroom Mandi": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80",
-      "Pannner Rara Mandi": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80",
-      "Panner Juicy Mandi": "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80"
-    };
-
-    function findCatalogImage(dishName){
-      if(!dishName) return null;
-      const target = dishName.trim().toLowerCase();
-      const foundKey = Object.keys(menuImages).find(k => k.trim().toLowerCase() === target);
-      return foundKey ? menuImages[foundKey] : null;
+        return String(rawData||'').trim();
     }
 
     function showGlobalToast(msg, type='error'){
       const banner = document.getElementById('globalErrorBanner');
       if(banner){ 
         banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg; 
-        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-blue-600'}`;
+        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-blue-600'}`;
         banner.classList.remove('hidden'); 
         setTimeout(() => { banner.classList.add('hidden'); }, 5000);
       }
-      if(type==='error') console.error(msg);
-      else console.log(msg);
     }
     
-    window.addEventListener('error', function(e){
-      showGlobalToast('A script error occurred (' + (e.message || 'unknown') + '). Press F12 to open the browser console for the full error.', 'error');
-    });
-    window.addEventListener('unhandledrejection', function(e){
-      showGlobalToast('A background request failed (' + (e.reason && e.reason.message ? e.reason.message : e.reason) + ').', 'error');
-    });
-
     let db = null;
     try {
       firebase.initializeApp(firebaseConfig);
       db = firebase.database();
     } catch(e) {
-      showGlobalToast('Could not connect to Firebase: ' + e.message + '. Check your internet connection and reload.', 'error');
+      showGlobalToast('Could not connect to Firebase: ' + e.message, 'error');
     }
     
     let currentRole = null;
     let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-    let serviceSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3'); // Notification chime
+    let serviceSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3'); 
     let alarmTimer = null;
     let customersCache = {};
     let editOrderId = null;
@@ -420,12 +397,13 @@
     let editItemId = null;
     let revenueChart = null, paymentChart = null, topItemsChart = null;
     let revenueDataByDate = {};
-    let loginInFlight = false;
-
     let dbConnected = false;
-    if (db) {
-      db.ref('.info/connected').on('value', snap => { dbConnected = !!snap.val(); });
-    }
+    let alertedLowStock = new Set(); // To prevent spamming low stock toasts
+
+    // POS State
+    let posCart = {};
+
+    if (db) db.ref('.info/connected').on('value', snap => { dbConnected = !!snap.val(); });
 
     function waitForDbConnection(timeoutMs){
       return new Promise(resolve => {
@@ -439,7 +417,6 @@
     }
 
     window.attemptLogin = async function() {
-      if (loginInFlight) return;
       const pinRaw = document.getElementById('sysPin').value;
       const pin = pinRaw.trim();
       const statusEl = document.getElementById('loginStatusMsg');
@@ -451,26 +428,20 @@
       else if (pin === 'kitchen123') role = 'kitchen';
       else { if(statusEl) statusEl.textContent = ''; return alert("Invalid PIN"); }
 
-      if(!db){
-        return alert("⚠️ Not connected to the database (Firebase failed to load). Check your internet connection and reload the page. If this keeps happening, press F12 and check the Console tab for the exact error.");
-      }
+      if(!db) return alert("⚠️ Not connected to database.");
 
-      loginInFlight = true;
       if (btn) { btn.disabled = true; btn.textContent = 'CONNECTING...'; }
-      if (statusEl) statusEl.textContent = 'Connecting to the database…';
+      if (statusEl) statusEl.textContent = 'Connecting to workspace...';
 
       const connected = dbConnected || await waitForDbConnection(6000);
-
       if (!connected) {
-        loginInFlight = false;
-        if (btn) { btn.disabled = false; btn.textContent = 'ACCESS DASHBOARD'; }
+        if (btn) { btn.disabled = false; btn.textContent = 'ACCESS WORKSPACE'; }
         if (statusEl) statusEl.textContent = '';
-        return alert("⚠️ Could not reach the database (still offline after 6s). Check your internet connection and try again.");
+        return alert("⚠️ Could not reach the database. Check connection.");
       }
 
       currentRole = role;
       try { alertSound.play().then(()=>{alertSound.pause();alertSound.currentTime=0;}).catch(()=>{}); } catch(e){}
-      try { serviceSound.play().then(()=>{serviceSound.pause();serviceSound.currentTime=0;}).catch(()=>{}); } catch(e){}
 
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainLayout').classList.remove('hidden');
@@ -483,29 +454,20 @@
       loadSystem();
     };
 
-    document.addEventListener('DOMContentLoaded', function(){
-      const pinInput = document.getElementById('sysPin');
-      if (pinInput) {
-        pinInput.addEventListener('keydown', function(e){
-          if (e.key === 'Enter') { e.preventDefault(); attemptLogin(); }
-        });
-      }
-    });
-
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(b => {
         let isMatch = b.id === `tab-${tab}`;
-        
         if (isMatch) {
             b.classList.remove('text-slate-400', 'hover:bg-white/5');
-            b.classList.add('bg-primary/10', 'text-primary');
+            b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
         } else {
-            b.classList.remove('bg-primary/10', 'text-primary');
+            b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
             b.classList.add('text-slate-400', 'hover:bg-white/5');
         }
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
+      if (tab === 'pos') renderPosMenu();
     };
 
     function triggerAlarm() {
@@ -517,124 +479,58 @@
     function printViaIframe(htmlDoc){
       try{
         const iframe = document.createElement('iframe');
-        iframe.setAttribute('aria-hidden', 'true');
         iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;';
         document.body.appendChild(iframe);
-
         const cleanup = () => { setTimeout(() => { if(iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 2000); };
-
         iframe.onload = function(){
           setTimeout(() => {
-            try{
-              iframe.contentWindow.focus();
-              iframe.contentWindow.print();
-            }catch(e){
-              console.error('Print failed', e);
-              alert('Could not open the print dialog. Please check your browser\'s print / popup settings and try again.');
-            }
+            try{ iframe.contentWindow.focus(); iframe.contentWindow.print(); }catch(e){ console.error(e); }
             cleanup();
           }, 500); 
         };
-
         const doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write('<!DOCTYPE html>' + htmlDoc);
-        doc.close();
-      }catch(e){
-        console.error('printViaIframe failed', e);
-        alert('Could not prepare the print — please try again.');
-      }
+        doc.open(); doc.write('<!DOCTYPE html>' + htmlDoc); doc.close();
+      }catch(e){ console.error(e); }
     }
 
     window.printKOTReceipt = function(tableId) {
-        const table = (window.currentTables || {})[tableId];
-        if(!table){ return alert('Could not find this order — it may have already been cleared. Please refresh the page and try again.'); }
+      const table = (window.currentTables || {})[tableId];
+      if(!table) return alert('Could not find order.');
 
-        db.ref('active_tables/'+tableId).update({status: 'cooking'});
+      db.ref('active_tables/'+tableId).update({status: 'cooking'});
 
-        const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        
-        const rawItems = extractOrderItemsStr(table);
-        const safeItems = esc(rawItems ? rawItems : 'No items recorded for this order.');
-        
-        // Highlight cancelled items with a strikethrough in print format
-        let itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
-        itemsHtml = itemsHtml.split('<br>').map(line => {
-            return line.match(/CANCELLED/i) ? `<span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${line}</span>` : line;
-        }).join('<br>');
+      const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const rawItems = extractOrderItemsStr(table);
+      const safeItems = esc(rawItems ? rawItems : 'No items recorded.');
+      
+      let itemsHtml = rawItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
+      itemsHtml = itemsHtml.split('<br>').map(line => {
+          return line.match(/CANCELLED/i) ? `<span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${line}</span>` : line;
+      }).join('<br>');
 
-        const safeTableNo = esc(table.table);
+      const html = `
+          <html><head><style>
+              @page { margin: 0; }
+              body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; text-align: left; }
+              h2 { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-size: 20px;}
+              h3 { margin: 5px 0; font-size: 18px; }
+              .items { margin-top: 15px; font-size: 16px; font-weight: bold; border-top: 2px dashed #000; padding-top: 10px; line-height: 1.5; }
+              .end { text-align: center; margin-top: 20px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
+          </style></head><body>
+              <h2>*** K O T ***<br>MANDI CROODS</h2>
+              <h3>Table: ${esc(table.table)}</h3>
+              <p>Time: ${new Date().toLocaleTimeString()}</p>
+              <div class="items">${itemsHtml}</div>
+              <div class="end">End of Order</div>
+          </body></html>`;
 
-        const html = `
-            <html><head><style>
-                @page { margin: 0; }
-                body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; text-align: left; }
-                h2 { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-size: 20px;}
-                h3 { margin: 5px 0; font-size: 18px; }
-                p { margin: 5px 0; font-size: 14px; }
-                .items { margin-top: 15px; font-size: 16px; font-weight: bold; border-top: 2px dashed #000; padding-top: 10px; line-height: 1.5; }
-                .end { text-align: center; margin-top: 20px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
-            </style></head><body>
-                <h2>*** K O T ***<br>FUSION MANDI</h2>
-                <h3>Table: ${safeTableNo}</h3>
-                <p>Time: ${new Date().toLocaleTimeString()}</p>
-                <div class="items">${itemsHtml}</div>
-                <div class="end">End of Order</div>
-            </body></html>`;
-
-        printViaIframe(html);
+      printViaIframe(html);
     };
 
-    function buildFinalBillText(tableData){
-      const itemsStr = extractOrderItemsStr(tableData);
-      return `=== FUSION MANDI ===\nTable: ${tableData.table}\nMobile: ${tableData.phone}\n------------------\n${itemsStr.replace(/ \| /g,'\n')}\n------------------\nTOTAL: Rs. ${tableData.total}\n=================`;
-    }
-
-    function printFinalBillReceipt(billText){
-      try{
-        const safe = String(billText).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        const html = `
-            <html><head><style>
-                @page { margin: 0; }
-                body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; }
-                h2 { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; font-size: 18px; }
-                pre { white-space: pre-wrap; font-size: 13px; line-height: 1.6; margin: 0; }
-            </style></head><body>
-                <h2>FINAL BILL</h2>
-                <pre>${safe}</pre>
-            </body></html>`;
-        printViaIframe(html);
-      }catch(e){ console.error('Admin bill print failed', e); }
-    }
-
-    function downloadFinalBillFile(billText, tableId){
-      try{
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
-        a.download = `FusionMandi_Bill_${tableId}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }catch(e){ console.error('Admin bill download failed', e); }
-    }
-
-    function sendBillToCustomerWhatsApp(tableData, billText){
-      try{
-        if(!tableData || !tableData.phone) return;
-        const waLink = document.createElement('a');
-        waLink.href = `https://wa.me/91${tableData.phone}?text=${encodeURIComponent(billText)}`;
-        waLink.target = '_blank';
-        waLink.rel = 'noopener';
-        document.body.appendChild(waLink);
-        waLink.click();
-        document.body.removeChild(waLink);
-      }catch(e){ console.error('WhatsApp bill send failed', e); }
-    }
-
     function loadSystem() {
-      if(!db){ showGlobalToast('Cannot load data — no database connection.', 'error'); return; }
+      if(!db) return;
 
-      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; }, err => showGlobalToast('customers listener: ' + err.message, 'error'));
+      db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; });
 
       db.ref('.info/connected').on('value', snap => {
         const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
@@ -642,47 +538,64 @@
         else { dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; txt.innerText="Offline"; txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest"; }
       });
 
-      // --- Floor Operations Listener ---
+      // --- Floor Operations Listener & Occupancy Map ---
       db.ref('active_tables').on('value', snap => {
         const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
         const tables = snap.val() || {};
         window.currentTables = tables;
         let needsAttention = false;
         
+        // Render Occupancy Map
+        const occMap = document.getElementById('occupancyMap');
+        if(occMap) {
+            occMap.innerHTML = '';
+            const allTableList = ["1","2","3","4","5","6","7","8","9","10","R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11","L1","L2","L3","L4","L5","L6","L7","BH1","BH2","BH3","C1","C2","C3","C4","C5","C6","C7","C8"];
+            
+            let occupiedSet = new Set();
+            for(let key in tables) { occupiedSet.add(tables[key].table); }
+
+            allTableList.forEach(tName => {
+                const isOcc = occupiedSet.has(tName);
+                occMap.innerHTML += `<div class="px-2 py-1 rounded text-[10px] font-black border ${isOcc ? 'bg-red-100 text-red-600 border-red-300' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}">${tName}</div>`;
+            });
+        }
+
         Object.entries(tables).sort((a,b)=>a[1].timestamp-b[1].timestamp).forEach(([id, table]) => {
           if(table.status === 'pending' || table.status === 'bill_requested') needsAttention = true;
           let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
           if(table.status==='served') border = 'border-emerald-500';
-          let badge = table.status==='pending'?'bg-primary/10 text-primary':(table.status==='bill_requested'?'bg-amber-100 text-amber-600 animate-pulse':'bg-emerald-100 text-emerald-600');
+          let badge = table.status==='pending'?'bg-primary/20 text-primary':(table.status==='bill_requested'?'bg-amber-100 text-amber-600 animate-pulse':'bg-emerald-100 text-emerald-600');
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
 
           let btn = '';
+          const isPrintRole = (currentRole === 'admin' || currentRole === 'kitchen');
+          
           if (currentRole === 'admin') {
             if(table.status === 'pending') { 
-              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT (Kitchen)</button>`; 
+              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT (Kitchen)</button>`; 
             } else if (table.status === 'cooking') {
-              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black transition-colors shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
-                     <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black transition-colors shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
+              btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
+                     <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`; 
             } else if(table.status === 'bill_requested') { 
-              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md border border-amber-500" onclick="clearTable('${id}')">Clear & Bill (${table.paymentMethod || 'CASH'})</button>`; 
+              btn = `<button class="w-full bg-dark text-primary border border-primary/50 py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">Clear & Bill (${table.paymentMethod || 'CASH'})</button>`; 
             } else { 
-              btn = `<button class="w-full bg-slate-900 hover:bg-slate-800 text-white py-4 rounded-xl font-black transition-colors shadow-md" onclick="clearTable('${id}')">Clear Table & Receipt</button>`; 
+              btn = `<button class="w-full bg-dark text-white py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">Clear Table</button>`; 
             }
           } else if (currentRole === 'kitchen') {
              if(table.status === 'pending') {
-               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT</button>`;
+               btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ Print KOT</button>`;
              } else if (table.status === 'cooking') {
-               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
-                      <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`;
+               btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ Re-Print KOT</button>
+                      <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Mark Food Served</button>`;
              } else {
                btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>Awaiting Checkout</button>`;
              }
           } else {
+            // Waiter
             if(table.status === 'pending') {
-              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">Print KOT</button>`;
+              btn = `<button class="w-full bg-light text-slate-500 py-4 rounded-xl font-black shadow-sm" disabled>Sent to Kitchen</button>`;
             } else if(table.status === 'cooking') {
-              btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">Re-Print KOT</button>
-                     <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Confirm Served</button>`;
+              btn = `<button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ Confirm Served</button>`;
             } else if(table.status === 'bill_requested') {
               btn = `<button class="w-full bg-amber-500 text-white py-4 rounded-xl font-black shadow-md" onclick="waiterCashCollect('${id}')">Mark Cash Collected</button>`;
             } else {
@@ -691,12 +604,9 @@
           }
 
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
-
           const itemsStr = extractOrderItemsStr(table);
           let formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
-          formattedItems = formattedItems.split('<br>').map(line => {
-              return line.match(/CANCELLED/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line;
-          }).join('<br>');
+          formattedItems = formattedItems.split('<br>').map(line => line.match(/CANCELLED/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line).join('<br>');
 
           grid.innerHTML += `
             <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
@@ -706,21 +616,21 @@
                     <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
                     <span class="font-black text-2xl text-slate-900 leading-none">${table.table}</span>
                   </div>
-                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg">${table.status.replace('_',' ')}</span>
+                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg border border-current">${table.status.replace('_',' ')}</span>
                 </div>
-                <div class="max-h-40 overflow-y-auto pr-2 mb-2">
-                  <p class="font-semibold text-slate-600 text-sm leading-relaxed">${formattedItems}</p>
+                <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-600 font-semibold leading-relaxed">
+                  ${formattedItems}
                 </div>
               </div>
               <div class="mt-2 pt-4 border-t border-slate-100">
                 <div class="flex justify-between items-end mb-5">
-                  <span class="text-xs font-bold text-slate-400 bg-light px-2 py-1 rounded-md">📞 ${table.phone}${isVip ? ' <span class="text-amber-500" title="VIP guest — 3+ visits">👑 VIP</span>' : ''}</span>
+                  <span class="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}${isVip ? ' <span class="text-primary ml-1">👑 VIP</span>' : ''}</span>
                   <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total}</span>
                 </div>
                 ${currentRole==='admin' ? `
                 <div class="flex gap-2 mb-2">
-                  <button onclick="openEditOrder('${id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-transform">✏️ Edit Order</button>
-                  <button onclick="cancelOrder('${id}')" class="flex-1 bg-red-50 hover:bg-red-100 text-red-500 py-2.5 rounded-xl font-bold text-xs active:scale-95 transition-transform">🗑️ Cancel Order</button>
+                  <button onclick="openEditOrder('${id}')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl font-bold text-xs">✏️ Edit Order</button>
+                  <button onclick="cancelOrder('${id}')" class="flex-1 bg-red-50 text-red-500 py-2.5 rounded-xl font-bold text-xs">🗑️ Cancel Order</button>
                 </div>` : ''}
                 ${btn}
               </div>
@@ -734,13 +644,10 @@
           clearInterval(alarmTimer); alarmTimer = null;
           alertSound.pause(); alertSound.currentTime = 0;
         }
-      }, err => showGlobalToast('active_tables listener: ' + err.message, 'error'));
+      });
 
       // --- Service Requests Listener ---
       if (currentRole === 'admin' || currentRole === 'waiter') {
-          let firstServiceLoad = true;
-          let knownPendingServices = new Set();
-
           db.ref('service_requests').on('value', snap => {
               const reqs = snap.val() || {};
               const grid = document.getElementById('serviceRequestsGrid');
@@ -749,16 +656,10 @@
 
               grid.innerHTML = '';
               let pendingCount = 0;
-              let newIncoming = false;
 
               Object.entries(reqs).sort((a,b)=> b[1].timestamp - a[1].timestamp).forEach(([id, req]) => {
                   if (req.status === 'pending') {
                       pendingCount++;
-                      if (!firstServiceLoad && !knownPendingServices.has(id)) {
-                          newIncoming = true;
-                      }
-                      knownPendingServices.add(id);
-
                       const timeStr = new Date(req.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                       let icon = '🛎️';
                       if(req.request_type === 'Water Refill') icon = '💧';
@@ -767,45 +668,49 @@
                       if(req.request_type === 'Call Waiter') icon = '👤';
 
                       grid.innerHTML += `
-                          <div class="dash-card bg-card p-5 rounded-3xl border-2 border-blue-400 flex flex-col justify-between shadow-lg relative overflow-hidden">
-                              <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-2xl opacity-50">${icon}</div>
+                          <div class="dash-card bg-card p-5 rounded-3xl border-2 border-primary/50 flex flex-col justify-between shadow-lg relative overflow-hidden">
+                              <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-2xl">${icon}</div>
                               <div>
                                   <div class="flex justify-between items-center mb-3">
-                                      <span class="text-xs font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-md">${req.request_type}</span>
+                                      <span class="text-xs font-black text-dark uppercase tracking-widest bg-primary/20 px-2 py-1 rounded-md border border-primary/30">${req.request_type}</span>
                                       <span class="text-[10px] font-bold text-slate-400">${timeStr}</span>
                                   </div>
                                   <h3 class="font-black text-2xl text-slate-900 mb-1">Table ${req.table}</h3>
-                                  ${req.phone ? `<p class="text-xs font-bold text-slate-500 mb-3">📞 ${req.phone}</p>` : ''}
                                   ${req.note ? `<p class="text-sm font-semibold text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 italic">"${req.note}"</p>` : ''}
                               </div>
-                              <button onclick="resolveService('${id}')" class="w-full mt-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white border border-emerald-200 py-3 rounded-xl font-black transition-colors active:scale-95">✅ Mark Resolved</button>
-                          </div>
-                      `;
+                              <button onclick="resolveService('${id}')" class="w-full mt-4 bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md active:scale-95">✅ Mark Resolved</button>
+                          </div>`;
                   }
               });
-
+              
               if (pendingCount === 0) {
-                  grid.innerHTML = `<div class="col-span-full text-center p-10"><p class="text-slate-400 font-bold">No active customer requests at the moment.</p></div>`;
+                  grid.innerHTML = `<div class="col-span-full text-center p-10 text-slate-400 font-bold">No active requests.</div>`;
                   badge.classList.add('hidden');
               } else {
                   badge.innerText = pendingCount;
                   badge.classList.remove('hidden');
               }
-
-              if (newIncoming) {
-                  serviceSound.play().catch(()=>{});
-                  showGlobalToast(`New Service Request from Table! Check the Requests tab.`, 'info');
-              }
-
-              firstServiceLoad = false;
-          }, err => showGlobalToast('service_requests listener: ' + err.message, 'error'));
+          });
       }
 
       if(currentRole === 'admin') {
         db.ref('menu').on('value', snap => {
           menuCache = snap.val() || {};
           renderInventory();
-        }, err => showGlobalToast('menu listener: ' + err.message, 'error'));
+          renderPosMenu(); // Also update POS
+          
+          // Low Stock Alert
+          let lowItems = [];
+          for (let k in menuCache) {
+             if (menuCache[k].stock_count <= 5 && !alertedLowStock.has(k)) {
+                 lowItems.push(menuCache[k].name);
+                 alertedLowStock.add(k); // alert once per session unless reloaded
+             }
+          }
+          if (lowItems.length > 0) {
+             showGlobalToast(`Stock Alert: ${lowItems.join(', ')} running low!`, 'error');
+          }
+        });
 
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
@@ -817,18 +722,18 @@
             renderPaymentSplitChart(data.cash || 0, data.upi || 0, data.card || 0);
             revenueDataByDate[dStr] = data.total || 0;
             renderRevenueTrendChart();
-        }, err => showGlobalToast('tallies listener: ' + err.message, 'error'));
+        });
         
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
           const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
           const logs = Object.values(snap.val()||{});
           logs.forEach(log => {
-            tb.innerHTML += `<tr class="hover:bg-light/50"><td class="p-4 font-medium text-slate-500">${log.time}</td><td class="p-4 font-black">T-${log.table}</td><td class="p-4 font-bold text-slate-600 text-xs">${log.method}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total}</td></tr>`;
+            tb.innerHTML += `<tr class="border-b border-slate-100"><td class="p-4 text-xs text-slate-500">${log.time}</td><td class="p-4 font-black">T-${log.table}</td><td class="p-4 font-bold text-slate-600 text-[10px] uppercase">${log.method}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total}</td></tr>`;
           });
           renderTopItemsChart(logs);
-        }, err => showGlobalToast('daily_logs listener: ' + err.message, 'error'));
+        });
 
-        db.ref('feedback').limitToLast(100).on('value', snap => {
+        db.ref('feedback').on('value', snap => {
           const list = document.getElementById('feedbackListAdmin');
           const summary = document.getElementById('feedbackSummary');
           if(!list) return;
@@ -836,69 +741,169 @@
           const entries = Object.entries(snap.val()||{}).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
 
           if(summary){
-            const counts = { Excellent: 0, Good: 0, Average: 0, Bad: 0 };
-            entries.forEach(([id, f]) => { if(counts[f.rating] !== undefined) counts[f.rating]++; else if(f.rating) counts[f.rating] = 1; });
+            const counts = { Excellent: 0, Good: 0, Bad: 0 };
+            entries.forEach(([id, f]) => { if(counts[f.rating] !== undefined) counts[f.rating]++; });
             summary.innerHTML = entries.length === 0 ? '<p class="text-slate-400 font-bold text-sm">No feedback yet.</p>' :
-              Object.entries(counts).filter(([k,v])=>v>0 || ['Excellent','Good','Average','Bad'].includes(k)).map(([rating, count]) => {
-                const color = rating==='Excellent'?'text-emerald-600':(rating==='Bad'?'text-red-500':(rating==='Good'?'text-blue-600':'text-slate-500'));
+              Object.entries(counts).map(([rating, count]) => {
+                const color = rating==='Excellent'?'text-emerald-600':(rating==='Bad'?'text-red-500':'text-blue-600');
                 return `<div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">${rating}</p><p class="text-2xl font-black ${color}">${count}</p></div>`;
               }).join('') + `<div><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total</p><p class="text-2xl font-black text-slate-900">${entries.length}</p></div>`;
           }
 
           if(entries.length===0){ list.innerHTML = '<p class="text-slate-400 font-bold text-sm">No feedback yet.</p>'; return; }
           entries.forEach(([id, f]) => {
-            const isVip = f.phone && customersCache[f.phone] && customersCache[f.phone].visits >= 3;
             const ratingColor = f.rating==='Excellent'?'text-emerald-600':(f.rating==='Bad'?'text-red-500':(f.rating==='Good'?'text-blue-600':'text-slate-500'));
-            list.innerHTML += `<div class="dash-card bg-card p-4 rounded-2xl">
-                <div class="flex items-center justify-between mb-1">
-                  <p class="font-black text-sm text-slate-900">Table ${f.table} ${isVip?'<span class="text-amber-500">👑 VIP</span>':''}</p>
-                  <div class="flex items-center gap-3">
-                    <span class="font-black text-xs ${ratingColor}">${f.rating||''}</span>
-                    <button onclick="deleteFeedback('${id}')" title="Delete this feedback" class="w-6 h-6 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400 rounded-full text-xs font-black active:scale-90 transition-transform">✕</button>
-                  </div>
-                </div>
-                ${f.note ? `<p class="text-sm text-slate-600 font-medium mt-1">"${f.note}"</p>` : ''}
-                <p class="text-[10px] text-slate-400 font-bold mt-2">${f.timestamp ? new Date(f.timestamp).toLocaleString() : ''} ${f.phone ? '· 📞 '+f.phone : ''}</p>
+            list.innerHTML += `<div class="dash-card bg-card p-4 rounded-2xl border-l-4 border-slate-200">
+                <p class="font-black text-sm text-slate-900">Table ${f.table} <span class="text-xs ${ratingColor} ml-2">${f.rating||''}</span></p>
+                ${f.note ? `<p class="text-sm text-slate-600 italic mt-1">"${f.note}"</p>` : ''}
               </div>`;
           });
-        }, err => showGlobalToast('feedback listener: ' + err.message, 'error'));
+        });
 
         initAnalytics(dStr);
       }
     }
 
-    window.resolveService = function(id) {
-        db.ref('service_requests/'+id).update({status: 'resolved'})
-          .catch(err => alert('Failed to resolve request. Check connection.'));
-    }
+    // Admin Pos Logic
+    window.renderPosMenu = function() {
+        const grid = document.getElementById('posMenuGrid');
+        if(!grid) return;
+        const q = (document.getElementById('posSearch')?.value || '').toLowerCase();
+        grid.innerHTML = '';
+        
+        Object.entries(menuCache).forEach(([id, item]) => {
+            if(q && !item.name.toLowerCase().includes(q) && !item.category.toLowerCase().includes(q)) return;
+            
+            let varSelect = '';
+            if (item.portions && Object.keys(item.portions).length > 0) {
+              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-50 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">Base - ₹${item.base_price}</option>`;
+              Object.entries(item.portions).forEach(([pName, pPrice]) => { varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`; });
+              varSelect += `</select>`;
+            } else { varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`; }
 
-    window.deleteFeedback = function(id){
-      if(!confirm('Delete this feedback entry? This cannot be undone.')) return;
-      db.ref('feedback/'+id).remove().catch(err => alert('Could not delete feedback — check your connection and try again.'));
+            grid.innerHTML += `
+              <div class="border rounded-xl p-3 bg-white flex flex-col justify-between shadow-sm">
+                <h4 class="font-bold text-xs text-slate-800 leading-tight mb-1">${item.name}</h4>
+                ${varSelect}
+                <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 text-primary py-1.5 rounded-lg text-xs font-black">+ ADD</button>
+              </div>
+            `;
+        });
+        updatePosCartUI();
     };
 
-    function initAnalytics(todayStr){
-      if(window.analyticsInit) return;
-      window.analyticsInit = true;
+    window.addToPosCart = function(id) {
+        let price = Number(menuCache[id].base_price), variant = "Regular"; 
+        const sel = document.getElementById(`posVar-${id}`);
+        if (sel && sel.value) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]); }
+        
+        const key = `${id}|${variant}`;
+        if(posCart[key]) posCart[key].qty++;
+        else posCart[key] = { id, name: menuCache[id].name, variant, price, qty: 1 };
+        
+        updatePosCartUI();
+    };
 
+    window.changePosCartQty = function(key, change) {
+        if(posCart[key]) {
+            posCart[key].qty += change;
+            if(posCart[key].qty <= 0) delete posCart[key];
+            updatePosCartUI();
+        }
+    };
+
+    window.updatePosCartUI = function() {
+        const list = document.getElementById('posCartList');
+        if(!list) return;
+        list.innerHTML = '';
+        let total = 0;
+        
+        Object.entries(posCart).forEach(([key, item]) => {
+            total += item.price * item.qty;
+            list.innerHTML += `
+                <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                    <div class="flex-1 pr-2 leading-tight">
+                        <span class="font-bold text-xs">${item.name}</span>
+                        <span class="text-[9px] text-slate-400 block">${item.variant}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changePosCartQty('${key}', -1)" class="w-6 h-6 bg-slate-100 rounded text-xs font-black">-</button>
+                        <span class="text-xs font-black">${item.qty}</span>
+                        <button onclick="changePosCartQty('${key}', 1)" class="w-6 h-6 bg-slate-900 text-primary rounded text-xs font-black">+</button>
+                    </div>
+                </div>
+            `;
+        });
+        document.getElementById('posTotal').innerText = `₹${total}`;
+    };
+
+    window.submitPosOrder = function() {
+        if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
+        const tNum = document.getElementById('posTableNum').value;
+        if(!tNum) return alert("Please select a table or takeaway slot.");
+        
+        const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
+        const tableId = `table_${tNum}`;
+        const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+        
+        const newLineItems = {};
+        Object.values(posCart).forEach((item, idx) => {
+            newLineItems[`${batchId}_${idx}`] = {
+                itemId: item.id, name: item.name, variant: item.variant,
+                price: item.price, qty: item.qty, cancelled: false, addedAt: Date.now()
+            };
+        });
+
+        db.ref(`active_tables/${tableId}`).transaction(existing => {
+            if (!existing) existing = { table: tNum, phone: phone, status: 'pending', line_items: {} };
+            const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
+            
+            // Helper function internally
+            const buildStr = (liObj) => Object.values(liObj).map(i => `${i.qty}x ${i.name} ${i.variant!=='Regular'?'('+i.variant+')':''}`).join(' | ');
+            const getTot = (liObj) => Object.values(liObj).reduce((s,i)=>s+(i.cancelled?0:i.price*i.qty), 0);
+
+            return {
+                orderId: existing.orderId || tableId, table: tNum, phone: phone,
+                line_items: mergedLineItems, items: buildStr(mergedLineItems),
+                total: getTot(mergedLineItems), status: 'pending',
+                timestamp: Date.now(), paymentMethod: existing.paymentMethod || ''
+            };
+        }, (error, committed) => {
+            if(error) return alert("Failed to send order.");
+            if(committed) {
+                posCart = {}; updatePosCartUI();
+                document.getElementById('posTableNum').value = "";
+                document.getElementById('posPhone').value = "";
+                showGlobalToast("Direct Order sent successfully to Kitchen!", "info");
+                switchTab('orders');
+            }
+        });
+    };
+
+    window.resolveService = function(id) {
+        db.ref('service_requests/'+id).update({status: 'resolved'});
+    }
+
+    window.clearAllFeedback = function() {
+        if(confirm("Are you sure you want to permanently delete all feedback?")) {
+            db.ref('feedback').remove();
+        }
+    }
+
+    function initAnalytics(todayStr){
+      if(window.analyticsInit) return; window.analyticsInit = true;
       for(let i = 6; i >= 0; i--){
-        const d = new Date();
-        d.setDate(d.getDate() - i);
+        const d = new Date(); d.setDate(d.getDate() - i);
         const dateStr = d.toISOString().split('T')[0];
         if(!(dateStr in revenueDataByDate)) revenueDataByDate[dateStr] = 0;
         if(dateStr !== todayStr){
-          db.ref(`tallies/daily/${dateStr}`).on('value', s => {
-            revenueDataByDate[dateStr] = (s.val() || {}).total || 0;
-            renderRevenueTrendChart();
-          });
+          db.ref(`tallies/daily/${dateStr}`).on('value', s => { revenueDataByDate[dateStr] = (s.val() || {}).total || 0; renderRevenueTrendChart(); });
         }
       }
       renderRevenueTrendChart();
     }
 
-    function chartColors(){
-      return { primary: '#ff7529', emerald: '#10b981', blue: '#3b82f6', purple: '#a855f7', slate: '#64748b' };
-    }
+    function chartColors(){ return { primary: '#D4AF37', emerald: '#10b981', blue: '#3b82f6', purple: '#a855f7' }; }
 
     function renderRevenueTrendChart(){
       const canvas = document.getElementById('revenueTrendChart');
@@ -910,19 +915,12 @@
       const c = chartColors();
 
       if(revenueChart){
-        revenueChart.data.labels = labels;
-        revenueChart.data.datasets[0].data = values;
-        revenueChart.update();
-        return;
+        revenueChart.data.labels = labels; revenueChart.data.datasets[0].data = values; revenueChart.update(); return;
       }
       revenueChart = new Chart(canvas.getContext('2d'), {
         type: 'line',
-        data: { labels, datasets: [{ label: 'Revenue (₹)', data: values, borderColor: c.primary, backgroundColor: 'rgba(255,117,41,0.12)', fill: true, tension: 0.35, pointRadius: 4, pointBackgroundColor: c.primary }] },
-        options: {
-          responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true, ticks: { callback: v => '₹' + v } } }
-        }
+        data: { labels, datasets: [{ label: 'Revenue (₹)', data: values, borderColor: c.primary, backgroundColor: 'rgba(212,175,55,0.2)', fill: true, tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
     }
 
@@ -932,15 +930,11 @@
       const c = chartColors();
       const data = [cash, upi, card];
 
-      if(paymentChart){
-        paymentChart.data.datasets[0].data = data;
-        paymentChart.update();
-        return;
-      }
+      if(paymentChart){ paymentChart.data.datasets[0].data = data; paymentChart.update(); return; }
       paymentChart = new Chart(canvas.getContext('2d'), {
         type: 'doughnut',
-        data: { labels: ['Cash', 'UPI / Online', 'Card'], datasets: [{ data, backgroundColor: [c.emerald, c.blue, c.purple], borderWidth: 0 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 11, weight: 'bold' } } } }, cutout: '65%' }
+        data: { labels: ['Cash', 'Online', 'Card'], datasets: [{ data, backgroundColor: [c.emerald, c.blue, c.purple], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
       });
     }
 
@@ -952,8 +946,6 @@
         let qty = 1, name = clean;
         let m = clean.match(/^(\d+)\s*[xX]\s*(.+)$/);
         if(m){ qty = parseInt(m[1]) || 1; name = m[2].trim(); }
-        else if((m = clean.match(/^(.+?)\s*[xX]\s*(\d+)$/))){ name = m[1].trim(); qty = parseInt(m[2]) || 1; }
-        else if((m = clean.match(/^(.+?)\s*-\s*qty\s*(\d+)$/i))){ name = m[1].trim(); qty = parseInt(m[2]) || 1; }
         return { name: name || entry, qty };
       });
     }
@@ -962,30 +954,16 @@
       const canvas = document.getElementById('topItemsChart');
       if(!canvas || typeof Chart === 'undefined') return;
       const counts = {};
-      logs.forEach(log => {
-        parseOrderItems(log.items).forEach(({ name, qty }) => {
-          counts[name] = (counts[name] || 0) + qty;
-        });
-      });
+      logs.forEach(log => { parseOrderItems(log.items).forEach(({ name, qty }) => { counts[name] = (counts[name] || 0) + qty; }); });
       const top5 = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
       const labels = top5.map(([name]) => name);
       const values = top5.map(([,qty]) => qty);
-      const c = chartColors();
-
-      if(topItemsChart){
-        topItemsChart.data.labels = labels;
-        topItemsChart.data.datasets[0].data = values;
-        topItemsChart.update();
-        return;
-      }
+      
+      if(topItemsChart){ topItemsChart.data.labels = labels; topItemsChart.data.datasets[0].data = values; topItemsChart.update(); return; }
       topItemsChart = new Chart(canvas.getContext('2d'), {
         type: 'bar',
-        data: { labels, datasets: [{ label: 'Units Sold', data: values, backgroundColor: c.primary, borderRadius: 6 }] },
-        options: {
-          indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
-        }
+        data: { labels, datasets: [{ label: 'Units', data: values, backgroundColor: '#D4AF37', borderRadius: 4 }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
     }
 
@@ -993,87 +971,27 @@
     window.toggleSpec = function(id, st) { db.ref('menu/'+id).update({is_special: !st}); };
     window.updStock = function(id) { db.ref('menu/'+id).update({stock_count: parseInt(document.getElementById(`stock-${id}`).value)||0}); };
 
-    let portionRowSeq = 0;
     function addPortionRow(containerId, label, price){
       const container = document.getElementById(containerId);
       if(!container) return;
-      const rowId = 'prow_' + (portionRowSeq++);
       const row = document.createElement('div');
-      row.className = 'flex items-center gap-2';
-      row.setAttribute('data-portion-row', rowId);
+      row.className = 'flex items-center gap-2 portion-row';
       row.innerHTML = `
-        <input type="text" placeholder="Portion name (e.g. Half)" value="${(label||'').replace(/"/g,'&quot;')}" data-portion-label class="flex-1 p-2.5 bg-light border-none rounded-lg font-bold text-xs outline-none">
-        <span class="text-slate-400 font-black text-xs">₹</span>
-        <input type="number" min="0" placeholder="Price" value="${price===undefined||price===null||price===''?'':price}" data-portion-price class="w-24 p-2.5 bg-light border-none rounded-lg font-black text-xs outline-none">
-        <button type="button" onclick="removePortionRow('${containerId}','${rowId}')" class="w-8 h-8 flex-shrink-0 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-400 rounded-lg text-xs font-black active:scale-90 transition-transform">✕</button>`;
+        <input type="text" placeholder="Portion Name" value="${label||''}" class="portion-label flex-1 p-2 bg-light rounded text-xs font-bold border outline-none">
+        <input type="number" placeholder="Price" value="${price||''}" class="portion-price w-20 p-2 bg-light rounded text-xs font-bold border outline-none">
+        <button type="button" onclick="this.parentElement.remove()" class="text-red-500 font-bold px-2">X</button>`;
       container.appendChild(row);
     }
-    window.removePortionRow = function(containerId, rowId){
-      const container = document.getElementById(containerId);
-      if(!container) return;
-      const row = container.querySelector(`[data-portion-row="${rowId}"]`);
-      if(row) row.remove();
-    };
-    window.quickAddPortion = function(containerId, presetLabel){
-      const container = document.getElementById(containerId);
-      if(!container) return;
-      if(presetLabel){
-        const existingRow = Array.from(container.querySelectorAll('[data-portion-row]')).find(r => {
-          const labelInput = r.querySelector('[data-portion-label]');
-          return labelInput && labelInput.value.trim().toLowerCase() === presetLabel.trim().toLowerCase();
-        });
-        if(existingRow){ existingRow.querySelector('[data-portion-price]').focus(); return; }
-      }
-      addPortionRow(containerId, presetLabel, '');
-      const rows = container.querySelectorAll('[data-portion-row]');
-      const last = rows[rows.length-1];
-      if(last){ const input = presetLabel ? last.querySelector('[data-portion-price]') : last.querySelector('[data-portion-label]'); if(input) input.focus(); }
-    };
-    function renderPortionRows(containerId, portionsObj){
-      const container = document.getElementById(containerId);
-      if(!container) return;
-      container.innerHTML = '';
-      Object.entries(portionsObj||{}).forEach(([label, price]) => addPortionRow(containerId, label, price));
-    }
-    function collectPortions(containerId){
-      const container = document.getElementById(containerId);
-      if(!container) return { ok: true, portions: {} };
+    window.quickAddPortion = function(cid, lbl) { addPortionRow(cid, lbl, ''); }
+    function collectPortions(cid){
       const portions = {};
-      const seenLabels = new Set();
-      const rows = Array.from(container.querySelectorAll('[data-portion-row]'));
-      for(const row of rows){
-        const labelInput = row.querySelector('[data-portion-label]');
-        const priceInput = row.querySelector('[data-portion-price]');
-        const label = (labelInput?.value || '').trim();
-        const priceRaw = priceInput?.value;
-        if(!label && (priceRaw === '' || priceRaw === undefined)) continue;
-        if(!label){ return { ok: false, error: 'Every portion row needs a name (e.g. Single, Half, Full).' }; }
-        const price = parseFloat(priceRaw);
-        if(priceRaw === '' || priceRaw === undefined || isNaN(price) || price < 0){
-          return { ok: false, error: `Enter a valid price (0 or more) for portion "${label}".` };
-        }
-        const key = label.toLowerCase();
-        if(seenLabels.has(key)){ return { ok: false, error: `Duplicate portion name "${label}" — each portion must be unique.` }; }
-        seenLabels.add(key);
-        portions[label] = Math.round(price * 100) / 100;
-      }
+      document.querySelectorAll(`#${cid} .portion-row`).forEach(row => {
+          const l = row.querySelector('.portion-label').value.trim();
+          const p = parseFloat(row.querySelector('.portion-price').value);
+          if(l && !isNaN(p)) portions[l] = p;
+      });
       return { ok: true, portions };
     }
-
-    window.syncCatalogImages = function(){
-      if(!db){ return alert('Not connected to the database.'); }
-      const updates = {};
-      let matchCount = 0;
-      Object.entries(menuCache).forEach(([id, item]) => {
-        const match = findCatalogImage(item.name);
-        if(match && match !== item.image_url){ updates[`menu/${id}/image_url`] = match; matchCount++; }
-      });
-      if(matchCount === 0){ return alert('No menu items matched the image catalog names — nothing to update.'); }
-      if(!confirm(`This will update images for ${matchCount} matching menu item(s) from the built-in catalog. Continue?`)) return;
-      db.ref().update(updates)
-        .then(() => alert(`✅ Updated images for ${matchCount} item(s).`))
-        .catch(err => alert('Could not sync images — check your connection and try again.'));
-    };
 
     window.openEditOrder = function(id){
       const table = (window.currentTables || {})[id];
@@ -1084,263 +1002,122 @@
       document.getElementById('editOrderTotal').value = table.total;
       document.getElementById('editOrderModal').classList.remove('hidden');
     };
-    window.closeEditOrder = function(){
-      document.getElementById('editOrderModal').classList.add('hidden');
-      editOrderId = null;
-    };
+    window.closeEditOrder = function(){ document.getElementById('editOrderModal').classList.add('hidden'); };
+    
     window.saveEditOrder = function(){
-      if(!editOrderId) return;
-      const table = (window.currentTables || {})[editOrderId];
-      if(!table) return;
-
-      const oldLines = extractOrderItemsStr(table).split(' | ').map(l=>l.trim()).filter(l=>l.length>0);
-      let rawLines = document.getElementById('editOrderItems').value.split('\n').map(l=>l.trim()).filter(l=>l.length>0);
-      const newTotal = Math.round(parseFloat(document.getElementById('editOrderTotal').value)*100)/100;
-
-      if(rawLines.length===0){ return alert('Order must have at least one item.'); }
-      if(isNaN(newTotal) || newTotal < 0){ return alert('Enter a valid total (0 or more).'); }
-
-      // Auto-detect removed items and mark them cancelled for the kitchen
-      const newLinesClean = rawLines.map(l => l.replace(/\[?CANCELLED\]?/gi, '').trim());
-      oldLines.forEach(oldItem => {
-         const cleanOld = oldItem.replace(/\[?CANCELLED\]?/gi, '').trim();
-         if (!newLinesClean.includes(cleanOld) && !oldItem.match(/CANCELLED/i)) {
-             rawLines.push(cleanOld + " [CANCELLED]");
-         }
-      });
-
-      db.ref('active_tables/'+editOrderId).update({ items: rawLines.join(' | '), total: newTotal })
-        .then(()=>{ closeEditOrder(); })
-        .catch(err=>{ console.error(err); alert('Could not save changes — check your connection and try again.'); });
+      const rawLines = document.getElementById('editOrderItems').value.split('\n').map(l=>l.trim()).filter(Boolean);
+      const newTotal = parseFloat(document.getElementById('editOrderTotal').value);
+      db.ref('active_tables/'+editOrderId).update({ items: rawLines.join(' | '), total: newTotal }).then(()=>closeEditOrder());
     };
 
     window.renderInventory = function(){
       const list = document.getElementById('inventoryList');
       if(!list) return;
-      const q = (document.getElementById('menuSearchInput')?.value || '').trim().toLowerCase();
-      const entries = Object.entries(menuCache).filter(([id, item]) => {
-        if(!q) return true;
-        return (item.name||'').toLowerCase().includes(q) || (item.category||'').toLowerCase().includes(q);
-      });
-      const countLabel = document.getElementById('menuCountLabel');
-      if(countLabel) countLabel.innerText = `${entries.length} of ${Object.keys(menuCache).length} items`;
-
-      list.innerHTML = '';
-      if(entries.length === 0){ list.innerHTML = '<p class="text-slate-400 font-bold text-sm p-4">No items match your search.</p>'; return; }
-
-      entries.forEach(([id, item]) => {
-        const stock = item.stock_count || 0;
-        const lowStock = stock <= 5;
-        const portionEntries = Object.entries(item.portions || {});
-        const portionBadges = portionEntries.map(([label, price]) =>
-          `<span class="inline-block bg-light text-slate-600 text-[9px] font-black px-2 py-1 rounded-md mr-1 mt-1">${label} · ₹${price}</span>`
-        ).join('');
-        list.innerHTML += `
-          <div class="dash-card bg-card p-4 rounded-2xl flex items-center justify-between gap-4 flex-wrap">
+      const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
+      const entries = Object.entries(menuCache).filter(([id, item]) => !q || item.name.toLowerCase().includes(q));
+      document.getElementById('menuCountLabel').innerText = `${entries.length} items`;
+      list.innerHTML = entries.map(([id, item]) => `
+          <div class="dash-card bg-card p-4 rounded-xl flex items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-              <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1544025162-8111142154ea?w=200&q=80'">
+              <img src="${item.image_url}" class="w-12 h-12 rounded object-cover shadow-sm">
               <div>
-                <h4 class="font-black text-sm text-slate-900">${item.name}</h4>
-                <p class="text-[10px] font-black text-slate-400 uppercase">${item.category} · Base ₹${item.base_price||0}</p>
-                <div>${portionBadges}</div>
-                ${lowStock ? '<span class="text-[9px] font-black text-red-500 uppercase tracking-widest">⚠️ Low Stock</span>' : ''}
+                <h4 class="font-black text-sm">${item.name}</h4>
+                <p class="text-[10px] text-slate-400">Base: ₹${item.base_price}</p>
               </div>
             </div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <button onclick="toggleSpec('${id}', ${item.is_special||false})" class="px-3 py-2 rounded-lg text-xs font-bold ${item.is_special?'bg-amber-100 text-amber-700':'bg-light text-slate-500'}">⭐ Special</button>
-              <div class="flex items-center bg-light rounded-lg overflow-hidden p-1">
-                <span class="px-2 text-[10px] font-black text-slate-400">Qty</span>
-                <input type="number" id="stock-${id}" value="${stock}" class="w-12 p-1 font-black text-center outline-none bg-transparent">
-              </div>
-              <button onclick="updStock('${id}')" class="bg-primary text-white px-4 py-2.5 rounded-lg font-black text-xs">Save</button>
-              <button onclick="openEditItem('${id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-lg font-black text-xs">✏️ Edit</button>
+            <div class="flex items-center gap-2">
+              <input type="number" id="stock-${id}" value="${item.stock_count||0}" class="w-16 p-2 border rounded font-bold text-center text-xs">
+              <button onclick="updStock('${id}')" class="bg-primary text-dark px-3 py-2 rounded font-black text-xs">Save</button>
+              <button onclick="openEditItem('${id}')" class="bg-slate-100 text-slate-600 px-3 py-2 rounded font-black text-xs">Edit</button>
             </div>
-          </div>`;
-      });
+          </div>
+      `).join('');
     };
 
     window.openEditItem = function(id){
-      const item = menuCache[id];
-      if(!item) return;
-      editItemId = id;
-      document.getElementById('editItemName').value = item.name || '';
-      document.getElementById('editItemCat').value = item.category || 'Chicken Mandi';
-      document.getElementById('editItemPrice').value = item.base_price || 0;
-      document.getElementById('editItemImg').value = item.image_url || '';
-      document.getElementById('editItemStock').value = item.stock_count || 0;
+      const item = menuCache[id]; editItemId = id;
+      document.getElementById('editItemName').value = item.name;
+      document.getElementById('editItemCat').value = item.category;
+      document.getElementById('editItemPrice').value = item.base_price;
+      document.getElementById('editItemImg').value = item.image_url;
+      document.getElementById('editItemStock').value = item.stock_count;
       document.getElementById('editItemSpecial').checked = !!item.is_special;
-      renderPortionRows('editItemPortions', item.portions || {});
+      const pC = document.getElementById('editItemPortions'); pC.innerHTML='';
+      Object.entries(item.portions||{}).forEach(([l,p]) => addPortionRow('editItemPortions', l, p));
       document.getElementById('editItemModal').classList.remove('hidden');
     };
-    window.closeEditItem = function(){
-      document.getElementById('editItemModal').classList.add('hidden');
-      editItemId = null;
-    };
+    window.closeEditItem = function(){ document.getElementById('editItemModal').classList.add('hidden'); };
+    
     window.saveEditItem = function(){
-      if(!editItemId) return;
-      const name = document.getElementById('editItemName').value.trim();
-      const price = parseFloat(document.getElementById('editItemPrice').value);
-      if(!name){ return alert('Dish name cannot be empty.'); }
-      if(isNaN(price) || price < 0){ return alert('Enter a valid price (0 or more).'); }
-      const portionResult = collectPortions('editItemPortions');
-      if(!portionResult.ok){ return alert(portionResult.error); }
       const updated = {
-        name: name,
+        name: document.getElementById('editItemName').value.trim(),
         category: document.getElementById('editItemCat').value,
-        base_price: price,
-        image_url: document.getElementById('editItemImg').value.trim() || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80",
-        stock_count: parseInt(document.getElementById('editItemStock').value) || 0,
+        base_price: parseFloat(document.getElementById('editItemPrice').value),
+        image_url: document.getElementById('editItemImg').value.trim(),
+        stock_count: parseInt(document.getElementById('editItemStock').value),
         is_special: document.getElementById('editItemSpecial').checked,
-        portions: portionResult.portions
+        portions: collectPortions('editItemPortions').portions
       };
-      db.ref('menu/'+editItemId).update(updated)
-        .then(()=> closeEditItem())
-        .catch(err => alert('Could not save item — check your connection and try again.'));
+      db.ref('menu/'+editItemId).update(updated).then(()=>closeEditItem());
     };
-    window.deleteMenuItem = function(){
-      if(!editItemId) return;
-      const item = menuCache[editItemId] || {};
-      if(!confirm(`Delete "${item.name||'this item'}" from the menu permanently?`)) return;
-      db.ref('menu/'+editItemId).remove()
-        .then(()=> closeEditItem())
-        .catch(err => alert('Could not delete item — check your connection and try again.'));
-    };
-
-    window.cancelOrder = function(id){
-      if(currentRole !== 'admin') return;
-      const table = (window.currentTables || {})[id];
-      if(!table){ return alert('Could not find this order — it may have already been cleared. Please refresh.'); }
-      if(!confirm(`Cancel the entire order for Table ${table.table}? This removes it from the floor without recording any revenue.`)) return;
-      const d = new Date().toISOString().split('T')[0];
-      db.ref(`cancelled_logs/${d}`).push({
-        time: new Date().toLocaleTimeString(),
-        table: table.table || '',
-        phone: table.phone || '',
-        items: extractOrderItemsStr(table),
-        total: table.total || 0,
-        cancelledBy: currentRole
-      }).catch(()=>{});
-      db.ref('active_tables/'+id).remove()
-        .catch(err => alert('Could not cancel order — check your connection and try again.'));
-    };
+    window.deleteMenuItem = function() { if(confirm('Delete item?')) db.ref('menu/'+editItemId).remove().then(()=>closeEditItem()); };
 
     window.addNewDish = function() {
       const name = document.getElementById('newDishName').value.trim();
-      const cat = document.getElementById('newDishCat').value;
-      const price = parseInt(document.getElementById('newDishPrice').value);
-      const img = document.getElementById('newDishImg').value.trim();
-
-      if (!name || isNaN(price) || price <= 0) {
-        return alert("Please enter a valid Dish Name and Base Price.");
-      }
-
-      const portionResult = collectPortions('newDishPortions');
-      if(!portionResult.ok){ return alert(portionResult.error); }
-
+      const price = parseFloat(document.getElementById('newDishPrice').value);
+      if(!name || isNaN(price)) return alert("Valid name and price required.");
       const newItemId = 'item_' + Date.now();
-      const resolvedImg = img || findCatalogImage(name) || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
-
-      const newItemData = {
-        name: name,
-        category: cat,
-        base_price: price,
-        stock_count: 60, 
-        is_special: false,
-        image_url: resolvedImg,
-        portions: portionResult.portions
-      };
-
-      db.ref('menu/' + newItemId).set(newItemData).then(() => {
-        alert(`✅ ${name} has been added to the menu!`);
-        document.getElementById('newDishName').value = '';
-        document.getElementById('newDishPrice').value = '';
-        document.getElementById('newDishImg').value = '';
-        document.getElementById('newDishPortions').innerHTML = '';
-      }).catch(err => {
-        alert("Error adding dish: " + err.message);
-      });
+      db.ref('menu/' + newItemId).set({
+        name, base_price: price, category: document.getElementById('newDishCat').value,
+        image_url: document.getElementById('newDishImg').value || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80",
+        stock_count: 50, portions: collectPortions('newDishPortions').portions
+      }).then(() => alert('Dish Added!'));
     };
 
-    window.markAllServed = function() {
-        db.ref('active_tables').once('value', snap => {
-            const tables = snap.val() || {};
-            Object.keys(tables).forEach(id => {
-                if(tables[id].status === 'cooking') {
-                    db.ref('active_tables/'+id).update({status: 'served'});
-                }
-            });
-        });
-    }
+    // Zero-Bill Cancellation
+    window.cancelOrder = function(id){
+      if(currentRole !== 'admin') return;
+      if(!confirm(`Cancel this order? The customer will be notified of a zero bill.`)) return;
+      
+      // We set status to cancelled so customer app sees it, alerts, and self-clears.
+      db.ref('active_tables/'+id).update({ status: 'cancelled', total: 0 });
+      
+      // Give the customer app 4 seconds to detect the change, then remove from DB
+      setTimeout(() => {
+          db.ref('active_tables/'+id).remove();
+      }, 4000);
+    };
 
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
-      if(!tableData){ return alert('Could not find this order — it may have already been cleared. Please refresh the page and try again.'); }
-
-      const pinInput = prompt("Enter Admin PIN to clear this table:");
-      if(pinInput === null) return;
-      const pin = pinInput.trim();
-      if(pin !== "admin123" && pin !== "1234") return alert("Access Denied: Invalid PIN.");
+      if(!tableData) return;
+      const pin = prompt("Enter Admin PIN to clear table:");
+      if(pin !== "admin123" && pin !== "1234") return alert("Invalid PIN.");
 
       const d = new Date().toISOString().split('T')[0];
       const pMethod = tableData.paymentMethod || "CASH";
-      let key = pMethod.toLowerCase();
-      if(!['cash', 'upi', 'card'].includes(key)) key = 'cash';
+      let key = pMethod.toLowerCase(); if(!['cash', 'upi', 'card'].includes(key)) key = 'cash';
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
           let curr = data || { total: 0, cash: 0, upi: 0, card: 0 };
-          curr.total += Number(tableData.total);
-          curr[key] += Number(tableData.total);
-          return curr;
+          curr.total += Number(tableData.total); curr[key] += Number(tableData.total); return curr;
       });
 
-      const itemsStr = extractOrderItemsStr(tableData);
-      db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, phone: tableData.phone, items: itemsStr, total: tableData.total, method: pMethod.toUpperCase() });
-      
-      const sheetPayload = { orderId: tableData.orderId, tableNo: tableData.table, phone: tableData.phone, totalAmount: tableData.total, paymentMethod: pMethod.toUpperCase(), itemsDetails: itemsStr };
-      fetch(WEBHOOK_URL, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(sheetPayload) }).catch(e=>console.log(e));
-
-      const billText = buildFinalBillText(tableData);
-      printFinalBillReceipt(billText);
-      downloadFinalBillFile(billText, id);
-      sendBillToCustomerWhatsApp(tableData, billText);
-      
-      db.ref('active_tables/'+id).remove()
-        .catch(err => alert('The bill was recorded, but the table could not be removed from the live floor — please refresh. (' + err.message + ')'));
+      db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, items: extractOrderItemsStr(tableData), total: tableData.total, method: pMethod.toUpperCase() });
+      db.ref('active_tables/'+id).remove();
     }
 
-    window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH'}); alert("Admin notified of cash collection."); };
+    window.waiterCashCollect = function(id) { db.ref('active_tables/'+id).update({status: 'bill_ready', paymentMethod: 'CASH'}); };
     
-    const factoryMenuData = {
-      'item_chicken_fry_mandi': { name: "chicken Fry Mandi", category: "Chicken Mandi", base_price: 270, stock_count: 60, is_special: false, image_url: menuImages["chicken Fry Mandi"], portions: { "Half (2 Pcs)": 499, "Triple (3 Pcs)": 729, "4 Person": 920, "Full Mandi Gang": 1111 } },
-      'item_chicken_bbq': { name: "Chickken BBQ", category: "Chicken Mandi", base_price: 310, stock_count: 60, is_special: false, image_url: menuImages["Chickken BBQ"], portions: { "Half (2 Pcs)": 560, "Triple (3 Pcs)": 837, "4 Person": 1060, "Full Mandi Gang": 1299 } },
-      'item_chicken_al_faham': { name: "Chicken AL Faham", category: "Chicken Mandi", base_price: 320, stock_count: 60, is_special: false, image_url: menuImages["Chicken AL Faham"], portions: { "Half (2 Pcs)": 580, "Triple (3 Pcs)": 864, "4 Person": 1099, "Full Mandi Gang": 1299 } },
-      'item_broasted_chicken': { name: "Braosted Chickken", category: "Chicken Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Braosted Chickken"], portions: { "Half (2 Pcs)": 560, "Triple (3 Pcs)": 820, "4 Person": 1020, "Full Mandi Gang": 1222 } },
-      'item_chicken_f2_mandi': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 329, stock_count: 60, is_special: false, image_url: menuImages["Chicken F2 Mandi"], portions: { "Half (2 Pcs)": 599, "Triple (3 Pcs)": 888, "4 Person": 1119, "Full Mandi Gang": 1350 } },
-      'item_f1_rara_chicken_mandi': { name: "F1 Rara Chicken Mandi", category: "Chicken Mandi", base_price: 330, stock_count: 60, is_special: false, image_url: menuImages["F1 Rara Chicken Mandi"], portions: { "Half (2 Pcs)": 540, "Triple (3 Pcs)": 899, "4 Person": 1122, "Full Mandi Gang": 1350 } },
-      'item_chicken_juicy_mandi': { name: "Chicken Juicy Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Chicken Juicy Mandi"], portions: { "Half (2 Pcs)": 540, "Triple (3 Pcs)": 820, "4 Person": 1020, "Full Mandi Gang": 1222 } },
-      'item_chicken_murg_musallam_mandi': { name: "Chicken Murg Musallam Mandi", category: "Chicken Mandi", base_price: 329, stock_count: 60, is_special: false, image_url: menuImages["Chicken Murg Musallam Mandi"], portions: { "Half (2 Pcs)": 600, "Triple (3 Pcs)": 888, "4 Person": 1111, "Full Mandi Gang": 1350 } },
-      'item_chicken_fry_wings_mandi': { name: "Chickken Fry Wings Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Chickken Fry Wings Mandi"], portions: { "5 Wings": 580, "8 Wings": 779, "14 Pieces": 1200 } },
-      'item_chicken_lolly_pop_mandi': { name: "Chicken Lolly pop Mandi", category: "Chicken Mandi", base_price: 199, stock_count: 60, is_special: false, image_url: menuImages["Chicken Lolly pop Mandi"], portions: {} },
-      'item_mutton_juicy_mandi': { name: "Muttom Juicy Mandi", category: "Mutton Mandi", base_price: 349, stock_count: 60, is_special: false, image_url: menuImages["Muttom Juicy Mandi"], portions: { "Half (2 Pcs)": 699, "Triple (3 Pcs)": 950, "4 Person": 1199, "Full Mandi Gang": 1450 } },
-      'item_f1_rara_mutton_mandi': { name: "F1 Rara mutton mandi", category: "Mutton Mandi", base_price: 360, stock_count: 60, is_special: false, image_url: menuImages["F1 Rara mutton mandi"], portions: { "Half (2 Pcs)": 710, "Triple (3 Pcs)": 979, "4 Person": 1222, "Full Mandi Gang": 1499 } },
-      'item_mutton_fry_mandi': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 340, stock_count: 60, is_special: false, image_url: menuImages["Mutton Fry Mandi"], portions: { "Half (2 Pcs)": 699, "Triple (3 Pcs)": 920, "4 Person": 1155, "Full Mandi Gang": 1399 } },
-      'item_mutton_f2': { name: "Mutton F2", category: "Mutton Mandi", base_price: 360, stock_count: 60, is_special: false, image_url: menuImages["Mutton F2"], portions: { "Half (2 Pcs)": 710, "Triple (3 Pcs)": 979, "4 Person": 1222, "Full Mandi Gang": 1499 } },
-      'item_bhakasura_mandi': { name: "Bhakasura Mandi (1099) 4 perso", category: "Specials", base_price: 1099, stock_count: 60, is_special: true, image_url: menuImages["Bhakasura Mandi (1099) 4 perso"], portions: {} },
-      'item_veg_mandi_mixed_veg': { name: "VEG MANDI Mixed Veg", category: "Veg Mandi", base_price: 260, stock_count: 60, is_special: false, image_url: menuImages["VEG MANDI Mixed Veg"], portions: { "Half (2 Pcs)": 510, "Triple (3 Pcs)": 720, "4 Person": 1000, "Full Mandi Gang": 1250 } },
-      'item_spl_veg_mandi': { name: "Spl Veg Mandi", category: "Veg Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Spl Veg Mandi"], portions: { "Half (2 Pcs)": 540, "Triple (3 Pcs)": 750, "4 Person": 1100, "Full Mandi Gang": 1375 } },
-      'item_mushroom_mandi': { name: "Mushroom Mandi", category: "Veg Mandi", base_price: 249, stock_count: 60, is_special: false, image_url: menuImages["Mushroom Mandi"], portions: { "Half (2 Pcs)": 520, "Triple (3 Pcs)": 710, "4 Person": 1050, "Full Mandi Gang": 1320 } },
-      'item_paneer_rara_mandi': { name: "Pannner Rara Mandi", category: "Veg Mandi", base_price: 299, stock_count: 60, is_special: false, image_url: menuImages["Pannner Rara Mandi"], portions: { "Half (2 Pcs)": 530, "Triple (3 Pcs)": 730, "4 Person": 1199, "Full Mandi Gang": 1499 } },
-      'item_paneer_juicy_mandi': { name: "Panner Juicy Mandi", category: "Veg Mandi", base_price: 279, stock_count: 60, is_special: false, image_url: menuImages["Panner Juicy Mandi"], portions: { "Half (2 Pcs)": 510, "Triple (3 Pcs)": 720, "4 Person": 1099, "Full Mandi Gang": 1399 } }
-    };
-
     window.factoryResetSystem = function() {
-      if(!db){ return alert('⚠️ Not connected to the database — check your internet connection and reload.'); }
-      const itemCount = Object.keys(factoryMenuData).length;
-      if(!confirm(`⚠️ This will REPLACE the entire live menu with the full ${itemCount}-item default database (all names, images, base prices and portion prices). Any custom items you added will be lost. Continue?`)) return;
-      db.ref('menu').set(factoryMenuData)
-        .then(() => alert(`✅ Factory reset complete — ${itemCount} menu items loaded with prices and images.`))
-        .catch(err => alert('Could not load factory data — check your connection and try again. (' + err.message + ')'));
-    };
+        if(!confirm("⚠️ FACTORY RESET will erase the menu and load the defaults. Continue?")) return;
+        const mockData = {
+          'm1': { name: "Chicken Mandi", category: "Chicken Mandi", base_price: 300, stock_count: 50, is_special: true, portions: {"Half": 500, "Full": 900}, image_url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=500&q=80" },
+          'm2': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 400, stock_count: 50, is_special: true, portions: {"Half": 700}, image_url: "https://images.unsplash.com/photo-1633383718081-22ac93e3db65?w=500&q=80" },
+          'm3': { name: "Veg Mandi", category: "Veg Mandi", base_price: 250, stock_count: 50, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80" }
+        };
+        db.ref('menu').set(mockData).then(() => alert("Factory Reset Complete."));
+    }
   </script>
 </body>
 </html>
