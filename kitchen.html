@@ -375,6 +375,13 @@
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
 
+    // --- FRESH START PROTOCOL ---
+    if (!localStorage.getItem('mc_admin_wiped_v4')) {
+        localStorage.clear();
+        localStorage.setItem('mc_admin_wiped_v4', 'true');
+        console.log("Old admin data wiped successfully.");
+    }
+
     // --- AUTO TRANSLATION ENGINE FOR ADMIN ---
     const adminDict = {
       'hi': {
@@ -433,18 +440,20 @@
             const key = el.getAttribute('data-i18n');
             if(adminDict[adminLang] && adminDict[adminLang][key]) {
                 const label = adminDict[adminLang][key];
-                let node = el.lastChild;
-                if (node && node.nodeType === Node.TEXT_NODE) node.textContent = label;
-                else el.appendChild(document.createTextNode(label));
-            } else if (lang === 'en') {
-                // Simplified revert logic for English fallback if needed.
-                // Assuming original English text is encoded in logic or manual refresh required.
+                let textFound = false;
+                for (let node of el.childNodes) {
+                    if (node.nodeType === Node.TEXT_NODE && node.nodeValue.trim() !== '') {
+                        node.nodeValue = label;
+                        textFound = true;
+                        break;
+                    }
+                }
+                if (!textFound) el.textContent = label;
             }
         });
 
         // Trigger re-renders to translate dynamic content
         if (document.getElementById('view-orders').classList.contains('hidden') === false && window.currentTables) {
-            // Re-render floor by simulating database update
             renderFloorGrid(window.currentTables);
         }
         if (document.getElementById('view-pos').classList.contains('hidden') === false) {
@@ -563,24 +572,47 @@
     // POS State
     let posCart = {};
 
-    if (db) db.ref('.info/connected').on('value', snap => { dbConnected = !!snap.val(); });
-
-    function waitForDbConnection(timeoutMs){
-      return new Promise(resolve => {
-        if (dbConnected) return resolve(true);
-        const start = Date.now();
-        const iv = setInterval(() => {
-          if (dbConnected) { clearInterval(iv); resolve(true); }
-          else if (Date.now() - start > timeoutMs) { clearInterval(iv); resolve(false); }
-        }, 150);
-      });
+    function setOnline() {
+        if(dbConnected) return;
+        dbConnected = true;
+        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
+        if(dot && txt) {
+            dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"; 
+            txt.innerText="Online"; 
+            txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest";
+        }
+        const banner = document.getElementById('connectionBanner');
+        if(banner) { banner.classList.remove('show'); banner.classList.add('hidden'); }
+    }
+    
+    function setOffline() {
+        if(!dbConnected) return;
+        dbConnected = false;
+        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
+        if(dot && txt) {
+            dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; 
+            txt.innerText="Offline"; 
+            txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest";
+        }
+        const banner = document.getElementById('connectionBanner');
+        if(banner) { banner.classList.remove('hidden'); banner.classList.add('show'); }
     }
 
-    window.attemptLogin = async function() {
+    if (db) {
+        db.ref('.info/connected').on('value', snap => {
+            if(snap.val() === true) setOnline();
+            else setOffline();
+        });
+        
+        // Failsafe: if we get any data from DB, we are definitely online regardless of the meta-flag
+        db.ref('active_tables').on('value', () => setOnline());
+        db.ref('menu').on('value', () => setOnline());
+    }
+
+    window.attemptLogin = function() {
       const pinRaw = document.getElementById('sysPin').value;
       const pin = pinRaw.trim();
       const statusEl = document.getElementById('loginStatusMsg');
-      const btn = document.getElementById('loginBtn');
 
       let role = null;
       if (pin === 'admin123') role = 'admin';
@@ -589,16 +621,6 @@
       else { if(statusEl) statusEl.textContent = ''; return alert("Invalid PIN"); }
 
       if(!db) return alert("⚠️ Not connected to database.");
-
-      if (btn) { btn.disabled = true; btn.textContent = 'CONNECTING...'; }
-      if (statusEl) statusEl.textContent = 'Connecting to workspace...';
-
-      const connected = dbConnected || await waitForDbConnection(6000);
-      if (!connected) {
-        if (btn) { btn.disabled = false; btn.textContent = 'ACCESS WORKSPACE'; }
-        if (statusEl) statusEl.textContent = '';
-        return alert("⚠️ Could not reach the database. Check connection.");
-      }
 
       currentRole = role;
       try { alertSound.play().then(()=>{alertSound.pause();alertSound.currentTime=0;}).catch(()=>{}); } catch(e){}
@@ -612,6 +634,22 @@
       if(currentRole === 'admin' || currentRole === 'kitchen' || currentRole === 'waiter') { document.querySelectorAll('.kitchen-waiter-only').forEach(el => el.classList.remove('hidden')); }
 
       loadSystem();
+    };
+
+    window.switchTab = function(tab) {
+      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        let isMatch = b.id === `tab-${tab}`;
+        if (isMatch) {
+            b.classList.remove('text-slate-400', 'hover:bg-white/5');
+            b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
+        } else {
+            b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
+            b.classList.add('text-slate-400', 'hover:bg-white/5');
+        }
+      });
+      document.getElementById(`view-${tab}`).classList.remove('hidden');
+      if (tab === 'pos') renderPosMenu();
     };
 
     function triggerAlarm() {
