@@ -58,17 +58,29 @@
     ⚠ Connection lost — reconnecting to Mandi Croods servers...
   </div>
 
-  <!-- Luxury Login Modal (Strict Layout Fix) -->
+  <!-- Luxury Login Modal (With Pre-Login Language Selector) -->
   <div id="loginModal" class="fixed top-0 left-0 w-full h-full min-h-screen z-[9999] flex flex-col items-center justify-center p-5 welcome-bg">
     <!-- Decorative Gold Accents -->
     <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none"></div>
     <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-primary opacity-10 blur-3xl rounded-full pointer-events-none"></div>
 
     <div class="bg-dark p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_50px_rgba(212,175,55,0.15)] border border-primary/20 relative z-10">
+      <!-- Language Selector Before Login -->
+      <div class="flex justify-end mb-3">
+        <div class="flex items-center gap-1.5 bg-white/5 border border-primary/30 rounded-xl px-2.5 py-1">
+          <span class="text-[10px] font-bold text-primary/80 uppercase tracking-wider">🌐</span>
+          <select id="loginLangSelect" onchange="changeLanguage(this.value)" class="bg-transparent text-primary font-black text-xs outline-none cursor-pointer">
+            <option value="en" class="bg-dark text-primary">English</option>
+            <option value="hi" class="bg-dark text-primary">हिंदी</option>
+            <option value="te" class="bg-dark text-primary">తెలుగు</option>
+          </select>
+        </div>
+      </div>
+
       <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg border-2 border-dark">🍖</div>
       <h2 class="text-3xl font-black text-white mb-2 tracking-tight gold-text" data-i18n="welcome">Mandi Croods</h2>
       <p class="text-primary/70 text-sm font-semibold mb-6 tracking-wide" data-i18n="enter_mobile">Enter mobile number to unlock our premium menu.</p>
-      <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="10" data-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
+      <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="10" data-i18n-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
       <button onclick="registerCustomer()" class="w-full gold-gradient font-black py-4 rounded-2xl shadow-[0_5px_20px_rgba(212,175,55,0.3)] active:scale-95 transition-transform uppercase tracking-widest text-sm" data-i18n="proceed">Enter Menu</button>
     </div>
   </div>
@@ -94,7 +106,7 @@
     </div>
     <div class="bg-dark text-primary px-3 py-1.5 rounded-xl shadow-md flex items-center gap-2 border border-primary/20">
       <span class="text-xs font-bold opacity-80" data-i18n="table">TABLE</span>
-      <select id="tableNum" class="bg-transparent font-black text-primary outline-none cursor-pointer text-sm">
+      <select id="tableNum" class="bg-transparent font-black text-primary outline-none cursor-pointer text-sm disabled:opacity-75 disabled:cursor-not-allowed">
         <optgroup label="Standard Tables">
           <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
         </optgroup>
@@ -114,6 +126,7 @@
           <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
         </optgroup>
       </select>
+      <span id="tableLockIcon" class="hidden text-xs" title="Table locked for active order">🔒</span>
     </div>
   </header>
 
@@ -156,15 +169,14 @@
 
     <div id="feedbackSection" class="hidden mt-5 pt-5 border-t border-primary/20 text-center relative z-10">
       <div id="feedbackBox" class="mb-5 pb-5 border-b border-primary/10">
-        <p class="text-xs font-bold uppercase tracking-widest text-primary mb-4" data-i18n="food_feedback">Rate your luxury experience</p>
+        <p class="text-xs font-bold uppercase tracking-widest text-primary mb-2" data-i18n="food_feedback">Rate your luxury experience</p>
+        <p id="feedbackHint" class="text-[11px] text-slate-400 font-semibold mb-3">1. Write your feedback below &nbsp;•&nbsp; 2. Tap an emoji to submit</p>
+        <textarea id="feedbackText" rows="2" placeholder="Write about your experience first, then tap an emoji below..." class="w-full mb-4 p-3 rounded-xl bg-white/5 border border-primary/20 text-sm text-white placeholder-slate-400 outline-none focus:border-primary resize-none"></textarea>
         <div class="flex justify-center gap-6 text-4xl">
-          <button onclick="sendFeedback('Bad')" class="hover:scale-110 active:scale-90 transition-transform filter grayscale hover:grayscale-0">😞</button>
-          <button onclick="sendFeedback('Good')" class="hover:scale-110 active:scale-90 transition-transform">😋</button>
-          <button onclick="sendFeedback('Excellent')" class="hover:scale-110 active:scale-90 transition-transform drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]">😍</button>
+          <button id="emoji-Bad" onclick="handleEmojiFeedback('Bad')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all filter grayscale hover:grayscale-0">😞</button>
+          <button id="emoji-Good" onclick="handleEmojiFeedback('Good')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all">😋</button>
+          <button id="emoji-Excellent" onclick="handleEmojiFeedback('Excellent')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]">😍</button>
         </div>
-        <textarea id="feedbackText" rows="2" placeholder="Tell us about your experience..." class="w-full mt-4 p-3 rounded-xl bg-white/5 border border-primary/20 text-sm text-white placeholder-slate-400 outline-none focus:border-primary resize-none"></textarea>
-        <button onclick="sendWrittenFeedback()" class="mt-2 w-full gold-gradient text-dark text-xs font-black py-2.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest">Send Feedback</button>
-        <p id="feedbackThanks" class="text-xs font-black text-primary mt-4 hidden" data-i18n="thanks_feedback">Thank you for your valuable feedback! 👑</p>
       </div>
       <div id="upiArea" class="hidden">
         <p class="text-primary font-black mb-4 text-sm uppercase tracking-widest" data-i18n="scan_pay">Scan to Pay via UPI</p>
@@ -332,7 +344,6 @@
         const voices = window.speechSynthesis.getVoices();
         let targetVoice = null;
         
-        // Target Male Indian/Telugu Voices
         if(lang === 'te') {
             targetVoice = voices.find(v => v.lang.includes('te') && v.name.toLowerCase().includes('male'));
             if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('te'));
@@ -341,14 +352,13 @@
             if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('hi'));
         }
         
-        // Fallback to Indian English male
         if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('en-IN') && v.name.toLowerCase().includes('male'));
         if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('en-IN'));
 
         if(targetVoice) msg.voice = targetVoice;
         
         msg.rate = 0.85; 
-        msg.pitch = 0.6; // Deep male tone simulation
+        msg.pitch = 0.6;
         msg.volume = 1.0;
         
         window.speechSynthesis.speak(msg);
@@ -438,9 +448,32 @@
     let menuData = {}; let cart = {}; let currentFilter = 'All'; let activeTableData = null;
     let cartWasVisible = false; let lastKnownStatus = null;
     let customerPhone = localStorage.getItem('mc_cust_phone') || "";
+    let lockedTable = localStorage.getItem('mc_locked_table') || "";
     let myServiceRequests = new Set();
     let autoBillText = "";
     
+    function lockCustomerTable(tableVal) {
+      const tableSelect = document.getElementById('tableNum');
+      const lockIcon = document.getElementById('tableLockIcon');
+      if (tableVal && tableSelect.querySelector(`option[value="${tableVal}"]`)) {
+        tableSelect.value = tableVal;
+      }
+      tableSelect.disabled = true;
+      if (lockIcon) lockIcon.classList.remove('hidden');
+      localStorage.setItem('mc_locked_table', tableSelect.value);
+    }
+
+    function unlockCustomerTable() {
+      localStorage.removeItem('mc_locked_table');
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.get('table')) {
+        const tableSelect = document.getElementById('tableNum');
+        if (tableSelect) tableSelect.disabled = false;
+        const lockIcon = document.getElementById('tableLockIcon');
+        if (lockIcon) lockIcon.classList.add('hidden');
+      }
+    }
+
     let cartExpanded = true;
     window.toggleCart = function() {
       cartExpanded = !cartExpanded;
@@ -528,7 +561,6 @@
       te: { welcome: "మండి క్రూడ్స్", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_group: "👑 4+ వ్యక్తులు", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "⭐ స్పెషల్", qty_left: "మిగిలి ఉన్నాయి", total_bill: "మొత్తం బిల్లు:", cart_total: "కొత్త వస్తువులు", confirm_order: "వంటగదికి పంపండి", special_req: "ఏదైనా సూచనలు?", live_status: "టేబుల్ రన్నింగ్ ట్యాబ్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! 👑", scan_pay: "స్కాన్ చేయండి", request_bill: "ఫైనల్ బిల్ అడగండి", select_payment: "చెల్లింపు విధానాన్ని ఎంచుకోండి", loading_menu: "లోడ్ అవుతోంది..." }
     };
     
-    // Dynamic Menu Item Translation Dictionary
     const wordDict = {
       'hi': {
         'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
@@ -546,7 +578,8 @@
       }
     };
     
-    let lang = 'en'; const t = (k) => i18n[lang][k] || k;
+    let lang = localStorage.getItem('mc_lang') || 'en';
+    const t = (k) => i18n[lang][k] || k;
 
     function translateItem(text) {
         if (lang === 'en' || !text) return text;
@@ -562,6 +595,12 @@
 
     window.changeLanguage = function(l) {
       lang = l;
+      localStorage.setItem('mc_lang', l);
+      const topSel = document.getElementById('langSelect');
+      const loginSel = document.getElementById('loginLangSelect');
+      if (topSel && topSel.value !== l) topSel.value = l;
+      if (loginSel && loginSel.value !== l) loginSel.value = l;
+
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
         const label = t(key);
@@ -828,12 +867,16 @@
 
     function buildBillText(order){
       const lines = buildLineItemsArray(order);
-      let body = lines.map(li => {
-        const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
-        const base = `${li.name} [${li.variant}] (x${li.qty}) - Rs.${lineTotal}`;
-        return li.cancelled ? `${base} (CANCELLED)` : base;
-      }).join('\n');
-      if(!body && order.items) body = String(order.items).replace(/ \| /g, '\n');
+      let body = '';
+      if (lines.length > 0) {
+        body = lines.map(li => {
+          const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
+          const base = `${li.name} [${li.variant || 'Regular'}] (x${li.qty}) - Rs.${lineTotal}`;
+          return li.cancelled ? `${base} (CANCELLED)` : base;
+        }).join('\n');
+      } else if (order && order.items) {
+        body = String(order.items).replace(/ \| /g, '\n');
+      }
       if(!body) body = '(no items)';
       return `=== MANDI CROODS ===\nTable: ${order.table}\nMobile: ${order.phone || customerPhone}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${body}\n------------------\nTOTAL: Rs. ${order.total}\n==================\nThank you for dining with Mandi Croods! 👑`;
     }
@@ -841,19 +884,28 @@
     function renderOrderedItemsList(order, tableId){
       const div = document.getElementById('customerOrderedItems');
       const lines = buildLineItemsArray(order);
-      if(lines.length === 0){ div.classList.add('hidden'); return; }
+      if(lines.length === 0 && (!order || !order.items)){ div.classList.add('hidden'); return; }
       const canCancel = order.status === 'pending';
+
+      if (lines.length === 0 && order.items) {
+        const rawParts = String(order.items).split('|').map(s => s.trim()).filter(Boolean);
+        div.innerHTML = `<div class="text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-white/10 pb-1">Items Ordered:</div>` +
+          rawParts.map(p => `<div class="py-2 border-b border-white/5 last:border-0"><span class="text-primary mr-2">✓</span>${translateItem(p)}</div>`).join('');
+        div.classList.remove('hidden');
+        return;
+      }
+
       div.innerHTML = `<div class="text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-white/10 pb-1">Items Ordered:</div>` +
         lines.map(li => {
           const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
           if(li.cancelled){
             return `<div class="py-2 border-b border-white/5 last:border-0 opacity-50">
-              <span class="text-red-500 mr-2">✕</span><s>${translateItem(li.name)} [${translateItem(li.variant)}] (x${li.qty})</s>
+              <span class="text-red-500 mr-2">✕</span><s>${translateItem(li.name)} [${translateItem(li.variant || 'Regular')}] (x${li.qty})</s>
               <span class="text-[10px] text-red-500 font-black ml-1 border border-red-500/50 px-1 rounded">CANCELLED</span>
             </div>`;
           }
           return `<div class="py-2 border-b border-white/5 last:border-0 flex items-center justify-between gap-2">
-            <span><span class="text-primary mr-2">✓</span>${translateItem(li.name)} <span class="opacity-70">[${translateItem(li.variant)}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-400 opacity-80">📝 ${li.note}</span>` : ''}</span>
+            <span><span class="text-primary mr-2">✓</span>${translateItem(li.name)} <span class="opacity-70">[${translateItem(li.variant || 'Regular')}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-400 opacity-80">📝 ${li.note}</span>` : ''}</span>
             ${canCancel ? `<button onclick="cancelOrderItem('${tableId}','${li.key}')" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-black px-2 py-1.5 rounded-lg active:scale-90 transition-transform">✕ Cancel</button>` : ''}
           </div>`;
         }).join('') +
@@ -866,7 +918,8 @@
       const btn = document.getElementById('placeOrderBtn');
       if (!btn) return;
       btn.disabled = true;
-      const tableId = `table_${document.getElementById('tableNum').value}`;
+      const chosenTable = document.getElementById('tableNum').value;
+      const tableId = `table_${chosenTable}`;
       const notes = document.getElementById('orderNotes').value.trim();
 
       const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
@@ -886,10 +939,10 @@
       });
 
       db.ref(`active_tables/${tableId}`).transaction(existing => {
-        if (!existing) existing = { table: document.getElementById('tableNum').value, phone: customerPhone, status: 'pending', line_items: {} };
+        if (!existing) existing = { table: chosenTable, phone: customerPhone, status: 'pending', line_items: {} };
         const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
         return {
-          orderId: existing.orderId || tableId, table: existing.table, phone: customerPhone,
+          orderId: existing.orderId || tableId, table: existing.table || chosenTable, phone: customerPhone,
           line_items: mergedLineItems, items: buildItemsString(mergedLineItems),
           total: computeOrderTotal(mergedLineItems), status: 'pending',
           timestamp: Date.now(), paymentMethod: existing.paymentMethod || ''
@@ -903,6 +956,7 @@
           Object.keys(stockUpdates).forEach(itemId => {
             db.ref(`menu/${itemId}/stock_count`).transaction(curr => Math.max(0, (curr||0) - stockUpdates[itemId]));
           });
+          lockCustomerTable(chosenTable);
           playSuccess(); vibrate([30,40,30]);
           fireConfetti(); showFunToast(randomFunLine());
           cart = {}; document.getElementById('orderNotes').value = ''; 
@@ -955,23 +1009,34 @@
         .catch(err => { console.error(err); playError(); alert('Could not request the bill.'); });
     };
 
-    window.sendFeedback = function(rating) {
+    // Require BOTH Written Feedback + Emoji Tap to Clear & Submit
+    window.handleEmojiFeedback = function(rating) {
       if(!activeTableData) return;
+      const textInput = document.getElementById('feedbackText');
+      const note = (textInput ? textInput.value : '').trim();
+
+      if (!note) {
+        playError();
+        vibrate(25);
+        showFunToast("✍️ Please write your feedback in the box first, then tap the emoji!");
+        if (textInput) {
+          textInput.classList.add('border-red-500');
+          textInput.focus();
+          setTimeout(() => textInput.classList.remove('border-red-500'), 2000);
+        }
+        return;
+      }
+
       playClick();
       if(rating === 'Excellent'){ fireConfetti(); }
-      const note = (document.getElementById('feedbackText')?.value || '').trim();
-      db.ref('feedback').push({ table: activeTableData.table, phone: activeTableData.phone, rating: rating, note: note, timestamp: Date.now() })
-        .then(() => vibrate(15)).catch(err => console.error('Feedback save failed', err));
-      document.getElementById('feedbackBox').innerHTML = `<p class="text-primary font-bold text-lg text-center mt-4">Feedback saved! 👑 Thank you.</p>`;
-    };
+      db.ref('feedback').push({
+        table: activeTableData.table,
+        phone: activeTableData.phone || customerPhone,
+        rating: rating,
+        note: note,
+        timestamp: Date.now()
+      }).then(() => vibrate(15)).catch(err => console.error('Feedback save failed', err));
 
-    window.sendWrittenFeedback = function() {
-      if(!activeTableData) return;
-      const note = (document.getElementById('feedbackText')?.value || '').trim();
-      if(!note){ playError(); return; }
-      playClick();
-      db.ref('feedback').push({ table: activeTableData.table, phone: activeTableData.phone, rating: 'Written', note: note, timestamp: Date.now() })
-        .then(() => vibrate(15)).catch(err => console.error('Feedback save failed', err));
       document.getElementById('feedbackBox').innerHTML = `<p class="text-primary font-bold text-lg text-center mt-4">Feedback saved! 👑 Thank you.</p>`;
     };
 
@@ -1000,7 +1065,7 @@
       if(occ){
         const isMine = occ.phone === customerPhone;
         pill.className = `text-[10px] font-black px-3 py-1.5 rounded-full inline-block border ${isMine ? 'bg-blue-900/40 text-blue-300 border-blue-500/50' : 'bg-red-900/40 text-red-300 border-red-500/50'}`;
-        pill.innerText = isMine ? '🔵 Your active order is on this table' : '🔴 This table is currently occupied';
+        pill.innerText = isMine ? '🔵 Your active order is on this table (Table Locked 🔒)' : '🔴 This table is currently occupied';
       } else {
         pill.className = 'text-[10px] font-black px-3 py-1.5 rounded-full inline-block bg-emerald-900/40 text-emerald-300 border border-emerald-500/50';
         pill.innerText = '🟢 This table is available';
@@ -1012,7 +1077,8 @@
 
     function listenToRunningTab() {
       if(!customerPhone) return;
-      const tableId = `table_${document.getElementById('tableNum').value}`;
+      const tableVal = document.getElementById('tableNum').value;
+      const tableId = `table_${tableVal}`;
 
       if(currentTableRef){ currentTableRef.off(); }
       currentTableRef = db.ref(`active_tables/${tableId}`);
@@ -1027,6 +1093,7 @@
         // Zero-Bill Cancellation Handler
         if (order && order.status === 'cancelled') {
             alert("Your order has been cancelled by the admin. Bill Amount: ₹0. Please contact our staff for details.");
+            unlockCustomerTable();
             localStorage.removeItem('mc_cust_phone');
             window.location.reload();
             return;
@@ -1037,6 +1104,10 @@
           const statusChanged = order.status !== lastKnownStatus;
 
           activeTableData = order; tr.classList.remove('hidden'); 
+          // Lock table so customer cannot change table while order is active
+          lockCustomerTable(order.table || tableVal);
+
+          // Always build bill text from the latest edited order state
           autoBillText = buildBillText(order);
 
           if (wasHidden) {
@@ -1083,11 +1154,13 @@
           lastKnownStatus = order.status;
         } else { 
           if(activeTableData) {
+            // Ensure autoBillText has the very latest activeTableData before clearing
+            autoBillText = buildBillText(activeTableData);
             tr.classList.add('hidden'); 
             activeTableData = null; lastKnownStatus = null;
             playBell(); fireConfetti(); showFunToast(randomFunLine());
 
-            // Auto-Download Bill for Customer
+            // Auto-Download Exact Edited Bill for Customer
             if (autoBillText) {
               try {
                 const a = document.createElement('a');
@@ -1100,6 +1173,7 @@
             }
 
             alert("Table Cleared! Receipt downloaded. Thank you for dining with Mandi Croods.");
+            unlockCustomerTable();
             localStorage.removeItem('mc_cust_phone');
             setTimeout(() => { window.location.reload(); }, 1500); 
           }
@@ -1116,10 +1190,12 @@
             tableSelect.value = tableParam;
             tableSelect.disabled = true;
         }
+    } else if (lockedTable) {
+        lockCustomerTable(lockedTable);
     }
 
     document.getElementById('tableNum').addEventListener('change', () => { listenToRunningTab(); updateTableOccupancyPill(); });
-    changeLanguage('en'); 
+    changeLanguage(lang); 
     if(customerPhone) { listenToRunningTab(); updateTableOccupancyPill(); }
   </script>
 </body>
