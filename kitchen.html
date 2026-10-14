@@ -282,20 +282,46 @@
     </main>
   </div>
 
-  <!-- Modals (Edit Order, Edit Item) -->
-  <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-5 no-print">
-    <div class="bg-card rounded-3xl p-6 w-full max-w-lg shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[85vh] overflow-y-auto">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-black text-lg text-slate-900">✏️ Edit Order — <span id="editOrderTableLabel" class="text-primary"></span></h3>
-        <button onclick="closeEditOrder()" class="w-8 h-8 bg-slate-100 rounded-full font-black text-slate-500 active:scale-90 transition-transform">✕</button>
+  <!-- Interactive Edit Order Modal (With Live Menu Picker & Auto Calculator) -->
+  <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
+    <div class="bg-card rounded-3xl p-6 w-full max-w-4xl shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[90vh] flex flex-col">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+        <div>
+          <h3 class="font-black text-xl text-slate-900">✏️ Edit Order — <span id="editOrderTableLabel" class="text-primary"></span></h3>
+          <p class="text-[11px] font-bold text-slate-400">Add, reduce, or remove items below — customer bill & total update automatically.</p>
+        </div>
+        <button onclick="closeEditOrder()" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full font-black text-slate-600 active:scale-90 transition-transform">✕</button>
       </div>
-      <p class="text-xs text-slate-400 font-bold mb-2 uppercase tracking-widest">Items (one line each)</p>
-      <textarea id="editOrderItems" rows="6" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-medium text-sm outline-none focus:border-primary mb-4"></textarea>
-      <p class="text-xs text-slate-400 font-bold mb-2 uppercase tracking-widest">Total (₹)</p>
-      <input type="number" id="editOrderTotal" min="0" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-black text-lg outline-none focus:border-primary mb-4">
-      <div class="flex gap-2 mt-4">
-        <button onclick="closeEditOrder()" class="flex-1 bg-slate-100 text-slate-600 font-bold py-3 rounded-xl active:scale-95 transition-transform">Cancel</button>
-        <button onclick="saveEditOrder()" class="flex-1 gold-gradient text-black font-black py-3 rounded-xl active:scale-95 transition-transform">Save Changes</button>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto flex-1 pr-1">
+        <!-- Left Column: Current Order Items & Calculator -->
+        <div class="flex flex-col bg-light p-4 rounded-2xl border border-slate-200">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-black text-slate-600 uppercase tracking-widest">🛒 Current Order Items</span>
+            <button onclick="recalcEditOrderTotal()" class="text-[10px] font-black text-primary bg-dark px-2.5 py-1 rounded-lg">🔄 Auto-Calc Total</button>
+          </div>
+          <div id="editOrderCartList" class="flex-1 space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+
+          <div class="mt-4 pt-3 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Calculated Bill Total (₹)</span>
+              <span id="editOrderAutoSum" class="text-xs font-bold text-emerald-600">Auto: ₹0</span>
+            </div>
+            <input type="number" id="editOrderTotal" min="0" class="w-full p-3 bg-white border border-primary/40 rounded-xl font-black text-2xl text-slate-900 outline-none focus:border-primary">
+          </div>
+        </div>
+
+        <!-- Right Column: Add Items from Menu -->
+        <div class="flex flex-col bg-light p-4 rounded-2xl border border-slate-200">
+          <span class="text-xs font-black text-slate-600 uppercase tracking-widest mb-2">➕ Add Dish from Menu</span>
+          <input type="text" id="editOrderMenuSearch" oninput="renderEditOrderMenuPicker()" placeholder="🔍 Search dish to add..." class="w-full p-2.5 mb-3 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-primary">
+          <div id="editOrderMenuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-5 pt-4 border-t border-slate-100">
+        <button onclick="closeEditOrder()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 rounded-xl active:scale-95 transition-transform">Cancel</button>
+        <button onclick="saveEditOrder()" class="flex-1 gold-gradient text-black font-black py-3.5 rounded-xl shadow-md active:scale-95 transition-transform uppercase tracking-wider text-sm">💾 Save & Sync Updated Bill</button>
       </div>
     </div>
   </div>
@@ -392,14 +418,12 @@
         'title_service': 'ग्राहक अनुरोध', 'title_menu': 'इन्वेंटरी प्रबंधन', 'title_analytics': 'डैशबोर्ड और आय',
         'title_feedback': 'ग्राहक फीडबैक',
         
-        // Item Translations
         'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
         'special': 'स्पेशल', 'juicy': 'जूसी', 'mixed': 'मिक्स्ड', 'paneer': 'पनीर', 'mushroom': 'मशरूम',
         'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस', 
         'pcs': 'पीस', 'half': 'हाफ', 'full': 'फुल', 'regular': 'रेगुलर', 'single': 'सिंगल', 'triple': 'ट्रिपल',
         'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'bhakasura': 'बकासुर',
         
-        // KOT & Actions
         'Print KOT (Kitchen)': 'केओटी प्रिंट करें', 'Re-Print KOT': 'दोबारा प्रिंट करें',
         'Mark Food Served': 'परोसा गया', 'Clear Table': 'टेबल खाली करें', 'Cancel Order': 'ऑर्डर रद्द करें',
         'Sent to Kitchen': 'किचन में भेजा गया', 'Confirm Served': 'सर्व कंफर्म करें', 'Mark Cash Collected': 'कैश लिया गया',
@@ -414,14 +438,12 @@
         'title_service': 'కస్టమర్ అభ్యర్థనలు', 'title_menu': 'ఇన్వెంటరీ మేనేజ్‌మెంట్', 'title_analytics': 'డ్యాష్‌బోర్డ్ & ఆదాయం',
         'title_feedback': 'కస్టమర్ ఫీడ్‌బ్యాక్',
         
-        // Item Translations
         'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
         'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
         'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్', 
         'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
         'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర',
         
-        // KOT & Actions
         'Print KOT (Kitchen)': 'KOT ప్రింట్ చేయండి', 'Re-Print KOT': 'KOT మళ్ళీ ప్రింట్ చేయండి',
         'Mark Food Served': 'వడ్డించినట్లు మార్క్ చేయండి', 'Clear Table': 'టేబుల్ క్లియర్ చేయండి', 'Cancel Order': 'ఆర్డర్ రద్దు చేయండి',
         'Sent to Kitchen': 'వంటగదికి పంపబడింది', 'Confirm Served': 'వడ్డించినట్లు నిర్ధారించండి', 'Mark Cash Collected': 'నగదు తీసుకున్నట్లు మార్క్ చేయండి',
@@ -435,7 +457,6 @@
     window.changeAdminLanguage = function(lang) {
         adminLang = lang;
         
-        // Static UI Translations
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if(adminDict[adminLang] && adminDict[adminLang][key]) {
@@ -452,7 +473,6 @@
             }
         });
 
-        // Trigger re-renders to translate dynamic content
         if (document.getElementById('view-orders').classList.contains('hidden') === false && window.currentTables) {
             renderFloorGrid(window.currentTables);
         }
@@ -476,7 +496,13 @@
 
     function extractOrderItemsStr(table) {
         if (!table) return '';
-        let rawData = table.items || table.line_items;
+        if (table.line_items && typeof table.line_items === 'object') {
+            return Object.values(table.line_items)
+                .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
+                .map(i => `${i.qty||1}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`)
+                .join(' | ');
+        }
+        let rawData = table.items;
         if (!rawData) {
             for (let key in table) {
                 if (['table', 'status', 'total', 'timestamp', 'phone', 'paymentMethod', 'orderId'].includes(key)) continue;
@@ -484,9 +510,6 @@
             }
         }
         if (typeof rawData === 'string') return rawData.trim();
-        if (typeof rawData === 'object' && rawData !== null) {
-            return Object.values(rawData).map(i => `${i.qty||1}x ${i.name} ${i.variant && i.variant!=='Regular'?'('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
-        }
         return String(rawData||'').trim();
     }
 
@@ -593,6 +616,7 @@
     let alarmTimer = null;
     let customersCache = {};
     let editOrderId = null;
+    let editOrderLineItems = {};
     let menuCache = {};
     let editItemId = null;
     let revenueChart = null, paymentChart = null, topItemsChart = null;
@@ -635,7 +659,6 @@
             else setOffline();
         });
         
-        // Failsafe: if we get any data from DB, we are definitely online regardless of the meta-flag
         db.ref('active_tables').on('value', () => setOnline());
         db.ref('menu').on('value', () => setOnline());
     }
@@ -714,7 +737,6 @@
 
       const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
       
-      // Auto translate items for KOT
       const rawItems = extractOrderItemsStr(table);
       let transItems = rawItems.split('|').map(p => translateText(p.trim())).join(' | ');
 
@@ -798,7 +820,6 @@
                btn = `<button class="w-full bg-light text-slate-400 py-4 rounded-xl font-black" disabled>${translateText('Awaiting Admin Clear')}</button>`;
              }
           } else {
-            // Waiter
             if(table.status === 'pending') {
               btn = `<button class="w-full bg-light text-slate-500 py-4 rounded-xl font-black shadow-sm" disabled>${translateText('Sent to Kitchen')}</button>`;
             } else if(table.status === 'cooking') {
@@ -813,7 +834,6 @@
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
           
           const rawItemsStr = extractOrderItemsStr(table);
-          // Apply auto-translation to order items
           const itemsStr = rawItemsStr.split('|').map(p => translateText(p.trim())).join(' | ');
 
           let formattedItems = itemsStr ? '• ' + itemsStr.replace(/ \| /g,'<br>• ') : 'No items';
@@ -861,6 +881,25 @@
       if(!db) return;
 
       db.ref('customers').on('value', snap => { customersCache = snap.val() || {}; });
+
+      // Always load menu for Admin and Waiter so POS and Edit Order Modal have full menu items
+      db.ref('menu').on('value', snap => {
+        menuCache = snap.val() || {};
+        if(currentRole === 'admin') {
+          renderInventory();
+          let lowItems = [];
+          for (let k in menuCache) {
+             if (menuCache[k].stock_count <= 5 && !alertedLowStock.has(k)) {
+                 lowItems.push(menuCache[k].name);
+                 alertedLowStock.add(k); 
+             }
+          }
+          if (lowItems.length > 0) {
+             showGlobalToast(`Stock Alert: ${lowItems.join(', ')} running low!`, 'error');
+          }
+        }
+        renderPosMenu();
+      });
 
       // --- Floor Operations Listener ---
       db.ref('active_tables').on('value', snap => {
@@ -916,23 +955,6 @@
       }
 
       if(currentRole === 'admin') {
-        db.ref('menu').on('value', snap => {
-          menuCache = snap.val() || {};
-          renderInventory();
-          renderPosMenu(); 
-          
-          let lowItems = [];
-          for (let k in menuCache) {
-             if (menuCache[k].stock_count <= 5 && !alertedLowStock.has(k)) {
-                 lowItems.push(menuCache[k].name);
-                 alertedLowStock.add(k); 
-             }
-          }
-          if (lowItems.length > 0) {
-             showGlobalToast(`Stock Alert: ${lowItems.join(', ')} running low!`, 'error');
-          }
-        });
-
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
             const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0 };
@@ -1216,21 +1238,215 @@
       return { ok: true, portions };
     }
 
+    // --- INTERACTIVE EDIT ORDER MODAL WITH LIVE MENU & AUTO-CALCULATOR ---
     window.openEditOrder = function(id){
       const table = (window.currentTables || {})[id];
       if(!table) return;
       editOrderId = id;
       document.getElementById('editOrderTableLabel').innerText = `Table ${table.table}`;
-      document.getElementById('editOrderItems').value = extractOrderItemsStr(table).split(' | ').join('\n');
-      document.getElementById('editOrderTotal').value = table.total;
+      
+      editOrderLineItems = {};
+      if (table.line_items && Object.keys(table.line_items).length > 0) {
+        Object.entries(table.line_items).forEach(([k, li]) => {
+          editOrderLineItems[k] = { ...li, qty: Number(li.qty) || 1, price: Number(li.price) || 0 };
+        });
+      } else if (table.items) {
+        // Parse legacy items string if line_items was missing
+        String(table.items).split('|').map(s => s.trim()).filter(Boolean).forEach((part, idx) => {
+          const isCanc = /\[CANCELLED\]/i.test(part);
+          const clean = part.replace(/\[CANCELLED\]/gi, '').trim();
+          const m = clean.match(/^(\d+)\s*[xX]\s*(.+)$/);
+          const qty = m ? parseInt(m[1]) || 1 : 1;
+          let rest = m ? m[2].trim() : clean;
+          let variant = 'Regular';
+          const vm = rest.match(/^(.+?)\s*\(([^)]+)\)$/);
+          if (vm) { rest = vm[1].trim(); variant = vm[2].trim(); }
+          let unitPrice = 0;
+          const foundMenu = Object.entries(menuCache).find(([, it]) => it.name && it.name.toLowerCase() === rest.toLowerCase());
+          if (foundMenu) {
+            const [, mItem] = foundMenu;
+            unitPrice = (variant !== 'Regular' && mItem.portions && mItem.portions[variant]) ? Number(mItem.portions[variant]) : Number(mItem.base_price) || 0;
+          }
+          editOrderLineItems[`legacy_${idx}`] = {
+            itemId: foundMenu ? foundMenu[0] : '',
+            name: rest,
+            variant: variant,
+            price: unitPrice,
+            qty: qty,
+            cancelled: isCanc,
+            addedAt: Date.now() + idx
+          };
+        });
+      }
+
+      document.getElementById('editOrderMenuSearch').value = '';
+      renderEditOrderCartList(true);
+      renderEditOrderMenuPicker();
       document.getElementById('editOrderModal').classList.remove('hidden');
     };
-    window.closeEditOrder = function(){ document.getElementById('editOrderModal').classList.add('hidden'); };
-    
+
+    window.closeEditOrder = function(){
+      document.getElementById('editOrderModal').classList.add('hidden');
+      editOrderId = null;
+      editOrderLineItems = {};
+    };
+
+    window.renderEditOrderCartList = function(autoUpdateTotal = true){
+      const list = document.getElementById('editOrderCartList');
+      if(!list) return;
+      list.innerHTML = '';
+
+      const entries = Object.entries(editOrderLineItems).sort((a,b) => (a[1].addedAt||0) - (b[1].addedAt||0));
+      let calcTotal = 0;
+
+      if (entries.length === 0) {
+        list.innerHTML = `<p class="text-xs text-slate-400 font-bold text-center py-6">No items in order. Add dishes from the menu on the right.</p>`;
+      }
+
+      entries.forEach(([key, li]) => {
+        const isCanc = !!li.cancelled;
+        const lineSum = (Number(li.price)||0) * (Number(li.qty)||0);
+        if (!isCanc) calcTotal += lineSum;
+
+        list.innerHTML += `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-white border ${isCanc ? 'border-red-200 opacity-60' : 'border-slate-200'} shadow-sm gap-2">
+            <div class="flex-1 min-w-0">
+              <p class="font-black text-xs text-slate-800 truncate ${isCanc ? 'line-through text-red-500' : ''}">${translateText(li.name)}</p>
+              <p class="text-[10px] font-bold text-slate-400">${translateText(li.variant || 'Regular')} · ₹${li.price} each ${isCanc ? '· [CANCELLED]' : ''}</p>
+            </div>
+            ${!isCanc ? `
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button type="button" onclick="changeEditOrderItemQty('${key}', -1)" class="w-7 h-7 bg-slate-100 hover:bg-slate-200 rounded-lg font-black text-xs text-slate-800">-</button>
+              <span class="font-black text-xs w-6 text-center">${li.qty}</span>
+              <button type="button" onclick="changeEditOrderItemQty('${key}', 1)" class="w-7 h-7 bg-dark text-primary rounded-lg font-black text-xs">+</button>
+            </div>
+            <div class="text-right w-14 shrink-0">
+              <span class="font-black text-xs text-slate-900">₹${lineSum}</span>
+            </div>
+            <button type="button" onclick="toggleCancelEditOrderItem('${key}')" title="Cancel / Remove Item" class="w-7 h-7 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg font-black text-xs shrink-0">✕</button>
+            ` : `
+            <button type="button" onclick="toggleCancelEditOrderItem('${key}')" class="px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg font-black text-[10px] shrink-0">↺ Restore</button>
+            `}
+          </div>`;
+      });
+
+      calcTotal = Math.round(calcTotal * 100) / 100;
+      const sumBadge = document.getElementById('editOrderAutoSum');
+      if (sumBadge) sumBadge.innerText = `Auto: ₹${calcTotal}`;
+      if (autoUpdateTotal) {
+        document.getElementById('editOrderTotal').value = calcTotal;
+      }
+    };
+
+    window.recalcEditOrderTotal = function(){
+      renderEditOrderCartList(true);
+    };
+
+    window.changeEditOrderItemQty = function(key, delta){
+      const li = editOrderLineItems[key];
+      if (!li || li.cancelled) return;
+      li.qty = (Number(li.qty) || 1) + delta;
+      if (li.qty <= 0) {
+        li.cancelled = true;
+        li.qty = 1;
+      }
+      renderEditOrderCartList(true);
+    };
+
+    window.toggleCancelEditOrderItem = function(key){
+      const li = editOrderLineItems[key];
+      if (!li) return;
+      li.cancelled = !li.cancelled;
+      renderEditOrderCartList(true);
+    };
+
+    window.renderEditOrderMenuPicker = function(){
+      const grid = document.getElementById('editOrderMenuGrid');
+      if(!grid) return;
+      const q = (document.getElementById('editOrderMenuSearch')?.value || '').trim().toLowerCase();
+      grid.innerHTML = '';
+
+      Object.entries(menuCache).forEach(([id, item]) => {
+        const transName = translateText(item.name);
+        if (q && !transName.toLowerCase().includes(q) && !(item.name||'').toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
+
+        let varSelect = '';
+        if (item.portions && Object.keys(item.portions).length > 0) {
+          varSelect = `<select id="editModalVar-${id}" class="w-full mt-1 p-1.5 rounded-lg bg-slate-50 text-[10px] font-bold border border-slate-200 outline-none">
+            <option value="Regular|${item.base_price}">${translateText('Regular')} - ₹${item.base_price}</option>`;
+          Object.entries(item.portions).forEach(([pName, pPrice]) => {
+            varSelect += `<option value="${pName}|${pPrice}">${translateText(pName)} - ₹${pPrice}</option>`;
+          });
+          varSelect += `</select>`;
+        } else {
+          varSelect = `<div class="font-black text-xs text-primary mt-1">₹${item.base_price}</div>`;
+        }
+
+        grid.innerHTML += `
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200 flex flex-col justify-between shadow-sm">
+            <div>
+              <h4 class="font-black text-xs text-slate-800 leading-tight">${transName}</h4>
+              ${varSelect}
+            </div>
+            <button type="button" onclick="addMenuItemToEditOrder('${id}')" class="mt-2 w-full bg-dark hover:bg-black text-primary py-1.5 rounded-lg text-[11px] font-black active:scale-95 transition-transform">+ Add to Bill</button>
+          </div>`;
+      });
+    };
+
+    window.addMenuItemToEditOrder = function(id){
+      const item = menuCache[id];
+      if(!item) return;
+      let price = Number(item.base_price) || 0;
+      let variant = 'Regular';
+      const sel = document.getElementById(`editModalVar-${id}`);
+      if (sel && sel.value) {
+        const pts = sel.value.split('|');
+        variant = pts[0];
+        price = parseFloat(pts[1]) || 0;
+      }
+
+      // Check if an active (un-cancelled) line item with same itemId + variant already exists
+      const existingEntry = Object.entries(editOrderLineItems).find(([, li]) => !li.cancelled && li.name === item.name && (li.variant || 'Regular') === variant);
+      if (existingEntry) {
+        existingEntry[1].qty = (Number(existingEntry[1].qty) || 1) + 1;
+      } else {
+        const newKey = `admin_${Date.now()}_${Math.random().toString(36).slice(2,6)}`;
+        editOrderLineItems[newKey] = {
+          itemId: id,
+          name: item.name,
+          variant: variant,
+          price: price,
+          qty: 1,
+          cancelled: false,
+          addedAt: Date.now()
+        };
+      }
+      renderEditOrderCartList(true);
+    };
+
     window.saveEditOrder = function(){
-      const rawLines = document.getElementById('editOrderItems').value.split('\n').map(l=>l.trim()).filter(Boolean);
-      const newTotal = parseFloat(document.getElementById('editOrderTotal').value);
-      db.ref('active_tables/'+editOrderId).update({ items: rawLines.join(' | '), total: newTotal }).then(()=>closeEditOrder());
+      if(!editOrderId) return;
+      const newTotal = Math.round((parseFloat(document.getElementById('editOrderTotal').value) || 0) * 100) / 100;
+      if(isNaN(newTotal) || newTotal < 0) return alert('Please enter a valid total amount.');
+
+      const formattedItems = Object.values(editOrderLineItems)
+        .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
+        .map(li => {
+          let base = `${li.qty}x ${li.name}`;
+          if (li.variant && li.variant !== 'Regular') base += ` (${li.variant})`;
+          if (li.note) base += ` - Note: ${li.note}`;
+          return li.cancelled ? `${base} [CANCELLED]` : base;
+        })
+        .join(' | ');
+
+      db.ref('active_tables/' + editOrderId).update({
+        line_items: editOrderLineItems,
+        items: formattedItems,
+        total: newTotal
+      }).then(() => {
+        showGlobalToast("Order & Customer Bill updated!", "success");
+        closeEditOrder();
+      }).catch(err => alert("Failed to update order: " + err.message));
     };
 
     window.renderInventory = function(){
