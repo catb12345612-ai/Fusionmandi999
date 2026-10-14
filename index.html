@@ -260,9 +260,8 @@
 
     if (!localStorage.getItem('mc_data_cleared_v1')) {
         db.ref('active_tables').remove();
-        localStorage.removeItem('fm_cust_phone'); // Clear old fusion mandi cache
+        localStorage.removeItem('fm_cust_phone'); 
         localStorage.setItem('mc_data_cleared_v1', 'true');
-        console.log("Database formatted for Mandi Croods luxury update.");
     }
 
     db.ref('.info/connected').on('value', snap => {
@@ -303,25 +302,58 @@
     
     // Luxury Arpeggio Chime
     function playChime(){ 
-        playTone(523.25, 0.4, 'sine', 0.2, 0);   // C5
-        playTone(659.25, 0.4, 'sine', 0.2, 0.1); // E5
-        playTone(783.99, 0.4, 'sine', 0.2, 0.2); // G5
-        playTone(1046.50, 0.6, 'sine', 0.2, 0.3); // C6
+        playTone(523.25, 0.4, 'sine', 0.2, 0);   
+        playTone(659.25, 0.4, 'sine', 0.2, 0.1); 
+        playTone(783.99, 0.4, 'sine', 0.2, 0.2); 
+        playTone(1046.50, 0.6, 'sine', 0.2, 0.3); 
     }
     function playClick(){ playTone(880,.05,'triangle',.1,0); }
     function playSuccess(){ playTone(659.25,.15,'sine',.15,0); playTone(880,.25,'sine',.15,.1); }
     function playBell(){ playTone(1046.5,.5,'sine',.2,0); playTone(1318.5,.4,'sine',.1,.08); }
     function playNotify(){ playTone(440,.15,'sine',.15,0); playTone(554.37,.2,'sine',.15,.1); }
     function playError(){ playTone(220,.3,'sawtooth',.15,0); }
+    
+    // Ensure Voices Load (Especially on Chrome)
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+    
     function speakWelcome(){
       try{
         if(!('speechSynthesis' in window)) return;
         window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance("Welcome to Mandi Croods, enjoy your premium dining experience.");
-        msg.rate = 0.9; msg.pitch = 1.0; msg.volume = 1.0;
+        
+        let text = "Welcome to Mandi Croods, enjoy your premium dining experience.";
+        if(lang === 'te') text = "మండి క్రూడ్స్ కి స్వాగతం, మీ భోజనాన్ని ఆస్వాదించండి.";
+        if(lang === 'hi') text = "मंडी क्रूड्स में आपका स्वागत है, अपने भोजन का आनंद लें।";
+
+        const msg = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        let targetVoice = null;
+        
+        // Target Male Indian/Telugu Voices
+        if(lang === 'te') {
+            targetVoice = voices.find(v => v.lang.includes('te') && v.name.toLowerCase().includes('male'));
+            if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('te'));
+        } else if(lang === 'hi') {
+            targetVoice = voices.find(v => v.lang.includes('hi') && v.name.toLowerCase().includes('male'));
+            if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('hi'));
+        }
+        
+        // Fallback to Indian English male
+        if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('en-IN') && v.name.toLowerCase().includes('male'));
+        if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('en-IN'));
+
+        if(targetVoice) msg.voice = targetVoice;
+        
+        msg.rate = 0.85; 
+        msg.pitch = 0.6; // Deep male tone simulation
+        msg.volume = 1.0;
+        
         window.speechSynthesis.speak(msg);
       }catch(e){ }
     }
+    
     function vibrate(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){ } }
 
     const FUN_LINES = [
@@ -407,7 +439,6 @@
     let customerPhone = localStorage.getItem('mc_cust_phone') || "";
     let myServiceRequests = new Set();
     
-    // Collapsible cart state
     let cartExpanded = true;
     window.toggleCart = function() {
       cartExpanded = !cartExpanded;
@@ -427,7 +458,6 @@
       }
     };
 
-    // Service Modal Functions
     window.openServiceModal = function() {
         playClick();
         const tableVal = document.getElementById('tableNum').value;
@@ -475,13 +505,12 @@
         });
     };
 
-    // Monitor My Service Requests for Resolution
     db.ref('service_requests').on('child_changed', snap => {
         const req = snap.val();
         if(myServiceRequests.has(snap.key) && req.status === 'resolved') {
             playSuccess();
             showFunToast("✅ Your request has been attended to. Thank you!");
-            myServiceRequests.delete(snap.key); // remove from track list
+            myServiceRequests.delete(snap.key); 
         }
     });
     
@@ -490,12 +519,44 @@
         document.body.classList.remove('overflow-hidden');
     }
 
+    // --- AUTO TRANSLATION ENGINE ---
     const i18n = {
       en: { welcome: "Mandi Croods", enter_mobile: "Enter mobile number to view our premium menu.", mobile_placeholder: "10-Digit Mobile", proceed: "Enter Menu", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "Premium Menu", cat_group: "👑 Royal Packs (4+)", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_veg: "Veg", cat_bev: "Beverages", add: "ADD", sold_out: "SOLD OUT", special: "⭐ SPECIAL", qty_left: "Left", total_bill: "Total Tab:", cart_total: "Selected Items", confirm_order: "Send to Kitchen", special_req: "Chef instructions or special requests?", live_status: "Your Running Tab", food_feedback: "Rate your luxury experience", thanks_feedback: "Thank you for your valuable feedback! 👑", scan_pay: "Scan to Pay via UPI", request_bill: "Request Final Bill", select_payment: "Select Payment Method", loading_menu: "Loading Premium Menu..." },
       hi: { welcome: "मंडी क्रूड्स", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_group: "👑 4+ लोग", cat_chicken: "चिकन", cat_mutton: "मटन", cat_veg: "वेज", cat_bev: "पेयजल", add: "जोड़ें", sold_out: "ख़त्म हो गया", special: "⭐ विशेष", qty_left: "बचे हैं", total_bill: "कुल बिल:", cart_total: "नए आइटम", confirm_order: "किचन में भेजें", special_req: "कोई निर्देश?", live_status: "आपका रनिंग टैब", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! 👑", scan_pay: "UPI से भुगतान करें", request_bill: "फाइनल बिल मांगें", select_payment: "भुगतान का तरीका चुनें", loading_menu: "लोड हो रहा है..." },
       te: { welcome: "మండి క్రూడ్స్", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_group: "👑 4+ వ్యక్తులు", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_veg: "వెజ్", cat_bev: "పానీయాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "⭐ స్పెషల్", qty_left: "మిగిలి ఉన్నాయి", total_bill: "మొత్తం బిల్లు:", cart_total: "కొత్త వస్తువులు", confirm_order: "వంటగదికి పంపండి", special_req: "ఏదైనా సూచనలు?", live_status: "టేబుల్ రన్నింగ్ ట్యాబ్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! 👑", scan_pay: "స్కాన్ చేయండి", request_bill: "ఫైనల్ బిల్ అడగండి", select_payment: "చెల్లింపు విధానాన్ని ఎంచుకోండి", loading_menu: "లోడ్ అవుతోంది..." }
     };
+    
+    // Dynamic Menu Item Translation Dictionary
+    const wordDict = {
+      'hi': {
+        'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
+        'special': 'स्पेशल', 'juicy': 'जूसी', 'mixed': 'मिक्स्ड', 'paneer': 'पनीर', 'mushroom': 'मशरूम',
+        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस', 
+        'pcs': 'पीस', 'half': 'हाफ', 'full': 'फुल', 'regular': 'रेगुलर', 'single': 'सिंगल', 'triple': 'ट्रिपल',
+        'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'bhakasura': 'बकासुर'
+      },
+      'te': {
+        'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
+        'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
+        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్', 
+        'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
+        'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర'
+      }
+    };
+    
     let lang = 'en'; const t = (k) => i18n[lang][k] || k;
+
+    function translateItem(text) {
+        if (lang === 'en' || !text) return text;
+        let res = text.toString();
+        const curDict = wordDict[lang] || {};
+        const keys = Object.keys(curDict).sort((a,b) => b.length - a.length);
+        keys.forEach(k => {
+            const regex = new RegExp(`\\b${k}\\b`, 'gi');
+            res = res.replace(regex, curDict[k]);
+        });
+        return res;
+    }
 
     window.changeLanguage = function(l) {
       lang = l;
@@ -508,6 +569,11 @@
       });
       document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-i18n-placeholder')));
       renderMenu();
+      updateCartUI();
+      if(activeTableData) {
+          const tableId = `table_${document.getElementById('tableNum').value}`;
+          renderOrderedItemsList(activeTableData, tableId);
+      }
     };
 
     window.registerCustomer = function() {
@@ -605,15 +671,17 @@
         let selectHtml = '';
         if (item.portions && Object.keys(item.portions).length > 0) {
           selectHtml = `<select id="var-${id}" class="w-full mt-2 p-2.5 rounded-lg text-xs font-bold bg-white border border-primary/20 outline-none focus:border-primary text-dark">`;
-          selectHtml += `<option value="Regular|${item.base_price}">Regular - ₹${item.base_price}</option>`;
+          selectHtml += `<option value="Regular|${item.base_price}">${translateItem('Regular')} - ₹${item.base_price}</option>`;
           Object.entries(item.portions).forEach(([pName, pPrice]) => { 
-              selectHtml += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`; 
+              selectHtml += `<option value="${pName}|${pPrice}">${translateItem(pName)} - ₹${pPrice}</option>`; 
           });
           selectHtml += `</select>`;
         } else { selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`; }
 
         let cartQty = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) cartQty += cart[k].qty; });
         const stockBadge = getStockBadge(item, stock);
+
+        const displayName = translateItem(item.name);
 
         grid.innerHTML += `
           <div class="food-card fade-in-card bg-card rounded-2xl p-4 flex flex-col relative overflow-hidden">
@@ -623,7 +691,7 @@
               <img src="${item.image_url}" class="w-full h-full object-cover">
             </div>
             <div class="flex flex-col flex-1">
-              <h3 class="font-black text-dark leading-tight text-sm">${item.name}</h3>
+              <h3 class="font-black text-dark leading-tight text-sm">${displayName}</h3>
               ${stockBadge ? `<div class="mt-1.5">
                 <span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full ${stockBadge.cls}">${stockBadge.text}</span>${stockBadge.pct !== null ? `<div class="w-full h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden"><div class="h-full ${stockBadge.pct<=20?'bg-red-500':'bg-amber-500'} rounded-full transition-all" style="width:${stockBadge.pct}%"></div></div>` : ''}
               </div>` : ''}
@@ -689,7 +757,7 @@
         totalQty += (Number(i.qty)||0);
         uiHtml += `<div class="py-3 flex items-center justify-between border-b border-white/10 last:border-0 text-sm">
           <div class="flex flex-col flex-1 pr-2">
-            <span class="font-bold text-white leading-tight">${i.name} <small class="text-primary opacity-80 font-semibold block">${i.variant}</small></span>
+            <span class="font-bold text-white leading-tight">${translateItem(i.name)} <small class="text-primary opacity-80 font-semibold block">${translateItem(i.variant)}</small></span>
             <span class="text-primary font-black mt-0.5">₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span>
           </div>
           <div class="flex items-center bg-white/10 rounded-lg p-1 shrink-0">
@@ -766,12 +834,12 @@
           const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
           if(li.cancelled){
             return `<div class="py-2 border-b border-white/5 last:border-0 opacity-50">
-              <span class="text-red-500 mr-2">✕</span><s>${li.name} [${li.variant}] (x${li.qty})</s>
+              <span class="text-red-500 mr-2">✕</span><s>${translateItem(li.name)} [${translateItem(li.variant)}] (x${li.qty})</s>
               <span class="text-[10px] text-red-500 font-black ml-1 border border-red-500/50 px-1 rounded">CANCELLED</span>
             </div>`;
           }
           return `<div class="py-2 border-b border-white/5 last:border-0 flex items-center justify-between gap-2">
-            <span><span class="text-primary mr-2">✓</span>${li.name} <span class="opacity-70">[${li.variant}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-400 opacity-80">📝 ${li.note}</span>` : ''}</span>
+            <span><span class="text-primary mr-2">✓</span>${translateItem(li.name)} <span class="opacity-70">[${translateItem(li.variant)}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-400 opacity-80">📝 ${li.note}</span>` : ''}</span>
             ${canCancel ? `<button onclick="cancelOrderItem('${tableId}','${li.key}')" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-black px-2 py-1.5 rounded-lg active:scale-90 transition-transform">✕ Cancel</button>` : ''}
           </div>`;
         }).join('') +
