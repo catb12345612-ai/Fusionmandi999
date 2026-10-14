@@ -58,11 +58,11 @@
     ⚠ Connection lost — reconnecting to Mandi Croods servers...
   </div>
 
-  <!-- Luxury Login Modal -->
-  <div id="loginModal" class="fixed inset-0 z-[150] flex flex-col items-center justify-center p-5 welcome-bg overflow-hidden">
+  <!-- Luxury Login Modal (Strict Layout Fix) -->
+  <div id="loginModal" class="fixed top-0 left-0 w-full h-full min-h-screen z-[9999] flex flex-col items-center justify-center p-5 welcome-bg">
     <!-- Decorative Gold Accents -->
-    <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full"></div>
-    <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-primary opacity-10 blur-3xl rounded-full"></div>
+    <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+    <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-primary opacity-10 blur-3xl rounded-full pointer-events-none"></div>
 
     <div class="bg-dark p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_50px_rgba(212,175,55,0.15)] border border-primary/20 relative z-10">
       <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg border-2 border-dark">🍖</div>
@@ -258,10 +258,11 @@
     const UPI_PAYEE_NAME = "Mandi Croods";
     const RESTAURANT_HELP_PHONE = "91XXXXXXXXXX";
 
-    if (!localStorage.getItem('mc_data_cleared_v1')) {
+    if (!localStorage.getItem('mc_data_cleared_v4')) {
         db.ref('active_tables').remove();
-        localStorage.removeItem('fm_cust_phone'); 
-        localStorage.setItem('mc_data_cleared_v1', 'true');
+        localStorage.clear(); 
+        localStorage.setItem('mc_data_cleared_v4', 'true');
+        console.log("Database formatted for Mandi Croods luxury update v4.");
     }
 
     db.ref('.info/connected').on('value', snap => {
