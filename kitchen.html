@@ -164,12 +164,20 @@
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base Price (₹)</label>
                 <input type="number" id="newDishPrice" placeholder="0" class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
               </div>
-              <div class="md:col-span-1">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Image URL</label>
-                <input type="text" id="newDishImg" placeholder="https://..." class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
+              
+              <!-- SMART IMAGE UPLOAD ENGINE -->
+              <div class="md:col-span-1 relative">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📸 Upload Photo</label>
+                <div class="w-full h-[46px] bg-light border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden relative cursor-pointer group">
+                  <input type="file" accept="image/*" capture="environment" onchange="processImageUpload(this, 'newDishImgUrl', 'newDishImgPreview', 'newDishImgText')" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-20">
+                  <span id="newDishImgText" class="text-xs font-bold text-slate-500 group-hover:text-primary z-10">Tap to Camera/Gallery</span>
+                  <img id="newDishImgPreview" class="absolute inset-0 w-full h-full object-cover hidden z-0">
+                </div>
+                <input type="hidden" id="newDishImgUrl">
               </div>
+
               <div class="md:col-span-1">
-                <button onclick="addNewDish()" class="w-full gold-gradient text-black font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform">ADD DISH</button>
+                <button onclick="addNewDish()" class="w-full gold-gradient text-black font-black py-3 rounded-xl shadow-md active:scale-95 transition-transform h-[46px]">ADD DISH</button>
               </div>
             </div>
 
@@ -289,6 +297,7 @@
     </div>
   </div>
 
+  <!-- Edit Item Modal -->
   <div id="editItemModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-5 no-print">
     <div class="bg-card rounded-3xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto border border-primary/30">
       <div class="flex items-center justify-between mb-4">
@@ -316,10 +325,20 @@
             <input type="number" id="editItemPrice" min="0" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-black text-sm outline-none focus:border-primary">
           </div>
         </div>
+        
+        <!-- SMART IMAGE UPLOAD ENGINE -->
         <div>
-          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Image URL</label>
-          <input type="text" id="editItemImg" placeholder="https://..." class="w-full p-3 bg-light border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dish Image (Tap to change)</label>
+          <div class="relative w-full h-32 bg-light border border-slate-200 rounded-xl overflow-hidden group cursor-pointer shadow-inner">
+            <input type="file" accept="image/*" capture="environment" onchange="processImageUpload(this, 'editItemImgUrl', 'editItemImgPreview', 'editItemImgText')" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer z-20">
+            <div id="editItemImgText" class="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <span class="text-white font-bold text-sm">📸 Upload New Photo</span>
+            </div>
+            <img id="editItemImgPreview" class="absolute inset-0 w-full h-full object-cover z-0">
+          </div>
+          <input type="hidden" id="editItemImgUrl">
         </div>
+
         <div class="grid grid-cols-2 gap-4 items-end">
           <div>
             <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Stock Qty</label>
@@ -373,12 +392,64 @@
       const banner = document.getElementById('globalErrorBanner');
       if(banner){ 
         banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg; 
-        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-blue-600'}`;
+        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-emerald-600'}`;
         banner.classList.remove('hidden'); 
         setTimeout(() => { banner.classList.add('hidden'); }, 5000);
       }
     }
     
+    // --- SMART IMAGE UPLOAD ENGINE ---
+    // Compresses the image on the device itself so it fits perfectly in the Firebase Realtime Database
+    window.processImageUpload = function(inputElem, hiddenUrlId, previewId, textId) {
+        const file = inputElem.files[0];
+        if (!file) return;
+
+        const previewEl = document.getElementById(previewId);
+        const urlEl = document.getElementById(hiddenUrlId);
+        const textEl = document.getElementById(textId);
+
+        if(textEl) textEl.innerText = "⏳ Compressing...";
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                // Compress image logic
+                const canvas = document.createElement('canvas');
+                const maxSize = 400; // Optimal size for menu items to keep database fast
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxSize) { height = Math.round(height * (maxSize / width)); width = maxSize; }
+                } else {
+                    if (height > maxSize) { width = Math.round(width * (maxSize / height)); height = maxSize; }
+                }
+                canvas.width = width; canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Convert to compressed Base64 string
+                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                
+                // Set the UI and hidden input
+                previewEl.src = compressedDataUrl;
+                previewEl.classList.remove('hidden');
+                urlEl.value = compressedDataUrl;
+                
+                if(textEl) {
+                    textEl.innerText = "✅ Uploaded!";
+                    textEl.classList.replace('text-white', 'text-emerald-400');
+                    textEl.classList.replace('text-slate-500', 'text-emerald-600');
+                }
+                
+                showGlobalToast("Photo processed and ready!", "success");
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
     let db = null;
     try {
       firebase.initializeApp(firebaseConfig);
@@ -398,7 +469,7 @@
     let revenueChart = null, paymentChart = null, topItemsChart = null;
     let revenueDataByDate = {};
     let dbConnected = false;
-    let alertedLowStock = new Set(); // To prevent spamming low stock toasts
+    let alertedLowStock = new Set(); 
 
     // POS State
     let posCart = {};
@@ -568,7 +639,6 @@
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
 
           let btn = '';
-          const isPrintRole = (currentRole === 'admin' || currentRole === 'kitchen');
           
           if (currentRole === 'admin') {
             if(table.status === 'pending') { 
@@ -697,14 +767,14 @@
         db.ref('menu').on('value', snap => {
           menuCache = snap.val() || {};
           renderInventory();
-          renderPosMenu(); // Also update POS
+          renderPosMenu(); 
           
           // Low Stock Alert
           let lowItems = [];
           for (let k in menuCache) {
              if (menuCache[k].stock_count <= 5 && !alertedLowStock.has(k)) {
                  lowItems.push(menuCache[k].name);
-                 alertedLowStock.add(k); // alert once per session unless reloaded
+                 alertedLowStock.add(k); 
              }
           }
           if (lowItems.length > 0) {
@@ -858,7 +928,6 @@
             if (!existing) existing = { table: tNum, phone: phone, status: 'pending', line_items: {} };
             const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
             
-            // Helper function internally
             const buildStr = (liObj) => Object.values(liObj).map(i => `${i.qty}x ${i.name} ${i.variant!=='Regular'?'('+i.variant+')':''}`).join(' | ');
             const getTot = (liObj) => Object.values(liObj).reduce((s,i)=>s+(i.cancelled?0:i.price*i.qty), 0);
 
@@ -1039,7 +1108,12 @@
       document.getElementById('editItemName').value = item.name;
       document.getElementById('editItemCat').value = item.category;
       document.getElementById('editItemPrice').value = item.base_price;
-      document.getElementById('editItemImg').value = item.image_url;
+      
+      document.getElementById('editItemImgUrl').value = item.image_url;
+      const prev = document.getElementById('editItemImgPreview');
+      prev.src = item.image_url;
+      prev.classList.remove('hidden');
+
       document.getElementById('editItemStock').value = item.stock_count;
       document.getElementById('editItemSpecial').checked = !!item.is_special;
       const pC = document.getElementById('editItemPortions'); pC.innerHTML='';
@@ -1053,7 +1127,7 @@
         name: document.getElementById('editItemName').value.trim(),
         category: document.getElementById('editItemCat').value,
         base_price: parseFloat(document.getElementById('editItemPrice').value),
-        image_url: document.getElementById('editItemImg').value.trim(),
+        image_url: document.getElementById('editItemImgUrl').value.trim() || document.getElementById('editItemImgPreview').src,
         stock_count: parseInt(document.getElementById('editItemStock').value),
         is_special: document.getElementById('editItemSpecial').checked,
         portions: collectPortions('editItemPortions').portions
@@ -1066,12 +1140,27 @@
       const name = document.getElementById('newDishName').value.trim();
       const price = parseFloat(document.getElementById('newDishPrice').value);
       if(!name || isNaN(price)) return alert("Valid name and price required.");
+      
+      const imgUrl = document.getElementById('newDishImgUrl').value || document.getElementById('newDishImgPreview').src || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
+
       const newItemId = 'item_' + Date.now();
       db.ref('menu/' + newItemId).set({
         name, base_price: price, category: document.getElementById('newDishCat').value,
-        image_url: document.getElementById('newDishImg').value || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80",
+        image_url: imgUrl,
         stock_count: 50, portions: collectPortions('newDishPortions').portions
-      }).then(() => alert('Dish Added!'));
+      }).then(() => {
+          alert('Dish Added!');
+          document.getElementById('newDishName').value = '';
+          document.getElementById('newDishPrice').value = '';
+          document.getElementById('newDishImgUrl').value = '';
+          document.getElementById('newDishImgPreview').classList.add('hidden');
+          const t = document.getElementById('newDishImgText');
+          if(t) {
+              t.innerText = "Tap to Camera/Gallery";
+              t.classList.replace('text-emerald-400', 'text-white');
+              t.classList.replace('text-emerald-600', 'text-slate-500');
+          }
+      });
     };
 
     // Zero-Bill Cancellation
@@ -1079,13 +1168,8 @@
       if(currentRole !== 'admin') return;
       if(!confirm(`Cancel this order? The customer will be notified of a zero bill.`)) return;
       
-      // We set status to cancelled so customer app sees it, alerts, and self-clears.
       db.ref('active_tables/'+id).update({ status: 'cancelled', total: 0 });
-      
-      // Give the customer app 4 seconds to detect the change, then remove from DB
-      setTimeout(() => {
-          db.ref('active_tables/'+id).remove();
-      }, 4000);
+      setTimeout(() => { db.ref('active_tables/'+id).remove(); }, 4000);
     };
 
     window.clearTable = async function(id) {
