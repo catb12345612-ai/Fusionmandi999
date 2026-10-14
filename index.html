@@ -439,6 +439,7 @@
     let cartWasVisible = false; let lastKnownStatus = null;
     let customerPhone = localStorage.getItem('mc_cust_phone') || "";
     let myServiceRequests = new Set();
+    let autoBillText = "";
     
     let cartExpanded = true;
     window.toggleCart = function() {
@@ -825,6 +826,18 @@
       return Math.round(total * 100) / 100;
     }
 
+    function buildBillText(order){
+      const lines = buildLineItemsArray(order);
+      let body = lines.map(li => {
+        const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
+        const base = `${li.name} [${li.variant}] (x${li.qty}) - Rs.${lineTotal}`;
+        return li.cancelled ? `${base} (CANCELLED)` : base;
+      }).join('\n');
+      if(!body && order.items) body = String(order.items).replace(/ \| /g, '\n');
+      if(!body) body = '(no items)';
+      return `=== MANDI CROODS ===\nTable: ${order.table}\nMobile: ${order.phone || customerPhone}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${body}\n------------------\nTOTAL: Rs. ${order.total}\n==================\nThank you for dining with Mandi Croods! 👑`;
+    }
+
     function renderOrderedItemsList(order, tableId){
       const div = document.getElementById('customerOrderedItems');
       const lines = buildLineItemsArray(order);
@@ -1024,6 +1037,7 @@
           const statusChanged = order.status !== lastKnownStatus;
 
           activeTableData = order; tr.classList.remove('hidden'); 
+          autoBillText = buildBillText(order);
 
           if (wasHidden) {
             tr.classList.remove('tracker-pop-in'); void tr.offsetWidth;
@@ -1072,7 +1086,20 @@
             tr.classList.add('hidden'); 
             activeTableData = null; lastKnownStatus = null;
             playBell(); fireConfetti(); showFunToast(randomFunLine());
-            alert("Table Cleared! Thank you for dining with Mandi Croods. Please login again for a new order.");
+
+            // Auto-Download Bill for Customer
+            if (autoBillText) {
+              try {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([autoBillText], { type: 'text/plain' }));
+                a.download = `MandiCroods_Bill_${tableId}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              } catch(err) { console.error('Customer bill download error', err); }
+            }
+
+            alert("Table Cleared! Receipt downloaded. Thank you for dining with Mandi Croods.");
             localStorage.removeItem('mc_cust_phone');
             setTimeout(() => { window.location.reload(); }, 1500); 
           }
