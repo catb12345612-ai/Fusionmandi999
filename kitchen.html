@@ -9,7 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', sidebar: '#0F1014', light: '#f8f9fa', card: '#ffffff' } } } }
+    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#0F1014', light: '#f8f9fa', card: '#ffffff' } } } }
   </script>
   <style>
     @media print { 
@@ -490,6 +490,37 @@
         return String(rawData||'').trim();
     }
 
+    function buildFinalBillText(tableData){
+      const itemsStr = extractOrderItemsStr(tableData);
+      return `=== MANDI CROODS ===\nTable: ${tableData.table}\nMobile: ${tableData.phone || 'Walk-in'}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${itemsStr ? itemsStr.replace(/ \| /g,'\n') : '(no items)'}\n------------------\nTOTAL: Rs. ${tableData.total}\nPayment: ${(tableData.paymentMethod || 'CASH').toUpperCase()}\n==================\nThank you for dining with Mandi Croods! 👑`;
+    }
+
+    function downloadFinalBillFile(billText, tableId){
+      try{
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
+        a.download = `MandiCroods_Bill_${tableId}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }catch(e){ console.error('Admin bill download failed', e); }
+    }
+
+    function sendBillToCustomerWhatsApp(tableData, billText){
+      try{
+        if(!tableData || !tableData.phone) return;
+        const cleanPhone = String(tableData.phone).replace(/\D/g, '').slice(-10);
+        if(cleanPhone.length !== 10) return;
+        const waLink = document.createElement('a');
+        waLink.href = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(billText)}`;
+        waLink.target = '_blank';
+        waLink.rel = 'noopener';
+        document.body.appendChild(waLink);
+        waLink.click();
+        document.body.removeChild(waLink);
+      }catch(e){ console.error('WhatsApp bill send failed', e); }
+    }
+
     function showGlobalToast(msg, type='error'){
       const banner = document.getElementById('globalErrorBanner');
       if(banner){ 
@@ -748,14 +779,14 @@
           
           if (currentRole === 'admin') {
             if(table.status === 'pending') { 
-              btn = `<button class="w-full bg-blue-600 text-white py-4 rounded-xl font-black shadow-md" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Print KOT (Kitchen)')}</button>`; 
+              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md transition-colors" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Print KOT (Kitchen)')}</button>`; 
             } else if (table.status === 'cooking') {
-              btn = `<button class="w-full bg-blue-600 text-white py-3 rounded-xl font-black shadow-md mb-2" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Re-Print KOT')}</button>
-                     <button class="w-full bg-emerald-500 text-white py-3 rounded-xl font-black shadow-md" onclick="markServed('${id}')">✅ ${translateText('Mark Food Served')}</button>`; 
+              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-md mb-2 transition-colors" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Re-Print KOT')}</button>
+                     <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black shadow-md transition-colors" onclick="markServed('${id}')">✅ ${translateText('Mark Food Served')}</button>`; 
             } else if(table.status === 'bill_requested') { 
-              btn = `<button class="w-full bg-dark text-primary border border-primary/50 py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">${translateText('Clear Table')} (${table.paymentMethod || 'CASH'})</button>`; 
+              btn = `<button class="w-full gold-gradient hover:opacity-95 text-black border-2 border-amber-600 py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 ${translateText('Clear Table')} & Bill (${table.paymentMethod || 'CASH'})</button>`; 
             } else { 
-              btn = `<button class="w-full bg-dark text-white py-4 rounded-xl font-black shadow-md" onclick="clearTable('${id}')">${translateText('Clear Table')}</button>`; 
+              btn = `<button class="w-full bg-slate-900 hover:bg-black text-primary border-2 border-primary py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 ${translateText('Clear Table')} & Bill</button>`; 
             }
           } else if (currentRole === 'kitchen') {
              if(table.status === 'pending') {
@@ -1299,7 +1330,12 @@
       const tableData = (window.currentTables || {})[id];
       if(!tableData) return;
       const pin = prompt("Enter Admin PIN to clear table:");
-      if(pin !== "admin123" && pin !== "1234") return alert("Invalid PIN.");
+      if(pin === null) return;
+      if(pin.trim() !== "admin123" && pin.trim() !== "1234") return alert("Invalid PIN.");
+
+      const billText = buildFinalBillText(tableData);
+      downloadFinalBillFile(billText, id);
+      sendBillToCustomerWhatsApp(tableData, billText);
 
       const d = new Date().toISOString().split('T')[0];
       const pMethod = tableData.paymentMethod || "CASH";
@@ -1310,7 +1346,7 @@
           curr.total += Number(tableData.total); curr[key] += Number(tableData.total); return curr;
       });
 
-      db.ref(`daily_logs/${d}/${tableData.orderId}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, items: extractOrderItemsStr(tableData), total: tableData.total, method: pMethod.toUpperCase() });
+      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set({ time: new Date().toLocaleTimeString(), table: tableData.table, items: extractOrderItemsStr(tableData), total: tableData.total, method: pMethod.toUpperCase() });
       db.ref('active_tables/'+id).remove();
     }
 
