@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Mandi Croods - Premium Dining</title>
+  <title>Premium Dining</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -12,7 +12,7 @@
   </script>
   <style>
     html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
-    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     .hide-scroll::-webkit-scrollbar { display: none; }
     .food-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(212, 175, 55, 0.1); }
     .food-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.15); border-color: #D4AF37; }
@@ -20,117 +20,35 @@
     .welcome-bg { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); }
     .gold-gradient { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); color: #0a0a0a; }
     .gold-text { background: linear-gradient(135deg, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .vip-glow { animation: goldPulse 2s infinite; }
-    @keyframes goldPulse { 0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); } 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); } }
     @keyframes slideUpBounce { 0% { transform: translateY(140%); opacity: 0; } 60% { transform: translateY(-8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
     .cart-pop-in { animation: slideUpBounce .55s cubic-bezier(.34,1.56,.64,1) both; }
-    @keyframes trackerSlideIn { 0% { transform: translateY(-24px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
-    .tracker-pop-in { animation: trackerSlideIn .55s cubic-bezier(.16,1,.3,1) both; }
     @keyframes fadeInCard { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
     .fade-in-card { animation: fadeInCard .4s ease both; }
-    #printBillArea { display: none; }
-    @media print {
-      body * { visibility: hidden; }
-      #printBillArea, #printBillArea * { visibility: visible; }
-      #printBillArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: #fff; }
-    }
-    .fun-toast {
-      position: fixed; left: 50%; top: 90px; transform: translateX(-50%) translateY(-20px);
-      background: linear-gradient(135deg, #D4AF37, #B38B22);
-      color: #0a0a0a; font-weight: 800; font-size: 13px; padding: 12px 24px;
-      border-radius: 999px; box-shadow: 0 10px 30px rgba(212,175,55,0.4);
-      z-index: 9998; opacity: 0; animation: funToastIn .4s cubic-bezier(.34,1.56,.64,1) forwards;
-      max-width: 88vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .fun-toast-out { animation: funToastOut .5s ease forwards; }
-    @keyframes funToastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-    @keyframes funToastOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
-
-    /* Sliding Right-Edge Service & Action Dock */
-    #sideServiceDock {
-      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-    #sideServiceDock.dock-closed {
-      transform: translateX(calc(100% - 38px));
-    }
-    #sideServiceDock.dock-open {
-      transform: translateX(0);
-    }
+    #sideServiceDock { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+    #sideServiceDock.dock-closed { transform: translateX(calc(100% - 38px)); }
+    #sideServiceDock.dock-open { transform: translateX(0); }
   </style>
 </head>
-<body class="bg-light text-slate-800 font-sans antialiased pb-36 overflow-hidden">
+<body class="bg-light text-slate-800 font-sans antialiased pb-36 overflow-x-hidden">
 
-  <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
-    ⚠ Connection lost — reconnecting to Mandi Croods servers...
-  </div>
-
-  <!-- Luxury Login Modal -->
-  <div id="loginModal" class="fixed top-0 left-0 w-full h-full min-h-screen z-[9999] flex flex-col items-center justify-center p-5 welcome-bg">
-    <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none"></div>
-    <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-primary opacity-10 blur-3xl rounded-full pointer-events-none"></div>
-
+  <!-- Login Modal -->
+  <div id="loginModal" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center p-5 welcome-bg">
     <div class="bg-dark p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_50px_rgba(212,175,55,0.15)] border border-primary/20 relative z-10">
-      <div class="flex justify-end mb-3">
-        <div class="flex items-center gap-1.5 bg-white/5 border border-primary/30 rounded-xl px-2.5 py-1">
-          <span class="text-[10px] font-bold text-primary/80 uppercase tracking-wider">🌐</span>
-          <select id="loginLangSelect" onchange="changeLanguage(this.value)" class="bg-transparent text-primary font-black text-xs outline-none cursor-pointer">
-            <option value="en" class="bg-dark text-primary">English</option>
-            <option value="hi" class="bg-dark text-primary">हिंदी</option>
-            <option value="te" class="bg-dark text-primary">తెలుగు</option>
-          </select>
-        </div>
-      </div>
-
       <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg border-2 border-dark">🍖</div>
-      <h2 class="text-3xl font-black text-white mb-2 tracking-tight gold-text" data-i18n="welcome">Mandi Croods</h2>
-      <p class="text-primary/70 text-sm font-semibold mb-6 tracking-wide" data-i18n="enter_mobile">Enter mobile number to unlock our premium menu.</p>
-      <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="10" data-i18n-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" onkeydown="if(event.key==='Enter') registerCustomer()" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
-      <button onclick="registerCustomer()" class="w-full gold-gradient font-black py-4 rounded-2xl shadow-[0_5px_20px_rgba(212,175,55,0.3)] active:scale-95 transition-transform uppercase tracking-widest text-sm" data-i18n="proceed">Enter Menu</button>
-    </div>
-  </div>
-
-  <!-- Developer Footer -->
-  <div class="bg-dark text-primary/80 px-5 py-2 flex justify-between items-center text-[10px] font-bold z-[105] relative border-b border-primary/20">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center hover:text-primary transition-colors w-1/2 truncate cursor-pointer">
-      <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary/50">
-      Dev: Syed Zeeshaan Ali | High-Fledged AI
-    </a>
-    <div class="flex items-center gap-2">
-      <select id="langSelect" onchange="changeLanguage(this.value)" class="bg-dark text-primary font-black border border-primary/30 rounded px-2 py-1 outline-none">
-        <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
-      </select>
+      <h2 class="text-3xl font-black text-white mb-2 tracking-tight gold-text">Welcome</h2>
+      <p class="text-primary/70 text-sm font-semibold mb-6 tracking-wide">Enter mobile number to unlock menu.</p>
+      <input type="tel" id="customerMobile" maxlength="10" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
+      <button onclick="registerCustomer()" class="w-full gold-gradient font-black py-4 rounded-2xl shadow-[0_5px_20px_rgba(212,175,55,0.3)] active:scale-95 transition-transform uppercase tracking-widest text-sm">Enter Menu</button>
     </div>
   </div>
 
   <header class="glass-nav sticky top-0 z-40 px-5 py-4 flex justify-between items-center">
-    <div>
-      <h1 class="text-2xl font-black tracking-tighter text-dark leading-none">Mandi <span class="text-primary">Croods</span></h1>
-      <p id="vipBadge" class="hidden text-[10px] font-black gold-gradient text-dark px-2 py-0.5 rounded-full mt-1.5 vip-glow inline-block uppercase tracking-widest shadow-sm">👑 VIP Guest</p>
-      <p id="loyaltyTeaser" class="hidden text-[10px] font-bold text-slate-400 mt-1"></p>
-    </div>
+    <h1 class="text-2xl font-black tracking-tighter text-dark leading-none">Smart <span class="text-primary">Menu</span></h1>
     <div class="bg-dark text-primary px-3 py-1.5 rounded-xl shadow-md flex items-center gap-2 border border-primary/20">
-      <span class="text-xs font-bold opacity-80" data-i18n="table">TABLE</span>
-      <select id="tableNum" class="bg-transparent font-black text-primary outline-none cursor-pointer text-sm disabled:opacity-75 disabled:cursor-not-allowed">
-        <optgroup label="Standard Tables">
-          <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option>
-        </optgroup>
-        <optgroup label="R-Section">
-          <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option><option value="R4">R4</option><option value="R5">R5</option><option value="R6">R6</option><option value="R7">R7</option><option value="R8">R8</option><option value="R9">R9</option><option value="R10">R10</option><option value="R11">R11</option>
-        </optgroup>
-        <optgroup label="L-Section">
-          <option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option><option value="L6">L6</option><option value="L7">L7</option>
-        </optgroup>
-        <optgroup label="BH-Section">
-          <option value="BH1">BH1</option><option value="BH2">BH2</option><option value="BH3">BH3</option>
-        </optgroup>
-        <optgroup label="C-Section">
-          <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option><option value="C6">C6</option><option value="C7">C7</option><option value="C8">C8</option>
-        </optgroup>
-        <optgroup label="Takeaway">
-          <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
-        </optgroup>
+      <span class="text-xs font-bold opacity-80">TABLE</span>
+      <select id="tableNum" class="bg-transparent font-black text-primary outline-none cursor-pointer text-sm">
+        <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option>
       </select>
-      <span id="tableLockIcon" class="hidden text-xs" title="Table locked for active order">🔒</span>
     </div>
   </header>
 
@@ -140,222 +58,64 @@
       <span class="text-lg">🎟️</span>
       <div>
         <p class="text-[11px] font-black text-primary uppercase tracking-wider">Use Code: <span class="bg-primary text-dark px-1.5 py-0.5 rounded font-black">MC</span></p>
-        <p class="text-[10px] text-slate-300 font-semibold">₹100–₹500: Flat ₹50 OFF • ₹899 / ₹999 / ₹1000+: Flat ₹100 OFF</p>
+        <p class="text-[10px] text-slate-300 font-semibold">₹100-500: ₹50 OFF • ₹899+: ₹100 OFF</p>
       </div>
     </div>
-    <span class="text-[10px] font-black text-emerald-400 border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 rounded-lg whitespace-nowrap">Up to 50% OFF</span>
+    <button onclick="quickApplyMCCoupon()" class="text-[10px] font-black text-dark bg-primary px-2 py-1 rounded-lg">Apply</button>
   </div>
 
-  <div class="px-5 pt-2 flex items-center justify-between gap-2">
-    <span id="tableOccupancyPill" class="hidden text-[10px] font-black px-2 py-1 rounded-full inline-block border"></span>
+  <!-- Category Bar -->
+  <div class="px-5 py-4 flex space-x-3 overflow-x-auto hide-scroll sticky top-[68px] z-30 bg-light/95 backdrop-blur-md border-b border-primary/10">
+    <button onclick="filterMenu('All', this)" data-cat="All" class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-dark text-primary shadow-md whitespace-nowrap border border-primary/30">Premium Menu</button>
+    <button onclick="filterMenu('Group', this)" data-cat="Group" class="category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-primary/10 text-secondary border border-primary/30 hover:bg-primary/20 whitespace-nowrap">👑 Royal Packs (4+)</button>
+    <button onclick="filterMenu('Chicken', this)" data-cat="Chicken" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:border-primary whitespace-nowrap">Chicken</button>
+    <button onclick="filterMenu('Mutton', this)" data-cat="Mutton" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white border border-slate-200 hover:border-primary whitespace-nowrap">Mutton</button>
   </div>
 
-  <!-- Search + Smooth Horizontal Category Bar -->
-  <div class="px-5 pt-3">
-    <input type="text" id="customerSearchInput" oninput="renderMenu()" placeholder="🔍 Search Mandi, Starters, Cool Drinks, Sweets..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-primary/20 text-xs font-bold text-dark outline-none focus:border-primary shadow-sm">
-  </div>
+  <div id="menuGrid" class="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4"></div>
 
-  <div id="categoryScrollContainer" class="px-5 py-3.5 flex space-x-3 overflow-x-auto hide-scroll sticky top-[68px] z-30 bg-light/95 backdrop-blur-md border-b border-primary/10 shadow-sm">
-    <button onclick="filterMenu('All', this)" data-cat="All" class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-dark text-primary shadow-md transition whitespace-nowrap border border-primary/30" data-i18n="all_items">Premium Menu</button>
-    <button onclick="filterMenu('Group', this)" data-cat="Group" class="category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-primary/10 text-secondary border border-primary/30 hover:bg-primary/20 transition whitespace-nowrap" data-i18n="cat_group">👑 Royal Packs (4+)</button>
-    <button onclick="filterMenu('Chicken', this)" data-cat="Chicken" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_chicken">Chicken</button>
-    <button onclick="filterMenu('Mutton', this)" data-cat="Mutton" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_mutton">Mutton</button>
-    <button onclick="filterMenu('Fish', this)" data-cat="Fish" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_fish">Fish & Prawns</button>
-    <button onclick="filterMenu('Veg', this)" data-cat="Veg" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_veg">Veg</button>
-    <button onclick="filterMenu('Starters', this)" data-cat="Starters" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_starters">Starters</button>
-    <button onclick="filterMenu('Beverages', this)" data-cat="Beverages" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_bev">Sweets, Drinks & Extras</button>
-  </div>
-
-  <!-- Live Running Tab Tracker -->
-  <div id="activeTracker" class="hidden mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(212,175,55,0.2)] border border-primary/30 relative overflow-hidden">
-    <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-    <div class="flex items-center justify-between gap-2">
-      <div>
-        <h3 class="text-xs text-primary font-black uppercase tracking-widest mb-1" data-i18n="live_status">Your Running Tab</h3>
-        <p id="orderStatusText" class="text-2xl font-black text-white uppercase tracking-tight">Active Session</p>
-      </div>
-      <!-- 15-20 Min Live Preparation Countdown Box -->
-      <div id="prepTimerBox" class="hidden bg-white/5 border border-primary/40 rounded-2xl px-3.5 py-2 text-right">
-        <span class="text-[9px] font-black text-primary uppercase tracking-widest block">⏱️ Est. Prep Time (15-20m)</span>
-        <span id="prepTimerCountdown" class="text-lg font-black text-emerald-400 font-mono">20:00</span>
-      </div>
-    </div>
-
-    <!-- Animated Progress Bar for 20-Min Timer -->
-    <div id="prepProgressBarWrap" class="hidden w-full h-1.5 bg-white/10 rounded-full overflow-hidden mt-3">
-      <div id="prepProgressBar" class="h-full gold-gradient transition-all duration-1000" style="width: 100%"></div>
-    </div>
-    
-    <div class="mt-4 border-t border-primary/20 pt-4">
-      <div id="customerOrderedItems" class="hidden mb-4 p-4 bg-white/5 rounded-xl text-sm font-medium text-slate-300 max-h-48 overflow-y-auto shadow-inner border border-white/5 hide-scroll"></div>
-
-      <!-- Coupon Code & MC Quick-Apply Box -->
-      <div class="mb-4 p-3.5 bg-white/5 rounded-2xl border border-primary/20 space-y-2.5">
-        <div class="flex items-center justify-between flex-wrap gap-1">
-          <span class="text-[10px] font-black text-primary uppercase tracking-widest">🎟️ Apply Coupon Code</span>
-          <button onclick="quickApplyMCCoupon()" class="text-[10px] font-black bg-primary/20 hover:bg-primary/30 text-primary border border-primary/40 px-2.5 py-1 rounded-lg transition">⚡ Tap to Apply 'MC' Offer</button>
-          <span id="customerDiscountBadge" class="hidden text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full"></span>
-        </div>
-        <div id="couponInputRow" class="flex gap-2">
-          <input type="text" id="customerCouponInput" placeholder="Enter Code (e.g. MC)" class="flex-1 bg-dark/80 border border-white/15 rounded-xl px-3 py-2 text-xs font-black text-primary uppercase outline-none focus:border-primary placeholder-slate-500">
-          <button onclick="applyCustomerCoupon()" class="gold-gradient text-dark font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider active:scale-95 transition-transform">Apply</button>
-        </div>
-        <div id="appliedDiscountInfo" class="hidden flex items-center justify-between text-xs font-bold text-emerald-400 pt-1 border-t border-white/10">
-          <span id="appliedDiscountText">Discount Applied</span>
-          <button id="removeCustomerCouponBtn" onclick="removeCustomerCoupon()" class="text-[10px] text-red-400 underline ml-2">Remove</button>
-        </div>
-      </div>
-
-      <!-- Even Split Bill Calculator Box -->
-      <div class="mb-4 p-3.5 bg-white/5 rounded-2xl border border-primary/20 flex items-center justify-between">
-        <div>
-          <span class="text-[10px] font-black text-primary uppercase tracking-widest block">👥 Split Bill Equally</span>
-          <span id="customerSplitEachDisplay" class="text-sm font-black text-white">₹0 / person</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="changeCustomerSplit(-1)" class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 text-white font-black text-sm active:scale-90 transition-transform">-</button>
-          <span id="customerSplitCountDisplay" class="font-black text-sm text-primary w-6 text-center">1</span>
-          <button onclick="changeCustomerSplit(1)" class="w-8 h-8 rounded-xl gold-gradient text-dark font-black text-sm active:scale-90 transition-transform">+</button>
-        </div>
-      </div>
-
-      <div id="subtotalRowDisplay" class="hidden flex justify-between items-center text-xs text-slate-400 font-bold mb-1">
-        <span>Subtotal:</span>
-        <span id="runningSubtotalDisplay" class="line-through">₹0</span>
-      </div>
-
-      <div class="flex justify-between items-center mb-4">
-        <span class="text-slate-400 font-bold text-sm" data-i18n="total_bill">Total Tab:</span>
-        <span id="runningTotalDisplay" class="text-3xl font-black text-primary">₹0</span>
-      </div>
-
-      <div id="paymentSelection" class="hidden flex flex-col gap-3 mt-4">
-        <p class="text-xs text-primary font-bold uppercase tracking-widest text-center mb-1" data-i18n="select_payment">Select Payment Method</p>
-        <div class="grid grid-cols-3 gap-2">
-            <button onclick="requestBill('UPI')" class="bg-blue-600/90 hover:bg-blue-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">UPI</button>
-            <button onclick="requestBill('CASH')" class="bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">CASH</button>
-            <button onclick="requestBill('CARD')" class="bg-purple-600/90 hover:bg-purple-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">CARD</button>
-        </div>
-      </div>
-      <button onclick="showPaymentOptions()" id="reqBillBtn" class="w-full gold-gradient py-3 rounded-xl font-black text-sm active:scale-95 transition-transform text-dark uppercase tracking-widest shadow-md" data-i18n="request_bill">Request Final Bill</button>
-    </div>
-
-    <div id="feedbackSection" class="hidden mt-5 pt-5 border-t border-primary/20 text-center relative z-10">
-      <div id="feedbackBox" class="mb-5 pb-5 border-b border-primary/10">
-        <p class="text-xs font-bold uppercase tracking-widest text-primary mb-2" data-i18n="food_feedback">Rate your luxury experience</p>
-        <p id="feedbackHint" class="text-[11px] text-slate-400 font-semibold mb-3">1. Write your feedback below &nbsp;•&nbsp; 2. Tap an emoji to submit</p>
-        <textarea id="feedbackText" rows="2" placeholder="Write about your experience first, then tap an emoji below..." class="w-full mb-4 p-3 rounded-xl bg-white/5 border border-primary/20 text-sm text-white placeholder-slate-400 outline-none focus:border-primary resize-none"></textarea>
-        <div class="flex justify-center gap-6 text-4xl">
-          <button id="emoji-Bad" onclick="handleEmojiFeedback('Bad')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all filter grayscale hover:grayscale-0">😞</button>
-          <button id="emoji-Good" onclick="handleEmojiFeedback('Good')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all">😋</button>
-          <button id="emoji-Excellent" onclick="handleEmojiFeedback('Excellent')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all drop-shadow-[0_0_15px_rgba(212,175,55,0.8)]">😍</button>
-        </div>
-      </div>
-      <div id="upiArea" class="hidden">
-        <p class="text-primary font-black mb-4 text-sm uppercase tracking-widest" data-i18n="scan_pay">Scan to Pay via UPI</p>
-        <img id="upiQRCode" src="upi-qr-img.jpeg" class="mx-auto rounded-2xl mb-4 w-44 h-auto bg-white p-3 shadow-[0_0_20px_rgba(212,175,55,0.3)] object-contain border-2 border-primary">
-        <a id="gpayDirectLink" href="#" class="block w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition-transform shadow-md">📱 Pay via GPay / PhonePe</a>
-      </div>
-    </div>
-  </div>
-
-  <div id="menuGrid" class="px-5 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-    <div class="text-center p-10 text-primary font-bold col-span-full" data-i18n="loading_menu">Loading Premium Menu...</div>
-  </div>
-
-  <!-- SLIDING SIDE SERVICE & OPTIONS DOCK (Right Edge) -->
+  <!-- SLIDING SIDE SERVICE DOCK -->
   <div id="sideServiceDock" class="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center dock-closed">
-    <button onclick="toggleSideDock()" class="bg-dark text-primary border-y-2 border-l-2 border-primary/60 rounded-l-2xl py-4 px-2.5 shadow-[0_5px_25px_rgba(0,0,0,0.4)] flex flex-col items-center gap-1 active:scale-95 transition-transform" title="Slide Service Options">
+    <button onclick="toggleSideDock()" class="bg-dark text-primary border-y-2 border-l-2 border-primary/60 rounded-l-2xl py-4 px-2.5 shadow-[0_5px_25px_rgba(0,0,0,0.4)] flex flex-col items-center gap-1">
       <span id="sideDockArrow" class="text-xs font-black">◀</span>
       <span class="text-base">🛎️</span>
-      <span class="text-[8px] font-black uppercase tracking-tighter [writing-mode:vertical-rl] rotate-180">Service</span>
     </button>
     <div class="bg-dark/95 backdrop-blur-md border-y-2 border-l border-primary/40 p-3 rounded-bl-2xl shadow-2xl flex flex-col gap-3">
-      <button onclick="openServiceModal(); toggleSideDock();" class="bg-primary/20 hover:bg-primary/30 border border-primary text-primary px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-black whitespace-nowrap active:scale-95 transition">
-        <span class="text-lg">🛎️</span> Call Waiter / Service
-      </button>
-      <button onclick="askForHelp(); toggleSideDock();" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-black whitespace-nowrap active:scale-95 transition">
-        <span class="text-lg">💬</span> WhatsApp Staff Help
-      </button>
-      <button onclick="shareWithFriends(); toggleSideDock();" class="gold-gradient text-dark px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-black whitespace-nowrap active:scale-95 transition">
-        <span class="text-lg">👑</span> Share Mandi Croods
-      </button>
+      <button onclick="requestStaff('Water Refill')" class="bg-primary/20 hover:bg-primary/30 text-primary px-3 py-2 rounded-xl text-xs font-black">💧 Water</button>
+      <button onclick="requestStaff('Clean Table')" class="bg-primary/20 hover:bg-primary/30 text-primary px-3 py-2 rounded-xl text-xs font-black">🧽 Clean</button>
+      <button onclick="requestStaff('Call Waiter')" class="gold-gradient text-dark px-3 py-2 rounded-xl text-xs font-black">👤 Staff</button>
     </div>
   </div>
 
-  <!-- SERVICE REQUEST MODAL -->
-  <div id="serviceModal" class="fixed inset-0 z-[150] flex flex-col justify-end hidden transition-opacity">
-    <div class="absolute inset-0 bg-dark/80 backdrop-blur-sm" onclick="closeServiceModal()"></div>
-    <div id="serviceModalContent" class="relative bg-white w-full rounded-t-[2rem] p-6 shadow-[0_-10px_50px_rgba(212,175,55,0.2)] border-t-2 border-primary/50 transform translate-y-full transition-transform duration-300 ease-out">
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="text-xl font-black text-dark tracking-tight">🛎️ Premium Service</h3>
-        <button onclick="closeServiceModal()" class="text-slate-400 hover:text-primary text-3xl font-black leading-none transition-colors">&times;</button>
-      </div>
-      <p class="text-sm text-slate-500 mb-5 font-semibold">How may we assist you at Table <span id="serviceTableDisplay" class="text-primary font-black"></span>?</p>
-      
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        <button onclick="submitServiceRequest('Water Refill')" class="bg-blue-50 text-blue-700 border border-blue-200 hover:border-blue-400 py-3.5 rounded-xl font-bold active:scale-95 transition-all flex flex-col items-center justify-center gap-1">
-          <span class="text-2xl">💧</span> <span class="text-xs">Water Refill</span>
-        </button>
-        <button onclick="submitServiceRequest('Clean Table')" class="bg-emerald-50 text-emerald-700 border border-emerald-200 hover:border-emerald-400 py-3.5 rounded-xl font-bold active:scale-95 transition-all flex flex-col items-center justify-center gap-1">
-          <span class="text-2xl">🧽</span> <span class="text-xs">Clean Table</span>
-        </button>
-        <button onclick="submitServiceRequest('Cutlery Needed')" class="bg-slate-50 text-slate-700 border border-slate-200 hover:border-slate-400 py-3.5 rounded-xl font-bold active:scale-95 transition-all flex flex-col items-center justify-center gap-1">
-          <span class="text-2xl">🍴</span> <span class="text-xs">Cutlery</span>
-        </button>
-        <button onclick="submitServiceRequest('Call Waiter')" class="bg-amber-50 text-amber-700 border border-amber-200 hover:border-primary py-3.5 rounded-xl font-bold active:scale-95 transition-all flex flex-col items-center justify-center gap-1">
-          <span class="text-2xl">👤</span> <span class="text-xs">Call Staff</span>
-        </button>
-      </div>
-      
-      <textarea id="serviceNotes" rows="2" placeholder="Any specific request for our staff?" class="w-full mb-3 p-3 rounded-xl bg-light border border-slate-200 text-sm text-dark font-semibold outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none"></textarea>
-      <button onclick="submitServiceRequest('Other')" class="w-full bg-dark text-primary py-4 rounded-xl font-black shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest text-xs border border-primary/30">
-        Send Custom Request
-      </button>
-    </div>
-  </div>
-
-  <!-- COLLAPSIBLE CART WITH SWEETS, COOL DRINKS & WATER UPSELL BAR -->
-  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[420px] bg-dark border border-primary/40 rounded-3xl shadow-[0_10px_40px_rgba(212,175,55,0.25)] p-5 z-50 transition-all duration-300">
+  <!-- COLLAPSIBLE CART -->
+  <div id="cartFooter" class="hidden fixed bottom-0 left-0 w-full bg-dark border-t border-primary/40 shadow-[0_-10px_40px_rgba(212,175,55,0.3)] p-5 z-50 rounded-t-3xl transition-all">
     <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCart()">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-dark font-black relative shadow-md">
-          🛒
-          <span id="cartBadgeCount" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-dark shadow-sm">0</span>
+        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-dark font-black relative">
+          🛒<span id="cartBadgeCount" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
         </div>
         <div>
-          <p class="text-[10px] font-bold text-primary opacity-80 uppercase tracking-widest" data-i18n="cart_total">Selected Items</p>
+          <p class="text-[10px] font-bold text-primary opacity-80 uppercase tracking-widest">Cart Total</p>
           <p id="cartTotal" class="text-2xl font-black text-white leading-none">₹0</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded-lg">⏱️ 15-20m Prep</span>
-        <div id="cartToggleIcon" class="w-8 h-8 flex items-center justify-center bg-white/10 text-primary border border-primary/30 rounded-full font-black text-sm transition-transform duration-300 shadow-sm">
-          ▼
-        </div>
+        <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded-lg flex items-center gap-1">⏱️ <span id="cartTimer">15:00</span></span>
       </div>
     </div>
     
-    <div id="cartExpandedContent" class="overflow-hidden transition-all duration-300" style="max-height: 620px; opacity: 1; margin-top: 1rem;">
-      <div id="cartListUI" class="mb-3 max-h-40 overflow-y-auto text-white hide-scroll"></div>
+    <div id="cartExpandedContent" class="overflow-hidden transition-all duration-300" style="max-height: 0px; opacity: 0; margin-top: 0;">
+      <div id="cartListUI" class="mb-3 max-h-40 overflow-y-auto text-white mt-4"></div>
 
-      <!-- Quick Add-Ons: Sweets, Cool Drinks & Water Bottles -->
+      <!-- DYNAMIC UPSELL CAROUSEL -->
       <div class="mb-3 bg-white/5 border border-primary/25 rounded-2xl p-2.5">
-        <p class="text-[10px] font-black text-primary uppercase tracking-wider mb-2">🍮 Complete Your Meal: Sweets, Cool Drinks & Water</p>
+        <p class="text-[10px] font-black text-primary uppercase tracking-wider mb-2">🍮 Complete Your Meal: Sweets & Drinks</p>
         <div id="cartUpsellCarousel" class="flex gap-2 overflow-x-auto hide-scroll pb-1"></div>
       </div>
 
-      <!-- MC Coupon Dynamic Nudge inside Cart -->
-      <div id="upsellNudge" class="text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 mb-3"></div>
-
-      <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Chef instructions or special requests?" class="w-full mb-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-semibold outline-none focus:border-primary text-sm placeholder-slate-500">
-      <button onclick="placeOrder()" id="placeOrderBtn" class="w-full gold-gradient text-dark py-4 rounded-xl font-black text-sm shadow-[0_5px_15px_rgba(212,175,55,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest">
-        <span data-i18n="confirm_order">Send to Kitchen (15-20 Min)</span>
-      </button>
+      <button onclick="placeOrder()" class="w-full gold-gradient text-dark py-4 rounded-xl font-black text-sm uppercase tracking-widest">Send to Kitchen</button>
     </div>
   </div>
-
-  <div id="printBillArea"></div>
 
   <script>
     const firebaseConfig = {
@@ -364,181 +124,207 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const UPI_ID = "yourupi@okbank";
-    const UPI_PAYEE_NAME = "Mandi Croods";
-    const RESTAURANT_HELP_PHONE = "91XXXXXXXXXX";
-    const PREP_TIME_MS = 20 * 60 * 1000; // 20 Minutes Countdown Limit
+    let menuData = {}, cart = {}, currentFilter = 'All', customerPhone = '';
+    let cartExpanded = false, sideDockOpen = false;
 
-    function sanitizeForFirebase(obj) {
-      return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
-    }
+    // 15 Min Timer Logic
+    let timeLeft = 15 * 60;
+    setInterval(() => {
+        if(timeLeft > 0) timeLeft--;
+        const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+        const s = (timeLeft % 60).toString().padStart(2, '0');
+        const el = document.getElementById('cartTimer');
+        if(el) el.innerText = `${m}:${s}`;
+    }, 1000);
 
-    // Tiered MC Coupon & General Coupon Evaluator
-    function evaluateTieredCoupon(code, subtotal, couponsMap) {
-      const sub = Math.max(0, Number(subtotal) || 0);
-      const cleanCode = String(code || '').trim().toUpperCase();
-      if (!cleanCode || sub <= 0) return { valid: false, discount: 0, pct: 0, message: "Enter a valid code" };
+    window.registerCustomer = function() {
+        const phone = document.getElementById('customerMobile').value;
+        if(phone.length !== 10) return alert("Enter valid 10-digit mobile.");
+        customerPhone = phone;
+        document.getElementById('loginModal').style.display = 'none';
+        document.body.classList.remove('overflow-hidden');
+    };
 
-      if (cleanCode === 'MC') {
-        if (sub < 100) {
-          return { valid: false, discount: 0, pct: 0, message: "Minimum order of ₹100 required for coupon MC." };
-        }
-        let disc = 50;
-        if (sub >= 899) {
-          disc = 100;
-        } else if (sub >= 100 && sub <= 500) {
-          disc = 50;
-        }
-        disc = Math.min(sub, disc);
-        const pct = Math.round((disc / sub) * 1000) / 10;
-        return {
-          valid: true,
-          code: 'MC',
-          type: 'tiered',
-          value: disc,
-          discount: disc,
-          pct: pct,
-          label: `MC Offer (-₹${disc} / ${pct}% OFF)`
-        };
-      }
-
-      const c = (couponsMap || {})[cleanCode];
-      if (!c || !c.active) {
-        return { valid: false, discount: 0, pct: 0, message: "Invalid or expired coupon code. Try code 'MC'!" };
-      }
-      if (c.minOrder && sub < Number(c.minOrder)) {
-        return { valid: false, discount: 0, pct: 0, message: `Minimum order of ₹${c.minOrder} required for ${cleanCode}.` };
-      }
-      const dAmt = c.type === 'percent'
-        ? Math.min(sub, Math.round((sub * Number(c.value)) / 100))
-        : Math.min(sub, Number(c.value) || 0);
-      const pct = sub > 0 ? Math.round((dAmt / sub) * 1000) / 10 : 0;
-      return {
-        valid: true,
-        code: cleanCode,
-        type: c.type,
-        value: Number(c.value) || 0,
-        discount: dAmt,
-        pct: pct,
-        label: `${cleanCode} (-₹${dAmt} / ${pct}% OFF)`
-      };
-    }
-
-    function getDefaultCustomerMenu() {
-      const IVM = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80";
-      const ICM = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80";
-      const IMM = "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&q=80";
-      const IFM = "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80";
-      const IPM = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80";
-      const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
-      const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80";
-      const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&q=80";
-      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
-      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
-      const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
-      const IDRK = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500&q=80";
-      const ISWT = "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500&q=80";
-
-      const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
-      const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
-      const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
-      const P_C3 = { "2P": 529, "3P": 779, "4P (Gang)": 1049, "5P (Gang)": 1339 };
-      const P_M1 = { "2P": 719, "3P": 950, "4P (Gang)": 1310, "5P (Gang)": 1599 };
-      const P_M2 = { "2P": 699, "3P": 929, "4P (Gang)": 1230, "5P (Gang)": 1599 };
-
-      return {
-        'vm1': { name: "Paneer Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
-        'vm2': { name: "Paneer Fry Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
-        'vm3': { name: "Mushroom Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
-        'vm4': { name: "Baby Corn Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
-        'vm5': { name: "Special Veg Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: true, portions: P_VM, image_url: IVM },
-        'cm1': { name: "Rara Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
-        'cm2': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm3': { name: "Chicken Dill Kush Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm4': { name: "Murgh Musallam Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
-        'cm5': { name: "Chicken BBQ Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm6': { name: "Chicken Juicy Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: true, portions: P_C2, image_url: ICM },
-        'cm7': { name: "Chicken Al Faham Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: P_C2, image_url: ICM },
-        'cm8': { name: "Chicken Fry Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
-        'cm9': { name: "Drumstick Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
-        'mm1': { name: "Mutton Rara Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
-        'mm2': { name: "Mutton F2 Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm3': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M2, image_url: IMM },
-        'mm4': { name: "Mutton BBQ Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm5': { name: "Mutton Ghee Roast Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
-        'mm6': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm7': { name: "Mutton Tandoori Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 699, "3P": 929, "4P (Gang)": 1290, "5P (Gang)": 1599 }, image_url: IMM },
-        'fm1': { name: "Fish Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
-        'fm2': { name: "Grill Fish Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
-        'pm1': { name: "Prawns Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
-        'pm2': { name: "Prawns Masala Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
-        'spm1': { name: "Zurbiyan Mandi (4P Pack)", category: "Specials", base_price: 1399, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1399 }, image_url: ISM },
-        'spm2': { name: "M.C Special Mix Mandi (8 Items - 4P)", category: "Specials", base_price: 1799, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1799 }, image_url: ISM },
-        'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
-        'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex4': { name: "Mineral Water Bottle (1L)", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: IDRK },
-        'ex5': { name: "Cool Drink (Thums Up / Sprite)", category: "Beverages", base_price: 40, stock_count: 150, is_special: false, portions: { "Large Bottle": 90 }, image_url: IDRK },
-        'ex6': { name: "Royal Double Ka Meetha (Sweet)", category: "Beverages", base_price: 79, stock_count: 80, is_special: true, portions: {}, image_url: ISWT },
-        'ex7': { name: "Shahi Kaddu Ka Kheer (Sweet)", category: "Beverages", base_price: 89, stock_count: 80, is_special: true, portions: {}, image_url: ISWT },
-        'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs4': { name: "Paneer Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs5': { name: "Mushroom Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs6': { name: "Baby Corn Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs7': { name: "Chilly Pepper", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs8': { name: "Chilly Baby Corn", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs9': { name: "Chilly Mushroom", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs10': { name: "Paneer Finger", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs11': { name: "Corn Salad Pepper", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'cs1': { name: "Chicken 65", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs2': { name: "Chilly Chicken", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs3': { name: "Chicken Manchuria", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs4': { name: "Chicken Majestic", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs5': { name: "Chicken Lollipop", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs6': { name: "Dragon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs7': { name: "Garlic Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs8': { name: "Lemon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs9': { name: "Chicken Drumstick", category: "Chicken Starters", base_price: 249, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs10': { name: "Chicken Wings Chilly", category: "Chicken Starters", base_price: 199, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs11': { name: "Chicken Stick", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs12': { name: "Turkish Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs13': { name: "Lemonies Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs14': { name: "Chicken Fingers", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'ms1': { name: "BBQ Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: true, portions: {}, image_url: IMS },
-        'ms2': { name: "Tandoori Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
-        'ms3': { name: "Mutton Fry Starter", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
-        'fs1': { name: "Apollo Fish", category: "Fish & Prawns Starters", base_price: 349, stock_count: 45, is_special: true, portions: {}, image_url: ISS },
-        'fs2': { name: "Fish Fingers", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'fs3': { name: "Arabian Fish", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'fs4': { name: "Grill Fish Starter", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'ps1': { name: "Prawns Butter Fry", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
-        'ps2': { name: "Golden Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: true, portions: {}, image_url: IPM },
-        'ps3': { name: "Prawns 65", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
-        'ps4': { name: "Crispy Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM }
-      };
-    }
-
-    if (!localStorage.getItem('mc_cust_init_v6')) {
-        localStorage.removeItem('mc_cust_phone');
-        localStorage.removeItem('mc_locked_table');
-        localStorage.setItem('mc_cust_init_v6', 'true');
-    }
-
-    db.ref('.info/connected').on('value', snap => {
-      const banner = document.getElementById('connectionBanner');
-      if (snap.val() === false) {
-        banner.classList.remove('hidden'); banner.classList.add('show');
-      } else {
-        banner.classList.remove('show'); banner.classList.add('hidden');
-      }
-    });
-
-    // Sliding Side Dock Toggle
-    let sideDockOpen = false;
     window.toggleSideDock = function() {
       sideDockOpen = !sideDockOpen;
       const dock = document.getElementById('sideServiceDock');
       const arrow = document.getElementById('sideDockArrow');
-      if (!dock) return;
+      if (sideDockOpen) {
+        dock.classList.replace('dock-closed', 'dock-open');
+        arrow.innerText = '▶';
+      } else {
+        dock.classList.replace('dock-open', 'dock-closed');
+        arrow.innerText = '◀';
+      }
+    };
+
+    window.requestStaff = function(type) {
+        const tableVal = document.getElementById('tableNum').value;
+        db.ref('service_requests').push({
+            table: tableVal, phone: customerPhone || 'Guest', request_type: type, status: 'pending', timestamp: Date.now()
+        }).then(() => {
+            alert(`🛎️ ${type} request sent to staff!`);
+            toggleSideDock();
+        });
+    };
+
+    // Load Menu from Firebase
+    db.ref('menu').on('value', snap => {
+        menuData = snap.val() || {};
+        renderMenu();
+        renderUpsellCarousel();
+    });
+
+    window.filterMenu = function(cat, btnElem) {
+      currentFilter = cat;
+      document.querySelectorAll('.category-btn').forEach(btn => {
+          btn.className = "category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap";
+      });
+      if(btnElem) btnElem.className = "category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-dark text-primary shadow-md transition whitespace-nowrap border border-primary/30";
+      renderMenu();
+    };
+
+    function renderMenu() {
+      const grid = document.getElementById('menuGrid'); grid.innerHTML = '';
+      Object.entries(menuData).forEach(([id, item]) => {
+        if(id === '_system_coupons' || !item.name) return;
+        if (currentFilter !== 'All' && !(item.category||'').includes(currentFilter) && currentFilter !== 'Group') return;
+        
+        let selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`;
+        if (item.portions && Object.keys(item.portions).length > 0) {
+          selectHtml = `<select id="var-${id}" class="w-full mt-2 p-2 rounded-lg text-xs font-bold bg-white border border-primary/20 outline-none text-dark">
+            <option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>
+            ${Object.entries(item.portions).map(([pName, pPrice]) => `<option value="${pName}\vert{}${pPrice}">${pName} - ₹${pPrice}</option>`).join('')}
+          </select>`;
+        }
+
+        grid.innerHTML += `
+          <div class="food-card bg-card rounded-2xl p-4 flex flex-col relative overflow-hidden">
+            <img src="${item.image_url}" class="w-full h-32 object-cover rounded-xl mb-3">
+            <h3 class="font-black text-dark text-sm leading-tight">${item.name}</h3>
+            ${selectHtml}
+            <button onclick="addToCart('${id}')" class="mt-3 w-full bg-dark text-primary font-black text-xs py-2.5 rounded-xl active:scale-95 uppercase">+ Add</button>
+          </div>`;
+      });
+    }
+
+    function renderUpsellCarousel() {
+        const carousel = document.getElementById('cartUpsellCarousel');
+        if(!carousel) return;
+        const upsellItems = Object.entries(menuData).filter(([k, v]) => (v.category||'').includes('Beverages') || (v.name||'').includes('Water') || (v.name||'').includes('Sweet'));
+        
+        carousel.innerHTML = upsellItems.map(([id, item]) => `
+            <div class="min-w-[120px] bg-white/10 border border-white/20 p-2 rounded-xl text-center shrink-0 flex flex-col justify-between">
+                <span class="text-xs font-bold text-white truncate w-full block">${item.name}</span>
+                <span class="text-[10px] text-primary font-black block my-1">₹${item.base_price}</span>
+                <button onclick="addToCart('${id}')" class="w-full bg-primary text-dark py-1.5 rounded-lg text-[10px] font-black uppercase shadow-sm">Add</button>
+            </div>
+        `).join('');
+    }
+
+    window.addToCart = function(id) {
+        const item = menuData[id];
+        let price = item.base_price, variant = "Regular";
+        const sel = document.getElementById(`var-${id}`);
+        if(sel) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]); }
+        
+        const key = `${id}|${variant}`;
+        if(cart[key]) cart[key].qty++;
+        else cart[key] = { id, name: item.name, variant, price, qty: 1 };
+        updateCartUI();
+    };
+
+    window.updateCartQty = function(key, change) {
+        if(cart[key]) {
+            cart[key].qty += change;
+            if(cart[key].qty <= 0) delete cart[key];
+            updateCartUI();
+        }
+    };
+
+    window.toggleCart = function() {
+      cartExpanded = !cartExpanded;
+      const content = document.getElementById('cartExpandedContent');
+      if(cartExpanded) {
+        content.style.maxHeight = "600px"; content.style.opacity = "1"; content.style.marginTop = "1rem";
+      } else {
+        content.style.maxHeight = "0px"; content.style.opacity = "0"; content.style.marginTop = "0px";
+      }
+    };
+
+    function updateCartUI() {
+        const list = document.getElementById('cartListUI');
+        let total = 0, totalQty = 0; list.innerHTML = '';
+        Object.entries(cart).forEach(([key, i]) => {
+            total += i.price * i.qty; totalQty += i.qty;
+            list.innerHTML += `
+            <div class="flex items-center justify-between py-2 border-b border-white/10">
+                <div>
+                    <span class="font-bold text-sm text-white">${i.name}</span>
+                    <span class="text-[10px] text-primary block">${i.variant}</span>
+                </div>
+                <div class="flex items-center bg-white/10 rounded-lg p-1">
+                    <button onclick="updateCartQty('${key}', -1)" class="w-7 h-7 text-white font-black">-</button>
+                    <span class="w-6 text-center text-xs font-black">${i.qty}</span>
+                    <button onclick="updateCartQty('${key}', 1)" class="w-7 h-7 text-primary font-black">+</button>
+                </div>
+            </div>`;
+        });
+        
+        document.getElementById('cartTotal').innerText = `₹${total}`;
+        document.getElementById('cartBadgeCount').innerText = totalQty;
+        document.getElementById('cartBadgeCount').classList.toggle('hidden', totalQty === 0);
+        document.getElementById('cartFooter').classList.toggle('hidden', totalQty === 0);
+        if(totalQty > 0 && !cartExpanded) {
+            document.getElementById('cartFooter').classList.add('cart-pop-in');
+        }
+    }
+
+    // Smart Coupon Logic
+    window.quickApplyMCCoupon = function() {
+        let total = 0;
+        Object.values(cart).forEach(i => total += (i.price * i.qty));
+        
+        if (total === 0) return alert("Cart is empty.");
+        
+        let discount = 0;
+        if (total >= 899) discount = 100;
+        else if (total >= 100) discount = 50;
+        else return alert("Minimum ₹100 order required for 'MC' coupon.");
+        
+        const percent = Math.round((discount / total) * 100);
+        alert(`🎉 MC Coupon Applied! You saved ₹${discount} (Approx ${percent}% OFF)`);
+    };
+
+    window.placeOrder = function() {
+        if(Object.keys(cart).length === 0) return;
+        const tNum = document.getElementById('tableNum').value;
+        const tableId = `table_${tNum}`;
+        const batchId = `${Date.now()}`;
+        
+        let subtotal = 0;
+        const lineItems = {};
+        Object.values(cart).forEach((item, idx) => {
+            subtotal += item.price * item.qty;
+            lineItems[`${batchId}_${idx}`] = { ...item, addedAt: Date.now() + idx, cancelled: false };
+        });
+
+        // Auto Apply MC Coupon if valid on checkout
+        let discountAmount = 0;
+        if (subtotal >= 899) discountAmount = 100;
+        else if (subtotal >= 100) discountAmount = 50;
+
+        const total = subtotal - discountAmount;
+        const itemsStr = Object.values(lineItems).map(i => `${i.qty}x ${i.name}`).join(' | ');
+
+        db.ref(`active_tables/${tableId}`).set({
+            table: tNum, phone: customerPhone, status: 'pending', timestamp: Date.now(),
+            line_items: lineItems, items: itemsStr, subtotal, discountAmount, couponCode: discountAmount > 0 ? 'MC' : '', total
+        }).then(() => {
+            alert('Order Sent to Kitchen!');
+            cart = {}; updateCartUI(); toggleCart();
+        });
+    };
+  </script>
+</body>
+</html>
