@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -11,6 +11,8 @@
     tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', secondary: '#B38B22', dark: '#0a0a0a', light: '#f9f9f9', card: '#ffffff' } } } }
   </script>
   <style>
+    html { scroll-behavior: smooth; -webkit-overflow-scrolling: touch; }
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
     .hide-scroll::-webkit-scrollbar { display: none; }
     .food-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(212, 175, 55, 0.1); }
     .food-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(212, 175, 55, 0.15); border-color: #D4AF37; }
@@ -43,9 +45,20 @@
     .fun-toast-out { animation: funToastOut .5s ease forwards; }
     @keyframes funToastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     @keyframes funToastOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
+
+    /* Sliding Right-Edge Service & Action Dock */
+    #sideServiceDock {
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    #sideServiceDock.dock-closed {
+      transform: translateX(calc(100% - 38px));
+    }
+    #sideServiceDock.dock-open {
+      transform: translateX(0);
+    }
   </style>
 </head>
-<body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
+<body class="bg-light text-slate-800 font-sans antialiased pb-36 overflow-hidden">
 
   <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
     ⚠ Connection lost — reconnecting to Mandi Croods servers...
@@ -121,37 +134,70 @@
     </div>
   </header>
 
-  <div class="px-5 pt-2">
+  <!-- Promo Banner for MC Coupon -->
+  <div class="mx-5 mt-3 bg-dark text-white px-4 py-2.5 rounded-2xl border border-primary/40 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-2">
+      <span class="text-lg">🎟️</span>
+      <div>
+        <p class="text-[11px] font-black text-primary uppercase tracking-wider">Use Code: <span class="bg-primary text-dark px-1.5 py-0.5 rounded font-black">MC</span></p>
+        <p class="text-[10px] text-slate-300 font-semibold">₹100–₹500: Flat ₹50 OFF • ₹899 / ₹999 / ₹1000+: Flat ₹100 OFF</p>
+      </div>
+    </div>
+    <span class="text-[10px] font-black text-emerald-400 border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 rounded-lg whitespace-nowrap">Up to 50% OFF</span>
+  </div>
+
+  <div class="px-5 pt-2 flex items-center justify-between gap-2">
     <span id="tableOccupancyPill" class="hidden text-[10px] font-black px-2 py-1 rounded-full inline-block border"></span>
   </div>
 
-  <div class="px-5 py-4 flex space-x-3 overflow-x-auto hide-scroll sticky top-[68px] z-30 bg-light/95 backdrop-blur-md border-b border-primary/10 shadow-sm">
-    <button onclick="filterMenu('All')" data-cat="All" class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-dark text-primary shadow-md transition whitespace-nowrap border border-primary/30" data-i18n="all_items">Premium Menu</button>
-    <button onclick="filterMenu('Group')" data-cat="Group" class="category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-primary/10 text-secondary border border-primary/30 hover:bg-primary/20 transition whitespace-nowrap" data-i18n="cat_group">👑 Royal Packs (4+)</button>
-    <button onclick="filterMenu('Chicken')" data-cat="Chicken" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_chicken">Chicken</button>
-    <button onclick="filterMenu('Mutton')" data-cat="Mutton" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_mutton">Mutton</button>
-    <button onclick="filterMenu('Fish')" data-cat="Fish" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_fish">Fish & Prawns</button>
-    <button onclick="filterMenu('Veg')" data-cat="Veg" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_veg">Veg</button>
-    <button onclick="filterMenu('Starters')" data-cat="Starters" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_starters">Starters</button>
-    <button onclick="filterMenu('Beverages')" data-cat="Beverages" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_bev">Extras & Add-ons</button>
+  <!-- Search + Smooth Horizontal Category Bar -->
+  <div class="px-5 pt-3">
+    <input type="text" id="customerSearchInput" oninput="renderMenu()" placeholder="🔍 Search Mandi, Starters, Cool Drinks, Sweets..." class="w-full px-4 py-2.5 rounded-xl bg-white border border-primary/20 text-xs font-bold text-dark outline-none focus:border-primary shadow-sm">
   </div>
 
+  <div id="categoryScrollContainer" class="px-5 py-3.5 flex space-x-3 overflow-x-auto hide-scroll sticky top-[68px] z-30 bg-light/95 backdrop-blur-md border-b border-primary/10 shadow-sm">
+    <button onclick="filterMenu('All', this)" data-cat="All" class="category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-dark text-primary shadow-md transition whitespace-nowrap border border-primary/30" data-i18n="all_items">Premium Menu</button>
+    <button onclick="filterMenu('Group', this)" data-cat="Group" class="category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-primary/10 text-secondary border border-primary/30 hover:bg-primary/20 transition whitespace-nowrap" data-i18n="cat_group">👑 Royal Packs (4+)</button>
+    <button onclick="filterMenu('Chicken', this)" data-cat="Chicken" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_chicken">Chicken</button>
+    <button onclick="filterMenu('Mutton', this)" data-cat="Mutton" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_mutton">Mutton</button>
+    <button onclick="filterMenu('Fish', this)" data-cat="Fish" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_fish">Fish & Prawns</button>
+    <button onclick="filterMenu('Veg', this)" data-cat="Veg" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_veg">Veg</button>
+    <button onclick="filterMenu('Starters', this)" data-cat="Starters" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_starters">Starters</button>
+    <button onclick="filterMenu('Beverages', this)" data-cat="Beverages" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_bev">Sweets, Drinks & Extras</button>
+  </div>
+
+  <!-- Live Running Tab Tracker -->
   <div id="activeTracker" class="hidden mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(212,175,55,0.2)] border border-primary/30 relative overflow-hidden">
     <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
-    <h3 class="text-xs text-primary font-black uppercase tracking-widest mb-1" data-i18n="live_status">Your Running Tab</h3>
-    <p id="orderStatusText" class="text-2xl font-black text-white uppercase tracking-tight">Active Session</p>
+    <div class="flex items-center justify-between gap-2">
+      <div>
+        <h3 class="text-xs text-primary font-black uppercase tracking-widest mb-1" data-i18n="live_status">Your Running Tab</h3>
+        <p id="orderStatusText" class="text-2xl font-black text-white uppercase tracking-tight">Active Session</p>
+      </div>
+      <!-- 15-20 Min Live Preparation Countdown Box -->
+      <div id="prepTimerBox" class="hidden bg-white/5 border border-primary/40 rounded-2xl px-3.5 py-2 text-right">
+        <span class="text-[9px] font-black text-primary uppercase tracking-widest block">⏱️ Est. Prep Time (15-20m)</span>
+        <span id="prepTimerCountdown" class="text-lg font-black text-emerald-400 font-mono">20:00</span>
+      </div>
+    </div>
+
+    <!-- Animated Progress Bar for 20-Min Timer -->
+    <div id="prepProgressBarWrap" class="hidden w-full h-1.5 bg-white/10 rounded-full overflow-hidden mt-3">
+      <div id="prepProgressBar" class="h-full gold-gradient transition-all duration-1000" style="width: 100%"></div>
+    </div>
     
     <div class="mt-4 border-t border-primary/20 pt-4">
-      <div id="customerOrderedItems" class="hidden mb-4 p-4 bg-white/5 rounded-xl text-sm font-medium text-slate-300 max-h-48 overflow-y-auto shadow-inner border border-white/5"></div>
+      <div id="customerOrderedItems" class="hidden mb-4 p-4 bg-white/5 rounded-xl text-sm font-medium text-slate-300 max-h-48 overflow-y-auto shadow-inner border border-white/5 hide-scroll"></div>
 
-      <!-- Coupon Code & Admin Discount Display Box -->
+      <!-- Coupon Code & MC Quick-Apply Box -->
       <div class="mb-4 p-3.5 bg-white/5 rounded-2xl border border-primary/20 space-y-2.5">
-        <div class="flex items-center justify-between">
-          <span class="text-[10px] font-black text-primary uppercase tracking-widest">🎟️ Have a Coupon Code?</span>
+        <div class="flex items-center justify-between flex-wrap gap-1">
+          <span class="text-[10px] font-black text-primary uppercase tracking-widest">🎟️ Apply Coupon Code</span>
+          <button onclick="quickApplyMCCoupon()" class="text-[10px] font-black bg-primary/20 hover:bg-primary/30 text-primary border border-primary/40 px-2.5 py-1 rounded-lg transition">⚡ Tap to Apply 'MC' Offer</button>
           <span id="customerDiscountBadge" class="hidden text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full"></span>
         </div>
         <div id="couponInputRow" class="flex gap-2">
-          <input type="text" id="customerCouponInput" placeholder="Enter Coupon Code" class="flex-1 bg-dark/80 border border-white/15 rounded-xl px-3 py-2 text-xs font-black text-primary uppercase outline-none focus:border-primary placeholder-slate-500">
+          <input type="text" id="customerCouponInput" placeholder="Enter Code (e.g. MC)" class="flex-1 bg-dark/80 border border-white/15 rounded-xl px-3 py-2 text-xs font-black text-primary uppercase outline-none focus:border-primary placeholder-slate-500">
           <button onclick="applyCustomerCoupon()" class="gold-gradient text-dark font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider active:scale-95 transition-transform">Apply</button>
         </div>
         <div id="appliedDiscountInfo" class="hidden flex items-center justify-between text-xs font-bold text-emerald-400 pt-1 border-t border-white/10">
@@ -217,10 +263,25 @@
     <div class="text-center p-10 text-primary font-bold col-span-full" data-i18n="loading_menu">Loading Premium Menu...</div>
   </div>
 
-  <!-- FLOATING ACTION BUTTONS -->
-  <button onclick="openServiceModal()" class="fixed bottom-[164px] right-4 z-40 bg-dark border-2 border-primary text-primary w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(212,175,55,0.4)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Call Waiter / Service Request">🛎️</button>
-  <button onclick="askForHelp()" class="fixed bottom-24 right-4 z-40 bg-white border border-slate-200 text-dark w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Need help? Message our staff">💬</button>
-  <button onclick="shareWithFriends()" class="fixed bottom-24 left-4 z-40 bg-primary text-dark w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(212,175,55,0.4)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Share Mandi Croods with a friend">👑</button>
+  <!-- SLIDING SIDE SERVICE & OPTIONS DOCK (Right Edge) -->
+  <div id="sideServiceDock" class="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex items-center dock-closed">
+    <button onclick="toggleSideDock()" class="bg-dark text-primary border-y-2 border-l-2 border-primary/60 rounded-l-2xl py-4 px-2.5 shadow-[0_5px_25px_rgba(0,0,0,0.4)] flex flex-col items-center gap-1 active:scale-95 transition-transform" title="Slide Service Options">
+      <span id="sideDockArrow" class="text-xs font-black">◀</span>
+      <span class="text-base">🛎️</span>
+      <span class="text-[8px] font-black uppercase tracking-tighter [writing-mode:vertical-rl] rotate-180">Service</span>
+    </button>
+    <div class="bg-dark/95 backdrop-blur-md border-y-2 border-l border-primary/40 p-3 rounded-bl-2xl shadow-2xl flex flex-col gap-3">
+      <button onclick="openServiceModal(); toggleSideDock();" class="bg-primary/20 hover:bg-primary/30 border border-primary text-primary px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-black whitespace-nowrap active:scale-95 transition">
+        <span class="text-lg">🛎️</span> Call Waiter / Service
+      </button>
+      <button onclick="askForHelp(); toggleSideDock();" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-black whitespace-nowrap active:scale-95 transition">
+        <span class="text-lg">💬</span> WhatsApp Staff Help
+      </button>
+      <button onclick="shareWithFriends(); toggleSideDock();" class="gold-gradient text-dark px-3.5 py-2.5 rounded-xl flex items-center gap-2 text-xs font-black whitespace-nowrap active:scale-95 transition">
+        <span class="text-lg">👑</span> Share Mandi Croods
+      </button>
+    </div>
+  </div>
 
   <!-- SERVICE REQUEST MODAL -->
   <div id="serviceModal" class="fixed inset-0 z-[150] flex flex-col justify-end hidden transition-opacity">
@@ -254,8 +315,8 @@
     </div>
   </div>
 
-  <!-- COLLAPSIBLE CART -->
-  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[400px] bg-dark border border-primary/40 rounded-3xl shadow-[0_10px_40px_rgba(212,175,55,0.2)] p-5 z-50 transition-all duration-300">
+  <!-- COLLAPSIBLE CART WITH SWEETS, COOL DRINKS & WATER UPSELL BAR -->
+  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[420px] bg-dark border border-primary/40 rounded-3xl shadow-[0_10px_40px_rgba(212,175,55,0.25)] p-5 z-50 transition-all duration-300">
     <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCart()">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-dark font-black relative shadow-md">
@@ -267,17 +328,29 @@
           <p id="cartTotal" class="text-2xl font-black text-white leading-none">₹0</p>
         </div>
       </div>
-      <div id="cartToggleIcon" class="w-8 h-8 flex items-center justify-center bg-white/10 text-primary border border-primary/30 rounded-full font-black text-sm transition-transform duration-300 shadow-sm">
-        ▼
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-1 rounded-lg">⏱️ 15-20m Prep</span>
+        <div id="cartToggleIcon" class="w-8 h-8 flex items-center justify-center bg-white/10 text-primary border border-primary/30 rounded-full font-black text-sm transition-transform duration-300 shadow-sm">
+          ▼
+        </div>
       </div>
     </div>
     
-    <div id="cartExpandedContent" class="overflow-hidden transition-all duration-300" style="max-height: 500px; opacity: 1; margin-top: 1rem;">
-      <div id="cartListUI" class="mb-3 max-h-48 overflow-y-auto text-white"></div>
-      <p id="upsellNudge" class="hidden text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-lg px-3 py-2 mb-3">🥤 Add a starter or extra mayonnaise to complete your royal meal!</p>
+    <div id="cartExpandedContent" class="overflow-hidden transition-all duration-300" style="max-height: 620px; opacity: 1; margin-top: 1rem;">
+      <div id="cartListUI" class="mb-3 max-h-40 overflow-y-auto text-white hide-scroll"></div>
+
+      <!-- Quick Add-Ons: Sweets, Cool Drinks & Water Bottles -->
+      <div class="mb-3 bg-white/5 border border-primary/25 rounded-2xl p-2.5">
+        <p class="text-[10px] font-black text-primary uppercase tracking-wider mb-2">🍮 Complete Your Meal: Sweets, Cool Drinks & Water</p>
+        <div id="cartUpsellCarousel" class="flex gap-2 overflow-x-auto hide-scroll pb-1"></div>
+      </div>
+
+      <!-- MC Coupon Dynamic Nudge inside Cart -->
+      <div id="upsellNudge" class="text-[11px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-xl px-3 py-2 mb-3"></div>
+
       <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Chef instructions or special requests?" class="w-full mb-3 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-semibold outline-none focus:border-primary text-sm placeholder-slate-500">
       <button onclick="placeOrder()" id="placeOrderBtn" class="w-full gold-gradient text-dark py-4 rounded-xl font-black text-sm shadow-[0_5px_15px_rgba(212,175,55,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest">
-        <span data-i18n="confirm_order">Send to Kitchen</span>
+        <span data-i18n="confirm_order">Send to Kitchen (15-20 Min)</span>
       </button>
     </div>
   </div>
@@ -294,9 +367,61 @@
     const UPI_ID = "yourupi@okbank";
     const UPI_PAYEE_NAME = "Mandi Croods";
     const RESTAURANT_HELP_PHONE = "91XXXXXXXXXX";
+    const PREP_TIME_MS = 20 * 60 * 1000; // 20 Minutes Countdown Limit
 
     function sanitizeForFirebase(obj) {
       return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
+    }
+
+    // Tiered MC Coupon & General Coupon Evaluator
+    function evaluateTieredCoupon(code, subtotal, couponsMap) {
+      const sub = Math.max(0, Number(subtotal) || 0);
+      const cleanCode = String(code || '').trim().toUpperCase();
+      if (!cleanCode || sub <= 0) return { valid: false, discount: 0, pct: 0, message: "Enter a valid code" };
+
+      if (cleanCode === 'MC') {
+        if (sub < 100) {
+          return { valid: false, discount: 0, pct: 0, message: "Minimum order of ₹100 required for coupon MC." };
+        }
+        let disc = 50;
+        if (sub >= 899) {
+          disc = 100;
+        } else if (sub >= 100 && sub <= 500) {
+          disc = 50;
+        }
+        disc = Math.min(sub, disc);
+        const pct = Math.round((disc / sub) * 1000) / 10;
+        return {
+          valid: true,
+          code: 'MC',
+          type: 'tiered',
+          value: disc,
+          discount: disc,
+          pct: pct,
+          label: `MC Offer (-₹${disc} / ${pct}% OFF)`
+        };
+      }
+
+      const c = (couponsMap || {})[cleanCode];
+      if (!c || !c.active) {
+        return { valid: false, discount: 0, pct: 0, message: "Invalid or expired coupon code. Try code 'MC'!" };
+      }
+      if (c.minOrder && sub < Number(c.minOrder)) {
+        return { valid: false, discount: 0, pct: 0, message: `Minimum order of ₹${c.minOrder} required for ${cleanCode}.` };
+      }
+      const dAmt = c.type === 'percent'
+        ? Math.min(sub, Math.round((sub * Number(c.value)) / 100))
+        : Math.min(sub, Number(c.value) || 0);
+      const pct = sub > 0 ? Math.round((dAmt / sub) * 1000) / 10 : 0;
+      return {
+        valid: true,
+        code: cleanCode,
+        type: c.type,
+        value: Number(c.value) || 0,
+        discount: dAmt,
+        pct: pct,
+        label: `${cleanCode} (-₹${dAmt} / ${pct}% OFF)`
+      };
     }
 
     function getDefaultCustomerMenu() {
@@ -311,6 +436,9 @@
       const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
       const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
       const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
+      const IDRK = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500&q=80";
+      const ISWT = "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=500&q=80";
+
       const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
       const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
       const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
@@ -349,6 +477,10 @@
         'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
         'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
         'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
+        'ex4': { name: "Mineral Water Bottle (1L)", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: IDRK },
+        'ex5': { name: "Cool Drink (Thums Up / Sprite)", category: "Beverages", base_price: 40, stock_count: 150, is_special: false, portions: { "Large Bottle": 90 }, image_url: IDRK },
+        'ex6': { name: "Royal Double Ka Meetha (Sweet)", category: "Beverages", base_price: 79, stock_count: 80, is_special: true, portions: {}, image_url: ISWT },
+        'ex7': { name: "Shahi Kaddu Ka Kheer (Sweet)", category: "Beverages", base_price: 89, stock_count: 80, is_special: true, portions: {}, image_url: ISWT },
         'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
@@ -388,10 +520,10 @@
       };
     }
 
-    if (!localStorage.getItem('mc_cust_init_v5')) {
+    if (!localStorage.getItem('mc_cust_init_v6')) {
         localStorage.removeItem('mc_cust_phone');
         localStorage.removeItem('mc_locked_table');
-        localStorage.setItem('mc_cust_init_v5', 'true');
+        localStorage.setItem('mc_cust_init_v6', 'true');
     }
 
     db.ref('.info/connected').on('value', snap => {
@@ -403,1066 +535,10 @@
       }
     });
 
-    let audioCtx = null;
-    function getAudioCtx(){
-      try{
-        if(!audioCtx){
-          const Ctx = window.AudioContext || window.webkitAudioContext;
-          if(!Ctx) return null;
-          audioCtx = new Ctx();
-        }
-        if(audioCtx.state === 'suspended'){ audioCtx.resume().catch(()=>{}); }
-        return audioCtx;
-      }catch(e){ return null; }
-    }
-    function playTone(freq, duration, type, volume, delay){
-      const ctx = getAudioCtx();
-      if(!ctx) return;
-      try{
-        const osc = ctx.createOscillator(); const gain = ctx.createGain();
-        osc.type = type || 'sine'; osc.frequency.value = freq;
-        const start = ctx.currentTime + (delay||0);
-        gain.gain.setValueAtTime(volume||0.15, start);
-        gain.gain.exponentialRampToValueAtTime(0.0001, start + (duration||0.15));
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(start); osc.stop(start + (duration||0.15) + 0.02);
-      }catch(e){ }
-    }
-    
-    function playChime(){ 
-        playTone(523.25, 0.4, 'sine', 0.2, 0);   
-        playTone(659.25, 0.4, 'sine', 0.2, 0.1); 
-        playTone(783.99, 0.4, 'sine', 0.2, 0.2); 
-        playTone(1046.50, 0.6, 'sine', 0.2, 0.3); 
-    }
-    function playClick(){ playTone(880,.05,'triangle',.1,0); }
-    function playSuccess(){ playTone(659.25,.15,'sine',.15,0); playTone(880,.25,'sine',.15,.1); }
-    function playBell(){ playTone(1046.5,.5,'sine',.2,0); playTone(1318.5,.4,'sine',.1,.08); }
-    function playNotify(){ playTone(440,.15,'sine',.15,0); playTone(554.37,.2,'sine',.15,.1); }
-    function playError(){ playTone(220,.3,'sawtooth',.15,0); }
-    
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-    }
-    
-    function speakWelcome(){
-      try{
-        if(!('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        let text = "Welcome to Mandi Croods, enjoy your premium dining experience.";
-        if(lang === 'te') text = "మండి క్రూడ్స్ కి స్వాగతం, మీ భోజనాన్ని ఆస్వాదించండి.";
-        if(lang === 'hi') text = "मंडी क्रूड्स में आपका स्वागत है, अपने भोजन का आनंद लें।";
-
-        const msg = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
-        let targetVoice = null;
-        if(lang === 'te') {
-            targetVoice = voices.find(v => v.lang.includes('te') && v.name.toLowerCase().includes('male')) || voices.find(v => v.lang.includes('te'));
-        } else if(lang === 'hi') {
-            targetVoice = voices.find(v => v.lang.includes('hi') && v.name.toLowerCase().includes('male')) || voices.find(v => v.lang.includes('hi'));
-        }
-        if(!targetVoice) targetVoice = voices.find(v => v.lang.includes('en-IN') && v.name.toLowerCase().includes('male')) || voices.find(v => v.lang.includes('en-IN'));
-        if(targetVoice) msg.voice = targetVoice;
-        msg.rate = 0.85; msg.pitch = 0.6; msg.volume = 1.0;
-        window.speechSynthesis.speak(msg);
-      }catch(e){ }
-    }
-    
-    function vibrate(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){ } }
-
-    const FUN_LINES = [
-      "Your order is locked in — our chefs are preparing your masterpiece! 👑",
-      "Get ready for a royal feast! 🍖✨",
-      "Taste luxury. Your order has been sent to the kitchen. 🥂",
-      "A culinary experience awaits. Sit back and relax. 🌟",
-      "Bill cleared — thank you for dining with Mandi Croods! 💛"
-    ];
-    function randomFunLine(){ return FUN_LINES[Math.floor(Math.random() * FUN_LINES.length)]; }
-
-    function showFunToast(text){
-      try{
-        const toast = document.createElement('div');
-        toast.className = 'fun-toast';
-        toast.innerText = text;
-        document.body.appendChild(toast);
-        setTimeout(() => { toast.classList.add('fun-toast-out'); }, 3000);
-        setTimeout(() => { toast.remove(); }, 3600);
-      }catch(e){ }
-    }
-
-    function fireConfetti(){
-      try{
-        const canvas = document.createElement('canvas');
-        canvas.style.position = 'fixed'; canvas.style.top = '0'; canvas.style.left = '0';
-        canvas.style.width = '100%'; canvas.style.height = '100%';
-        canvas.style.pointerEvents = 'none'; canvas.style.zIndex = '9999';
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        document.body.appendChild(canvas);
-        const ctx = canvas.getContext('2d');
-        const colors = ['#D4AF37', '#F9E596', '#AA8C2C', '#ffffff', '#1a1a1a'];
-        const pieces = Array.from({ length: 100 }, () => ({
-          x: Math.random() * canvas.width, y: -20 - Math.random() * canvas.height * 0.3,
-          r: 3 + Math.random() * 6, c: colors[Math.floor(Math.random() * colors.length)],
-          vy: 2 + Math.random() * 4, vx: -1.5 + Math.random() * 3,
-          rot: Math.random() * 360, vr: -8 + Math.random() * 16
-        }));
-        let frame = 0; const maxFrames = 120;
-        function draw(){
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          pieces.forEach(p => {
-            p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-            ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
-            ctx.fillStyle = p.c; ctx.fillRect(-p.r / 2, -p.r / 2, p.r, p.r * 1.5); ctx.restore();
-          });
-          frame++;
-          if(frame < maxFrames){ requestAnimationFrame(draw); } else { canvas.remove(); }
-        }
-        draw();
-      }catch(e){ }
-    }
-
-    function updateLoyaltyTeaser(visits){
-      const el = document.getElementById('loyaltyTeaser');
-      if(!el) return;
-      if(!visits || visits >= 3){ el.classList.add('hidden'); return; }
-      const remaining = 3 - visits;
-      el.innerText = `🎯 ${remaining} more visit${remaining > 1 ? 's' : ''} to unlock VIP perks!`;
-      el.classList.remove('hidden');
-    }
-
-    window.shareWithFriends = function(){
-      playClick();
-      const msg = "I'm dining at Mandi Croods and the luxury experience is amazing! 👑🍖 You should try it too!";
-      const waLink = document.createElement('a');
-      waLink.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-      waLink.target = '_blank'; waLink.rel = 'noopener';
-      document.body.appendChild(waLink); waLink.click(); document.body.removeChild(waLink);
-    };
-
-    let menuData = getDefaultCustomerMenu();
-    let cart = {}; let currentFilter = 'All'; let activeTableData = null;
-    let selectedVariants = {};
-    let couponsData = {};
-    let cartWasVisible = false; let lastKnownStatus = null;
-    let customerPhone = localStorage.getItem('mc_cust_phone') || "";
-    let lockedTable = localStorage.getItem('mc_locked_table') || "";
-    let myServiceRequests = new Set();
-    let autoBillText = "";
-
-    db.ref('coupons').on('value', snap => {
-      if (snap.val()) couponsData = Object.assign({}, couponsData, snap.val());
-    }, () => {});
-    
-    function lockCustomerTable(tableVal) {
-      const tableSelect = document.getElementById('tableNum');
-      const lockIcon = document.getElementById('tableLockIcon');
-      if (tableVal && tableSelect.querySelector(`option[value="${tableVal}"]`)) {
-        tableSelect.value = tableVal;
-      }
-      tableSelect.disabled = true;
-      if (lockIcon) lockIcon.classList.remove('hidden');
-      localStorage.setItem('mc_locked_table', tableSelect.value);
-    }
-
-    function unlockCustomerTable() {
-      localStorage.removeItem('mc_locked_table');
-      const urlParams = new URLSearchParams(window.location.search);
-      if (!urlParams.get('table')) {
-        const tableSelect = document.getElementById('tableNum');
-        if (tableSelect) tableSelect.disabled = false;
-        const lockIcon = document.getElementById('tableLockIcon');
-        if (lockIcon) lockIcon.classList.add('hidden');
-      }
-    }
-
-    let cartExpanded = true;
-    window.toggleCart = function() {
-      cartExpanded = !cartExpanded;
-      const content = document.getElementById('cartExpandedContent');
-      const icon = document.getElementById('cartToggleIcon');
-      if(cartExpanded) {
-        content.style.maxHeight = "500px"; content.style.opacity = "1";
-        content.style.marginTop = "1rem"; icon.style.transform = "rotate(0deg)";
-      } else {
-        content.style.maxHeight = "0px"; content.style.opacity = "0";
-        content.style.marginTop = "0px"; icon.style.transform = "rotate(180deg)";
-      }
-    };
-
-    window.openServiceModal = function() {
-        playClick();
-        const tableVal = document.getElementById('tableNum').value;
-        document.getElementById('serviceTableDisplay').innerText = tableVal;
-        const modal = document.getElementById('serviceModal');
-        const content = document.getElementById('serviceModalContent');
-        modal.classList.remove('hidden');
-        setTimeout(() => { content.classList.remove('translate-y-full'); content.classList.add('translate-y-0'); }, 10);
-    };
-
-    window.closeServiceModal = function() {
-        const modal = document.getElementById('serviceModal');
-        const content = document.getElementById('serviceModalContent');
-        content.classList.remove('translate-y-0'); content.classList.add('translate-y-full');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
-    };
-
-    window.submitServiceRequest = function(type) {
-        playClick();
-        const tableVal = document.getElementById('tableNum').value;
-        const phone = customerPhone || 'Guest';
-        let note = document.getElementById('serviceNotes').value.trim();
-        if (type === 'Other' && !note) type = 'Call Waiter';
-
-        const newReqRef = db.ref('service_requests').push();
-        newReqRef.set({
-            table: tableVal, phone: phone, request_type: type, note: note, status: 'pending', timestamp: Date.now()
-        }).then(() => {
-            myServiceRequests.add(newReqRef.key);
-            playNotify(); vibrate([30, 50, 30]);
-            showFunToast(`🛎️ Request sent to our staff!`);
-            closeServiceModal();
-            document.getElementById('serviceNotes').value = '';
-        }).catch(err => {
-            console.error(err); playError(); alert('Failed to send request. Please check connection.');
-        });
-    };
-
-    db.ref('service_requests').on('child_changed', snap => {
-        const req = snap.val();
-        if(myServiceRequests.has(snap.key) && req && req.status === 'resolved') {
-            playSuccess();
-            showFunToast("✅ Your request has been attended to. Thank you!");
-            myServiceRequests.delete(snap.key); 
-        }
-    });
-    
-    if (customerPhone && customerPhone.length >= 10) {
-        document.getElementById('loginModal').style.display = 'none';
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    const i18n = {
-      en: { welcome: "Mandi Croods", enter_mobile: "Enter mobile number to view our premium menu.", mobile_placeholder: "10-Digit Mobile", proceed: "Enter Menu", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "Premium Menu", cat_group: "👑 Royal Packs (4+)", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_fish: "Fish & Prawns", cat_veg: "Veg", cat_starters: "Starters", cat_bev: "Extras & Add-ons", add: "ADD", sold_out: "SOLD OUT", special: "⭐ SPECIAL", qty_left: "Left", total_bill: "Total Tab:", cart_total: "Selected Items", confirm_order: "Send to Kitchen", special_req: "Chef instructions or special requests?", live_status: "Your Running Tab", food_feedback: "Rate your luxury experience", thanks_feedback: "Thank you for your valuable feedback! 👑", scan_pay: "Scan to Pay via UPI", request_bill: "Request Final Bill", select_payment: "Select Payment Method", loading_menu: "Loading Premium Menu..." },
-      hi: { welcome: "मंडी क्रूड्स", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_group: "👑 4+ लोग", cat_chicken: "चिकन", cat_mutton: "मटन", cat_fish: "फिश और प्रॉन्स", cat_veg: "वेज", cat_starters: "स्टार्टर्स", cat_bev: "एक्स्ट्रा", add: "जोड़ें", sold_out: "ख़त्म हो गया", special: "⭐ विशेष", qty_left: "बचे हैं", total_bill: "कुल बिल:", cart_total: "नए आइटम", confirm_order: "किचन में भेजें", special_req: "कोई निर्देश?", live_status: "आपका रनिंग टैब", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! 👑", scan_pay: "UPI से भुगतान करें", request_bill: "फाइनल बिल मांगें", select_payment: "भुगतान का तरीका चुनें", loading_menu: "लोड हो रहा है..." },
-      te: { welcome: "మండి క్రూడ్స్", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_group: "👑 4+ వ్యక్తులు", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_fish: "ఫిష్ & ప్రాన్స్", cat_veg: "వెజ్", cat_starters: "స్టార్టర్స్", cat_bev: "ఎక్స్‌ట్రాలు", add: "జోడించు", sold_out: "అయిపోయింది", special: "⭐ స్పెషల్", qty_left: "మిగిలి ఉన్నాయి", total_bill: "మొత్తం బిల్లు:", cart_total: "కొత్త వస్తువులు", confirm_order: "వంటగదికి పంపండి", special_req: "ఏదైనా సూచనలు?", live_status: "టేబుల్ రన్నింగ్ ట్యాబ్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! 👑", scan_pay: "స్కాన్ చేయండి", request_bill: "ఫైనల్ బిల్ అడగండి", select_payment: "చెల్లింపు విధానాన్ని ఎంచుకోండి", loading_menu: "లోడ్ అవుతోంది..." }
-    };
-    
-    const wordDict = {
-      'hi': {
-        'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
-        'special': 'स्पेशल', 'juicy': 'जूसी', 'mixed': 'मिक्स्ड', 'paneer': 'पनीर', 'mushroom': 'मशरूम',
-        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस', 
-        'pcs': 'पीस', 'half': 'हाफ', 'full': 'फुल', 'regular': 'रेगुलर', 'single': 'सिंगल', 'triple': 'ट्रिपल',
-        'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'bhakasura': 'बकासुर', 'fish': 'फिश', 'prawns': 'प्रॉन्स'
-      },
-      'te': {
-        'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
-        'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
-        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్', 
-        'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
-        'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర', 'fish': 'ఫిష్', 'prawns': 'ప్రాన్స్'
-      }
-    };
-    
-    let lang = localStorage.getItem('mc_lang') || 'en';
-    const t = (k) => (i18n[lang] && i18n[lang][k]) || i18n.en[k] || k;
-
-    function translateItem(text) {
-        if (lang === 'en' || !text) return text;
-        let res = text.toString();
-        const curDict = wordDict[lang] || {};
-        const keys = Object.keys(curDict).sort((a,b) => b.length - a.length);
-        keys.forEach(k => {
-            const regex = new RegExp(`\\b${k}\\b`, 'gi');
-            res = res.replace(regex, curDict[k]);
-        });
-        return res;
-    }
-
-    window.changeLanguage = function(l) {
-      lang = l;
-      localStorage.setItem('mc_lang', l);
-      const topSel = document.getElementById('langSelect');
-      const loginSel = document.getElementById('loginLangSelect');
-      if (topSel && topSel.value !== l) topSel.value = l;
-      if (loginSel && loginSel.value !== l) loginSel.value = l;
-
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        const label = t(key);
-        let node = el.lastChild;
-        if (node && node.nodeType === Node.TEXT_NODE) { node.textContent = label; } 
-        else { el.appendChild(document.createTextNode(label)); }
-      });
-      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-i18n-placeholder')));
-      renderMenu();
-      updateCartUI();
-      if(activeTableData) {
-          const tableId = `table_${document.getElementById('tableNum').value}`;
-          renderOrderedItemsList(activeTableData, tableId);
-      }
-    };
-
-    window.registerCustomer = function() {
-      const rawInput = document.getElementById('customerMobile').value;
-      let digits = rawInput.replace(/\D/g, '');
-      if (digits.length > 10) digits = digits.slice(-10);
-
-      if (digits.length !== 10) {
-        playError(); return alert(lang==='en' ? "Please enter a valid 10-digit mobile number." : "अमान्य नंबर");
-      }
-      const num = digits;
-      document.getElementById('customerMobile').value = num;
-
-      customerPhone = num; localStorage.setItem('mc_cust_phone', num);
-
-      playChime(); speakWelcome(); vibrate(20);
-      
-      db.ref('customers/' + num).once('value', snap => {
-          let visits = (snap.val() && typeof snap.val().visits === 'number') ? snap.val().visits + 1 : 1;
-          db.ref('customers/' + num).set({ visits: visits, last_visit: Date.now() });
-          if(visits >= 3) document.getElementById('vipBadge').classList.remove('hidden');
-          updateLoyaltyTeaser(visits);
-      }).catch(err => console.error('Customer lookup failed', err));
-
-      showFunToast("Welcome to Mandi Croods! 👑");
-      document.getElementById('loginModal').style.display = 'none';
-      document.body.classList.remove('overflow-hidden');
-      listenToRunningTab();
-      updateTableOccupancyPill();
-    };
-
-    if(customerPhone) {
-        db.ref('customers/' + customerPhone).once('value', snap => {
-            const visits = snap.val() ? snap.val().visits : 0;
-            if(visits >= 3) document.getElementById('vipBadge').classList.remove('hidden');
-            updateLoyaltyTeaser(visits);
-        }).catch(err => console.error('Customer lookup failed', err));
-        speakWelcome();
-        showFunToast("Welcome back to Mandi Croods! 👑");
-    }
-
-    window.filterMenu = function(cat) {
-      currentFilter = cat;
-      playClick();
-      document.querySelectorAll('.category-btn').forEach(btn => {
-        let isMatch = btn.getAttribute('data-cat') === cat;
-        if(isMatch) {
-            btn.className = "category-btn active px-6 py-2.5 rounded-xl font-bold text-sm bg-dark text-primary shadow-md transition whitespace-nowrap border border-primary";
-        } else {
-            if(btn.getAttribute('data-i18n') === 'cat_group') {
-                btn.className = "category-btn px-6 py-2.5 rounded-xl font-black text-sm bg-primary/10 text-secondary border border-primary/30 hover:bg-primary/20 transition whitespace-nowrap";
-            } else {
-                btn.className = "category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap";
-            }
-        }
-      });
-      renderMenu();
-    };
-
-    db.ref('menu').on('value', snap => { 
-      try{
-        let rawData = snap.val() || {}; 
-        if (rawData._system_coupons) {
-          couponsData = Object.assign({}, couponsData, rawData._system_coupons);
-        }
-        const loadedMenu = {};
-        Object.keys(rawData).forEach(k => {
-          if (k !== '_system_coupons' && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
-            loadedMenu[k] = rawData[k];
-          }
-        });
-        if (Object.keys(loadedMenu).length > 0) {
-          menuData = loadedMenu;
-        }
-        renderMenu(); 
-      }catch(e){ console.error('Menu render error', e); }
-    });
-
-    function getStockBadge(item, stock){
-      if(stock <= 0) return null;
-      let pct = null;
-      if(item.initial_stock && Number(item.initial_stock) > 0){
-        pct = Math.max(0, Math.min(100, Math.round((stock / Number(item.initial_stock)) * 100)));
-      }
-      const isCritical = pct !== null ? pct <= 20 : stock <= 3;
-      const isLow      = pct !== null ? pct <= 50 : stock <= 7;
-      if(isCritical) return { text: `🔥 ${stock} ${t('qty_left')}!`, cls: 'bg-red-600 text-white shadow-sm', pct };
-      if(isLow)      return { text: `⚠ ${stock} ${t('qty_left')}`, cls: 'bg-amber-600 text-white shadow-sm', pct };
-      return null;
-    }
-
-    window.onVariantChange = function(id, val) {
-      selectedVariants[id] = val;
-    };
-
-    function renderMenu() {
-      const grid = document.getElementById('menuGrid'); grid.innerHTML = '';
-      let items = Object.entries(menuData).sort((a,b) => (b[1].is_special?1:0) - (a[1].is_special?1:0));
-      if(items.length === 0) { grid.innerHTML = `<div class="text-center p-10 font-bold col-span-full text-primary">${t('loading_menu')}</div>`; return; }
-
-      items.forEach(([id, item]) => {
-        let itemCat = item.category || ""; 
-        if (currentFilter === 'Group') {
-            let hasBigPortion = item.base_price > 800 || itemCat === 'Specials' || (item.portions && Object.keys(item.portions).some(k => k.includes("Gang") || k.includes("4") || k.includes("5")));
-            if(!hasBigPortion) return;
-        } else if (currentFilter === 'Starters') {
-            if(!itemCat.toLowerCase().includes('starter')) return;
-        } else if (currentFilter === 'Fish') {
-            if(!itemCat.toLowerCase().includes('fish') && !itemCat.toLowerCase().includes('prawn')) return;
-        } else if (currentFilter !== 'All' && !itemCat.toLowerCase().includes(currentFilter.split(' ')[0].toLowerCase())) {
-            return;
-        }
-
-        const stock = item.stock_count !== undefined ? Number(item.stock_count) : 50;
-        let selectHtml = '';
-        const savedVar = selectedVariants[id] || `Regular|${item.base_price}`;
-
-        if (item.portions && Object.keys(item.portions).length > 0) {
-          selectHtml = `<select id="var-${id}" onchange="onVariantChange('${id}', this.value)" class="w-full mt-2 p-2.5 rounded-lg text-xs font-bold bg-white border border-primary/20 outline-none focus:border-primary text-dark">`;
-          selectHtml += `<option value="Regular|${item.base_price}" ${savedVar === `Regular|${item.base_price}` ? 'selected' : ''}>${translateItem('Regular')} (1P) - ₹${item.base_price}</option>`;
-          Object.entries(item.portions).forEach(([pName, pPrice]) => { 
-              const optVal = `${pName}|${pPrice}`;
-              selectHtml += `<option value="${optVal}" ${savedVar === optVal ? 'selected' : ''}>${translateItem(pName)} - ₹${pPrice}</option>`; 
-          });
-          selectHtml += `</select>`;
-        } else { selectHtml = `<div class="font-black text-xl text-primary mt-1">₹${item.base_price}</div>`; }
-
-        let cartQty = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) cartQty += cart[k].qty; });
-        const stockBadge = getStockBadge(item, stock);
-        const displayName = translateItem(item.name);
-
-        grid.innerHTML += `
-          <div class="food-card fade-in-card bg-card rounded-2xl p-4 flex flex-col relative overflow-hidden">
-            ${stock <= 0 ? `<div class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center"><span class="bg-dark text-primary font-black px-4 py-2 rounded-xl shadow-lg border border-primary/50">${t('sold_out')}</span></div>` : ''}
-            ${item.is_special ? `<div class="absolute top-3 left-3 bg-dark text-primary border border-primary/50 text-[10px] font-black px-2 py-1 rounded-md shadow-md z-20 uppercase tracking-widest">${t('special')}</div>` : ''}
-            <div class="w-full h-36 rounded-xl bg-light overflow-hidden shadow-inner mb-3 border border-slate-100">
-              <img src="${item.image_url}" class="w-full h-full object-cover">
-            </div>
-            <div class="flex flex-col flex-1">
-              <h3 class="font-black text-dark leading-tight text-sm">${displayName}</h3>
-              <span class="text-[10px] font-bold text-slate-400 mt-0.5">${itemCat}</span>
-              ${stockBadge ? `<div class="mt-1.5">
-                <span class="inline-block text-[9px] font-black px-2 py-0.5 rounded-full ${stockBadge.cls}">${stockBadge.text}</span>${stockBadge.pct !== null ? `<div class="w-full h-1.5 bg-slate-100 rounded-full mt-1 overflow-hidden"><div class="h-full ${stockBadge.pct<=20?'bg-red-500':'bg-amber-500'} rounded-full transition-all" style="width:${stockBadge.pct}%"></div></div>` : ''}
-              </div>` : ''}
-              ${selectHtml}
-              <div class="flex items-center justify-between mt-auto pt-4 z-0">
-                 ${cartQty > 0 
-                 ? `<div class="flex items-center bg-slate-50 border border-primary/20 rounded-lg p-1 w-full justify-between">
-                      <button onclick="updateCartQty('${id}', -1,${stock})" class="w-8 h-8 bg-white rounded-md font-black shadow-sm text-slate-800 active:scale-90 transition-transform">-</button>
-                      <span class="font-black text-sm">${cartQty}</span>
-                      <button onclick="updateCartQty('${id}', 1,${stock})" class="w-8 h-8 bg-dark rounded-md font-black shadow-sm text-primary active:scale-90 transition-transform">+</button>
-                    </div>`
-                 : `<button onclick="updateCartQty('${id}', 1,${stock})" class="w-full bg-dark text-primary border border-primary/40 font-black text-xs py-2.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest">+ ${t('add')}</button>`
-                 }
-              </div>
-            </div>
-          </div>`;
-      });
-      updateCartUI();
-    }
-
-    window.updateCartQty = function(id, change, maxStock) {
-      if(!menuData[id]) return;
-      let finalPrice = Number(menuData[id].base_price) || 0, varName = "Regular"; 
-      const sel = document.getElementById(`var-${id}`);
-      if (sel && sel.value) {
-        selectedVariants[id] = sel.value;
-        const pts = sel.value.split('|');
-        varName = pts[0];
-        finalPrice = Math.round((parseFloat(pts[1])||0)*100)/100;
-      }
-      
-      const cartKey = `${id}|${varName}`;
-      let totalQtyOfThisItem = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) totalQtyOfThisItem += cart[k].qty; });
-
-      if (change > 0 && totalQtyOfThisItem >= maxStock) { playError(); return alert(lang==='en'?"Out of stock!":"स्टॉक खत्म!"); }
-      
-      if(change > 0) {
-        playClick(); vibrate(15);
-        if(cart[cartKey]) cart[cartKey].qty++; else cart[cartKey] = { id, name: menuData[id].name, variant: varName, price: finalPrice, qty: 1 };
-      } else {
-        if(cart[cartKey]) {
-          cart[cartKey].qty--;
-          if(cart[cartKey].qty <= 0) delete cart[cartKey];
-        } else {
-          const anyKey = Object.keys(cart).find(k => k.startsWith(id+"|"));
-          if (anyKey) {
-            cart[anyKey].qty--;
-            if (cart[anyKey].qty <= 0) delete cart[anyKey];
-          }
-        }
-      }
-      renderMenu();
-    };
-
-    window.updateCartQtyFromCart = function(id, variant, change) {
-      const cartKey = `${id}|${variant}`;
-      if(cart[cartKey]) {
-        const maxStock = menuData[id]?.stock_count || 50;
-        let totalQtyOfThisItem = 0; Object.keys(cart).forEach(k => { if(k.startsWith(id+"|")) totalQtyOfThisItem += cart[k].qty; });
-        
-        if(change > 0) {
-          if(totalQtyOfThisItem >= maxStock) { playError(); return alert(lang==='en'?"Out of stock!":"स्टॉक खत्म!"); }
-          cart[cartKey].qty++;
-        } else {
-          cart[cartKey].qty--;
-          if(cart[cartKey].qty <= 0) delete cart[cartKey];
-        }
-        playClick(); vibrate(15);
-        updateCartUI();
-        renderMenu();
-      }
-    };
-
-    function updateCartUI() {
-      let total = 0; let uiHtml = ''; let totalQty = 0;
-      Object.values(cart).forEach(i => {
-        total += (Number(i.price)||0) * (Number(i.qty)||0);
-        totalQty += (Number(i.qty)||0);
-        uiHtml += `<div class="py-3 flex items-center justify-between border-b border-white/10 last:border-0 text-sm">
-          <div class="flex flex-col flex-1 pr-2">
-            <span class="font-bold text-white leading-tight">${translateItem(i.name)} <small class="text-primary opacity-80 font-semibold block">${translateItem(i.variant)}</small></span>
-            <span class="text-primary font-black mt-0.5">₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span>
-          </div>
-          <div class="flex items-center bg-white/10 rounded-lg p-1 shrink-0">
-            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', -1)" class="w-8 h-8 bg-dark rounded-md font-black shadow-sm text-white active:scale-90 transition-transform border border-white/20">-</button>
-            <span class="font-black text-sm w-8 text-center text-white">${i.qty}</span>
-            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', 1)" class="w-8 h-8 bg-primary rounded-md font-black shadow-sm text-dark active:scale-90 transition-transform">+</button>
-          </div>
-        </div>`;
-      });
-      total = Math.round(total * 100) / 100;
-      
-      const totalEl = document.getElementById('cartTotal');
-      if (totalEl) totalEl.innerText = '₹' + total;
-      
-      const cartList = document.getElementById('cartListUI');
-      if (cartList) cartList.innerHTML = uiHtml;
-      
-      const upsell = document.getElementById('upsellNudge');
-      if (upsell) upsell.classList.toggle('hidden', !(total > 0 && total < 300));
-      
-      const badge = document.getElementById('cartBadgeCount');
-      if (badge) {
-        if (totalQty > 0) { badge.innerText = totalQty; badge.classList.remove('hidden'); }
-        else { badge.classList.add('hidden'); }
-      }
-
-      const footer = document.getElementById('cartFooter');
-      const shouldShow = total > 0;
-      if (footer) footer.classList.toggle('hidden', !shouldShow);
-
-      if (shouldShow && !cartWasVisible) {
-        footer.classList.remove('cart-pop-in'); void footer.offsetWidth;
-        footer.classList.add('cart-pop-in');
-        if (!cartExpanded) toggleCart();
-      }
-      cartWasVisible = shouldShow;
-    }
-
-    function buildItemsString(lineItemsObj) {
-      if (!lineItemsObj) return "";
-      return Object.values(lineItemsObj)
-          .filter(Boolean)
-          .sort((a,b) => (a.addedAt||0) - (b.addedAt||0))
-          .map(li => {
-              let base = `${li.qty}x ${li.name}`;
-              if (li.variant && li.variant !== 'Regular') base += ` (${li.variant})`;
-              if (li.note) base += ` - Note: ${li.note}`;
-              return li.cancelled ? `${base} [CANCELLED]` : base;
-          })
-          .join(' | ');
-    }
-
-    function buildLineItemsArray(order){
-      if(!order || !order.line_items) return [];
-      return Object.entries(order.line_items)
-        .filter(([,li]) => li && typeof li === 'object')
-        .map(([key, li]) => ({ key, ...li }))
-        .sort((a,b) => (a.addedAt||0) - (b.addedAt||0));
-    }
-
-    function computeOrderTotal(lineItemsObj){
-      let total = 0;
-      Object.values(lineItemsObj || {}).forEach(li => {
-        if(li && !li.cancelled) total += (Number(li.price)||0) * (Number(li.qty)||0);
-      });
-      return Math.round(total * 100) / 100;
-    }
-
-    function computeDiscountFromOrder(subtotal, order) {
-      const sub = Math.max(0, Number(subtotal) || 0);
-      if (!order) return 0;
-      const dType = order.discountType || 'flat';
-      const dVal = Math.max(0, Number(order.discountValue) || 0);
-      if (!dVal || sub <= 0) return 0;
-      const d = dType === 'percent' ? Math.round((sub * Math.min(100, dVal)) / 100) : dVal;
-      return Math.min(sub, Math.round(d * 100) / 100);
-    }
-
-    window.applyCustomerCoupon = function() {
-      if (!activeTableData) return;
-      const rawCode = (document.getElementById('customerCouponInput')?.value || '').trim().toUpperCase();
-      if (!rawCode) { playError(); return alert("Please enter a coupon code."); }
-
-      const coupon = couponsData[rawCode];
-      if (!coupon || !coupon.active) {
-        playError(); vibrate(25);
-        return alert("Invalid or expired coupon code. Please ask our staff for a valid coupon or admin discount.");
-      }
-
-      const sub = computeOrderTotal(activeTableData.line_items) || Number(activeTableData.subtotal) || Number(activeTableData.total) || 0;
-      if (coupon.minOrder && sub < Number(coupon.minOrder)) {
-        playError();
-        return alert(`Minimum order of ₹${coupon.minOrder} is required to use coupon ${rawCode}.`);
-      }
-
-      const dAmt = coupon.type === 'percent'
-        ? Math.min(sub, Math.round((sub * Number(coupon.value)) / 100))
-        : Math.min(sub, Number(coupon.value) || 0);
-      const newTot = Math.max(0, sub - dAmt);
-
-      const tableId = `table_${document.getElementById('tableNum').value}`;
-      db.ref(`active_tables/${tableId}`).update({
-        subtotal: sub,
-        discountType: coupon.type,
-        discountValue: Number(coupon.value) || 0,
-        discountAmount: dAmt,
-        couponCode: rawCode,
-        total: newTot
-      }).then(() => {
-        playSuccess(); fireConfetti();
-        document.getElementById('customerCouponInput').value = '';
-        showFunToast(`🎉 Coupon ${rawCode} applied!`);
-      }).catch(err => alert("Could not apply coupon: " + err.message));
-    };
-
-    window.removeCustomerCoupon = function() {
-      if (!activeTableData) return;
-      const tableId = `table_${document.getElementById('tableNum').value}`;
-      const currSub = computeOrderTotal(activeTableData.line_items) || Number(activeTableData.subtotal) || Number(activeTableData.total) || 0;
-      db.ref(`active_tables/${tableId}`).update({
-        subtotal: currSub,
-        discountType: 'flat',
-        discountValue: 0,
-        discountAmount: 0,
-        couponCode: '',
-        total: currSub
-      }).then(() => {
-        playClick();
-        showFunToast("Coupon removed.");
-      });
-    };
-
-    window.changeCustomerSplit = function(delta) {
-      if (!activeTableData) return;
-      const tableId = `table_${document.getElementById('tableNum').value}`;
-      const currSplit = Math.max(1, parseInt(activeTableData.splitCount) || 1);
-      let nextSplit = currSplit + delta;
-      if (nextSplit < 1) nextSplit = 1;
-      if (nextSplit > 50) nextSplit = 50;
-      playClick(); vibrate(10);
-      db.ref(`active_tables/${tableId}`).update({ splitCount: nextSplit });
-    };
-
-    function buildBillText(order){
-      const lines = buildLineItemsArray(order);
-      let body = '';
-      if (lines.length > 0) {
-        body = lines.map(li => {
-          const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
-          const base = `${li.name} [${li.variant || 'Regular'}] (x${li.qty}) - Rs.${lineTotal}`;
-          return li.cancelled ? `${base} (CANCELLED)` : base;
-        }).join('\n');
-      } else if (order && order.items) {
-        body = String(order.items).replace(/ \| /g, '\n');
-      }
-      if(!body) body = '(no items)';
-
-      const subTotal = Number(order.subtotal) || Number(order.total) || 0;
-      const discAmt = Number(order.discountAmount) || 0;
-      const splitCount = Math.max(1, parseInt(order.splitCount) || 1);
-      const splitAmt = Math.ceil((Number(order.total) || 0) / splitCount);
-
-      let extraLines = '';
-      if (discAmt > 0) {
-        extraLines += `Subtotal: Rs. ${subTotal}\nDiscount${order.couponCode ? ' (' + order.couponCode + ')' : ''}: -Rs. ${discAmt}\n`;
-      }
-      if (splitCount > 1) {
-        extraLines += `Split Bill (${splitCount} Persons): Rs. ${splitAmt} / person\n`;
-      }
-
-      return `=== MANDI CROODS ===\nTable: ${order.table}\nMobile: ${order.phone || customerPhone}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${body}\n------------------\n${extraLines}TOTAL: Rs. ${order.total}\n==================\nThank you for dining with Mandi Croods! 👑`;
-    }
-
-    function renderOrderedItemsList(order, tableId){
-      const div = document.getElementById('customerOrderedItems');
-      const lines = buildLineItemsArray(order);
-      if(lines.length === 0 && (!order || !order.items)){ div.classList.add('hidden'); return; }
-      const canCancel = order.status === 'pending';
-
-      if (lines.length === 0 && order.items) {
-        const rawParts = String(order.items).split('|').map(s => s.trim()).filter(Boolean);
-        div.innerHTML = `<div class="text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-white/10 pb-1">Items Ordered:</div>` +
-          rawParts.map(p => `<div class="py-2 border-b border-white/5 last:border-0"><span class="text-primary mr-2">✓</span>${translateItem(p)}</div>`).join('');
-        div.classList.remove('hidden');
-        return;
-      }
-
-      div.innerHTML = `<div class="text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-white/10 pb-1">Items Ordered:</div>` +
-        lines.map(li => {
-          const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
-          if(li.cancelled){
-            return `<div class="py-2 border-b border-white/5 last:border-0 opacity-50">
-              <span class="text-red-500 mr-2">✕</span><s>${translateItem(li.name)} [${translateItem(li.variant || 'Regular')}] (x${li.qty})</s>
-              <span class="text-[10px] text-red-500 font-black ml-1 border border-red-500/50 px-1 rounded">CANCELLED</span>
-            </div>`;
-          }
-          return `<div class="py-2 border-b border-white/5 last:border-0 flex items-center justify-between gap-2">
-            <span><span class="text-primary mr-2">✓</span>${translateItem(li.name)} <span class="opacity-70">[${translateItem(li.variant || 'Regular')}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-400 opacity-80">📝 ${li.note}</span>` : ''}</span>
-            ${canCancel ? `<button onclick="cancelOrderItem('${tableId}','${li.key}')" class="shrink-0 bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-black px-2 py-1.5 rounded-lg active:scale-90 transition-transform">✕ Cancel</button>` : ''}
-          </div>`;
-        }).join('') +
-        (!canCancel ? `<div class="text-[10px] text-white/50 pt-3 italic">Items are being prepared by the Chef — cancellations are no longer available.</div>` : '');
-      div.classList.remove('hidden');
-    }
-
-    window.placeOrder = function() {
-      if(Object.keys(cart).length === 0) return;
-      const btn = document.getElementById('placeOrderBtn');
-      if (!btn) return;
-      btn.disabled = true;
-      const chosenTable = document.getElementById('tableNum').value;
-      const tableId = `table_${chosenTable}`;
-      const notes = document.getElementById('orderNotes').value.trim();
-
-      const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-      const cartEntries = Object.values(cart);
-      const newLineItems = {};
-      const stockUpdates = {};
-      cartEntries.forEach((item, idx) => {
-        const key = `${batchId}_${idx}`;
-        newLineItems[key] = {
-          itemId: String(item.id || ''),
-          name: String(item.name || 'Item'),
-          variant: String(item.variant || 'Regular'),
-          price: Number(item.price) || 0,
-          qty: Number(item.qty) || 1,
-          cancelled: false,
-          addedAt: Date.now() + idx,
-          note: (idx === 0 && notes) ? notes : null
-        };
-        if(!stockUpdates[item.id]) stockUpdates[item.id] = 0;
-        stockUpdates[item.id] += item.qty;
-      });
-
-      const existing = activeTableData || (occupiedTablesMap && occupiedTablesMap[tableId]) || { table: chosenTable, phone: customerPhone, status: 'pending', line_items: {} };
-      const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
-      const subTot = computeOrderTotal(mergedLineItems);
-      const dAmt = computeDiscountFromOrder(subTot, existing);
-      const finalTot = Math.max(0, subTot - dAmt);
-
-      const orderPayload = sanitizeForFirebase({
-        orderId: existing.orderId || tableId,
-        table: String(existing.table || chosenTable),
-        phone: String(customerPhone || 'Walk-in'),
-        line_items: mergedLineItems,
-        items: buildItemsString(mergedLineItems),
-        subtotal: subTot,
-        discountType: existing.discountType || 'flat',
-        discountValue: Number(existing.discountValue) || 0,
-        discountAmount: dAmt,
-        couponCode: existing.couponCode || '',
-        splitCount: Math.max(1, parseInt(existing.splitCount) || 1),
-        total: finalTot,
-        status: 'pending',
-        timestamp: Date.now(),
-        paymentMethod: existing.paymentMethod || ''
-      });
-
-      db.ref(`active_tables/${tableId}`).set(orderPayload).then(() => {
-        Object.keys(stockUpdates).forEach(itemId => {
-          db.ref(`menu/${itemId}/stock_count`).transaction(curr => Math.max(0, (curr||0) - stockUpdates[itemId]));
-        });
-        lockCustomerTable(chosenTable);
-        playSuccess(); vibrate([30,40,30]);
-        fireConfetti(); showFunToast(randomFunLine());
-        cart = {}; document.getElementById('orderNotes').value = ''; 
-        if(cartExpanded) toggleCart();
-        renderMenu(); listenToRunningTab();
-        btn.disabled = false;
-      }).catch(error => {
-        console.error(error); playError(); alert('Could not send your order — please check connection.');
-        btn.disabled = false;
-      });
-    };
-
-    window.cancelOrderItem = function(tableId, lineItemKey){
-      if(!confirm('Cancel this item? It will be removed from your bill.')) return;
-      if(!activeTableData || !activeTableData.line_items || !activeTableData.line_items[lineItemKey]) return;
-      if(activeTableData.status !== 'pending') {
-        playError(); return alert('This item can no longer be cancelled — preparation has begun.');
-      }
-
-      const li = activeTableData.line_items[lineItemKey];
-      if (li.cancelled) return;
-
-      const updatedLineItems = Object.assign({}, activeTableData.line_items);
-      updatedLineItems[lineItemKey] = Object.assign({}, li, { cancelled: true });
-
-      const subTot = computeOrderTotal(updatedLineItems);
-      const dAmt = computeDiscountFromOrder(subTot, activeTableData);
-      const finalTot = Math.max(0, subTot - dAmt);
-
-      db.ref(`active_tables/${tableId}`).update(sanitizeForFirebase({
-        line_items: updatedLineItems,
-        items: buildItemsString(updatedLineItems),
-        subtotal: subTot,
-        discountAmount: dAmt,
-        total: finalTot
-      })).then(() => {
-        if(li.itemId && li.qty){
-          db.ref(`menu/${li.itemId}/stock_count`).transaction(curr => (curr||0) + Number(li.qty));
-        }
-        playNotify(); vibrate(15); showFunToast('Item cancelled — bill updated ✅');
-      }).catch(err => {
-        console.error(err); playError(); alert('Could not cancel this item.');
-      });
-    };
-
-    window.showPaymentOptions = function() {
-        const reqBtn = document.getElementById('reqBillBtn');
-        if(reqBtn.disabled) return;
-        reqBtn.classList.add('hidden');
-        document.getElementById('paymentSelection').classList.remove('hidden');
-    };
-
-    window.requestBill = function(method) {
-      const tableId = `table_${document.getElementById('tableNum').value}`;
-      db.ref(`active_tables/${tableId}`).update({ status: 'bill_requested', paymentMethod: method.toUpperCase() })
-        .then(() => { playNotify(); vibrate(15); showFunToast('Bill requested — please wait for staff! 🧾'); })
-        .catch(err => { console.error(err); playError(); alert('Could not request the bill.'); });
-    };
-
-    window.handleEmojiFeedback = function(rating) {
-      if(!activeTableData) return;
-      const textInput = document.getElementById('feedbackText');
-      const note = (textInput ? textInput.value : '').trim();
-
-      if (!note) {
-        playError(); vibrate(25);
-        showFunToast("✍️ Please write your feedback in the box first, then tap the emoji!");
-        if (textInput) {
-          textInput.classList.add('border-red-500');
-          textInput.focus();
-          setTimeout(() => textInput.classList.remove('border-red-500'), 2000);
-        }
-        return;
-      }
-
-      playClick();
-      if(rating === 'Excellent'){ fireConfetti(); }
-      db.ref('feedback').push({
-        table: activeTableData.table,
-        phone: activeTableData.phone || customerPhone,
-        rating: rating,
-        note: note,
-        timestamp: Date.now()
-      }).then(() => vibrate(15)).catch(err => console.error('Feedback save failed', err));
-
-      document.getElementById('feedbackBox').innerHTML = `<p class="text-primary font-bold text-lg text-center mt-4">Feedback saved! 👑 Thank you.</p>`;
-    };
-
-    window.askForHelp = function() {
-      playClick();
-      const tableNo = document.getElementById('tableNum').value;
-      const msg = `Hi, I need assistance at Table ${tableNo}` + (customerPhone ? ` (Mobile: ${customerPhone})` : '') + `.`;
-      const waLink = document.createElement('a');
-      waLink.href = `https://wa.me/${RESTAURANT_HELP_PHONE}?text=${encodeURIComponent(msg)}`;
-      waLink.target = '_blank'; waLink.rel = 'noopener';
-      document.body.appendChild(waLink); waLink.click(); document.body.removeChild(waLink);
-    };
-
-    let occupiedTablesMap = {};
-    db.ref('active_tables').on('value', snap => {
-      occupiedTablesMap = snap.val() || {};
-      updateTableOccupancyPill();
-    });
-
-    function updateTableOccupancyPill(){
-      const pill = document.getElementById('tableOccupancyPill');
-      if(!pill) return;
-      const tableVal = document.getElementById('tableNum').value;
-      const tableId = `table_${tableVal}`;
-      const occ = occupiedTablesMap[tableId];
-      if(occ){
-        const isMine = occ.phone === customerPhone;
-        pill.className = `text-[10px] font-black px-3 py-1.5 rounded-full inline-block border ${isMine ? 'bg-blue-900/40 text-blue-300 border-blue-500/50' : 'bg-red-900/40 text-red-300 border-red-500/50'}`;
-        pill.innerText = isMine ? '🔵 Your active order is on this table (Table Locked 🔒)' : '🔴 This table is currently occupied';
-      } else {
-        pill.className = 'text-[10px] font-black px-3 py-1.5 rounded-full inline-block bg-emerald-900/40 text-emerald-300 border border-emerald-500/50';
-        pill.innerText = '🟢 This table is available';
-      }
-      pill.classList.remove('hidden');
-    }
-
-    let currentTableRef = null;
-
-    function listenToRunningTab() {
-      if(!customerPhone) return;
-      const tableVal = document.getElementById('tableNum').value;
-      const tableId = `table_${tableVal}`;
-
-      if(currentTableRef){ currentTableRef.off(); }
-      currentTableRef = db.ref(`active_tables/${tableId}`);
-
-      currentTableRef.on('value', snap => {
-        try{
-        const order = snap.val(); 
-        const tr = document.getElementById('activeTracker'); const st = document.getElementById('orderStatusText'); 
-        const fbSec = document.getElementById('feedbackSection'); const reqBtn = document.getElementById('reqBillBtn');
-        const paySel = document.getElementById('paymentSelection'); const upiArea = document.getElementById('upiArea');
-
-        if (order && order.status === 'cancelled') {
-            alert("Your order has been cancelled by the admin. Bill Amount: ₹0. Please contact our staff for details.");
-            unlockCustomerTable();
-            localStorage.removeItem('mc_cust_phone');
-            window.location.reload();
-            return;
-        }
-
-        if (order) {
-          const wasHidden = tr.classList.contains('hidden');
-          const statusChanged = order.status !== lastKnownStatus;
-
-          activeTableData = order; tr.classList.remove('hidden'); 
-          lockCustomerTable(order.table || tableVal);
-
-          autoBillText = buildBillText(order);
-
-          if (wasHidden) {
-            tr.classList.remove('tracker-pop-in'); void tr.offsetWidth;
-            tr.classList.add('tracker-pop-in');
-            tr.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-
-          document.getElementById('runningTotalDisplay').innerText = `₹${order.total || 0}`;
-          renderOrderedItemsList(order, tableId);
-
-          const discAmt = Number(order.discountAmount) || 0;
-          const subTotal = Number(order.subtotal) || (Number(order.total || 0) + discAmt);
-          const subRow = document.getElementById('subtotalRowDisplay');
-          const subVal = document.getElementById('runningSubtotalDisplay');
-          const discBadge = document.getElementById('customerDiscountBadge');
-          const discInfo = document.getElementById('appliedDiscountInfo');
-          const discText = document.getElementById('appliedDiscountText');
-          const couponRow = document.getElementById('couponInputRow');
-
-          if (discAmt > 0) {
-            if (subRow) subRow.classList.remove('hidden');
-            if (subVal) subVal.innerText = `₹${subTotal}`;
-            if (discBadge) {
-              discBadge.innerText = `-₹${discAmt} SAVED`;
-              discBadge.classList.remove('hidden');
-            }
-            if (discInfo) discInfo.classList.remove('hidden');
-            if (discText) {
-              discText.innerText = order.couponCode
-                ? `🏷️ ${order.couponCode} applied (-₹${discAmt})`
-                : `👑 Admin Special Discount (-₹${discAmt})`;
-            }
-            if (couponRow) couponRow.classList.add('hidden');
-          } else {
-            if (subRow) subRow.classList.add('hidden');
-            if (discBadge) discBadge.classList.add('hidden');
-            if (discInfo) discInfo.classList.add('hidden');
-            if (couponRow) couponRow.classList.remove('hidden');
-          }
-
-          const splitCount = Math.max(1, parseInt(order.splitCount) || 1);
-          const perPerson = Math.ceil((Number(order.total) || 0) / splitCount);
-          const splitCountEl = document.getElementById('customerSplitCountDisplay');
-          const splitEachEl = document.getElementById('customerSplitEachDisplay');
-          if (splitCountEl) splitCountEl.innerText = splitCount;
-          if (splitEachEl) splitEachEl.innerText = `₹${perPerson} / person${splitCount > 1 ? ` (${splitCount} ways)` : ''}`;
-
-          reqBtn.disabled = false;
-          reqBtn.classList.remove('opacity-50','cursor-not-allowed');
-
-          if (order.status === 'pending') { 
-            st.innerText = lang==='en'?"Order Sent!":"ऑर्डर भेजा गया!"; st.className = "text-xl font-black text-amber-400 uppercase tracking-tight";
-            fbSec.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden'); reqBtn.innerText = t('request_bill');
-          } else if (order.status === 'cooking') { 
-            if(statusChanged) playNotify();
-            st.innerText = lang==='en'?"Chef is cooking...":"खाना बन रहा है"; st.className = "text-xl font-black text-blue-400 uppercase tracking-tight";
-            fbSec.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden'); reqBtn.innerText = t('request_bill');
-          } else if (order.status === 'served') { 
-            if(statusChanged) playBell();
-            st.innerText = lang==='en'?"Food Served! Enjoy.":"खाना परोसा गया!"; st.className = "text-xl font-black text-emerald-400 uppercase tracking-tight";
-            fbSec.classList.remove('hidden'); upiArea.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden'); reqBtn.innerText = t('request_bill');
-          } else if (order.status === 'bill_requested') { 
-            st.innerText = lang==='en'?"Waiting for Bill...":"बिल का इंतजार..."; st.className = "text-xl font-black text-white uppercase tracking-tight";
-            fbSec.classList.remove('hidden'); upiArea.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden');
-            reqBtn.innerText = "Bill requested — waiting for staff...";
-            reqBtn.disabled = true;
-            reqBtn.classList.add('opacity-50','cursor-not-allowed');
-          } else if (order.status === 'bill_ready') { 
-            if(statusChanged) playNotify();
-            st.innerText = "Please Pay Bill"; 
-            if(order.paymentMethod === 'UPI') {
-                upiArea.classList.remove('hidden');
-                const upiLink = `upi://pay?pa=${encodeURIComponent(UPI_ID)}&pn=${encodeURIComponent(UPI_PAYEE_NAME)}&am=${order.total}&cu=INR&tn=${encodeURIComponent('Table '+order.table+' Bill')}`;
-                const gpayLink = document.getElementById('gpayDirectLink');
-                if(gpayLink) gpayLink.href = upiLink;
-            } else { upiArea.classList.add('hidden'); }
-            fbSec.classList.remove('hidden'); reqBtn.classList.add('hidden'); paySel.classList.add('hidden');
-          }
-
-          lastKnownStatus = order.status;
-        } else { 
-          if(activeTableData) {
-            autoBillText = buildBillText(activeTableData);
-            tr.classList.add('hidden'); 
-            activeTableData = null; lastKnownStatus = null;
-            playBell(); fireConfetti(); showFunToast(randomFunLine());
-
-            if (autoBillText) {
-              try {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(new Blob([autoBillText], { type: 'text/plain' }));
-                a.download = `MandiCroods_Bill_${tableId}.txt`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-              } catch(err) { console.error('Customer bill download error', err); }
-            }
-
-            alert("Table Cleared! Receipt downloaded. Thank you for dining with Mandi Croods.");
-            unlockCustomerTable();
-            localStorage.removeItem('mc_cust_phone');
-            setTimeout(() => { window.location.reload(); }, 1500); 
-          }
-        }
-        }catch(e){ console.error('Order tracking error', e); }
-      }, err => { console.error('Order listener error', err); });
-    }
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const tableParam = urlParams.get('table');
-    if (tableParam) {
-        const tableSelect = document.getElementById('tableNum');
-        if (tableSelect.querySelector(`option[value="${tableParam}"]`)) {
-            tableSelect.value = tableParam;
-            tableSelect.disabled = true;
-        }
-    } else if (lockedTable) {
-        lockCustomerTable(lockedTable);
-    }
-
-    document.getElementById('tableNum').addEventListener('change', () => { listenToRunningTab(); updateTableOccupancyPill(); });
-    changeLanguage(lang); 
-    if(customerPhone) { listenToRunningTab(); updateTableOccupancyPill(); }
-  </script>
-</body>
-</html>
+    // Sliding Side Dock Toggle
+    let sideDockOpen = false;
+    window.toggleSideDock = function() {
+      sideDockOpen = !sideDockOpen;
+      const dock = document.getElementById('sideServiceDock');
+      const arrow = document.getElementById('sideDockArrow');
+      if (!dock) return;
