@@ -26,12 +26,6 @@
     .tracker-pop-in { animation: trackerSlideIn .55s cubic-bezier(.16,1,.3,1) both; }
     @keyframes fadeInCard { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
     .fade-in-card { animation: fadeInCard .4s ease both; }
-    #printBillArea { display: none; }
-    @media print {
-      body * { visibility: hidden; }
-      #printBillArea, #printBillArea * { visibility: visible; }
-      #printBillArea { display: block !important; position: absolute; top: 0; left: 0; width: 100%; padding: 20px; background: #fff; }
-    }
     .fun-toast {
       position: fixed; left: 50%; top: 90px; transform: translateX(-50%) translateY(-20px);
       background: linear-gradient(135deg, #D4AF37, #B38B22);
@@ -43,17 +37,15 @@
     .fun-toast-out { animation: funToastOut .5s ease forwards; }
     @keyframes funToastIn { from { opacity: 0; transform: translateX(-50%) translateY(-20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
     @keyframes funToastOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(-20px); } }
-    /* Floating buttons dock animation */
     .fab-dock { transition: all .35s cubic-bezier(.34,1.56,.64,1); }
     .fab-hidden { transform: scale(0); opacity: 0; pointer-events: none; }
     @keyframes connBarPulse { 0%,100%{opacity:1} 50%{opacity:.75} }
     .conn-bar { animation: connBarPulse 1.6s infinite; }
   </style>
-<base target="_blank">
 </head>
 <body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
 
-  <!-- CONNECTION BANNER (grace-period logic — no false alarms) -->
+  <!-- CONNECTION BANNER -->
   <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md conn-bar">
     ⚠ Connection lost — reconnecting to Mandi Croods servers...
   </div>
@@ -253,7 +245,7 @@
     <div class="text-center p-10 text-primary font-bold col-span-full" data-i18n="loading_menu">Loading Premium Menu...</div>
   </div>
 
-  <!-- FLOATING ACTION BUTTONS (dockable: start expanded, tap ➖ to slide into corner) -->
+  <!-- FLOATING ACTION BUTTONS -->
   <button id="fabService" onclick="openServiceModal()" class="fab-dock fixed bottom-[164px] right-4 z-40 bg-dark border-2 border-primary text-primary w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(212,175,55,0.4)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Call Waiter / Service Request">🛎️</button>
   <button id="fabChat" onclick="askForHelp()" class="fab-dock fixed bottom-24 right-4 z-40 bg-white border border-slate-200 text-dark w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Need help? Message our staff">💬</button>
   <button id="fabShare" onclick="shareWithFriends()" class="fab-dock fixed bottom-24 left-4 z-40 bg-primary text-dark w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(212,175,55,0.4)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Share Mandi Croods with a friend">👑</button>
@@ -334,8 +326,6 @@
     </div>
   </div>
 
-  <div id="printBillArea"></div>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
@@ -347,10 +337,6 @@
     const UPI_PAYEE_NAME = "Mandi Croods";
     const RESTAURANT_HELP_PHONE = "91XXXXXXXXXX";
 
-    /* ============================================================
-       FEATURE: AUTO CLEAR LOCAL CACHE EVERY 30 DAYS
-       (prevents localStorage bloat; keeps essential keys only)
-    ============================================================ */
     (function monthlyCacheClear(){
       try {
         const KEY = 'mc_last_cache_clear';
@@ -360,7 +346,6 @@
           const keep = ['mc_cust_phone','mc_locked_table','mc_lang','mc_cust_init_v5','mc_sound_on'];
           Object.keys(localStorage).forEach(k => { if(!keep.includes(k)) localStorage.removeItem(k); });
           localStorage.setItem(KEY, String(Date.now()));
-          console.log('[MandiCroods] Monthly cache cleared to prevent storage limits.');
         }
       } catch(e) {}
     })();
@@ -464,51 +449,45 @@
         localStorage.setItem('mc_cust_init_v5', 'true');
     }
 
-    /* ============================================================
-       FIX: INTERNET CONNECTION ERROR — reliable connectivity layer
-       - Grace period: banner only shows after 3s of real outage
-       - Auto reconnect with exponential backoff
-       - Browser online/offline events wired in
-    ============================================================ */
     let connBannerTimer = null;
     let connRetryTimer = null;
-    let connIsUp = true;
+    let connIsUp = null; // FIXED: Start as null to prevent false positive offline banner on load
 
     function showConnBanner(){ const b = document.getElementById('connectionBanner'); b.classList.remove('hidden'); }
     function hideConnBanner(){ const b = document.getElementById('connectionBanner'); b.classList.add('hidden'); }
 
     function onConnDown(){
-      if (!connIsUp) return;
+      if (connIsUp === false) return; // FIXED check
       connIsUp = false;
       clearTimeout(connBannerTimer);
-      connBannerTimer = setTimeout(() => { if (!connIsUp) showConnBanner(); }, 3000); // grace period — no flicker
+      connBannerTimer = setTimeout(() => { if (connIsUp === false) showConnBanner(); }, 4000); // Wait 4s before showing
       scheduleReconnect();
     }
+    
     function onConnUp(){
-      const wasDown = !connIsUp;
+      const wasDown = (connIsUp === false);
       connIsUp = true;
       clearTimeout(connBannerTimer);
       clearTimeout(connRetryTimer);
       hideConnBanner();
       if (wasDown) { try{ db.goOnline(); }catch(e){} showFunToast("✅ Back online!"); }
     }
+    
     function scheduleReconnect(attempt){
       attempt = attempt || 1;
       clearTimeout(connRetryTimer);
       connRetryTimer = setTimeout(() => {
         if (connIsUp) return;
         try { db.goOnline(); } catch(e){}
-        // force a lightweight ping to re-establish websocket
         db.ref('.info/connected').once('value').catch(()=>{});
         scheduleReconnect(Math.min(attempt + 1, 6));
-      }, Math.min(1000 * Math.pow(2, attempt), 15000)); // 2s→4s→8s→15s cap
+      }, Math.min(1000 * Math.pow(2, attempt), 15000));
     }
 
     if (db) {
       db.ref('.info/connected').on('value', snap => {
         if (snap.val() === true) onConnUp();
         else if (snap.val() === false) onConnDown();
-        // snap.val() === null = still establishing → stay silent (this was the bug)
       });
     }
     window.addEventListener('offline', onConnDown);
@@ -643,7 +622,6 @@
       }catch(e){ }
     }
 
-    /* ---------- Loyalty progress bar ---------- */
     function updateLoyaltyTeaser(visits){
       const el = document.getElementById('loyaltyTeaser');
       const bar = document.getElementById('loyaltyBar');
@@ -656,7 +634,6 @@
       if (bar && fill) { bar.classList.remove('hidden'); fill.style.width = Math.min(100, (visits/3)*100) + '%'; }
     }
 
-    /* ---------- Floating buttons: dock / slide into corner ---------- */
     let fabsDocked = false;
     const fabIds = ['fabService','fabChat','fabShare','fabHistory','fabSound','fabDock'];
     window.dockFabs = function(){
@@ -673,7 +650,7 @@
       fabsDocked = false;
       localStorage.setItem('mc_fabs_docked','0');
     };
-    if (localStorage.getItem('mc_fabs_docked') === '1') { setTimeout(dockFabs, 600); } // docked state persists
+    if (localStorage.getItem('mc_fabs_docked') === '1') { setTimeout(dockFabs, 600); }
 
     window.shareWithFriends = function(){
       playClick();
@@ -684,7 +661,6 @@
       document.body.appendChild(waLink); waLink.click(); document.body.removeChild(waLink);
     };
 
-    /* ---------- Order history (local, premium feature) ---------- */
     function saveOrderToHistory(order){
       try{
         if (!customerPhone || !order) return;
@@ -833,7 +809,7 @@
       },
       'te': {
         'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
-        'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
+        'special': 'స్పెషల్', 'జ్యూసీ': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
         'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్',
         'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
         'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర', 'fish': 'ఫిష్', 'prawns': 'ప్రాన్స్'
@@ -1406,6 +1382,7 @@
         paymentMethod: existing.paymentMethod || ''
       });
 
+      // FIXED ERROR CATCHING SO WE SEE THE REAL FIREBASE ERROR
       db.ref(`active_tables/${tableId}`).set(orderPayload).then(() => {
         Object.keys(stockUpdates).forEach(itemId => {
           db.ref(`menu/${itemId}/stock_count`).transaction(curr => Math.max(0, (curr||0) - stockUpdates[itemId]));
@@ -1418,7 +1395,8 @@
         renderMenu(); listenToRunningTab();
         btn.disabled = false;
       }).catch(error => {
-        console.error(error); playError(); alert('Could not send your order — please check connection.');
+        console.error(error); playError(); 
+        alert('Order Failed: ' + error.message + '\n\n(If this says "Permission denied", you need to update your Firebase Database Rules to true)');
         btn.disabled = false;
       });
     };
