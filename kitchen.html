@@ -12,10 +12,10 @@
     tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#0F1014', light: '#f8f9fa', card: '#ffffff' } } } }
   </script>
   <style>
-    @media print { 
-        body * { visibility: hidden; } 
-        #printArea, #printArea * { visibility: visible; } 
-        #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; } 
+    @media print {
+        body * { visibility: hidden; }
+        #printArea, #printArea * { visibility: visible; }
+        #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
         .no-print { display: none !important; }
         .dash-card { box-shadow: none !important; border: 1px solid #ccc !important; }
     }
@@ -28,14 +28,10 @@
       100% { box-shadow: inset 0 0 0 5px #ef4444; border-color: #ef4444; }
     }
     .urgent-alarm { animation: redBlueFlash 1s infinite; }
-    
     .gold-gradient { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); }
     .gold-text { background: linear-gradient(135deg, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-    /* Slide-to-Corner Quick Tools Dock */
-    #adminQuickDock { transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease; }
-    #adminQuickDock.docked-right { transform: translateX(calc(100% - 42px)); }
   </style>
+<base target="_blank">
 </head>
 <body class="font-sans antialiased text-slate-800">
 
@@ -91,27 +87,13 @@
 
     <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
       <div class="p-8 pb-32">
-        
+
         <!-- Floor Operations -->
         <section id="view-orders" class="tab-section">
-          <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight" data-i18n="title_floor">Floor Operations & Kitchen</h2>
-            <!-- Kitchen & Floor Status Filter Pills -->
-            <div class="flex flex-wrap items-center gap-2">
-              <button onclick="setFloorFilter('all')" id="flt-all" class="floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black bg-dark text-primary border border-primary">All Active</button>
-              <button onclick="setFloorFilter('pending')" id="flt-pending" class="floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200">🔥 New / Pending</button>
-              <button onclick="setFloorFilter('cooking')" id="flt-cooking" class="floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200">👨‍🍳 Cooking</button>
-              <button onclick="setFloorFilter('served')" id="flt-served" class="floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200">✅ Served</button>
-              <button onclick="setFloorFilter('bill_requested')" id="flt-bill_requested" class="floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200">🧾 Bill Req</button>
-            </div>
-          </div>
-          
-          <!-- Table Occupancy Map -->
+          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_floor">Floor Operations</h2>
+
           <div class="mb-8 admin-waiter-only hidden bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
-              <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy</h3>
-                <span id="activeOrderCountBadge" class="text-xs font-black bg-primary/20 text-dark px-3 py-1 rounded-full">0 Active Tables</span>
-              </div>
+              <h3 class="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy</h3>
               <div id="occupancyMap" class="flex flex-wrap gap-2"></div>
           </div>
 
@@ -122,16 +104,16 @@
         <section id="view-pos" class="tab-section hidden no-print">
             <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[78vh] flex flex-col">
+
+                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
                     <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
                     <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
                 </div>
 
-                <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[78vh] flex flex-col">
-                    <h3 class="text-lg font-black text-slate-900 mb-3 border-b pb-2" data-i18n="new_order">New Order</h3>
-                    
-                    <div class="flex gap-2 mb-3">
+                <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[75vh] flex flex-col">
+                    <h3 class="text-lg font-black text-slate-900 mb-4 border-b pb-2" data-i18n="new_order">New Order</h3>
+
+                    <div class="flex gap-2 mb-4">
                         <select id="posTableNum" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
                             <option value="" disabled selected>Select Table</option>
                             <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
@@ -147,8 +129,7 @@
                     </div>
 
                     <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-slate-100 rounded-xl p-2 hide-scroll"></div>
-                    
-                    <!-- POS Discount, Split People & Cash+Online Split Controls -->
+
                     <div class="bg-light p-3 rounded-2xl border border-slate-200 mb-3 space-y-2">
                         <div class="flex items-center gap-2">
                             <span class="text-[10px] font-black uppercase text-slate-500 w-16">Discount:</span>
@@ -160,33 +141,11 @@
                             <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs uppercase outline-none">
                         </div>
                         <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
-                            <span class="text-[10px] font-black uppercase text-slate-500">Split People:</span>
+                            <span class="text-[10px] font-black uppercase text-slate-500">Split Bill:</span>
                             <div class="flex items-center gap-2">
                                 <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 bg-white border border-slate-200 rounded-lg font-black text-xs text-center outline-none">
                                 <span class="text-[10px] font-bold text-slate-500">Persons</span>
                                 <span id="posSplitEach" class="text-xs font-black text-emerald-600 ml-1">₹0/each</span>
-                            </div>
-                        </div>
-                        <div class="pt-1 border-t border-slate-200/60">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-black uppercase text-slate-500">Payment Mode:</span>
-                                <select id="posPayMethod" onchange="togglePosSplitPayUI()" class="p-1 bg-white border border-slate-200 rounded-lg font-black text-[11px] outline-none">
-                                    <option value="">Pay Later</option>
-                                    <option value="CASH">CASH</option>
-                                    <option value="UPI">ONLINE (UPI)</option>
-                                    <option value="CARD">CARD</option>
-                                    <option value="SPLIT">💸 SPLIT (CASH + ONLINE)</option>
-                                </select>
-                            </div>
-                            <div id="posSplitPayBox" class="hidden grid grid-cols-2 gap-2 mt-1.5 bg-white p-2 rounded-xl border border-primary/40">
-                                <div>
-                                    <label class="text-[9px] font-black text-emerald-600 uppercase block">💵 Cash (₹)</label>
-                                    <input type="number" id="posCashPart" min="0" value="0" oninput="syncPosSplitAmounts('cash')" class="w-full p-1 bg-light border rounded font-black text-xs outline-none">
-                                </div>
-                                <div>
-                                    <label class="text-[9px] font-black text-blue-600 uppercase block">📱 Online/UPI (₹)</label>
-                                    <input type="number" id="posOnlinePart" min="0" value="0" oninput="syncPosSplitAmounts('online')" class="w-full p-1 bg-light border rounded font-black text-xs outline-none">
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,8 +169,7 @@
         <!-- Inventory & Coupon Management -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight" data-i18n="title_menu">Inventory & Coupons</h2>
-          
-          <!-- Coupon Generator Card -->
+
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-emerald-500">
             <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div>
@@ -272,8 +230,7 @@
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base Price (1P / Regular ₹)</label>
                 <input type="number" id="newDishPrice" placeholder="0" class="w-full p-3 bg-light border-none rounded-xl font-bold text-sm outline-none">
               </div>
-              
-              <!-- SMART IMAGE UPLOAD ENGINE -->
+
               <div class="md:col-span-1 relative">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📸 Upload Photo</label>
                 <div class="w-full h-[46px] bg-light border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden relative cursor-pointer group">
@@ -314,8 +271,11 @@
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
             <h2 class="text-3xl font-black text-slate-900 tracking-tight" data-i18n="title_analytics">Dashboard & Revenue</h2>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
               <button onclick="clearDashboardRevenue()" class="bg-red-50 text-red-600 border border-red-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-red-600 hover:text-white transition-all">🧹 Clear Dashboard & Revenue (₹0)</button>
+              <button onclick="exportTodayExcel()" class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Excel: Today's Sales (CSV)</button>
+              <button onclick="exportAllLogsExcel()" class="bg-blue-50 text-blue-600 border border-blue-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-blue-600 hover:text-white transition-all">📥 Excel: Full History (CSV)</button>
+              <button onclick="toggleAutoExport()" id="autoExportBtn" class="bg-slate-100 text-slate-600 border border-slate-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-slate-600 hover:text-white transition-all">🌙 Nightly Auto-Excel: OFF</button>
               <button onclick="window.print()" class="bg-white text-slate-800 border border-slate-200 px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-slate-50">🖨️ Export PDF Report</button>
             </div>
           </div>
@@ -336,9 +296,9 @@
           </div>
 
           <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
-            
+
             <h2 class="text-2xl font-black text-slate-900 mb-6 text-center border-b pb-4">Mandi Croods - Daily Revenue</h2>
-            
+
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               <div class="bg-dark text-primary p-6 rounded-2xl print-card-bg border border-primary/30">
                 <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Total Gross</p>
@@ -367,7 +327,7 @@
                 <tbody id="dailyLogsTable" class="divide-y divide-slate-100 font-medium"></tbody>
               </table>
             </div>
-            
+
             <div class="mt-16 pt-8 border-t border-slate-100 text-center no-print flex flex-wrap justify-center gap-4">
               <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm">
                 ⚠️ FACTORY RESET: Load Full 66-Item Menu & Clear Dashboard
@@ -389,59 +349,43 @@
     </main>
   </div>
 
-  <!-- SLIDE-TO-CORNER QUICK ACTION DOCK FOR ADMIN / KITCHEN -->
-  <div id="adminQuickDock" class="fixed bottom-6 right-0 z-[90] flex items-center no-print">
-    <button onclick="toggleAdminQuickDock()" id="adminDockHandle" class="bg-dark text-primary border-2 border-r-0 border-primary rounded-l-2xl px-2.5 py-4 shadow-xl font-black text-xs flex flex-col items-center gap-1 cursor-pointer" title="Slide Quick Actions">
-      <span id="adminDockArrow">▶</span>
-      <span class="text-[9px] tracking-widest uppercase" style="writing-mode: vertical-rl;">TOOLS</span>
-    </button>
-    <div class="bg-dark/95 backdrop-blur-md border-2 border-r-0 border-primary/50 p-3 rounded-bl-2xl shadow-2xl flex flex-col gap-2">
-      <button onclick="adminDockAction('orders')" class="bg-primary/20 hover:bg-primary text-primary hover:text-black px-3 py-2 rounded-xl font-black text-xs flex items-center gap-2 transition-colors">📦 Floor</button>
-      <button onclick="adminDockAction('pos')" class="bg-white/10 hover:bg-primary text-white hover:text-black px-3 py-2 rounded-xl font-black text-xs flex items-center gap-2 transition-colors admin-waiter-only hidden">🧾 Fast POS</button>
-      <button onclick="adminDockAction('services')" class="bg-white/10 hover:bg-primary text-white hover:text-black px-3 py-2 rounded-xl font-black text-xs flex items-center gap-2 transition-colors admin-waiter-only hidden">🛎️ Calls</button>
-      <button onclick="muteKitchenAlarm()" class="bg-red-500/20 hover:bg-red-600 text-red-400 hover:text-white px-3 py-2 rounded-xl font-black text-xs flex items-center gap-2 transition-colors">🔇 Mute Bell</button>
-    </div>
-  </div>
-
-  <!-- Interactive Edit Order Modal (With Live Menu Picker, Direct Admin Discount, Split People & Split Cash+Online) -->
+  <!-- Interactive Edit Order Modal -->
   <div id="editOrderModal" class="hidden fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 no-print">
-    <div class="bg-card rounded-3xl p-6 w-full max-w-4xl shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[94vh] flex flex-col">
-      <div class="flex items-center justify-between mb-3 pb-3 border-b border-slate-100">
+    <div class="bg-card rounded-3xl p-6 w-full max-w-4xl shadow-[0_10px_40px_rgba(212,175,55,0.2)] border border-primary/30 max-h-[92vh] flex flex-col">
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
         <div>
           <h3 class="font-black text-xl text-slate-900">✏️ Edit Order, Discount & Split — <span id="editOrderTableLabel" class="text-primary"></span></h3>
-          <p class="text-[11px] font-bold text-slate-400">Modify items, grant direct admin discount, split by persons, or split Cash + Online payment.</p>
+          <p class="text-[11px] font-bold text-slate-400">Modify items, grant direct admin discount/coupon, or split bill — syncs live to customer phone.</p>
         </div>
         <button onclick="closeEditOrder()" class="w-9 h-9 bg-slate-100 hover:bg-slate-200 rounded-full font-black text-slate-600 active:scale-90 transition-transform">✕</button>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto flex-1 pr-1">
-        <!-- Left Column: Current Order Items, Admin Discount & Split Calculator -->
         <div class="flex flex-col bg-light p-4 rounded-2xl border border-slate-200">
-          <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center justify-between mb-3">
             <span class="text-xs font-black text-slate-600 uppercase tracking-widest">🛒 Current Order Items</span>
             <button onclick="recalcEditOrderTotal()" class="text-[10px] font-black text-primary bg-dark px-2.5 py-1 rounded-lg">🔄 Recalculate</button>
           </div>
-          <div id="editOrderCartList" class="flex-1 space-y-2 max-h-40 overflow-y-auto pr-1"></div>
+          <div id="editOrderCartList" class="flex-1 space-y-2 max-h-48 overflow-y-auto pr-1"></div>
 
-          <!-- Admin Direct Discount & Coupon Box -->
-          <div class="mt-3 pt-2.5 border-t border-slate-200 space-y-2">
+          <div class="mt-3 pt-3 border-t border-slate-200 space-y-2.5">
             <div class="flex items-center justify-between text-xs font-bold text-slate-500">
               <span>Items Subtotal:</span>
               <span id="editOrderSubtotalLabel" class="font-black text-slate-800">₹0</span>
             </div>
 
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-1.5">
+            <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">🏷️ Admin Discount / Coupon</span>
                 <button type="button" onclick="clearEditOrderDiscount()" class="text-[10px] font-bold text-red-500 hover:underline">Clear Discount</button>
               </div>
               <div class="flex items-center gap-2">
-                <input type="number" id="editOrderDiscVal" min="0" value="0" oninput="renderEditOrderCartList(true)" placeholder="0" class="w-20 p-1.5 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none focus:border-primary">
-                <select id="editOrderDiscType" onchange="renderEditOrderCartList(true)" class="p-1.5 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none cursor-pointer">
+                <input type="number" id="editOrderDiscVal" min="0" value="0" oninput="renderEditOrderCartList(true)" placeholder="0" class="w-20 p-2 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none focus:border-primary">
+                <select id="editOrderDiscType" onchange="renderEditOrderCartList(true)" class="p-2 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none cursor-pointer">
                   <option value="flat">₹ Flat Off</option>
                   <option value="percent">% Percent Off</option>
                 </select>
-                <input type="text" id="editOrderCouponCode" oninput="applyEditModalCoupon(this.value)" placeholder="Coupon / Reason" class="flex-1 p-1.5 bg-light border border-slate-200 rounded-lg font-black text-xs uppercase outline-none focus:border-primary">
+                <input type="text" id="editOrderCouponCode" oninput="applyEditModalCoupon(this.value)" placeholder="Coupon / Reason" class="flex-1 p-2 bg-light border border-slate-200 rounded-lg font-black text-xs uppercase outline-none focus:border-primary">
               </div>
               <div class="flex justify-between items-center text-[11px] font-bold text-emerald-600">
                 <span>Discount Applied:</span>
@@ -449,7 +393,6 @@
               </div>
             </div>
 
-            <!-- Split Bill By Persons Calculator -->
             <div class="bg-white p-2.5 rounded-xl border border-slate-200 flex items-center justify-between">
               <div>
                 <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block">👥 Split Bill Equally</span>
@@ -462,46 +405,22 @@
               </div>
             </div>
 
-            <!-- Split Cash + Online Payment Box -->
-            <div class="bg-white p-2.5 rounded-xl border border-slate-200 space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">💳 Payment Mode / Split Cash+Online</span>
-                <select id="editOrderPaymentMethod" onchange="toggleEditSplitPaymentUI()" class="p-1 bg-light border border-slate-200 rounded-lg font-black text-xs outline-none">
-                  <option value="CASH">CASH</option>
-                  <option value="UPI">ONLINE (UPI)</option>
-                  <option value="CARD">CARD</option>
-                  <option value="SPLIT">💸 SPLIT (CASH + ONLINE)</option>
-                </select>
-              </div>
-              <div id="editOrderSplitPayInputs" class="hidden grid grid-cols-2 gap-2 pt-1">
-                <div>
-                  <label class="text-[9px] font-black text-emerald-600 uppercase block mb-0.5">💵 Cash Amount (₹)</label>
-                  <input type="number" id="editOrderCashAmt" min="0" value="0" oninput="syncEditSplitPayment('cash')" class="w-full p-2 bg-emerald-50/50 border border-emerald-200 rounded-lg font-black text-xs text-emerald-900 outline-none">
-                </div>
-                <div>
-                  <label class="text-[9px] font-black text-blue-600 uppercase block mb-0.5">📱 Online / UPI Amount (₹)</label>
-                  <input type="number" id="editOrderOnlineAmt" min="0" value="0" oninput="syncEditSplitPayment('online')" class="w-full p-2 bg-blue-50/50 border border-blue-200 rounded-lg font-black text-xs text-blue-900 outline-none">
-                </div>
-              </div>
-            </div>
-
             <div class="flex items-center justify-between pt-1">
               <span class="text-xs font-black text-slate-500 uppercase tracking-widest">Final Payable Bill (₹)</span>
               <span id="editOrderAutoSum" class="text-xs font-bold text-emerald-600">Auto: ₹0</span>
             </div>
-            <input type="number" id="editOrderTotal" min="0" oninput="updateEditSplitPreview(); syncEditSplitPayment('total');" class="w-full p-2.5 bg-white border border-primary/40 rounded-xl font-black text-xl text-slate-900 outline-none focus:border-primary">
+            <input type="number" id="editOrderTotal" min="0" oninput="updateEditSplitPreview()" class="w-full p-2.5 bg-white border border-primary/40 rounded-xl font-black text-xl text-slate-900 outline-none focus:border-primary">
           </div>
         </div>
 
-        <!-- Right Column: Add Items from Menu -->
         <div class="flex flex-col bg-light p-4 rounded-2xl border border-slate-200">
           <span class="text-xs font-black text-slate-600 uppercase tracking-widest mb-2">➕ Add Dish from Menu</span>
           <input type="text" id="editOrderMenuSearch" oninput="renderEditOrderMenuPicker()" placeholder="🔍 Search dish to add..." class="w-full p-2.5 mb-3 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none focus:border-primary">
-          <div id="editOrderMenuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-96 overflow-y-auto pr-1"></div>
+          <div id="editOrderMenuGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto pr-1"></div>
         </div>
       </div>
 
-      <div class="flex gap-3 mt-4 pt-3 border-t border-slate-100">
+      <div class="flex gap-3 mt-5 pt-4 border-t border-slate-100">
         <button onclick="closeEditOrder()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 rounded-xl active:scale-95 transition-transform">Cancel</button>
         <button onclick="saveEditOrder()" class="flex-1 gold-gradient text-black font-black py-3.5 rounded-xl shadow-md active:scale-95 transition-transform uppercase tracking-wider text-sm">💾 Save & Sync Updated Bill</button>
       </div>
@@ -541,8 +460,7 @@
             <input type="number" id="editItemPrice" min="0" class="w-full p-3 bg-light border border-slate-200 rounded-xl font-black text-sm outline-none focus:border-primary">
           </div>
         </div>
-        
-        <!-- SMART IMAGE UPLOAD ENGINE -->
+
         <div>
           <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dish Image (Tap to change)</label>
           <div class="relative w-full h-32 bg-light border border-slate-200 rounded-xl overflow-hidden group cursor-pointer shadow-inner">
@@ -592,34 +510,27 @@
 
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
 
+    /* ============================================================
+       FEATURE: AUTO CLEAR LOCAL CACHE EVERY 30 DAYS
+       (prevents localStorage bloat; keeps essential keys only)
+    ============================================================ */
+    (function monthlyCacheClear(){
+      try {
+        const KEY = 'mc_admin_last_cache_clear';
+        const last = parseInt(localStorage.getItem(KEY) || '0');
+        const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+        if (!last || (Date.now() - last) > THIRTY_DAYS) {
+          const keep = ['mc_full_menu_reset_v5','mc_auto_export'];
+          Object.keys(localStorage).forEach(k => { if(!keep.includes(k)) localStorage.removeItem(k); });
+          localStorage.setItem(KEY, String(Date.now()));
+          console.log('[MandiCroods Admin] Monthly cache cleared.');
+        }
+      } catch(e) {}
+    })();
+
     function sanitizeForFirebase(obj) {
       return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
     }
-
-    // --- SLIDE-TO-CORNER QUICK DOCK LOGIC ---
-    let adminDockCollapsed = false;
-    window.toggleAdminQuickDock = function(forceCollapse) {
-      const dock = document.getElementById('adminQuickDock');
-      const arrow = document.getElementById('adminDockArrow');
-      if (!dock) return;
-      adminDockCollapsed = typeof forceCollapse === 'boolean' ? forceCollapse : !adminDockCollapsed;
-      if (adminDockCollapsed) {
-        dock.classList.add('docked-right');
-        if (arrow) arrow.innerText = '◀';
-      } else {
-        dock.classList.remove('docked-right');
-        if (arrow) arrow.innerText = '▶';
-      }
-    };
-    window.adminDockAction = function(tabName) {
-      switchTab(tabName);
-      toggleAdminQuickDock(true); // Automatically slide into corner after choosing an option
-    };
-    window.muteKitchenAlarm = function() {
-      try { alertSound.pause(); alertSound.currentTime = 0; } catch(e){}
-      showGlobalToast("Kitchen alarm muted.", "info");
-      toggleAdminQuickDock(true);
-    };
 
     function getFullDefaultMenu(existingCoupons) {
       const IMG_VEG_MANDI = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80";
@@ -716,6 +627,7 @@
       };
     }
 
+    // --- AUTO TRANSLATION ENGINE FOR ADMIN ---
     const adminDict = {
       'hi': {
         'nav_floor': '📦 एक्टिव फ्लोर', 'nav_pos': '🧾 पीओएस ऑर्डर', 'nav_service': '🛎️ सर्विस रिक्वेस्ट',
@@ -724,15 +636,17 @@
         'title_pos': 'पीओएस / डायरेक्ट ऑर्डर', 'new_order': 'नया ऑर्डर', 'btn_send_kitchen': 'किचन में भेजें',
         'title_service': 'ग्राहक अनुरोध', 'title_menu': 'इन्वेंटरी प्रबंधन', 'title_analytics': 'डैशबोर्ड और आय',
         'title_feedback': 'ग्राहक फीडबैक',
+
         'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
         'special': 'स्पेशल', 'juicy': 'जूसी', 'mixed': 'मिक्स्ड', 'paneer': 'पनीर', 'mushroom': 'मशरूम',
-        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस', 
+        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस',
         'pcs': 'पीस', 'half': 'हाफ', 'full': 'फुल', 'regular': 'रेगुलर', 'single': 'सिंगल', 'triple': 'ट्रिपल',
         'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'bhakasura': 'बकासुर',
+
         'Print KOT (Kitchen)': 'केओटी प्रिंट करें', 'Re-Print KOT': 'दोबारा प्रिंट करें',
         'Mark Food Served': 'परोसा गया', 'Clear Table': 'टेबल खाली करें', 'Cancel Order': 'ऑर्डर रद्द करें',
         'Sent to Kitchen': 'किचन में भेजा गया', 'Confirm Served': 'सर्व कंफर्म करें', 'Mark Cash Collected': 'कैश लिया गया',
-        'Awaiting Admin Clear': 'एडमिन का इंतज़ार', 'pending': 'पेंडिंग', 'cooking': 'पक रहा है', 
+        'Awaiting Admin Clear': 'एडमिन का इंतज़ार', 'pending': 'पेंडिंग', 'cooking': 'पक रहा है',
         'served': 'परोसा गया', 'bill_requested': 'बिल माँगा गया', 'bill_ready': 'बिल तैयार'
       },
       'te': {
@@ -742,33 +656,22 @@
         'title_pos': 'POS / డైరెక్ట్ ఆర్డర్', 'new_order': 'కొత్త ఆర్డర్', 'btn_send_kitchen': 'వంటగదికి పంపండి',
         'title_service': 'కస్టమర్ అభ్యర్థనలు', 'title_menu': 'ఇన్వెంటరీ మేనేజ్‌మెంట్', 'title_analytics': 'డ్యాష్‌బోర్డ్ & ఆదాయం',
         'title_feedback': 'కస్టమర్ ఫీడ్‌బ్యాక్',
+
         'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
         'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
-        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్', 
+        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్',
         'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
         'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర',
+
         'Print KOT (Kitchen)': 'KOT ప్రింట్ చేయండి', 'Re-Print KOT': 'KOT మళ్ళీ ప్రింట్ చేయండి',
         'Mark Food Served': 'వడ్డించినట్లు మార్క్ చేయండి', 'Clear Table': 'టేబుల్ క్లియర్ చేయండి', 'Cancel Order': 'ఆర్డర్ రద్దు చేయండి',
         'Sent to Kitchen': 'వంటగదికి పంపబడింది', 'Confirm Served': 'వడ్డించినట్లు నిర్ధారించండి', 'Mark Cash Collected': 'నగదు తీసుకున్నట్లు మార్క్ చేయండి',
-        'Awaiting Admin Clear': 'అడ్మిన్ కోసం వేచి ఉంది', 'pending': 'పెండింగ్', 'cooking': 'వంటలో ఉంది', 
+        'Awaiting Admin Clear': 'అడ్మిన్ కోసం వేచి ఉంది', 'pending': 'పెండింగ్', 'cooking': 'వంటలో ఉంది',
         'served': 'వడ్డించారు', 'bill_requested': 'బిల్లు అడిగారు', 'bill_ready': 'బిల్లు సిద్ధంగా ఉంది'
       }
     };
-    
-    let adminLang = 'en';
-    let currentFloorFilter = 'all';
 
-    window.setFloorFilter = function(flt) {
-      currentFloorFilter = flt;
-      document.querySelectorAll('.floor-flt-btn').forEach(b => {
-        if (b.id === 'flt-' + flt) {
-          b.className = "floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black bg-dark text-primary border border-primary";
-        } else {
-          b.className = "floor-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-600 border border-slate-200";
-        }
-      });
-      if (window.currentTables) renderFloorGrid(window.currentTables);
-    };
+    let adminLang = 'en';
 
     window.changeAdminLanguage = function(lang) {
         adminLang = lang;
@@ -833,22 +736,23 @@
       const itemsStr = extractOrderItemsStr(tableData);
       const subTotal = Number(tableData.subtotal) || Number(tableData.total) || 0;
       const discAmt = Number(tableData.discountAmount) || 0;
+      const tipAmt = Number(tableData.tipAmount) || 0;
       const splitCount = Math.max(1, parseInt(tableData.splitCount) || 1);
       const splitAmt = Math.ceil((Number(tableData.total) || 0) / splitCount);
-      const pMethod = (tableData.paymentMethod || 'CASH').toUpperCase();
 
       let extraLines = '';
       if (discAmt > 0) {
         extraLines += `Subtotal: Rs. ${subTotal}\nDiscount${tableData.couponCode ? ' (' + tableData.couponCode + ')' : ''}: -Rs. ${discAmt}\n`;
       }
+      if (tipAmt > 0) extraLines += `Tip: Rs. ${tipAmt}\n`;
       if (splitCount > 1) {
         extraLines += `Split Bill (${splitCount} Persons): Rs. ${splitAmt} / person\n`;
       }
-      if (pMethod === 'SPLIT') {
-        extraLines += `Split Payment: Cash Rs. ${Number(tableData.splitCashAmount)||0} + Online Rs. ${Number(tableData.splitOnlineAmount)||0}\n`;
+      if (tableData.paymentMethod === 'SPLIT') {
+        extraLines += `SPLIT PAY: Cash Rs. ${tableData.splitCash} + Online Rs. ${tableData.splitOnline}\n`;
       }
 
-      return `=== MANDI CROODS ===\nTable: ${tableData.table}\nMobile: ${tableData.phone || 'Walk-in'}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${itemsStr ? itemsStr.replace(/ \| /g,'\n') : '(no items)'}\n------------------\n${extraLines}TOTAL: Rs. ${tableData.total}\nPayment: ${pMethod}\n==================\nThank you for dining with Mandi Croods! 👑`;
+      return `=== MANDI CROODS ===\nTable: ${tableData.table}\nMobile: ${tableData.phone || 'Walk-in'}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${itemsStr ? itemsStr.replace(/ \| /g,'\n') : '(no items)'}\n------------------\n${extraLines}TOTAL: Rs. ${tableData.total}\nPayment: ${(tableData.paymentMethod || 'CASH').toUpperCase()}\n==================\nThank you for dining with Mandi Croods! 👑`;
     }
 
     function downloadFinalBillFile(billText, tableId){
@@ -879,14 +783,15 @@
 
     function showGlobalToast(msg, type='error'){
       const banner = document.getElementById('globalErrorBanner');
-      if(banner){ 
-        banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg; 
+      if(banner){
+        banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg;
         banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-emerald-600'}`;
-        banner.classList.remove('hidden'); 
+        banner.classList.remove('hidden');
         setTimeout(() => { banner.classList.add('hidden'); }, 5000);
       }
     }
-    
+
+    // --- SMART IMAGE UPLOAD ENGINE ---
     window.processImageUpload = function(inputElem, hiddenUrlId, previewId, textId) {
         const file = inputElem.files[0];
         if (!file) return;
@@ -902,7 +807,7 @@
             const img = new Image();
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                const maxSize = 400; 
+                const maxSize = 400;
                 let width = img.width;
                 let height = img.height;
 
@@ -916,17 +821,17 @@
                 ctx.drawImage(img, 0, 0, width, height);
 
                 const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                
+
                 previewEl.src = compressedDataUrl;
                 previewEl.classList.remove('hidden');
                 urlEl.value = compressedDataUrl;
-                
+
                 if(textEl) {
                     textEl.innerText = "✅ Uploaded!";
                     textEl.classList.replace('text-white', 'text-emerald-400');
                     textEl.classList.replace('text-slate-500', 'text-emerald-600');
                 }
-                
+
                 showGlobalToast("Photo processed and ready!", "success");
             };
             img.src = event.target.result;
@@ -941,10 +846,10 @@
     } catch(e) {
       showGlobalToast('Could not connect to Firebase: ' + e.message, 'error');
     }
-    
+
     let currentRole = null;
     let alertSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
-    let serviceSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3'); 
+    let serviceSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2868/2868-preview.mp3');
     let alarmTimer = null;
     let customersCache = {};
     let couponsCache = {};
@@ -955,8 +860,10 @@
     let revenueChart = null, paymentChart = null, topItemsChart = null;
     let revenueDataByDate = {};
     let dbConnected = false;
-    let alertedLowStock = new Set(); 
+    let alertedLowStock = new Set();
+    let fullHistoryCache = {};
 
+    // POS State
     let posCart = {};
 
     function setOnline() {
@@ -964,44 +871,36 @@
         dbConnected = true;
         const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
         if(dot && txt) {
-            dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]"; 
-            txt.innerText="Online"; 
+            dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]";
+            txt.innerText="Online";
             txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest";
         }
+        const banner = document.getElementById('connectionBanner');
+        if(banner) { banner.classList.remove('show'); banner.classList.add('hidden'); }
     }
-    
+
     function setOffline() {
         if(!dbConnected) return;
         dbConnected = false;
         const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
         if(dot && txt) {
-            dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse"; 
-            txt.innerText="Offline"; 
+            dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse";
+            txt.innerText="Offline";
             txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest";
         }
+        const banner = document.getElementById('connectionBanner');
+        if(banner) { banner.classList.remove('hidden'); banner.classList.add('show'); }
     }
 
     if (db) {
         db.ref('.info/connected').on('value', snap => {
             if(snap.val() === true) setOnline();
-            else setOffline();
+            else if (snap.val() === false) setOffline();
         });
+
         db.ref('active_tables').on('value', () => setOnline());
         db.ref('menu').on('value', () => setOnline());
     }
-
-    // Live Kitchen Elapsed Timer Updater
-    setInterval(() => {
-      document.querySelectorAll('[data-order-ts]').forEach(el => {
-        const ts = parseInt(el.getAttribute('data-order-ts')) || 0;
-        if (!ts) return;
-        const diffSec = Math.max(0, Math.floor((Date.now() - ts) / 1000));
-        const mins = Math.floor(diffSec / 60);
-        const secs = diffSec % 60;
-        el.innerText = `⏱️ ${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
-        if (mins >= 20) el.className = "text-[10px] font-black text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-200";
-      });
-    }, 1000);
 
     window.attemptLogin = function() {
       const pinRaw = document.getElementById('sysPin').value;
@@ -1063,7 +962,7 @@
     function triggerAlarm() {
       if(currentRole !== 'admin' && currentRole !== 'kitchen') return;
       alertSound.play().catch(()=>{});
-      setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000); 
+      setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; }, 5000);
     }
 
     function printViaIframe(htmlDoc){
@@ -1076,7 +975,7 @@
           setTimeout(() => {
             try{ iframe.contentWindow.focus(); iframe.contentWindow.print(); }catch(e){ console.error(e); }
             cleanup();
-          }, 500); 
+          }, 500);
         };
         const doc = iframe.contentDocument || iframe.contentWindow.document;
         doc.open(); doc.write('<!DOCTYPE html>' + htmlDoc); doc.close();
@@ -1090,12 +989,12 @@
       db.ref('active_tables/'+tableId).update({status: 'cooking'});
 
       const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      
+
       const rawItems = extractOrderItemsStr(table);
       let transItems = rawItems.split('|').map(p => translateText(p.trim())).join(' | ');
 
       const safeItems = esc(transItems ? transItems : 'No items recorded.');
-      
+
       let itemsHtml = transItems ? '• ' + safeItems.replace(/ \| /g, '<br>• ') : safeItems;
       itemsHtml = itemsHtml.split('<br>').map(line => {
           return line.match(/CANCELLED|रद्द|రద్దు/i) ? `<span style="text-decoration: line-through; color: #ef4444; font-weight: bold;">${line}</span>` : line;
@@ -1111,7 +1010,7 @@
               .end { text-align: center; margin-top: 20px; border-top: 2px dashed #000; padding-top: 10px; font-size: 12px; }
           </style></head><body>
               <h2>*** K O T ***<br>MANDI CROODS</h2>
-              <h3>Table: ${esc(table.table)} ${table.rushPriority ? ' [🔥 RUSH]' : ''}</h3>
+              <h3>Table: ${esc(table.table)}</h3>
               <p>Time: ${new Date().toLocaleTimeString()}</p>
               <div class="items">${itemsHtml}</div>
               <div class="end">End of Order</div>
@@ -1120,24 +1019,17 @@
       printViaIframe(html);
     };
 
-    window.toggleRushPriority = function(id, currentRush) {
-      db.ref('active_tables/' + id).update({ rushPriority: !currentRush });
-    };
-
     function renderFloorGrid(tables) {
-        const grid = document.getElementById('kitchenGrid'); 
+        const grid = document.getElementById('kitchenGrid');
         if(!grid) return;
         grid.innerHTML = '';
         let needsAttention = false;
 
         const occMap = document.getElementById('occupancyMap');
-        const allEntries = Object.entries(tables).filter(([,t]) => t && typeof t === 'object');
-        const countBadge = document.getElementById('activeOrderCountBadge');
-        if (countBadge) countBadge.innerText = `${allEntries.length} Active Table${allEntries.length === 1 ? '' : 's'}`;
-
         if(occMap) {
             occMap.innerHTML = '';
             const allTableList = ["1","2","3","4","5","6","7","8","9","10","R1","R2","R3","R4","R5","R6","R7","R8","R9","R10","R11","L1","L2","L3","L4","L5","L6","L7","BH1","BH2","BH3","C1","C2","C3","C4","C5","C6","C7","C8"];
+
             let occupiedSet = new Set();
             for(let key in tables) { if(tables[key]) occupiedSet.add(String(tables[key].table)); }
 
@@ -1147,34 +1039,28 @@
             });
         }
 
-        allEntries
-          .filter(([, table]) => currentFloorFilter === 'all' || table.status === currentFloorFilter)
-          .sort((a,b) => ((b[1].rushPriority?1:0) - (a[1].rushPriority?1:0)) || ((a[1].timestamp||0)-(b[1].timestamp||0)))
-          .forEach(([id, table]) => {
+        Object.entries(tables).filter(([,t]) => t && typeof t === 'object').sort((a,b)=>(a[1].timestamp||0)-(b[1].timestamp||0)).forEach(([id, table]) => {
           if(table.status === 'pending' || table.status === 'bill_requested') needsAttention = true;
           let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
           if(table.status==='served') border = 'border-emerald-500';
-          
+
           let statusText = translateText(table.status || 'pending');
-          
+
           let badge = table.status==='pending'?'bg-primary/20 text-primary':(table.status==='bill_requested'?'bg-amber-100 text-amber-600 animate-pulse':'bg-emerald-100 text-emerald-600');
           if(table.status==='cooking') badge = 'bg-blue-100 text-blue-600';
 
-          const pMethodDisplay = table.paymentMethod === 'SPLIT'
-            ? `SPLIT (💵₹${table.splitCashAmount||0} + 📱₹${table.splitOnlineAmount||0})`
-            : (table.paymentMethod || 'CASH');
-
           let btn = '';
+
           if (currentRole === 'admin') {
-            if(table.status === 'pending') { 
-              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md transition-colors" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Print KOT (Kitchen)')}</button>`; 
+            if(table.status === 'pending') {
+              btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-md transition-colors" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Print KOT (Kitchen)')}</button>`;
             } else if (table.status === 'cooking') {
               btn = `<button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-md mb-2 transition-colors" onclick="printKOTReceipt('${id}')">🖨️ ${translateText('Re-Print KOT')}</button>
-                     <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black shadow-md transition-colors" onclick="markServed('${id}')">✅ ${translateText('Mark Food Served')}</button>`; 
-            } else if(table.status === 'bill_requested') { 
-              btn = `<button class="w-full gold-gradient hover:opacity-95 text-black border-2 border-amber-600 py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-xs" onclick="clearTable('${id}')">🧾 ${translateText('Clear Table')} & Bill (${pMethodDisplay})</button>`; 
-            } else { 
-              btn = `<button class="w-full bg-slate-900 hover:bg-black text-primary border-2 border-primary py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 ${translateText('Clear Table')} & Bill</button>`; 
+                     <button class="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-black shadow-md transition-colors" onclick="markServed('${id}')">✅ ${translateText('Mark Food Served')}</button>`;
+            } else if(table.status === 'bill_requested') {
+              btn = `<button class="w-full gold-gradient hover:opacity-95 text-black border-2 border-amber-600 py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 ${translateText('Clear Table')} & Bill (${table.paymentMethod || 'CASH'})</button>`;
+            } else {
+              btn = `<button class="w-full bg-slate-900 hover:bg-black text-primary border-2 border-primary py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 ${translateText('Clear Table')} & Bill</button>`;
             }
           } else if (currentRole === 'kitchen') {
              if(table.status === 'pending') {
@@ -1198,7 +1084,7 @@
           }
 
           const isVip = customersCache[table.phone] && customersCache[table.phone].visits >= 3;
-          
+
           const rawItemsStr = extractOrderItemsStr(table);
           const itemsStr = rawItemsStr.split('|').map(p => translateText(p.trim())).join(' | ');
 
@@ -1206,25 +1092,20 @@
           formattedItems = formattedItems.split('<br>').map(line => line.match(/CANCELLED|रद्द|రద్దు/i) ? `<span class="text-red-500 font-bold line-through">${line}</span>` : line).join('<br>');
 
           const discAmount = Number(table.discountAmount) || 0;
+          const tipAmt = Number(table.tipAmount) || 0;
           const splitCount = Math.max(1, parseInt(table.splitCount) || 1);
           const perPerson = Math.ceil((Number(table.total) || 0) / splitCount);
+          const isSplitPay = table.paymentMethod === 'SPLIT';
 
           grid.innerHTML += `
-            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between relative">
+            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
               <div>
-                <div class="flex justify-between items-start border-b border-slate-100 pb-4 mb-4">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
                   <div>
-                    <div class="flex items-center gap-2 mb-0.5">
-                      <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Table</span>
-                      <span data-order-ts="${table.timestamp || Date.now()}" class="text-[10px] font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded">⏱️ 0m 00s</span>
-                      ${table.rushPriority ? `<span class="text-[10px] font-black bg-red-600 text-white px-2 py-0.5 rounded animate-pulse">🔥 RUSH</span>` : ''}
-                    </div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
                     <span class="font-black text-2xl text-slate-900 leading-none">${table.table}</span>
                   </div>
-                  <div class="flex flex-col items-end gap-1">
-                    <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg border border-current">${statusText.replace('_',' ')}</span>
-                    <button onclick="toggleRushPriority('${id}', ${!!table.rushPriority})" class="text-[10px] font-bold ${table.rushPriority ? 'text-red-600' : 'text-slate-400 hover:text-red-500'}">🔥 ${table.rushPriority ? 'Unmark Rush' : 'Mark Rush'}</button>
-                  </div>
+                  <span class="text-[10px] font-black uppercase ${badge} px-3 py-1.5 rounded-lg border border-current">${statusText.replace('_',' ')}</span>
                 </div>
                 <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-600 font-semibold leading-relaxed">
                   ${formattedItems}
@@ -1235,13 +1116,16 @@
                   <span>🏷️ Discount ${table.couponCode ? `(${table.couponCode})` : '(Admin)'}</span>
                   <span>-₹${discAmount}</span>
                 </div>` : ''}
+                ${tipAmt > 0 ? `<div class="flex justify-between items-center text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg mb-2 border border-amber-200">
+                  <span>💛 Tip</span>
+                  <span>₹${tipAmt}</span>
+                </div>` : ''}
                 ${splitCount > 1 ? `<div class="flex justify-between items-center text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-lg mb-2 border border-blue-200">
                   <span>👥 Split (${splitCount} Persons)</span>
                   <span>₹${perPerson} / each</span>
                 </div>` : ''}
-                ${table.paymentMethod === 'SPLIT' ? `<div class="flex justify-between items-center text-xs font-black text-purple-700 bg-purple-50 px-2.5 py-1.5 rounded-lg mb-2 border border-purple-200">
-                  <span>💸 Split Cash + Online</span>
-                  <span>💵₹${table.splitCashAmount||0} + 📱₹${table.splitOnlineAmount||0}</span>
+                ${isSplitPay ? `<div class="flex justify-between items-center text-xs font-black text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg mb-2 border border-purple-200">
+                  <span>💳 SPLIT: Cash ₹${table.splitCash} + Online ₹${table.splitOnline}</span>
                 </div>` : ''}
                 <div class="flex justify-between items-end mb-5">
                   <span class="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}${isVip ? ' <span class="text-primary ml-1">👑 VIP</span>' : ''}</span>
@@ -1300,7 +1184,7 @@
           for (let k in menuCache) {
              if (menuCache[k].stock_count <= 5 && !alertedLowStock.has(k)) {
                  lowItems.push(menuCache[k].name);
-                 alertedLowStock.add(k); 
+                 alertedLowStock.add(k);
              }
           }
           if (lowItems.length > 0) {
@@ -1350,7 +1234,7 @@
                           </div>`;
                   }
               });
-              
+
               if (pendingCount === 0) {
                   grid.innerHTML = `<div class="col-span-full text-center p-10 text-slate-400 font-bold">No active requests.</div>`;
                   badge.classList.add('hidden');
@@ -1373,7 +1257,7 @@
             revenueDataByDate[dStr] = data.total || 0;
             renderRevenueTrendChart();
         });
-        
+
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
           const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
           const logs = Object.values(snap.val()||{});
@@ -1383,6 +1267,8 @@
           });
           renderTopItemsChart(logs);
         });
+
+        db.ref('daily_logs').on('value', snap => { fullHistoryCache = snap.val() || {}; });
 
         db.ref('feedback').on('value', snap => {
           const list = document.getElementById('feedbackListAdmin');
@@ -1412,6 +1298,7 @@
         });
 
         initAnalytics(dStr);
+        refreshAutoExportBtn();
       }
     }
 
@@ -1471,57 +1358,95 @@
       return Math.min(sub, Math.round(d * 100) / 100);
     }
 
-    // --- POS LOGIC WITH SPLIT CASH + ONLINE ---
-    window.togglePosSplitPayUI = function() {
-      const mode = document.getElementById('posPayMethod')?.value || '';
-      const box = document.getElementById('posSplitPayBox');
-      if (!box) return;
-      if (mode === 'SPLIT') {
-        box.classList.remove('hidden');
-        updatePosCartUI();
-      } else {
-        box.classList.add('hidden');
-      }
+    // ==================== EXCEL (CSV) EXPORT FEATURES ====================
+    function logsToCsv(logsObj){
+      let rows = [['Date','Time','Table','Payment Method','Items','Total (Rs)']];
+      const dates = Object.keys(logsObj || {}).sort();
+      dates.forEach(d => {
+        const dayLogs = logsObj[d] || {};
+        Object.values(dayLogs).forEach(log => {
+          if(!log) return;
+          const items = String(log.items || '').replace(/"/g, '""');
+          rows.push([d, log.time || '', log.table || '', log.method || '', `"${items}"`, log.total || 0]);
+        });
+      });
+      return rows.map(r => r.join(',')).join('\n');
+    }
+    function downloadCsv(csvText, filename){
+      const blob = new Blob(["\uFEFF" + csvText], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Manual: today's sales
+    window.exportTodayExcel = async function(){
+      const dStr = new Date().toISOString().split('T')[0];
+      const snap = await db.ref(`daily_logs/${dStr}`).once('value');
+      const logs = snap.val() || {};
+      if (Object.keys(logs).length === 0) return alert('No transactions today yet.');
+      downloadCsv(logsToCsv({ [dStr]: logs }), `MandiCroods_Sales_${dStr}.csv`);
+      showGlobalToast('Excel (CSV) downloaded for today!', 'info');
     };
 
-    window.syncPosSplitAmounts = function(changedField) {
-      let subtotal = 0;
-      Object.values(posCart).forEach(item => { subtotal += (Number(item.price)||0) * (Number(item.qty)||0); });
-      const discType = document.getElementById('posDiscType')?.value || 'flat';
-      const discVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
-      const finalTotal = Math.max(0, subtotal - calculateDiscountAmount(subtotal, discType, discVal));
-
-      const cashInp = document.getElementById('posCashPart');
-      const onlineInp = document.getElementById('posOnlinePart');
-      if (!cashInp || !onlineInp) return;
-
-      if (changedField === 'cash') {
-        const c = Math.min(finalTotal, Math.max(0, parseFloat(cashInp.value) || 0));
-        cashInp.value = c;
-        onlineInp.value = Math.max(0, Math.round((finalTotal - c) * 100) / 100);
-      } else {
-        const o = Math.min(finalTotal, Math.max(0, parseFloat(onlineInp.value) || 0));
-        onlineInp.value = o;
-        cashInp.value = Math.max(0, Math.round((finalTotal - o) * 100) / 100);
-      }
+    // Manual: full history
+    window.exportAllLogsExcel = function(){
+      const csv = logsToCsv(fullHistoryCache);
+      downloadCsv(csv, `MandiCroods_FullHistory_${new Date().toISOString().split('T')[0]}.csv`);
+      showGlobalToast('Full history Excel (CSV) downloaded!', 'info');
     };
 
+    // Auto nightly export at 23:55
+    let autoExportOn = localStorage.getItem('mc_auto_export') === '1';
+    window.toggleAutoExport = function(){
+      autoExportOn = !autoExportOn;
+      localStorage.setItem('mc_auto_export', autoExportOn ? '1' : '0');
+      refreshAutoExportBtn();
+      showGlobalToast(autoExportOn ? '🌙 Nightly auto-Excel enabled (23:55)' : 'Nightly auto-Excel disabled', 'info');
+    };
+    function refreshAutoExportBtn(){
+      const btn = document.getElementById('autoExportBtn');
+      if (btn) btn.innerText = autoExportOn ? '🌙 Nightly Auto-Excel: ON (23:55)' : '🌙 Nightly Auto-Excel: OFF';
+    }
+    setInterval(async () => {
+      if (!autoExportOn || currentRole !== 'admin') return;
+      const now = new Date();
+      if (now.getHours() === 23 && now.getMinutes() === 55) {
+        const dStr = now.toISOString().split('T')[0];
+        if (localStorage.getItem('mc_exported_' + dStr)) return; // once per day
+        try {
+          const snap = await db.ref(`daily_logs/${dStr}`).once('value');
+          const logs = snap.val() || {};
+          if (Object.keys(logs).length > 0) {
+            downloadCsv(logsToCsv({ [dStr]: logs }), `MandiCroods_AutoNightly_${dStr}.csv`);
+            localStorage.setItem('mc_exported_' + dStr, '1');
+            showGlobalToast('🌙 Nightly auto-Excel downloaded!', 'info');
+          }
+        } catch(e){ console.error(e); }
+      }
+    }, 30000);
+    // ==================== END EXCEL EXPORT ====================
+
+    // Admin Pos Logic with Translation Applied to Names
     window.renderPosMenu = function() {
         const grid = document.getElementById('posMenuGrid');
         if(!grid) return;
         const q = (document.getElementById('posSearch')?.value || '').toLowerCase();
         grid.innerHTML = '';
-        
+
         Object.entries(menuCache).forEach(([id, item]) => {
             if(!item || !item.name) return;
             const transName = translateText(item.name);
             if(q && !transName.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
-            
+
             let varSelect = '';
             if (item.portions && Object.keys(item.portions).length > 0) {
               varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-50 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">${translateText('Regular')} (1P) - ₹${item.base_price}</option>`;
-              Object.entries(item.portions).forEach(([pName, pPrice]) => { 
-                  varSelect += `<option value="${pName}|${pPrice}">${translateText(pName)} - ₹${pPrice}</option>`; 
+              Object.entries(item.portions).forEach(([pName, pPrice]) => {
+                  varSelect += `<option value="${pName}|${pPrice}">${translateText(pName)} - ₹${pPrice}</option>`;
               });
               varSelect += `</select>`;
             } else { varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`; }
@@ -1540,14 +1465,14 @@
 
     window.addToPosCart = function(id) {
         if(!menuCache[id]) return;
-        let price = Number(menuCache[id].base_price) || 0, variant = "Regular"; 
+        let price = Number(menuCache[id].base_price) || 0, variant = "Regular";
         const sel = document.getElementById(`posVar-${id}`);
         if (sel && sel.value) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]) || 0; }
-        
+
         const key = `${id}|${variant}`;
         if(posCart[key]) posCart[key].qty++;
         else posCart[key] = { id, name: menuCache[id].name, variant, price, qty: 1 };
-        
+
         updatePosCartUI();
     };
 
@@ -1574,7 +1499,7 @@
         if(!list) return;
         list.innerHTML = '';
         let subtotal = 0;
-        
+
         Object.entries(posCart).forEach(([key, item]) => {
             subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
             list.innerHTML += `
@@ -1602,28 +1527,21 @@
         document.getElementById('posTotal').innerText = `₹${finalTotal}`;
         const splitEl = document.getElementById('posSplitEach');
         if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
-
-        if (document.getElementById('posPayMethod')?.value === 'SPLIT') {
-          const halfCash = Math.floor(finalTotal / 2);
-          document.getElementById('posCashPart').value = halfCash;
-          document.getElementById('posOnlinePart').value = finalTotal - halfCash;
-        }
     };
 
     window.submitPosOrder = function() {
         if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
         const tNum = document.getElementById('posTableNum').value;
         if(!tNum) return alert("Please select a table or takeaway slot.");
-        
+
         const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
         const tableId = `table_${tNum}`;
         const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-        
+
         const posDiscType = document.getElementById('posDiscType')?.value || 'flat';
         const posDiscVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
         const posCoupon = (document.getElementById('posCouponCode')?.value || '').trim().toUpperCase();
         const posSplitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
-        const posPayMethod = document.getElementById('posPayMethod')?.value || '';
 
         const newLineItems = {};
         Object.values(posCart).forEach((item, idx) => {
@@ -1650,14 +1568,6 @@
         const finalTot = Math.max(0, subTot - dAmt);
         const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
 
-        const finalPayMethod = posPayMethod || existing.paymentMethod || '';
-        let splitCash = Number(existing.splitCashAmount) || 0;
-        let splitOnline = Number(existing.splitOnlineAmount) || 0;
-        if (finalPayMethod === 'SPLIT') {
-          splitCash = parseFloat(document.getElementById('posCashPart')?.value) || 0;
-          splitOnline = Math.max(0, finalTot - splitCash);
-        }
-
         const payload = sanitizeForFirebase({
             orderId: existing.orderId || tableId,
             table: String(tNum),
@@ -1670,12 +1580,11 @@
             discountAmount: dAmt,
             couponCode: cCode,
             splitCount: sCount,
-            splitCashAmount: splitCash,
-            splitOnlineAmount: splitOnline,
+            tipAmount: Number(existing.tipAmount) || 0,
             total: finalTot,
             status: 'pending',
-            timestamp: Date.now(),
-            paymentMethod: finalPayMethod
+            timestamp: existing.timestamp || Date.now(),
+            paymentMethod: existing.paymentMethod || ''
         });
 
         db.ref(`active_tables/${tableId}`).set(payload).then(() => {
@@ -1683,8 +1592,6 @@
             if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
             if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
             if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
-            if(document.getElementById('posPayMethod')) document.getElementById('posPayMethod').value = '';
-            togglePosSplitPayUI();
             updatePosCartUI();
             document.getElementById('posTableNum').value = "";
             document.getElementById('posPhone').value = "";
@@ -1773,7 +1680,7 @@
       const top5 = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
       const labels = top5.map(([name]) => name);
       const values = top5.map(([,qty]) => qty);
-      
+
       if(topItemsChart){ topItemsChart.data.labels = labels; topItemsChart.data.datasets[0].data = values; topItemsChart.update(); return; }
       topItemsChart = new Chart(canvas.getContext('2d'), {
         type: 'bar',
@@ -1808,13 +1715,13 @@
       return { ok: true, portions };
     }
 
-    // --- INTERACTIVE EDIT ORDER MODAL WITH LIVE MENU, DIRECT DISCOUNT, SPLIT PEOPLE & SPLIT CASH+ONLINE ---
+    // --- INTERACTIVE EDIT ORDER MODAL WITH LIVE MENU, DIRECT DISCOUNT & SPLIT BILL ---
     window.openEditOrder = function(id){
       const table = (window.currentTables || {})[id];
       if(!table) return;
       editOrderId = id;
       document.getElementById('editOrderTableLabel').innerText = `Table ${table.table}`;
-      
+
       editOrderLineItems = {};
       if (table.line_items && Object.keys(table.line_items).length > 0) {
         Object.entries(table.line_items).forEach(([k, li]) => {
@@ -1864,14 +1771,8 @@
       document.getElementById('editOrderCouponCode').value = table.couponCode || '';
       document.getElementById('editOrderSplitCount').value = Math.max(1, parseInt(table.splitCount) || 1);
 
-      const pMethod = (table.paymentMethod || 'CASH').toUpperCase();
-      document.getElementById('editOrderPaymentMethod').value = ['CASH','UPI','CARD','SPLIT'].includes(pMethod) ? pMethod : 'CASH';
-      document.getElementById('editOrderCashAmt').value = Number(table.splitCashAmount) || 0;
-      document.getElementById('editOrderOnlineAmt').value = Number(table.splitOnlineAmount) || 0;
-
       document.getElementById('editOrderMenuSearch').value = '';
       renderEditOrderCartList(true);
-      toggleEditSplitPaymentUI();
       renderEditOrderMenuPicker();
       document.getElementById('editOrderModal').classList.remove('hidden');
     };
@@ -1880,46 +1781,6 @@
       document.getElementById('editOrderModal').classList.add('hidden');
       editOrderId = null;
       editOrderLineItems = {};
-    };
-
-    window.toggleEditSplitPaymentUI = function() {
-      const mode = document.getElementById('editOrderPaymentMethod')?.value || 'CASH';
-      const box = document.getElementById('editOrderSplitPayInputs');
-      if (!box) return;
-      if (mode === 'SPLIT') {
-        box.classList.remove('hidden');
-        const tot = Math.max(0, parseFloat(document.getElementById('editOrderTotal')?.value) || 0);
-        const curCash = parseFloat(document.getElementById('editOrderCashAmt')?.value) || 0;
-        const curOnline = parseFloat(document.getElementById('editOrderOnlineAmt')?.value) || 0;
-        if (Math.abs((curCash + curOnline) - tot) > 1) {
-          const half = Math.floor(tot / 2);
-          document.getElementById('editOrderCashAmt').value = half;
-          document.getElementById('editOrderOnlineAmt').value = Math.max(0, tot - half);
-        }
-      } else {
-        box.classList.add('hidden');
-      }
-    };
-
-    window.syncEditSplitPayment = function(changedField) {
-      const tot = Math.max(0, parseFloat(document.getElementById('editOrderTotal')?.value) || 0);
-      const cashInp = document.getElementById('editOrderCashAmt');
-      const onlineInp = document.getElementById('editOrderOnlineAmt');
-      if (!cashInp || !onlineInp) return;
-
-      if (changedField === 'cash') {
-        const c = Math.min(tot, Math.max(0, parseFloat(cashInp.value) || 0));
-        cashInp.value = c;
-        onlineInp.value = Math.max(0, Math.round((tot - c) * 100) / 100);
-      } else if (changedField === 'online') {
-        const o = Math.min(tot, Math.max(0, parseFloat(onlineInp.value) || 0));
-        onlineInp.value = o;
-        cashInp.value = Math.max(0, Math.round((tot - o) * 100) / 100);
-      } else {
-        const c = Math.min(tot, Math.max(0, parseFloat(cashInp.value) || 0));
-        cashInp.value = c;
-        onlineInp.value = Math.max(0, Math.round((tot - c) * 100) / 100);
-      }
     };
 
     window.applyEditModalCoupon = function(rawCode) {
@@ -2012,7 +1873,6 @@
         document.getElementById('editOrderTotal').value = finalTotal;
       }
       updateEditSplitPreview();
-      syncEditSplitPayment('total');
     };
 
     window.recalcEditOrderTotal = function(){
@@ -2120,14 +1980,6 @@
       const couponRaw = (document.getElementById('editOrderCouponCode').value || '').trim().toUpperCase();
       const couponCode = discAmt > 0 ? (couponRaw || 'ADMIN PRIVILEGE') : '';
       const splitCount = Math.max(1, parseInt(document.getElementById('editOrderSplitCount').value) || 1);
-      const pMethod = document.getElementById('editOrderPaymentMethod').value || 'CASH';
-
-      let splitCash = 0;
-      let splitOnline = 0;
-      if (pMethod === 'SPLIT') {
-        splitCash = Math.min(newTotal, Math.max(0, parseFloat(document.getElementById('editOrderCashAmt').value) || 0));
-        splitOnline = Math.max(0, Math.round((newTotal - splitCash) * 100) / 100);
-      }
 
       const formattedItems = Object.values(editOrderLineItems)
         .filter(Boolean)
@@ -2149,14 +2001,11 @@
         discountAmount: discAmt,
         couponCode: couponCode,
         splitCount: splitCount,
-        paymentMethod: pMethod,
-        splitCashAmount: splitCash,
-        splitOnlineAmount: splitOnline,
         total: newTotal
       });
 
       db.ref('active_tables/' + editOrderId).update(updatePayload).then(() => {
-        showGlobalToast("Order, Discount & Split Payment synced to Customer!", "success");
+        showGlobalToast("Order, Discount & Split Bill synced to Customer!", "success");
         closeEditOrder();
       }).catch(err => alert("Failed to update order: " + err.message));
     };
@@ -2198,7 +2047,7 @@
       document.getElementById('editItemName').value = item.name || '';
       document.getElementById('editItemCat').value = item.category || 'Chicken Mandi';
       document.getElementById('editItemPrice').value = item.base_price || 0;
-      
+
       document.getElementById('editItemImgUrl').value = item.image_url || '';
       const prev = document.getElementById('editItemImgPreview');
       prev.src = item.image_url || '';
@@ -2211,7 +2060,7 @@
       document.getElementById('editItemModal').classList.remove('hidden');
     };
     window.closeEditItem = function(){ document.getElementById('editItemModal').classList.add('hidden'); };
-    
+
     window.saveEditItem = function(){
       const updated = sanitizeForFirebase({
         name: document.getElementById('editItemName').value.trim(),
@@ -2230,7 +2079,7 @@
       const name = document.getElementById('newDishName').value.trim();
       const price = parseFloat(document.getElementById('newDishPrice').value);
       if(!name || isNaN(price)) return alert("Valid name and price required.");
-      
+
       const imgUrl = document.getElementById('newDishImgUrl').value || document.getElementById('newDishImgPreview').src || "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
 
       const newItemId = 'item_' + Date.now();
@@ -2257,7 +2106,7 @@
     window.cancelOrder = function(id){
       if(currentRole !== 'admin') return;
       if(!confirm(`Cancel this order? The customer will be notified of a zero bill.`)) return;
-      
+
       db.ref('active_tables/'+id).update({ status: 'cancelled', total: 0 });
       setTimeout(() => { db.ref('active_tables/'+id).remove(); }, 4000);
     };
@@ -2275,25 +2124,20 @@
 
       const d = new Date().toISOString().split('T')[0];
       const timeStr = new Date().toLocaleTimeString();
-      const pMethod = (tableData.paymentMethod || "CASH").toUpperCase();
-      const totalAmt = Number(tableData.total) || 0;
+      let pMethod = tableData.paymentMethod || "CASH";
       const itemsSummary = extractOrderItemsStr(tableData);
 
-      let cashAdded = 0, upiAdded = 0, cardAdded = 0;
+      // --- SPLIT PAYMENT TALLY: cash & online counted separately ---
+      let tallyKey = pMethod.toLowerCase();
+      let cashAmt = 0, upiAmt = 0, cardAmt = 0;
+      const tot = Number(tableData.total) || 0;
       if (pMethod === 'SPLIT') {
-        cashAdded = Number(tableData.splitCashAmount) || 0;
-        upiAdded = Number(tableData.splitOnlineAmount) || Math.max(0, totalAmt - cashAdded);
-      } else if (pMethod === 'UPI') {
-        upiAdded = totalAmt;
-      } else if (pMethod === 'CARD') {
-        cardAdded = totalAmt;
-      } else {
-        cashAdded = totalAmt;
-      }
-
-      const methodLabel = pMethod === 'SPLIT'
-        ? `SPLIT (Cash ₹${cashAdded} + UPI ₹${upiAdded})`
-        : pMethod;
+        tallyKey = 'split';
+        cashAmt = Number(tableData.splitCash) || 0;
+        upiAmt = Number(tableData.splitOnline) || 0;
+      } else if (tallyKey === 'upi') { upiAmt = tot; }
+      else if (tallyKey === 'card') { cardAmt = tot; }
+      else { tallyKey = 'cash'; cashAmt = tot; }
 
       // --- SEND ORDER PARTICULARS TO GOOGLE SHEET ---
       try {
@@ -2304,15 +2148,16 @@
           table: tableData.table,
           phone: tableData.phone || 'Walk-in',
           items: itemsSummary,
-          subtotal: Number(tableData.subtotal) || totalAmt,
+          subtotal: Number(tableData.subtotal) || Number(tableData.total) || 0,
           discountAmount: Number(tableData.discountAmount) || 0,
           couponCode: tableData.couponCode || '',
+          tipAmount: Number(tableData.tipAmount) || 0,
           splitCount: Math.max(1, parseInt(tableData.splitCount) || 1),
-          splitCashAmount: cashAdded,
-          splitOnlineAmount: upiAdded,
-          total: totalAmt,
-          paymentMethod: methodLabel,
-          method: methodLabel
+          total: tot,
+          paymentMethod: pMethod.toUpperCase(),
+          method: pMethod.toUpperCase(),
+          cashAmount: cashAmt,
+          onlineAmount: upiAmt
         };
         fetch(GOOGLE_SHEET_WEBHOOK_URL, {
           method: 'POST',
@@ -2326,19 +2171,19 @@
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
           let curr = data || { total: 0, cash: 0, upi: 0, card: 0 };
-          curr.total = (Number(curr.total)||0) + totalAmt;
-          curr.cash = (Number(curr.cash)||0) + cashAdded;
-          curr.upi = (Number(curr.upi)||0) + upiAdded;
-          curr.card = (Number(curr.card)||0) + cardAdded;
+          curr.total = (Number(curr.total)||0) + tot;
+          curr.cash = (Number(curr.cash)||0) + cashAmt;
+          curr.upi = (Number(curr.upi)||0) + upiAmt;
+          curr.card = (Number(curr.card)||0) + cardAmt;
           return curr;
       });
 
       db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set(sanitizeForFirebase({
         time: timeStr,
         table: tableData.table,
-        items: itemsSummary + (tableData.discountAmount ? ` [Disc: -₹${tableData.discountAmount}]` : ''),
-        total: totalAmt,
-        method: methodLabel
+        items: itemsSummary + (tableData.discountAmount ? ` [Disc: -₹${tableData.discountAmount}]` : '') + (tableData.tipAmount ? ` [Tip: ₹${tableData.tipAmount}]` : '') + (pMethod === 'SPLIT' ? ` [Split: Cash ₹${cashAmt} + Online ₹${upiAmt}]` : ''),
+        total: tot,
+        method: pMethod.toUpperCase()
       }));
       db.ref('active_tables/'+id).remove();
     };
@@ -2363,7 +2208,7 @@
         showGlobalToast("Dashboard & All Revenue Tallies Cleared to ₹0!", "info");
       }).catch(err => alert("Failed to clear dashboard: " + err.message));
     };
-    
+
     window.factoryResetSystem = function() {
         if(!confirm("⚠️ FACTORY RESET will load all 66 Mandi Croods Menu Items and clear all Dashboard Revenue & Logs to ₹0. Continue?")) return;
         Promise.all([
