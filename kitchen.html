@@ -89,10 +89,13 @@
     </div>
   </div>
 
-  <div class="bg-dark text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20 no-print" style="background:#0a0a0a;">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-1/2 truncate cursor-pointer">
-      <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary">
-      Dev: Syed Zeeshaan Ali | High-Fledged AI
+  <div class="bg-dark text-white px-5 py-2.5 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20 no-print" style="background:#0a0a0a;">
+    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-2/3 truncate cursor-pointer">
+      <img src="dev-logo.png (1).png" class="h-6 w-6 rounded-full mr-2 object-cover border border-primary">
+      <div class="flex flex-col leading-tight">
+          <span class="font-black tracking-wide">Built by Syed Zeeshaan Ali 07</span>
+          <span class="text-slate-400 text-[8px] uppercase tracking-widest">Admin Support: 91334 33655</span>
+      </div>
     </a>
     <div class="flex items-center gap-2">
       <select id="adminLangSelect" onchange="changeAdminLanguage(this.value)" class="bg-dark text-primary font-black border border-primary/30 rounded px-2 py-1 outline-none">
@@ -101,7 +104,7 @@
     </div>
   </div>
 
-  <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden no-print" id="mainLayout">
+  <div class="flex h-[calc(100vh-45px)] overflow-hidden hidden no-print" id="mainLayout">
     <aside class="w-64 bg-sidebar text-white flex flex-col shadow-xl z-20 border-r border-[#2b2b40]">
       <div class="p-6 border-b border-[#2b2b40]">
         <h1 class="font-black text-xl leading-tight tracking-tight gold-text">Mandi Croods</h1>
@@ -114,7 +117,7 @@
       <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn" data-i18n="nav_floor">📦 Active Floor</button>
         <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
-        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only">
+        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">
             <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
             <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
@@ -188,6 +191,7 @@
                         <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
                     </div>
 
+                    <!-- Direct Order Edit capability for admin built into the posCartList rendering below -->
                     <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-[#4b4b6a] rounded-xl p-2 hide-scroll"></div>
 
                     <div class="bg-light p-3 rounded-2xl border border-[#4b4b6a] mb-3 space-y-2">
@@ -334,11 +338,17 @@
 
           <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
             <h2 class="text-2xl font-black text-white mb-6 text-center border-b border-[#4b4b6a] pb-4">Mandi Croods - Daily Revenue</h2>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
               <div class="bg-light text-primary p-6 rounded-2xl print-card-bg border border-primary/50 relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/20 rounded-full blur-xl"></div>
                 <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Total Gross</p>
                 <p id="tallyTotal" class="text-3xl font-black text-primary">₹0</p>
+              </div>
+              <div class="bg-light text-white p-6 rounded-2xl print-card-bg border border-[#4b4b6a] relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
+                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Orders Served</p>
+                <p id="tallyOrders" class="text-3xl font-black text-white">0</p>
               </div>
               <div class="bg-light text-emerald-400 border border-emerald-500/30 p-6 rounded-2xl print-card-bg relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl"></div>
@@ -532,7 +542,10 @@
             }
           }
         });
-        if(currentRole === 'admin') renderInventory();
+
+        if(currentRole === 'admin') {
+            renderInventory();
+        }
         renderPosMenu();
       });
 
@@ -577,11 +590,12 @@
       if(currentRole === 'admin') {
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
-            const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0 };
+            const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
             document.getElementById('tallyTotal').innerText = `₹${data.total || 0}`;
             document.getElementById('tallyCash').innerText = `₹${data.cash || 0}`;
             document.getElementById('tallyUPI').innerText = `₹${data.upi || 0}`;
             document.getElementById('tallyCard').innerText = `₹${data.card || 0}`;
+            document.getElementById('tallyOrders').innerText = data.orderCount || 0;
             updateChartData(data);
         });
 
@@ -643,6 +657,7 @@
         }
     }
 
+    /* ---- Raw Materials / Kitchen Inventory Logging ---- */
     window.addKitchenRawMaterial = function() {
         const name = document.getElementById('rawName').value.trim();
         const unit = document.getElementById('rawUnit').value;
@@ -784,7 +799,7 @@
             reader.onload = function(e) { processAdd(e.target.result); };
             reader.readAsDataURL(fileInput.files[0]);
         } else {
-            processAdd(image_url);
+            alert("Please select an image file to upload.");
         }
     };
 
@@ -888,7 +903,45 @@
         }
     }
 
-    /* ---- PREMIUM THERMAL BILL PRINTING SYSTEM ---- */
+    /* ---- PREMIUM THERMAL BILL PRINTING SYSTEM (Separated KOT and Bill) ---- */
+    
+    // 1. Print KOT (Kitchen Copy)
+    window.printPremiumKOT = function(id) {
+        const tableData = (window.currentTables || {})[id];
+        if(!tableData) return alert("Order data not found.");
+        
+        const d = new Date().toISOString().split('T')[0];
+        const timeStr = new Date().toLocaleTimeString();
+
+        let itemsHtml = '';
+        if(tableData.line_items) {
+            Object.values(tableData.line_items).forEach(li => {
+                if(!li.cancelled) {
+                    itemsHtml += `<div style="font-weight:700; margin-bottom:4px;">[ ${li.qty} ] x ${li.name.toUpperCase()}</div>`;
+                    if(li.variant && li.variant !== 'Regular') itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">- ${li.variant}</div>`;
+                    if(li.note) itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">* Note: ${li.note}</div>`;
+                }
+            });
+        }
+
+        const receiptDiv = document.getElementById('printableReceipt');
+        receiptDiv.innerHTML = `
+            <div style="font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 900; text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom:10px;">*** KITCHEN KOT ***</div>
+            <div class="receipt-line"><span>Table:</span><span style="font-size:18px; font-weight:900;">${tableData.table}</span></div>
+            <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
+            <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
+            <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
+            <div style="font-size: 14px; margin-top:5px; margin-bottom:5px;">
+            ${itemsHtml}
+            </div>
+            <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
+        `;
+        
+        window.print();
+        if(tableData.status === 'pending') acceptOrder(id);
+    };
+
+    // 2. Print Final Bill (Customer Copy)
     window.printPremiumBill = function(id) {
         const tableData = (window.currentTables || {})[id];
         if(!tableData) return alert("Order data not found.");
@@ -932,7 +985,7 @@
             <div class="receipt-line" style="font-weight:700; font-size:14px;"><span>TOTAL</span><span>Rs.${tableData.total}</span></div>
             <div class="receipt-divider" style="border-width:2px;"></div>
             <div style="text-align:center; margin-top:5px; font-weight:bold;">Method: ${pMethod} ${splitText}</div>
-            <div class="receipt-footer">Thank you for dining with us!<br>Admin Contact: 91334 33655<br>*** KOT / CUSTOMER COPY ***</div>
+            <div class="receipt-footer">Thank you for dining with us!<br>Scan QR to rate your experience.<br>*** CUSTOMER COPY ***</div>
         `;
 
         window.print();
@@ -1012,6 +1065,29 @@
         });
     };
 
+    window.adminCancelOrderItemInPos = function(tableId, lineItemKey) {
+        if(!confirm("Remove this item from the active order?")) return;
+        const existing = window.currentTables[tableId];
+        if(!existing || !existing.line_items || !existing.line_items[lineItemKey]) return;
+
+        const updatedLineItems = Object.assign({}, existing.line_items);
+        updatedLineItems[lineItemKey].cancelled = true;
+
+        const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
+        const subTot = Object.values(updatedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
+
+        const dAmt = calculateDiscountAmount(subTot, existing.discountType || 'flat', Number(existing.discountValue) || 0);
+        const finalTot = Math.max(0, subTot - dAmt);
+
+        db.ref(`active_tables/${tableId}`).update({
+            line_items: updatedLineItems,
+            items: buildStr(updatedLineItems),
+            subtotal: subTot,
+            discountAmount: dAmt,
+            total: finalTot
+        }).then(() => showGlobalToast("Item removed from order", "info"));
+    };
+
     window.renderPosMenu = function() {
         const grid = document.getElementById('posMenuGrid');
         if(!grid) return;
@@ -1067,8 +1143,34 @@
         const list = document.getElementById('posCartList');
         if(!list) return;
         list.innerHTML = '';
-        let subtotal = 0;
+        
+        const tNum = document.getElementById('posTableNum').value;
+        const tableId = `table_${tNum}`;
+        const existingTable = window.currentTables && window.currentTables[tableId];
 
+        // 1. Render existing items on the selected table (Allows Admin to delete)
+        if (existingTable && existingTable.line_items) {
+            list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mb-2 pb-1 border-b border-[#4b4b6a]">Currently on Table</div>`;
+            Object.entries(existingTable.line_items).forEach(([k, item]) => {
+                if(!item.cancelled) {
+                    list.innerHTML += `
+                    <div class="flex items-center justify-between py-1.5 text-slate-400">
+                        <div class="flex-1 pr-2 leading-tight">
+                            <span class="font-bold text-xs">${item.qty}x ${item.name}</span>
+                            <span class="text-[9px] block">${item.variant}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-white">₹${item.price * item.qty}</span>
+                            <button onclick="adminCancelOrderItemInPos('${tableId}', '${k}')" class="w-6 h-6 bg-red-500/20 text-red-500 rounded text-xs font-black">✕</button>
+                        </div>
+                    </div>`;
+                }
+            });
+            list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-[#4b4b6a]">New Items to Add</div>`;
+        }
+
+        // 2. Render new items in POS Cart
+        let subtotal = 0;
         Object.entries(posCart).forEach(([key, item]) => {
             subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
             list.innerHTML += `
@@ -1086,10 +1188,14 @@
             `;
         });
 
+        // Calculate combined total for display
+        const existingSub = existingTable ? Number(existingTable.subtotal) : 0;
+        const totalSub = existingSub + subtotal;
+
         const discType = document.getElementById('posDiscType')?.value || 'flat';
         const discVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
-        const discAmt = calculateDiscountAmount(subtotal, discType, discVal);
-        const finalTotal = Math.max(0, subtotal - discAmt);
+        const discAmt = calculateDiscountAmount(totalSub, discType, discVal);
+        const finalTotal = Math.max(0, totalSub - discAmt);
         const splitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
         const perPerson = Math.ceil(finalTotal / splitCount);
 
@@ -1097,6 +1203,9 @@
         const splitEl = document.getElementById('posSplitEach');
         if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
     };
+
+    // Re-render POS cart UI when table is switched
+    document.getElementById('posTableNum').addEventListener('change', updatePosCartUI);
 
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
@@ -1129,8 +1238,9 @@
       } catch(e) { }
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
-          let curr = data || { total: 0, cash: 0, upi: 0, card: 0 };
+          let curr = data || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
           curr.total = (Number(curr.total)||0) + tot;
+          curr.orderCount = (Number(curr.orderCount)||0) + 1;
           
           if(tableData.paymentMethod === "SPLIT") {
               curr.cash = (Number(curr.cash)||0) + (Number(tableData.splitCash)||0);
@@ -1150,6 +1260,14 @@
       }));
       db.ref('active_tables/'+id).remove();
 
+      const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nTotal: Rs. ${tot}\nMethod: ${pMethod}`;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
+      a.download = `Admin_Copy_Bill_T${tableData.table}_${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
       showGlobalToast("Table cleared successfully!", "success");
     };
 
@@ -1240,7 +1358,10 @@
                     ` : ''}
                     
                     ${table.status !== 'pending' ? `
-                        <button class="w-full mb-2 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-sm" onclick="printPremiumBill('${id}')">🖨️ Print KOT & Receipt</button>
+                        <div class="grid grid-cols-2 gap-2 mb-2">
+                           <button class="bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumKOT('${id}')">🖨️ KOT</button>
+                           <button class="bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumBill('${id}')">🧾 BILL</button>
+                        </div>
                         <button class="w-full mb-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-black text-xs uppercase tracking-wider" onclick="sendBillToWhatsApp('${table.phone}', '${table.table}', '${table.total}')">💬 Send Bill to WhatsApp</button>
                     ` : ''}
                     
