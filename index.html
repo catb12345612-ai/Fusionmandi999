@@ -1076,7 +1076,6 @@
       Object.values(cart).forEach(i => {
         total += (Number(i.price)||0) * (Number(i.qty)||0);
         totalQty += (Number(i.qty)||0);
-        // Added item thumbnail image in cart for complete visual richness
         uiHtml += `<div class="py-3 flex items-center justify-between border-b border-white/10 last:border-0 text-sm">
           <div class="flex items-center gap-3 flex-1 pr-2">
             <img src="${i.image_url || 'https://images.unsplash.com/photo-1544025162-8111142154ea?w=100&q=80'}" class="w-10 h-10 rounded-lg object-cover border border-primary/30 shrink-0">
@@ -1531,11 +1530,9 @@
     function updateEtaLine(order){
       const eta = document.getElementById('etaLine');
       if (!eta) return;
-      if (order.status === 'pending') {
-        eta.innerText = `⏳ Waiting for kitchen to accept...`;
-        eta.classList.remove('hidden');
-      } else if (order.status === 'cooking') {
-        let mins = order.prepSpeed || (12 + (buildLineItemsArray(order).filter(l=>!l.cancelled).length * 3));
+      if (order.status === 'pending' || order.status === 'cooking') {
+        const itemCount = buildLineItemsArray(order).filter(l=>!l.cancelled).length;
+        const mins = order.prepSpeed || (12 + itemCount * 3);
         eta.innerText = `⏱️ Estimated ready in ~${mins} mins`;
         eta.classList.remove('hidden');
       } else if (order.status === 'served') {
@@ -1576,7 +1573,7 @@
 
         if (order && order.status === 'cancelled') {
             document.getElementById('runningTotalDisplay').innerText = `₹0`;
-            alert("Your order has been cancelled by the admin. Bill Amount: ₹0. Please contact our staff.");
+            alert("Your order has been cancelled by the admin. Bill Amount: ₹0. Please contact our staff for details.");
             unlockCustomerTable();
             localStorage.removeItem('mc_cust_phone');
             window.location.reload();
