@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Mandi Croods</title>
+  <title>Admin - Mandi Croods Premium POS</title>
+  
+  <!-- Premium Fonts for Dashboard and Receipt Printing -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
   <script>
     tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#14141d', light: '#1e1e2d', card: '#2b2b40' } } } }
   </script>
   <style>
-    @media print {
-        body * { visibility: hidden; }
-        #printArea, #printArea * { visibility: visible; }
-        #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; background: white; color: black; }
-        .no-print { display: none !important; }
-        .dash-card { box-shadow: none !important; border: 1px solid #ccc !important; }
-        .print-card-bg { background-color: #fff !important; color: #000 !important; border: 1px solid #ddd; }
-    }
     .hide-scroll::-webkit-scrollbar { display: none; }
     .dash-card { box-shadow: 0 4px 25px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s; }
     body { background-color: #1e1e2d; color: #ffffff; }
+    
     @keyframes redBlueFlash {
       0% { box-shadow: inset 0 0 0 3px #ef4444; border-color: #ef4444; }
       50% { box-shadow: inset 0 0 0 3px #f59e0b; border-color: #f59e0b; }
@@ -41,10 +41,38 @@
     .border-slate-200 { border-color: #4b4b6a; }
     .bg-light { background-color: #1e1e2d; }
     input, select { background-color: #1e1e2d !important; color: white !important; border-color: #4b4b6a !important; }
+
+    /* PREMIUM THERMAL PRINTING CSS */
+    #printableReceipt { display: none; }
+    @media print {
+        body * { visibility: hidden; }
+        body { background-color: white !important; margin: 0; padding: 0; }
+        #printableReceipt, #printableReceipt * { visibility: visible; }
+        #printableReceipt { 
+            display: block; 
+            position: absolute; 
+            left: 0; top: 0; 
+            width: 80mm; 
+            padding: 5mm; 
+            background: white !important; 
+            color: black !important; 
+            font-family: 'Space Mono', monospace; 
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .receipt-brand { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; text-align: center; border-bottom: 2px dashed #000; margin-bottom: 10px; padding-bottom: 5px; }
+        .receipt-line { display: flex; justify-content: space-between; }
+        .receipt-divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+        .receipt-footer { text-align: center; font-size: 10px; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
+        .no-print { display: none !important; }
+    }
   </style>
 <base target="_blank">
 </head>
 <body class="font-sans antialiased text-white">
+
+  <!-- Hidden Premium Receipt Template for Printing -->
+  <div id="printableReceipt"></div>
 
   <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
   <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
@@ -61,9 +89,9 @@
     </div>
   </div>
 
-  <div class="bg-dark text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20" style="background:#0a0a0a;">
+  <div class="bg-dark text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20 no-print" style="background:#0a0a0a;">
     <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-1/2 truncate cursor-pointer">
-      <img src="dev-logo.png (1).png">
+      <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary">
       Dev: Syed Zeeshaan Ali | High-Fledged AI
     </a>
     <div class="flex items-center gap-2">
@@ -73,8 +101,8 @@
     </div>
   </div>
 
-  <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden" id="mainLayout">
-    <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20 border-r border-[#2b2b40]">
+  <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden no-print" id="mainLayout">
+    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-xl z-20 border-r border-[#2b2b40]">
       <div class="p-6 border-b border-[#2b2b40]">
         <h1 class="font-black text-xl leading-tight tracking-tight gold-text">Mandi Croods</h1>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
@@ -90,7 +118,8 @@
             <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
             <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Stock</button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Food Stock</button>
+        <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🥩 Raw Materials</button>
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
       </nav>
       <div class="p-4 border-t border-[#2b2b40]">
@@ -108,7 +137,7 @@
 
           <div class="mb-8 bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
               <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy (All Cabins & Tables)</h3>
-              <div id="occupancyMap" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2"></div>
+              <div id="occupancyMap" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 max-h-48 overflow-y-auto pr-2"></div>
           </div>
 
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
@@ -193,7 +222,7 @@
 
         <!-- Inventory & Menu Management -->
         <section id="view-inventory" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-white mb-8 tracking-tight" data-i18n="title_menu">Inventory & Menu Customization</h2>
+          <h2 class="text-3xl font-black text-white mb-8 tracking-tight" data-i18n="title_menu">Menu & Food Stock Control</h2>
           
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-emerald-500">
             <h3 class="text-lg font-black text-white mb-2">🎟️ Customer Coupon Codes</h3>
@@ -225,11 +254,11 @@
           </div>
 
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-blue-500">
-            <h3 class="text-lg font-black text-white mb-4">📸 Add New Item & Mobile Photo Upload</h3>
+            <h3 class="text-lg font-black text-white mb-4">📸 Add New Menu Item (Mobile Photo Upload)</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div>
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Image</label>
-                 <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border border-[#4b4b6a]">
+                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Image (Required)</label>
+                 <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border border-[#4b4b6a] text-slate-300">
               </div>
               <div>
                  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Name</label>
@@ -256,6 +285,43 @@
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
+        <!-- Premium Raw Material Kitchen Inventory -->
+        <section id="view-kitchen-inv" class="tab-section hidden no-print">
+            <h2 class="text-3xl font-black text-white mb-8 tracking-tight">🥩 Kitchen Raw Materials</h2>
+            
+            <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-amber-500">
+                <h3 class="text-lg font-black text-white mb-4">Add Raw Ingredient</h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ingredient Name</label>
+                        <input type="text" id="rawName" placeholder="e.g. Basmati Rice" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Unit</label>
+                        <select id="rawUnit" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                            <option value="Kg">Kilograms (Kg)</option>
+                            <option value="L">Liters (L)</option>
+                            <option value="Pcs">Pieces (Pcs)</option>
+                            <option value="Packs">Packs</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Current Stock</label>
+                        <input type="number" id="rawStock" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Alert Threshold</label>
+                        <input type="number" id="rawThreshold" placeholder="e.g. 5" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]" title="Alert when stock falls below this number">
+                    </div>
+                    <div>
+                        <button onclick="addKitchenRawMaterial()" class="w-full bg-amber-500 hover:bg-amber-600 text-dark font-black py-3 rounded-xl shadow-md h-[46px] text-xs">+ Add Ingredient</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="rawMaterialsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </section>
+
         <!-- Dashboard (Premium Dark Analytics Theme) -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
@@ -263,7 +329,6 @@
             <div class="flex items-center gap-3 flex-wrap">
               <button onclick="exportTodayExcel()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Auto-Download Today's Excel</button>
               <button onclick="exportAllLogsExcel()" class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-blue-600 hover:text-white transition-all">📥 Full History (CSV)</button>
-              <button onclick="window.print()" class="bg-white/10 text-white border border-white/20 px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-white/20">🖨️ Export PDF Report</button>
             </div>
           </div>
 
@@ -334,9 +399,8 @@
     }
 
     let currentRole = null;
-    let customersCache = {};
-    let couponsCache = {};
     let menuCache = {};
+    let rawMatsCache = {};
     let dbConnected = false;
     let connBannerTimer = null;
     let chartInstance = null;
@@ -450,19 +514,14 @@
       document.getElementById(`view-${tab}`).classList.remove('hidden');
       if (tab === 'pos') renderPosMenu();
       if (tab === 'dashboard' && chartInstance) chartInstance.update();
+      if (tab === 'kitchen-inv') renderKitchenInventory();
     };
 
     function loadSystem() {
       if(!db) return;
 
-      db.ref('coupons').on('value', snap => {
-        if (snap.val()) couponsCache = Object.assign({}, couponsCache, snap.val());
-      }, () => {});
-
       db.ref('menu').on('value', snap => {
         const rawMenu = snap.val() || {};
-        if (rawMenu._system_coupons) couponsCache = Object.assign({}, rawMenu._system_coupons);
-        
         menuCache = {};
         Object.keys(rawMenu).forEach(k => {
           if (k !== '_system_coupons' && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
@@ -473,27 +532,34 @@
             }
           }
         });
-
-        if(currentRole === 'admin') {
-            renderInventory();
-        }
+        if(currentRole === 'admin') renderInventory();
         renderPosMenu();
       });
 
-      // Active Tables listener & 30-sec recurring audio alarm for pending orders
+      // Raw Materials Sync
+      db.ref('raw_materials').on('value', snap => {
+          rawMatsCache = snap.val() || {};
+          if(currentRole === 'admin') renderKitchenInventory();
+          
+          Object.values(rawMatsCache).forEach(mat => {
+             if (mat.stock <= mat.threshold && mat.stock > 0) {
+                 showGlobalToast(`KITCHEN ALERT: ${mat.name} is running low (${mat.stock} ${mat.unit} left!)`, 'error');
+             }
+          });
+      });
+
       db.ref('active_tables').on('value', snap => {
         window.currentTables = snap.val() || {};
         renderFloorGrid(window.currentTables);
         renderOccupancyMap(window.currentTables);
 
-        // Check if any order is pending
         let hasPending = Object.values(window.currentTables).some(o => o && o.status === 'pending');
         if (hasPending) {
             if (!pendingAlarmInterval) {
                 playAlarmTone();
                 pendingAlarmInterval = setInterval(() => {
                     playAlarmTone();
-                }, 30000); // Repeat every 30 seconds until accepted/printed
+                }, 30000);
             }
         } else {
             if (pendingAlarmInterval) {
@@ -503,7 +569,6 @@
         }
       });
 
-      // Service requests listener
       db.ref('service_requests').on('value', snap => {
           const reqs = snap.val() || {};
           renderServiceRequests(reqs);
@@ -578,7 +643,72 @@
         }
     }
 
-    /* ---- Render Inventory Table & Full Editing Options ---- */
+    window.addKitchenRawMaterial = function() {
+        const name = document.getElementById('rawName').value.trim();
+        const unit = document.getElementById('rawUnit').value;
+        const stock = parseFloat(document.getElementById('rawStock').value);
+        const threshold = parseFloat(document.getElementById('rawThreshold').value);
+
+        if(!name || isNaN(stock) || isNaN(threshold)) return alert("Fill all fields correctly.");
+
+        const id = 'raw_' + Date.now();
+        db.ref(`raw_materials/${id}`).set({
+            name: name, unit: unit, stock: stock, threshold: threshold
+        }).then(() => {
+            showGlobalToast("Raw material added successfully!", "success");
+            document.getElementById('rawName').value = '';
+            document.getElementById('rawStock').value = '';
+            document.getElementById('rawThreshold').value = '';
+        });
+    };
+
+    window.renderKitchenInventory = function() {
+        const grid = document.getElementById('rawMaterialsGrid');
+        if(!grid) return;
+        grid.innerHTML = '';
+
+        if(Object.keys(rawMatsCache).length === 0) {
+            grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-4">No raw materials added yet. Track rice, chicken, oil, etc.</p>`;
+            return;
+        }
+
+        Object.entries(rawMatsCache).forEach(([id, mat]) => {
+            const isLow = mat.stock <= mat.threshold;
+            const border = isLow ? 'border-red-500 bg-red-900/20' : 'border-[#4b4b6a] bg-card';
+            const alertText = isLow ? `<span class="text-[10px] font-black uppercase text-red-500 mt-1 block">⚠️ Low Stock Alert</span>` : '';
+
+            grid.innerHTML += `
+                <div class="p-5 rounded-2xl border ${border} flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-black text-white text-lg">${mat.name}</h4>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-light px-2 py-1 rounded border border-[#4b4b6a]">${mat.unit}</span>
+                        </div>
+                        <p class="text-3xl font-black ${isLow ? 'text-red-400' : 'text-primary'}">${mat.stock}</p>
+                        ${alertText}
+                    </div>
+                    <div class="mt-4 flex gap-2">
+                        <button onclick="updateRawStock('${id}', -1)" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-white font-black">-1</button>
+                        <button onclick="updateRawStock('${id}', 1)" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-white font-black">+1</button>
+                        <button onclick="deleteRawMaterial('${id}')" class="w-10 h-10 ml-auto bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-sm font-black">🗑️</button>
+                    </div>
+                </div>
+            `;
+        });
+    };
+
+    window.updateRawStock = function(id, change) {
+        if(!rawMatsCache[id]) return;
+        const newStock = Math.max(0, rawMatsCache[id].stock + change);
+        db.ref(`raw_materials/${id}/stock`).set(newStock);
+    };
+
+    window.deleteRawMaterial = function(id) {
+        if(confirm("Remove this raw material from tracking?")) {
+            db.ref(`raw_materials/${id}`).remove().then(() => showGlobalToast("Material deleted", "info"));
+        }
+    };
+
     window.renderInventory = function() {
         const list = document.getElementById('inventoryList');
         if (!list) return;
@@ -658,7 +788,6 @@
         }
     };
 
-    /* ---- Render Table Occupancy Map (All Cabins & Tables) ---- */
     function renderOccupancyMap(tables) {
         const mapDiv = document.getElementById('occupancyMap');
         if(!mapDiv) return;
@@ -666,11 +795,11 @@
 
         const allCabins = [
             ...Array.from({length: 10}, (_,i) => String(i+1)),
-            ...Array.from({length: 11}, (_,i) => `R${i+1}`),
-            ...Array.from({length: 7}, (_,i) => `L${i+1}`),
-            ...Array.from({length: 3}, (_,i) => `BH${i+1}`),
+            ...Array.from({length: 3}, (_,i) => `TA${i+1}`),
             ...Array.from({length: 8}, (_,i) => `C${i+1}`),
-            ...Array.from({length: 3}, (_,i) => `TA${i+1}`)
+            ...Array.from({length: 3}, (_,i) => `BH${i+1}`),
+            ...Array.from({length: 11}, (_,i) => `R${i+1}`),
+            ...Array.from({length: 7}, (_,i) => `L${i+1}`)
         ];
 
         allCabins.forEach(cab => {
@@ -678,21 +807,20 @@
             const isOccupied = tables && tables[tableId];
             const status = isOccupied ? (isOccupied.status === 'pending' ? 'Pending' : 'Occupied') : 'Available';
             
-            let bg = 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300';
+            let bg = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
             if(isOccupied) {
                 bg = isOccupied.status === 'pending' ? 'bg-amber-500/30 border-amber-500 text-amber-300 urgent-alarm' : 'bg-blue-600/30 border-blue-500 text-blue-200';
             }
 
             mapDiv.innerHTML += `
-                <div class="p-3 rounded-xl border ${bg} flex flex-col justify-between items-center text-center">
-                    <span class="font-black text-sm">Table ${cab}</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider mt-1">${status}</span>
+                <div class="p-2 rounded-xl border ${bg} flex flex-col justify-between items-center text-center cursor-default">
+                    <span class="font-black text-xs">T-${cab}</span>
+                    <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">${status}</span>
                 </div>
             `;
         });
     }
 
-    /* ---- Render Service Requests ---- */
     function renderServiceRequests(reqs) {
         const grid = document.getElementById('serviceRequestsGrid');
         const badge = document.getElementById('serviceBadge');
@@ -737,7 +865,9 @@
     };
 
     window.acceptOrder = function(id) {
-        db.ref(`active_tables/${id}`).update({ status: 'cooking' }).then(()=> showGlobalToast("Order Accepted. Status: Cooking", "success"));
+        db.ref(`active_tables/${id}`).update({ status: 'cooking' }).then(()=> {
+            showGlobalToast("Order Accepted. Status: Cooking", "success");
+        });
     };
 
     window.adminCancelOrder = function(id) {
@@ -757,6 +887,57 @@
               .then(()=> showGlobalToast(`Speed set to ${mins} mins! Customer app updated.`, "success"));
         }
     }
+
+    /* ---- PREMIUM THERMAL BILL PRINTING SYSTEM ---- */
+    window.printPremiumBill = function(id) {
+        const tableData = (window.currentTables || {})[id];
+        if(!tableData) return alert("Order data not found.");
+        
+        const d = new Date().toISOString().split('T')[0];
+        const timeStr = new Date().toLocaleTimeString();
+        let pMethod = tableData.paymentMethod || "PENDING";
+        const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | UPI Rs.${tableData.splitOnline}` : '';
+
+        let itemsHtml = '';
+        if(tableData.line_items) {
+            Object.values(tableData.line_items).forEach(li => {
+                if(!li.cancelled) {
+                    const lineTot = (Number(li.price)||0) * (Number(li.qty)||0);
+                    itemsHtml += `<div class="receipt-line"><span>${li.qty}x ${li.name.substring(0,18)}</span><span>Rs.${lineTot}</span></div>`;
+                }
+            });
+        } else {
+            itemsHtml = `<div class="receipt-line"><span>${tableData.items || 'No items'}</span></div>`;
+        }
+
+        const discountHtml = Number(tableData.discountAmount) > 0 ? `<div class="receipt-line"><span>Discount</span><span>-Rs.${tableData.discountAmount}</span></div>` : '';
+        const tipHtml = Number(tableData.tipAmount) > 0 ? `<div class="receipt-line"><span>Tip</span><span>Rs.${tableData.tipAmount}</span></div>` : '';
+
+        const receiptDiv = document.getElementById('printableReceipt');
+        receiptDiv.innerHTML = `
+            <div class="receipt-brand">✦ MANDI CROODS ✦</div>
+            <div style="text-align:center; font-size:10px; margin-bottom:10px;">Premium Dining Experience<br>Khammam, Telangana</div>
+            <div class="receipt-divider"></div>
+            <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
+            <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
+            <div class="receipt-line"><span>Table:</span><span>${tableData.table}</span></div>
+            <div class="receipt-line"><span>Mob:</span><span>${tableData.phone || 'Walk-in'}</span></div>
+            <div class="receipt-divider"></div>
+            ${itemsHtml}
+            <div class="receipt-divider"></div>
+            <div class="receipt-line"><span>Subtotal</span><span>Rs.${tableData.subtotal || tableData.total}</span></div>
+            ${discountHtml}
+            ${tipHtml}
+            <div class="receipt-divider" style="border-width:2px;"></div>
+            <div class="receipt-line" style="font-weight:700; font-size:14px;"><span>TOTAL</span><span>Rs.${tableData.total}</span></div>
+            <div class="receipt-divider" style="border-width:2px;"></div>
+            <div style="text-align:center; margin-top:5px; font-weight:bold;">Method: ${pMethod} ${splitText}</div>
+            <div class="receipt-footer">Thank you for dining with us!<br>Scan QR to rate your experience.<br>*** KOT / CUSTOMER COPY ***</div>
+        `;
+
+        window.print();
+        if(tableData.status === 'pending') acceptOrder(id);
+    };
 
     window.submitPosOrder = function() {
         if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
@@ -969,18 +1150,9 @@
       }));
       db.ref('active_tables/'+id).remove();
 
-      const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nTotal: Rs. ${tot}\nMethod: ${pMethod}`;
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
-      a.download = `Admin_Copy_Bill_T${tableData.table}_${Date.now()}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      
-      showGlobalToast("Table cleared. Receipt auto-downloaded.", "success");
+      showGlobalToast("Table cleared successfully!", "success");
     };
 
-    // WhatsApp Direct Bill Forwarding for Admin
     window.sendBillToWhatsApp = function(phone, tableNum, total) {
         if (!phone || phone === 'Walk-in') {
             const entered = prompt("Enter customer WhatsApp phone number (with country code, e.g. 919876543210):");
@@ -1068,7 +1240,7 @@
                     ` : ''}
                     
                     ${table.status !== 'pending' ? `
-                        <button class="w-full mb-2 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-sm" onclick="window.print()">🖨️ Print KOT & Receipt</button>
+                        <button class="w-full mb-2 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-sm" onclick="printPremiumBill('${id}')">🖨️ Print KOT & Receipt</button>
                         <button class="w-full mb-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-black text-xs uppercase tracking-wider" onclick="sendBillToWhatsApp('${table.phone}', '${table.table}', '${table.total}')">💬 Send Bill to WhatsApp</button>
                     ` : ''}
                     
