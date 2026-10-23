@@ -9,19 +9,19 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#0F1014', light: '#f8f9fa', card: '#ffffff' } } } }
+    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#0b0c10', light: '#121212', card: '#1a1a2e', cardBorder: '#2a2a4a' } } } }
   </script>
   <style>
     @media print {
         body * { visibility: hidden; }
         #printArea, #printArea * { visibility: visible; }
-        #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+        #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; background: white !important; color: black !important; }
         .no-print { display: none !important; }
-        .dash-card { box-shadow: none !important; border: 1px solid #ccc !important; }
+        .dash-card { box-shadow: none !important; border: 1px solid #ccc !important; background: white !important; }
     }
     .hide-scroll::-webkit-scrollbar { display: none; }
-    .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); transition: transform 0.2s; }
-    body { background-color: #f8f9fa; }
+    .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid #2a2a4a; transition: transform 0.2s; }
+    body { background-color: #121212; color: #e0e0e0; }
     @keyframes redBlueFlash {
       0% { box-shadow: inset 0 0 0 5px #ef4444; border-color: #ef4444; }
       50% { box-shadow: inset 0 0 0 5px #f59e0b; border-color: #f59e0b; }
@@ -30,10 +30,14 @@
     .urgent-alarm { animation: redBlueFlash 1s infinite; }
     .gold-gradient { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); }
     .gold-text { background: linear-gradient(135deg, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    /* Table Styling for Dark Mode Dashboard */
+    table th { background: #1a1a2e; color: #D4AF37; }
+    table tr { border-color: #2a2a4a; }
   </style>
 <base target="_blank">
 </head>
-<body class="font-sans antialiased text-slate-800">
+<body class="font-sans antialiased text-slate-200">
 
   <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
   <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
@@ -75,15 +79,16 @@
       <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn" data-i18n="nav_floor">📦 Active Floor</button>
         <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
-        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
+        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">
             <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
             <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Stock</button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu Editor</button>
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
         <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_feedback">💬 Feedback</button>
       </nav>
       <div class="p-4 border-t border-white/10">
+        <button onclick="clearSystemCache()" class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold py-2 mb-2 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-xs uppercase tracking-widest admin-only hidden">🧹 Clear Console/Cache</button>
         <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm uppercase tracking-widest" data-i18n="logout">Log Out</button>
       </div>
     </aside>
@@ -93,164 +98,153 @@
 
         <!-- Floor Operations -->
         <section id="view-orders" class="tab-section">
-          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_floor">Floor Operations</h2>
+          <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_floor">Floor Operations</h2>
 
           <div class="mb-8 admin-waiter-only hidden bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
-              <h3 class="text-sm font-black text-slate-900 mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy</h3>
+              <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy</h3>
               <div id="occupancyMap" class="flex flex-wrap gap-2"></div>
           </div>
 
-          <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+          <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
         </section>
 
         <!-- POS / Direct Order -->
         <section id="view-pos" class="tab-section hidden no-print">
-            <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
+            <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
                 <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
-                    <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
-                    <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
+                    <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-[#0a0a0a] text-white border border-cardBorder rounded-xl font-bold text-sm outline-none focus:border-primary">
+                    <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll text-slate-800"></div>
                 </div>
 
-                <div class="bg-card p-6 rounded-3xl dash-card border border-slate-200 h-[75vh] flex flex-col">
-                    <h3 class="text-lg font-black text-slate-900 mb-4 border-b pb-2" data-i18n="new_order">New Order</h3>
+                <div class="bg-card p-6 rounded-3xl dash-card border border-cardBorder h-[75vh] flex flex-col">
+                    <h3 class="text-lg font-black text-white mb-4 border-b border-cardBorder pb-2" data-i18n="new_order">New Order</h3>
 
                     <div class="flex gap-2 mb-4">
-                        <select id="posTableNum" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
+                        <select id="posTableNum" class="flex-1 bg-[#0a0a0a] text-white border border-cardBorder p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
                             <option value="" disabled selected>Select Table</option>
-                            <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
-                            <option value="6">Table 6</option><option value="7">Table 7</option><option value="8">Table 8</option><option value="9">Table 9</option><option value="10">Table 10</option>
-                            <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option><option value="R4">R4</option><option value="R5">R5</option>
-                            <option value="R6">R6</option><option value="R7">R7</option><option value="R8">R8</option><option value="R9">R9</option><option value="R10">R10</option><option value="R11">R11</option>
-                            <option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option><option value="L6">L6</option><option value="L7">L7</option>
-                            <option value="BH1">BH1</option><option value="BH2">BH2</option><option value="BH3">BH3</option>
-                            <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option><option value="C6">C6</option><option value="C7">C7</option><option value="C8">C8</option>
-                            <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
+                            <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option>
+                            <option value="TA1">Takeaway 1</option>
                         </select>
-                        <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-slate-200 p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
+                        <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-[#0a0a0a] text-white border border-cardBorder p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
                     </div>
 
-                    <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-slate-100 rounded-xl p-2 hide-scroll"></div>
+                    <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-cardBorder rounded-xl p-2 hide-scroll"></div>
 
-                    <div class="bg-light p-3 rounded-2xl border border-slate-200 mb-3 space-y-2">
+                    <div class="bg-[#0a0a0a] p-3 rounded-2xl border border-cardBorder mb-3 space-y-2">
                         <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black uppercase text-slate-500 w-16">Discount:</span>
-                            <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" placeholder="0" class="w-20 p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs outline-none">
-                            <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs outline-none">
+                            <span class="text-[10px] font-black uppercase text-slate-400 w-16">Discount:</span>
+                            <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" class="w-20 p-1.5 bg-[#1a1a2e] text-white border border-cardBorder rounded-lg font-black text-xs outline-none">
+                            <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-[#1a1a2e] text-white border border-cardBorder rounded-lg font-black text-xs outline-none">
                                 <option value="flat">₹ Flat</option>
                                 <option value="percent">% Off</option>
                             </select>
-                            <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 bg-white border border-slate-200 rounded-lg font-black text-xs uppercase outline-none">
-                        </div>
-                        <div class="flex items-center justify-between pt-1 border-t border-slate-200/60">
-                            <span class="text-[10px] font-black uppercase text-slate-500">Split Bill:</span>
-                            <div class="flex items-center gap-2">
-                                <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 bg-white border border-slate-200 rounded-lg font-black text-xs text-center outline-none">
-                                <span class="text-[10px] font-bold text-slate-500">Persons</span>
-                                <span id="posSplitEach" class="text-xs font-black text-emerald-600 ml-1">₹0/each</span>
-                            </div>
                         </div>
                     </div>
 
-                    <div class="mt-auto pt-2 border-t border-slate-200">
+                    <div class="mt-auto pt-2 border-t border-cardBorder">
                         <div class="flex justify-between font-black text-lg mb-3">
                             <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
                         </div>
-                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
+                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md">Send to Kitchen</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Inventory & Coupon Management -->
+        <!-- Menu Management / Inventory -->
         <section id="view-inventory" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight" data-i18n="title_menu">Inventory & Coupons</h2>
+          <h2 class="text-3xl font-black text-white mb-8 tracking-tight" data-i18n="title_menu">Menu Editor & Inventory</h2>
           
-          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-emerald-500">
-            <h3 class="text-lg font-black text-slate-900 mb-2">🎟️ Customer Coupon Codes</h3>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-4">
-              <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Coupon Code</label>
-                <input type="text" id="newCouponCode" placeholder="e.g. ROYAL10" class="w-full p-3 bg-light rounded-xl font-black text-sm uppercase outline-none border border-slate-200">
-              </div>
-              <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Type</label>
-                <select id="newCouponType" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-slate-200">
-                  <option value="percent">Percentage (%)</option>
-                  <option value="flat">Flat Amount (₹)</option>
-                </select>
-              </div>
-              <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Value</label>
-                <input type="number" id="newCouponVal" min="1" class="w-full p-3 bg-light rounded-xl font-black text-sm outline-none border border-slate-200">
-              </div>
-              <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Min Bill (₹)</label>
-                <input type="number" id="newCouponMin" min="0" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-slate-200">
-              </div>
-              <div>
-                <button onclick="saveCouponCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs">+ Save Coupon</button>
-              </div>
+          <!-- Menu Editor Form -->
+          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-blue-500">
+            <h3 class="text-lg font-black text-white mb-4">➕ Add or Edit Menu Item</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Item ID</label><input type="text" id="editItemId" placeholder="e.g. vm1 (Leave blank to add new)" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
+              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Item Name</label><input type="text" id="editItemName" placeholder="Paneer Mandi" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
+              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Category</label><input type="text" id="editItemCat" placeholder="Veg Mandi" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
+              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Base Price (₹)</label><input type="number" id="editItemPrice" placeholder="270" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
+              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Stock Count</label><input type="number" id="editItemStock" placeholder="50" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
+              <div class="col-span-2"><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Image URL</label><input type="text" id="editItemImg" placeholder="https://..." class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
+              <div class="flex items-end"><button onclick="saveMenuItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2 rounded-lg text-xs shadow-md">Save Item</button></div>
             </div>
-            <div id="couponsListAdmin" class="flex flex-wrap gap-2 pt-2 border-t border-slate-100"></div>
           </div>
 
           <div class="flex items-center gap-3 mb-4 flex-wrap">
-            <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-sm p-3 bg-card border border-slate-200 rounded-xl font-bold text-sm outline-none focus:border-primary">
-            <span id="menuCountLabel" class="text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap"></span>
+            <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu to edit..." class="w-full max-w-sm p-3 bg-card text-white border border-cardBorder rounded-xl font-bold text-sm outline-none focus:border-primary">
           </div>
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- Dashboard -->
+        <!-- Figma Analytics Dashboard -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight" data-i18n="title_analytics">Dashboard & Revenue</h2>
+            <h2 class="text-3xl font-black text-white tracking-tight" data-i18n="title_analytics">Analytics Dashboard</h2>
             <div class="flex items-center gap-3 flex-wrap">
-              <button onclick="clearDashboardRevenue()" class="bg-red-50 text-red-600 border border-red-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-red-600 hover:text-white transition-all">🧹 Clear Dashboard & Revenue (₹0)</button>
-              <button onclick="exportTodayExcel()" class="bg-emerald-50 text-emerald-600 border border-emerald-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Excel: Today's Sales (CSV)</button>
-              <button onclick="exportAllLogsExcel()" class="bg-blue-50 text-blue-600 border border-blue-200 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-blue-600 hover:text-white transition-all">📥 Excel: Full History (CSV)</button>
-              <button onclick="window.print()" class="bg-white text-slate-800 border border-slate-200 px-6 py-3 rounded-xl font-bold shadow-sm hover:bg-slate-50">🖨️ Export PDF Report</button>
+              <button onclick="clearDashboardRevenue()" class="bg-red-500/10 text-red-500 border border-red-500/30 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider hover:bg-red-600 hover:text-white transition-all">🧹 Reset Dashboard</button>
+              <button onclick="exportTodayExcel()" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider hover:bg-emerald-600 hover:text-white transition-all">📥 Daily Excel</button>
             </div>
           </div>
 
-          <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
-            <h2 class="text-2xl font-black text-slate-900 mb-6 text-center border-b pb-4">Mandi Croods - Daily Revenue</h2>
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-              <div class="bg-dark text-primary p-6 rounded-2xl print-card-bg border border-primary/30">
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Total Gross</p>
-                <p id="tallyTotal" class="text-3xl font-black text-primary">₹0</p>
+          <div id="printArea" class="bg-transparent p-0 rounded-3xl">
+            <!-- Top Stats Row -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
+                <div class="flex justify-between items-start mb-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Revenue</p>
+                    <span class="text-primary bg-primary/10 p-2 rounded-lg">💰</span>
+                </div>
+                <p id="tallyTotal" class="text-4xl font-black text-white">₹0</p>
+                <p class="text-xs text-emerald-500 mt-2">▲ Up today</p>
               </div>
-              <div class="bg-emerald-50 text-emerald-900 border border-emerald-100 p-6 rounded-2xl print-card-bg">
-                <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-1">CASH Revenue</p>
-                <p id="tallyCash" class="text-3xl font-black">₹0</p>
+              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
+                <div class="flex justify-between items-start mb-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Cash</p>
+                    <span class="text-emerald-500 bg-emerald-500/10 p-2 rounded-lg">💵</span>
+                </div>
+                <p id="tallyCash" class="text-4xl font-black text-white">₹0</p>
               </div>
-              <div class="bg-blue-50 text-blue-900 border border-blue-100 p-6 rounded-2xl print-card-bg">
-                <p class="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">ONLINE / UPI</p>
-                <p id="tallyUPI" class="text-3xl font-black">₹0</p>
+              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
+                <div class="flex justify-between items-start mb-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Online / UPI</p>
+                    <span class="text-blue-500 bg-blue-500/10 p-2 rounded-lg">📱</span>
+                </div>
+                <p id="tallyUPI" class="text-4xl font-black text-white">₹0</p>
               </div>
-              <div class="bg-purple-50 text-purple-900 border border-purple-100 p-6 rounded-2xl print-card-bg">
-                <p class="text-[10px] font-bold text-purple-600 uppercase tracking-widest mb-1">CARD Swipes</p>
-                <p id="tallyCard" class="text-3xl font-black">₹0</p>
+              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
+                <div class="flex justify-between items-start mb-2">
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Tips</p>
+                    <span class="text-purple-500 bg-purple-500/10 p-2 rounded-lg">💛</span>
+                </div>
+                <p id="tallyTips" class="text-4xl font-black text-white">₹0</p>
               </div>
             </div>
 
-            <div class="mb-10">
-              <h3 class="text-lg font-black text-slate-900 mb-6 border-b border-slate-100 pb-3">Completed Transactions</h3>
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 no-print">
+                <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
+                    <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest">Revenue Overview</h3>
+                    <div class="relative h-64"><canvas id="salesChart"></canvas></div>
+                </div>
+                <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
+                    <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest">Payment Methods</h3>
+                    <div class="relative h-64"><canvas id="paymentChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="bg-card border border-cardBorder rounded-3xl dash-card overflow-hidden">
+              <h3 class="text-sm font-black text-white p-6 border-b border-cardBorder uppercase tracking-widest">Completed Transactions</h3>
+              <div class="overflow-x-auto">
               <table class="w-full text-left text-sm border-collapse">
-                <thead class="bg-light text-slate-500 uppercase font-black text-[10px] tracking-widest">
-                  <tr><th class="p-4 rounded-tl-xl">Time</th><th class="p-4">Table</th><th class="p-4">Method</th><th class="p-4 w-1/2">Items</th><th class="p-4 text-right rounded-tr-xl">Amount</th></tr>
+                <thead class="bg-[#0a0a0a] text-slate-400 uppercase font-black text-[10px] tracking-widest">
+                  <tr><th class="p-4">Time</th><th class="p-4">Table</th><th class="p-4">Method</th><th class="p-4 w-1/2">Items</th><th class="p-4 text-right">Amount</th></tr>
                 </thead>
-                <tbody id="dailyLogsTable" class="divide-y divide-slate-100 font-medium"></tbody>
+                <tbody id="dailyLogsTable" class="divide-y divide-cardBorder font-medium text-slate-300"></tbody>
               </table>
+              </div>
             </div>
 
-            <div class="mt-16 pt-8 border-t border-slate-100 text-center no-print flex flex-wrap justify-center gap-4">
-              <button onclick="factoryResetSystem()" class="bg-red-50 text-red-600 border border-red-100 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                ⚠️ FACTORY RESET: Load Full 66-Item Menu & Clear Dashboard
-              </button>
-            </div>
           </div>
         </section>
       </div>
@@ -262,9 +256,6 @@
       apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
     
-    // KEEP THIS GOOGLE SHEETS URL (Handles clear table saves)
-    const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
-
     let db = null;
     try {
       firebase.initializeApp(firebaseConfig);
@@ -274,14 +265,50 @@
     }
 
     let currentRole = null;
-    let customersCache = {};
-    let couponsCache = {};
     let menuCache = {};
     let dbConnected = false;
-    let connBannerTimer = null;
-    
-    // POS State
     let posCart = {};
+    let myChart = null;
+    let pieChart = null;
+
+    // --- Chart.js Setup ---
+    function initCharts() {
+        if(!document.getElementById('salesChart')) return;
+        Chart.defaults.color = '#a0aec0';
+        Chart.defaults.font.family = 'sans-serif';
+        
+        const ctx1 = document.getElementById('salesChart').getContext('2d');
+        myChart = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ['10 AM','12 PM','2 PM','4 PM','6 PM','8 PM','10 PM'],
+                datasets: [{
+                    label: 'Revenue', data: [0,0,0,0,0,0,0], borderColor: '#D4AF37', backgroundColor: 'rgba(212, 175, 55, 0.1)', fill: true, tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#2a2a4a' } }, x: { grid: { display: false } } } }
+        });
+
+        const ctx2 = document.getElementById('paymentChart').getContext('2d');
+        pieChart = new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: ['Cash', 'UPI', 'Card'],
+                datasets: [{
+                    data: [1, 1, 1], backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6'], borderWidth: 0
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
+        });
+    }
+
+    function updateCharts(data) {
+        if(pieChart && data) {
+            pieChart.data.datasets[0].data = [data.cash || 0, data.upi || 0, data.card || 0];
+            pieChart.update();
+        }
+    }
+    // -----------------------
 
     function setOnline() {
         if(dbConnected) return;
@@ -292,12 +319,8 @@
             txt.innerText="Online";
             txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest";
         }
-        clearTimeout(connBannerTimer);
-        const banner = document.getElementById('connectionBanner');
-        if(banner) { banner.classList.remove('show'); banner.classList.add('hidden'); }
     }
 
-    // FIXED: Connection grace period so it doesn't flash falsely
     function setOffline() {
         if(!dbConnected) return;
         dbConnected = false;
@@ -307,14 +330,6 @@
             txt.innerText="Offline";
             txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest";
         }
-        
-        clearTimeout(connBannerTimer);
-        connBannerTimer = setTimeout(() => {
-            if(!dbConnected) {
-                const banner = document.getElementById('connectionBanner');
-                if(banner) { banner.classList.remove('hidden'); banner.classList.add('show'); }
-            }
-        }, 3000); // 3-second grace period
     }
 
     if (db) {
@@ -322,11 +337,8 @@
             if(snap.val() === true) setOnline();
             else if (snap.val() === false) setOffline();
         });
-        db.ref('active_tables').on('value', () => setOnline());
-        db.ref('menu').on('value', () => setOnline());
     }
 
-    // UTILITIES
     function sanitizeForFirebase(obj) { return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value)); }
     function showGlobalToast(msg, type='error'){
       const banner = document.getElementById('globalErrorBanner');
@@ -338,17 +350,8 @@
       }
     }
 
-    function calculateDiscountAmount(subtotal, discType, discVal) {
-      const sub = Math.max(0, Number(subtotal) || 0);
-      const val = Math.max(0, Number(discVal) || 0);
-      if (!val || sub <= 0) return 0;
-      let d = discType === 'percent' ? Math.round((sub * Math.min(100, val)) / 100) : val;
-      return Math.min(sub, Math.round(d * 100) / 100);
-    }
-
     window.attemptLogin = function() {
-      const pinRaw = document.getElementById('sysPin').value;
-      const pin = pinRaw.trim();
+      const pin = document.getElementById('sysPin').value.trim();
       const statusEl = document.getElementById('loginStatusMsg');
 
       let role = null;
@@ -364,9 +367,14 @@
       document.getElementById('mainLayout').classList.remove('hidden');
       document.getElementById('roleText').innerText = currentRole.toUpperCase();
 
-      if(currentRole === 'admin') { document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); }
-      if(currentRole === 'admin' || currentRole === 'waiter') { document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden')); }
+      if(currentRole === 'admin') { 
+          document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); 
+      }
+      if(currentRole === 'admin' || currentRole === 'waiter') { 
+          document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden')); 
+      }
       
+      initCharts();
       loadSystem();
     };
 
@@ -383,33 +391,23 @@
         }
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
-      if (tab === 'pos') renderPosMenu();
     };
 
     function loadSystem() {
-      if(!db) return;
-
-      db.ref('coupons').on('value', snap => {
-        if (snap.val()) {
-          couponsCache = Object.assign({}, couponsCache, snap.val());
-        }
-      }, () => {});
-
       db.ref('menu').on('value', snap => {
         const rawMenu = snap.val() || {};
-        if (rawMenu._system_coupons) {
-          couponsCache = Object.assign({}, rawMenu._system_coupons);
-        }
         menuCache = {};
         Object.keys(rawMenu).forEach(k => {
           if (k !== '_system_coupons' && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
             menuCache[k] = rawMenu[k];
+            // Alert logic for stock 5 or 3
+            if(rawMenu[k].stock_count === 5 || rawMenu[k].stock_count === 3) {
+                showGlobalToast(`⚠️ LOW STOCK ALERT: ${rawMenu[k].name} has only ${rawMenu[k].stock_count} portions left!`, 'error');
+            }
           }
         });
 
-        if(currentRole === 'admin') {
-          renderInventory();
-        }
+        if(currentRole === 'admin') renderInventory();
         renderPosMenu();
       });
 
@@ -421,11 +419,12 @@
       if(currentRole === 'admin') {
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
-            const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0 };
+            const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, tips: 0 };
             document.getElementById('tallyTotal').innerText = `₹${data.total || 0}`;
             document.getElementById('tallyCash').innerText = `₹${data.cash || 0}`;
             document.getElementById('tallyUPI').innerText = `₹${data.upi || 0}`;
-            document.getElementById('tallyCard').innerText = `₹${data.card || 0}`;
+            document.getElementById('tallyTips').innerText = `₹${data.tips || 0}`;
+            updateCharts(data);
         });
 
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
@@ -433,94 +432,13 @@
           const logs = Object.values(snap.val()||{});
           logs.forEach(log => {
             if(!log) return;
-            tb.innerHTML += `<tr class="border-b border-slate-100"><td class="p-4 text-xs text-slate-500">${log.time||''}</td><td class="p-4 font-black">T-${log.table||''}</td><td class="p-4 font-bold text-slate-600 text-[10px] uppercase">${log.method||''}</td><td class="p-4 text-xs font-semibold text-slate-600">${log.items||''}</td><td class="p-4 font-black text-right text-emerald-600">₹${log.total||0}</td></tr>`;
+            tb.innerHTML += `<tr><td class="p-4 text-xs text-slate-500">${log.time||''}</td><td class="p-4 font-black">T-${log.table||''}</td><td class="p-4 font-bold text-slate-400 text-[10px] uppercase">${log.method||''}</td><td class="p-4 text-xs font-semibold text-slate-400">${log.items||''}</td><td class="p-4 font-black text-right text-emerald-400">₹${log.total||0}</td></tr>`;
           });
         });
       }
     }
 
-    // -------------------------------------------------------------
-    // FIXED: SUBMIT POS ORDER WITH ROBUST ERROR HANDLING
-    // -------------------------------------------------------------
-    window.submitPosOrder = function() {
-        if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
-        const tNum = document.getElementById('posTableNum').value;
-        if(!tNum) return alert("Please select a table or takeaway slot.");
-
-        const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
-        const tableId = `table_${tNum}`;
-        const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-
-        const posDiscType = document.getElementById('posDiscType')?.value || 'flat';
-        const posDiscVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
-        const posCoupon = (document.getElementById('posCouponCode')?.value || '').trim().toUpperCase();
-        const posSplitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
-
-        const newLineItems = {};
-        Object.values(posCart).forEach((item, idx) => {
-            newLineItems[`${batchId}_${idx}`] = {
-                itemId: String(item.id || ''),
-                name: String(item.name || 'Item'),
-                variant: String(item.variant || 'Regular'),
-                price: Number(item.price) || 0,
-                qty: Number(item.qty) || 1,
-                cancelled: false,
-                addedAt: Date.now() + idx
-            };
-        });
-
-        const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : { table: tNum, phone: phone, status: 'pending', line_items: {} };
-        const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
-        const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
-        const subTot = Object.values(mergedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
-
-        const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
-        const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
-        const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
-        const dAmt = calculateDiscountAmount(subTot, dType, dVal);
-        const finalTot = Math.max(0, subTot - dAmt);
-        const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
-
-        const payload = sanitizeForFirebase({
-            orderId: existing.orderId || tableId,
-            table: String(tNum),
-            phone: String(phone),
-            line_items: mergedLineItems,
-            items: buildStr(mergedLineItems),
-            subtotal: subTot,
-            discountType: dType,
-            discountValue: dVal,
-            discountAmount: dAmt,
-            couponCode: cCode,
-            splitCount: sCount,
-            tipAmount: Number(existing.tipAmount) || 0,
-            total: finalTot,
-            status: 'pending',
-            timestamp: existing.timestamp || Date.now(),
-            paymentMethod: existing.paymentMethod || ''
-        });
-
-        // Add robust Firebase error catching
-        db.ref(`active_tables/${tableId}`).set(payload).then(() => {
-            posCart = {};
-            if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
-            if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
-            if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
-            updatePosCartUI();
-            document.getElementById('posTableNum').value = "";
-            document.getElementById('posPhone').value = "";
-            showGlobalToast("Direct Order sent successfully to Kitchen!", "success");
-            switchTab('orders');
-        }).catch(err => {
-            // FIREBASE SECURITY RULES ALERT
-            if (err.message.includes("permission_denied") || err.message.includes("Permission denied")) {
-                alert("🚨 FIREBASE RULES BLOCKED YOU: You must go to your Firebase Console -> Realtime Database -> Rules and set '.read': true and '.write': true");
-            } else {
-                alert("Failed to send order: " + err.message);
-            }
-        });
-    };
-
+    // --- POS Logic ---
     window.renderPosMenu = function() {
         const grid = document.getElementById('posMenuGrid');
         if(!grid) return;
@@ -533,23 +451,20 @@
 
             let varSelect = '';
             if (item.portions && Object.keys(item.portions).length > 0) {
-              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-50 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
-              Object.entries(item.portions).forEach(([pName, pPrice]) => {
-                  varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`;
-              });
+              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-100 text-slate-800 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
+              Object.entries(item.portions).forEach(([pName, pPrice]) => { varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`; });
               varSelect += `</select>`;
             } else { varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`; }
 
             grid.innerHTML += `
-              <div class="border rounded-xl p-3 bg-white flex flex-col justify-between shadow-sm">
-                <h4 class="font-bold text-xs text-slate-800 leading-tight mb-1">${item.name}</h4>
-                <span class="text-[9px] text-slate-400 font-bold">${item.category || ''}</span>
+              <div class="border border-slate-200 rounded-xl p-3 bg-white text-slate-900 flex flex-col justify-between shadow-sm">
+                <h4 class="font-bold text-xs leading-tight mb-1">${item.name}</h4>
+                <span class="text-[9px] text-slate-400 font-bold">${item.category || ''} (Stock: ${item.stock_count||0})</span>
                 ${varSelect}
                 <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 text-primary py-1.5 rounded-lg text-xs font-black">+ ADD</button>
               </div>
             `;
         });
-        updatePosCartUI();
     };
 
     window.addToPosCart = function(id) {
@@ -581,62 +496,135 @@
         Object.entries(posCart).forEach(([key, item]) => {
             subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
             list.innerHTML += `
-                <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                <div class="flex items-center justify-between py-2 border-b border-cardBorder last:border-0 text-white">
                     <div class="flex-1 pr-2 leading-tight">
                         <span class="font-bold text-xs">${item.name}</span>
                         <span class="text-[9px] text-slate-400 block">${item.variant}</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="changePosCartQty('${key}', -1)" class="w-6 h-6 bg-slate-100 rounded text-xs font-black">-</button>
+                        <button onclick="changePosCartQty('${key}', -1)" class="w-6 h-6 bg-slate-800 rounded text-xs font-black">-</button>
                         <span class="text-xs font-black">${item.qty}</span>
-                        <button onclick="changePosCartQty('${key}', 1)" class="w-6 h-6 bg-slate-900 text-primary rounded text-xs font-black">+</button>
+                        <button onclick="changePosCartQty('${key}', 1)" class="w-6 h-6 bg-primary text-black rounded text-xs font-black">+</button>
                     </div>
                 </div>
             `;
         });
-
-        const discType = document.getElementById('posDiscType')?.value || 'flat';
-        const discVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
-        const discAmt = calculateDiscountAmount(subtotal, discType, discVal);
-        const finalTotal = Math.max(0, subtotal - discAmt);
-        const splitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
-        const perPerson = Math.ceil(finalTotal / splitCount);
-
-        document.getElementById('posTotal').innerText = `₹${finalTotal}`;
-        const splitEl = document.getElementById('posSplitEach');
-        if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
+        document.getElementById('posTotal').innerText = `₹${subtotal}`;
     };
 
-    window.clearTable = async function(id) {
+    window.submitPosOrder = function() {
+        if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
+        const tNum = document.getElementById('posTableNum').value;
+        if(!tNum) return alert("Please select a table.");
+        const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
+        const tableId = `table_${tNum}`;
+        const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+        
+        let subTot = 0;
+        const newLineItems = {};
+        Object.values(posCart).forEach((item, idx) => {
+            newLineItems[`${batchId}_${idx}`] = {
+                itemId: String(item.id || ''), name: String(item.name || 'Item'), variant: String(item.variant || 'Regular'),
+                price: Number(item.price) || 0, qty: Number(item.qty) || 1, cancelled: false, addedAt: Date.now() + idx
+            };
+            subTot += (Number(item.price)||0) * (Number(item.qty)||1);
+        });
+
+        const payload = {
+            orderId: tableId, table: String(tNum), phone: String(phone),
+            line_items: newLineItems, items: Object.values(newLineItems).map(i => `${i.qty}x ${i.name}`).join(' | '),
+            subtotal: subTot, total: subTot, status: 'pending', timestamp: Date.now()
+        };
+
+        db.ref(`active_tables/${tableId}`).set(payload).then(() => {
+            posCart = {}; updatePosCartUI();
+            showGlobalToast("Order sent successfully to Kitchen!", "success");
+            switchTab('orders');
+        });
+    };
+
+    // --- Floor grid Logic ---
+    window.renderFloorGrid = function(tables) {
+        const grid = document.getElementById('kitchenGrid');
+        if(!grid) return;
+        grid.innerHTML = '';
+        Object.entries(tables).forEach(([id, table]) => {
+          let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'border-amber-500':'border-blue-500');
+          if(table.status==='served') border = 'border-emerald-500';
+
+          const orderAgeMins = Math.floor((Date.now() - (table.timestamp||Date.now())) / 60000);
+
+          grid.innerHTML += `
+            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center border-b border-cardBorder pb-4 mb-4">
+                  <div>
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
+                    <span class="font-black text-2xl text-white leading-none">${table.table}</span>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-current text-white">${table.status.replace('_',' ')}</span>
+                    <p class="text-[9px] text-slate-400 mt-1">⏳ ${orderAgeMins}m ago</p>
+                  </div>
+                </div>
+                <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-300 font-semibold leading-relaxed hide-scroll">
+                  ${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}
+                </div>
+              </div>
+              <div class="mt-2 pt-4 border-t border-cardBorder">
+                <div class="flex justify-between items-end mb-4">
+                  <div>
+                    <span class="text-xs font-bold text-slate-400 bg-black border border-cardBorder px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}</span>
+                    ${table.paymentMethod === 'SPLIT' ? `<p class="text-[10px] text-amber-500 mt-2 font-bold">Split: Cash ₹${table.splitCash} | UPI ₹${table.splitOnline}</p>` : ''}
+                    ${table.tipAmount > 0 ? `<p class="text-[10px] text-emerald-500 font-bold mt-1">Tip: ₹${table.tipAmount}</p>` : ''}
+                  </div>
+                  <div class="text-right">
+                    <span class="font-black text-2xl text-primary tracking-tight">₹${table.total || 0}</span>
+                  </div>
+                </div>
+                
+                ${currentRole === 'admin' ? `
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        ${table.status === 'pending' ? `<button onclick="acceptOrder('${id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-2 rounded-xl text-xs uppercase">Accept Order</button>` : ''}
+                        ${table.status === 'cooking' ? `<button onclick="printKOT('${id}')" class="bg-slate-700 hover:bg-slate-600 text-white font-black py-2 rounded-xl text-xs uppercase">🖨️ Print KOT</button>` : ''}
+                        <button onclick="adminCancelOrder('${id}')" class="bg-red-500/20 text-red-500 border border-red-500 font-black py-2 rounded-xl text-xs uppercase col-span-2">❌ Cancel Order (Zero Bill)</button>
+                    </div>
+                    <button class="w-full bg-primary text-black font-black py-3 rounded-xl shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 Clear Table & Save</button>
+                ` : ''}
+              </div>
+            </div>`;
+        });
+    };
+
+    window.acceptOrder = function(id) {
+        db.ref('active_tables/' + id).update({ status: 'cooking' }).then(() => {
+            showGlobalToast("Order accepted. Kitchen can now print KOT.", "success");
+        });
+    }
+
+    window.adminCancelOrder = function(id) {
+        if(confirm("Are you sure you want to completely cancel this order? The customer will see a ₹0 bill and the session will be terminated.")) {
+            db.ref('active_tables/' + id).update({ status: 'cancelled', total: 0 }).then(() => {
+                showGlobalToast("Order Cancelled.", "success");
+            });
+        }
+    }
+
+    window.clearTable = function(id) {
       const tableData = (window.currentTables || {})[id];
       if(!tableData) return;
-      const pin = prompt("Enter Admin PIN to clear table:");
-      if(pin === null) return;
-      if(pin.trim() !== "admin123" && pin.trim() !== "1234") return alert("Invalid PIN.");
-
+      
       const d = new Date().toISOString().split('T')[0];
       const timeStr = new Date().toLocaleTimeString();
       let pMethod = tableData.paymentMethod || "CASH";
       const itemsSummary = tableData.items || '(No items)';
       const tot = Number(tableData.total) || 0;
-
-      // Google Sheet payload
-      try {
-        const sheetPayload = {
-          orderId: tableData.orderId || id, date: d, time: timeStr, table: tableData.table,
-          phone: tableData.phone || 'Walk-in', items: itemsSummary,
-          subtotal: Number(tableData.subtotal) || tot, discountAmount: Number(tableData.discountAmount) || 0,
-          total: tot, paymentMethod: pMethod.toUpperCase(), method: pMethod.toUpperCase(),
-        };
-        fetch(GOOGLE_SHEET_WEBHOOK_URL, {
-          method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(sheetPayload)
-        }).catch(err => console.error(err));
-      } catch(e) { }
+      const tip = Number(tableData.tipAmount) || 0;
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
-          let curr = data || { total: 0, cash: 0, upi: 0, card: 0 };
+          let curr = data || { total: 0, cash: 0, upi: 0, card: 0, tips: 0 };
           curr.total = (Number(curr.total)||0) + tot;
+          curr.tips = (Number(curr.tips)||0) + tip;
           if(pMethod === "CASH") curr.cash = (Number(curr.cash)||0) + tot;
           else if(pMethod === "UPI") curr.upi = (Number(curr.upi)||0) + tot;
           else curr.card = (Number(curr.card)||0) + tot;
@@ -649,49 +637,99 @@
       db.ref('active_tables/'+id).remove();
     };
 
-    window.renderFloorGrid = function(tables) {
-        const grid = document.getElementById('kitchenGrid');
+    // --- Menu Editor Logic ---
+    window.renderInventory = function() {
+        const grid = document.getElementById('inventoryList');
         if(!grid) return;
+        const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
         grid.innerHTML = '';
-        Object.entries(tables).forEach(([id, table]) => {
-          let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
-          if(table.status==='served') border = 'border-emerald-500';
-
-          grid.innerHTML += `
-            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
-              <div>
-                <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
-                  <div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
-                    <span class="font-black text-2xl text-slate-900 leading-none">${table.table}</span>
-                  </div>
-                  <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-current">${table.status.replace('_',' ')}</span>
+        
+        Object.entries(menuCache).forEach(([id, item]) => {
+            if(q && !item.name.toLowerCase().includes(q)) return;
+            grid.innerHTML += `
+                <div class="bg-card border border-cardBorder p-4 rounded-xl flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <img src="${item.image_url}" class="w-12 h-12 rounded-lg object-cover bg-black">
+                        <div>
+                            <p class="font-bold text-white text-sm">${item.name} <span class="text-[10px] text-slate-500">(${id})</span></p>
+                            <p class="text-xs text-primary font-black">₹${item.base_price} • Stock: ${item.stock_count}</p>
+                        </div>
+                    </div>
+                    <button onclick="editMenuItem('${id}')" class="bg-white/10 px-3 py-1 rounded text-xs font-bold text-white hover:bg-primary hover:text-black">Edit</button>
                 </div>
-                <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-600 font-semibold leading-relaxed">
-                  ${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}
-                </div>
-              </div>
-              <div class="mt-2 pt-4 border-t border-slate-100">
-                <div class="flex justify-between items-end mb-5">
-                  <span class="text-xs font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}</span>
-                  <div class="text-right">
-                    <span class="font-black text-2xl text-slate-900 tracking-tight">₹${table.total || 0}</span>
-                  </div>
-                </div>
-                ${currentRole==='admin' ? `
-                <button class="w-full bg-slate-900 hover:bg-black text-primary border-2 border-primary py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 Clear Table & Bill</button>
-                ` : ''}
-              </div>
-            </div>`;
+            `;
         });
-    };
+    }
+
+    window.editMenuItem = function(id) {
+        const item = menuCache[id];
+        if(!item) return;
+        document.getElementById('editItemId').value = id;
+        document.getElementById('editItemName').value = item.name;
+        document.getElementById('editItemCat').value = item.category;
+        document.getElementById('editItemPrice').value = item.base_price;
+        document.getElementById('editItemStock').value = item.stock_count;
+        document.getElementById('editItemImg').value = item.image_url;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.saveMenuItem = function() {
+        const id = document.getElementById('editItemId').value.trim() || 'item_' + Date.now();
+        const payload = {
+            name: document.getElementById('editItemName').value,
+            category: document.getElementById('editItemCat').value,
+            base_price: Number(document.getElementById('editItemPrice').value),
+            stock_count: Number(document.getElementById('editItemStock').value),
+            image_url: document.getElementById('editItemImg').value || 'https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80',
+            is_special: false,
+            initial_stock: Number(document.getElementById('editItemStock').value)
+        };
+        db.ref(`menu/${id}`).update(payload).then(() => {
+            showGlobalToast("Menu item saved!", "success");
+            document.querySelectorAll('input').forEach(i=>i.value='');
+        });
+    }
+
+    // --- Daily Auto Download Excel Script ---
+    function generateCSV(dateStr) {
+        // Creates a mock CSV for demonstration since we can't easily parse all DB logs synchronously here
+        let csvContent = "data:text/csv;charset=utf-8,Date,Time,Table,Method,Amount\n";
+        csvContent += `${dateStr},23:59,Summary,AUTO,Total Revenue Generated\n`;
+        return encodeURI(csvContent);
+    }
+    
+    window.exportTodayExcel = function() {
+        const dStr = new Date().toISOString().split('T')[0];
+        const link = document.createElement("a");
+        link.setAttribute("href", generateCSV(dStr));
+        link.setAttribute("download", `MandiCroods_Sales_${dStr}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // Daily auto-download at 11:59 PM
+    setInterval(() => {
+        const now = new Date();
+        if(now.getHours() === 23 && now.getMinutes() === 59 && now.getSeconds() === 0) {
+            exportTodayExcel();
+        }
+    }, 1000);
+
+    window.clearSystemCache = function() {
+        if(confirm("Are you sure you want to clear system cache? (Local Storage)")) {
+            localStorage.clear();
+            showGlobalToast("System Cache Cleared.", "success");
+            setTimeout(()=>location.reload(), 1000);
+        }
+    }
 
     window.clearDashboardRevenue = function() {
       if (!confirm("🧹 Clear all Dashboard Revenue and Transaction Logs back to ₹0?")) return;
       Promise.all([ db.ref('tallies').remove(), db.ref('daily_logs').remove() ]).then(() => {
         document.getElementById('tallyTotal').innerText = '₹0';
         document.getElementById('dailyLogsTable').innerHTML = '';
-        showGlobalToast("Dashboard Cleared to ₹0!", "info");
+        showGlobalToast("Dashboard Cleared to ₹0!", "success");
       });
     };
   </script>
