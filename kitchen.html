@@ -7,731 +7,454 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#0b0c10', light: '#121212', card: '#1a1a2e', cardBorder: '#2a2a4a' } } } }
+    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#0F1014', card: '#161821' } } } }
   </script>
   <style>
-    @media print {
-        body * { visibility: hidden; }
-        #printArea, #printArea * { visibility: visible; }
-        #printArea { position: absolute; left: 0; top: 0; width: 100%; padding: 0; background: white !important; color: black !important; }
-        .no-print { display: none !important; }
-        .dash-card { box-shadow: none !important; border: 1px solid #ccc !important; background: white !important; }
-    }
+    @media print { body * { visibility: hidden; } #printArea, #printArea * { visibility: visible; } #printArea { position: absolute; left: 0; top: 0; width: 100%; color:black; background:white;} .no-print { display: none !important; } }
     .hide-scroll::-webkit-scrollbar { display: none; }
-    .dash-card { box-shadow: 0 4px 20px rgba(0,0,0,0.3); border: 1px solid #2a2a4a; transition: transform 0.2s; }
-    body { background-color: #121212; color: #e0e0e0; }
-    @keyframes redBlueFlash {
-      0% { box-shadow: inset 0 0 0 5px #ef4444; border-color: #ef4444; }
-      50% { box-shadow: inset 0 0 0 5px #f59e0b; border-color: #f59e0b; }
-      100% { box-shadow: inset 0 0 0 5px #ef4444; border-color: #ef4444; }
-    }
-    .urgent-alarm { animation: redBlueFlash 1s infinite; }
+    body { background-color: #0d0f14; color: #fff; } /* Dark Figma Theme */
+    .glass-card { background: rgba(22, 24, 33, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; }
     .gold-gradient { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); }
-    .gold-text { background: linear-gradient(135deg, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    /* Table Styling for Dark Mode Dashboard */
-    table th { background: #1a1a2e; color: #D4AF37; }
-    table tr { border-color: #2a2a4a; }
+    .neon-text { text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
   </style>
-<base target="_blank">
 </head>
-<body class="font-sans antialiased text-slate-200">
-
-  <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
-  <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
-    ⚠ Connection lost — reconnecting to Mandi Croods servers...
-  </div>
+<body class="font-sans antialiased">
 
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
     <div class="bg-[#141414] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
-      <div class="w-16 h-16 gold-gradient text-black rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg">MC</div>
-      <h2 class="text-2xl font-black text-white mb-2 tracking-tight">System Login</h2>
-      <input type="password" id="sysPin" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') attemptLogin()" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
-      <button id="loginBtn" onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">ACCESS WORKSPACE</button>
-      <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
+      <h2 class="text-2xl font-black text-primary mb-6 tracking-tight">System Login</h2>
+      <input type="password" id="sysPin" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') attemptLogin()" class="w-full text-center p-4 bg-white/5 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4">
+      <button onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl">ACCESS WORKSPACE</button>
     </div>
   </div>
 
-  <div class="bg-dark text-white px-5 py-2 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20" style="background:#0a0a0a;">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-1/2 truncate cursor-pointer">
-      <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary">
-      Dev: Syed Zeeshaan Ali | High-Fledged AI
-    </a>
-    <div class="flex items-center gap-2">
-      <select id="adminLangSelect" onchange="changeAdminLanguage(this.value)" class="bg-dark text-primary font-black border border-primary/30 rounded px-2 py-1 outline-none">
-        <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="flex h-[calc(100vh-32px)] overflow-hidden hidden" id="mainLayout">
-    <aside class="w-64 bg-sidebar text-white flex flex-col no-print shadow-xl z-20">
+  <div class="flex h-screen overflow-hidden hidden" id="mainLayout">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-sidebar flex flex-col no-print border-r border-white/10">
       <div class="p-6 border-b border-white/10">
-        <h1 class="font-black text-xl leading-tight tracking-tight gold-text">Mandi Croods</h1>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
-        <div class="flex items-center gap-1.5 mt-3">
-            <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
-        </div>
+        <h1 class="font-black text-xl leading-tight text-primary">Mandi Croods</h1>
+        <p class="text-[10px] text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-white"></span></p>
       </div>
       <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn" data-i18n="nav_floor">📦 Active Floor</button>
-        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
-        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">
-            <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
-            <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
-        </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu Editor</button>
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
-        <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_feedback">💬 Feedback</button>
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn">📦 Active Floor</button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only">🍔 Menu & Inventory</button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full text-left px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only">📈 Analytics Dashboard</button>
       </nav>
       <div class="p-4 border-t border-white/10">
-        <button onclick="clearSystemCache()" class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold py-2 mb-2 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-xs uppercase tracking-widest admin-only hidden">🧹 Clear Console/Cache</button>
-        <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm uppercase tracking-widest" data-i18n="logout">Log Out</button>
+        <button onclick="location.reload()" class="w-full bg-red-500/10 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm">Log Out</button>
       </div>
     </aside>
 
-    <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
-      <div class="p-8 pb-32">
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+      
+      <!-- Floor Operations -->
+      <section id="view-orders" class="tab-section">
+        <h2 class="text-3xl font-black text-white mb-6">Floor Operations</h2>
+        <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+      </section>
 
-        <!-- Floor Operations -->
-        <section id="view-orders" class="tab-section">
-          <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_floor">Floor Operations</h2>
-
-          <div class="mb-8 admin-waiter-only hidden bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
-              <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy</h3>
-              <div id="occupancyMap" class="flex flex-wrap gap-2"></div>
-          </div>
-
-          <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
-        </section>
-
-        <!-- POS / Direct Order -->
-        <section id="view-pos" class="tab-section hidden no-print">
-            <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
-                    <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-[#0a0a0a] text-white border border-cardBorder rounded-xl font-bold text-sm outline-none focus:border-primary">
-                    <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll text-slate-800"></div>
-                </div>
-
-                <div class="bg-card p-6 rounded-3xl dash-card border border-cardBorder h-[75vh] flex flex-col">
-                    <h3 class="text-lg font-black text-white mb-4 border-b border-cardBorder pb-2" data-i18n="new_order">New Order</h3>
-
-                    <div class="flex gap-2 mb-4">
-                        <select id="posTableNum" class="flex-1 bg-[#0a0a0a] text-white border border-cardBorder p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
-                            <option value="" disabled selected>Select Table</option>
-                            <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option>
-                            <option value="TA1">Takeaway 1</option>
-                        </select>
-                        <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-[#0a0a0a] text-white border border-cardBorder p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
-                    </div>
-
-                    <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-cardBorder rounded-xl p-2 hide-scroll"></div>
-
-                    <div class="bg-[#0a0a0a] p-3 rounded-2xl border border-cardBorder mb-3 space-y-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black uppercase text-slate-400 w-16">Discount:</span>
-                            <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" class="w-20 p-1.5 bg-[#1a1a2e] text-white border border-cardBorder rounded-lg font-black text-xs outline-none">
-                            <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-[#1a1a2e] text-white border border-cardBorder rounded-lg font-black text-xs outline-none">
-                                <option value="flat">₹ Flat</option>
-                                <option value="percent">% Off</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mt-auto pt-2 border-t border-cardBorder">
-                        <div class="flex justify-between font-black text-lg mb-3">
-                            <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
-                        </div>
-                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md">Send to Kitchen</button>
-                    </div>
-                </div>
+      <!-- Inventory -->
+      <section id="view-inventory" class="tab-section hidden">
+        <h2 class="text-3xl font-black text-white mb-6">Inventory Management</h2>
+        
+        <div class="glass-card p-6 mb-8 border-t-4 border-primary">
+          <h3 class="text-lg font-black mb-4">Add New Item / Upload Photo</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <div><label class="text-[10px] uppercase text-slate-400">Name</label><input type="text" id="newItemName" class="w-full p-2.5 bg-dark rounded border border-white/20 outline-none"></div>
+            <div><label class="text-[10px] uppercase text-slate-400">Price</label><input type="number" id="newItemPrice" class="w-full p-2.5 bg-dark rounded border border-white/20 outline-none"></div>
+            <div>
+              <label class="text-[10px] uppercase text-slate-400">Direct Photo Upload</label>
+              <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 text-xs bg-dark rounded border border-white/20 outline-none text-slate-400">
             </div>
-        </section>
+            <div><button onclick="addNewMenuItem()" class="w-full bg-primary text-black font-black py-3 rounded shadow">Add Item</button></div>
+          </div>
+        </div>
 
-        <!-- Menu Management / Inventory -->
-        <section id="view-inventory" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-white mb-8 tracking-tight" data-i18n="title_menu">Menu Editor & Inventory</h2>
-          
-          <!-- Menu Editor Form -->
-          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-blue-500">
-            <h3 class="text-lg font-black text-white mb-4">➕ Add or Edit Menu Item</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Item ID</label><input type="text" id="editItemId" placeholder="e.g. vm1 (Leave blank to add new)" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
-              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Item Name</label><input type="text" id="editItemName" placeholder="Paneer Mandi" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
-              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Category</label><input type="text" id="editItemCat" placeholder="Veg Mandi" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
-              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Base Price (₹)</label><input type="number" id="editItemPrice" placeholder="270" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
-              <div><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Stock Count</label><input type="number" id="editItemStock" placeholder="50" class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
-              <div class="col-span-2"><label class="text-[10px] uppercase text-slate-400 font-bold block mb-1">Image URL</label><input type="text" id="editItemImg" placeholder="https://..." class="w-full p-2 bg-[#0a0a0a] text-white border border-cardBorder rounded-lg outline-none text-xs"></div>
-              <div class="flex items-end"><button onclick="saveMenuItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2 rounded-lg text-xs shadow-md">Save Item</button></div>
+        <div id="inventoryList" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+      </section>
+
+      <!-- Premium Dashboard -->
+      <section id="view-dashboard" class="tab-section hidden">
+        <div class="flex justify-between items-center mb-8 no-print">
+          <h2 class="text-3xl font-black text-white neon-text">Business Analytics</h2>
+          <div class="flex gap-3">
+             <button onclick="clearConsoleCache()" class="bg-red-900/30 border border-red-500 text-red-400 px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-600 hover:text-white">🗑 Clear Monthly Cache</button>
+             <button onclick="window.print()" class="bg-primary/20 border border-primary text-primary px-4 py-2 rounded-xl text-xs font-bold">🖨 Print Report</button>
+          </div>
+        </div>
+
+        <div id="printArea" class="space-y-6">
+          <!-- Summary Cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="glass-card p-6 text-center border-t-2 border-emerald-500">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Gross Revenue</p>
+              <p id="dashGross" class="text-3xl font-black text-emerald-400 mt-2">₹0</p>
+            </div>
+            <div class="glass-card p-6 text-center border-t-2 border-blue-500">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Cash Collected</p>
+              <p id="dashCash" class="text-3xl font-black text-blue-400 mt-2">₹0</p>
+            </div>
+            <div class="glass-card p-6 text-center border-t-2 border-purple-500">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Online / UPI</p>
+              <p id="dashOnline" class="text-3xl font-black text-purple-400 mt-2">₹0</p>
+            </div>
+            <div class="glass-card p-6 text-center border-t-2 border-primary">
+              <p class="text-[10px] font-bold text-slate-400 uppercase">Total Orders</p>
+              <p id="dashCount" class="text-3xl font-black text-primary mt-2">0</p>
             </div>
           </div>
 
-          <div class="flex items-center gap-3 mb-4 flex-wrap">
-            <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu to edit..." class="w-full max-w-sm p-3 bg-card text-white border border-cardBorder rounded-xl font-bold text-sm outline-none focus:border-primary">
-          </div>
-          <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
-        </section>
-
-        <!-- Figma Analytics Dashboard -->
-        <section id="view-dashboard" class="tab-section hidden">
-          <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
-            <h2 class="text-3xl font-black text-white tracking-tight" data-i18n="title_analytics">Analytics Dashboard</h2>
-            <div class="flex items-center gap-3 flex-wrap">
-              <button onclick="clearDashboardRevenue()" class="bg-red-500/10 text-red-500 border border-red-500/30 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider hover:bg-red-600 hover:text-white transition-all">🧹 Reset Dashboard</button>
-              <button onclick="exportTodayExcel()" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider hover:bg-emerald-600 hover:text-white transition-all">📥 Daily Excel</button>
-            </div>
+          <!-- Chart Area -->
+          <div class="glass-card p-6 no-print">
+             <h3 class="font-bold text-slate-400 text-sm mb-4">Revenue Trends (Chart)</h3>
+             <canvas id="revenueChart" height="80"></canvas>
           </div>
 
-          <div id="printArea" class="bg-transparent p-0 rounded-3xl">
-            <!-- Top Stats Row -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
-                <div class="flex justify-between items-start mb-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Revenue</p>
-                    <span class="text-primary bg-primary/10 p-2 rounded-lg">💰</span>
-                </div>
-                <p id="tallyTotal" class="text-4xl font-black text-white">₹0</p>
-                <p class="text-xs text-emerald-500 mt-2">▲ Up today</p>
-              </div>
-              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
-                <div class="flex justify-between items-start mb-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Cash</p>
-                    <span class="text-emerald-500 bg-emerald-500/10 p-2 rounded-lg">💵</span>
-                </div>
-                <p id="tallyCash" class="text-4xl font-black text-white">₹0</p>
-              </div>
-              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
-                <div class="flex justify-between items-start mb-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Online / UPI</p>
-                    <span class="text-blue-500 bg-blue-500/10 p-2 rounded-lg">📱</span>
-                </div>
-                <p id="tallyUPI" class="text-4xl font-black text-white">₹0</p>
-              </div>
-              <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
-                <div class="flex justify-between items-start mb-2">
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Tips</p>
-                    <span class="text-purple-500 bg-purple-500/10 p-2 rounded-lg">💛</span>
-                </div>
-                <p id="tallyTips" class="text-4xl font-black text-white">₹0</p>
-              </div>
-            </div>
-
-            <!-- Charts Row -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 no-print">
-                <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
-                    <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest">Revenue Overview</h3>
-                    <div class="relative h-64"><canvas id="salesChart"></canvas></div>
-                </div>
-                <div class="bg-card border border-cardBorder p-6 rounded-3xl dash-card">
-                    <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest">Payment Methods</h3>
-                    <div class="relative h-64"><canvas id="paymentChart"></canvas></div>
-                </div>
-            </div>
-
-            <!-- Transactions Table -->
-            <div class="bg-card border border-cardBorder rounded-3xl dash-card overflow-hidden">
-              <h3 class="text-sm font-black text-white p-6 border-b border-cardBorder uppercase tracking-widest">Completed Transactions</h3>
-              <div class="overflow-x-auto">
-              <table class="w-full text-left text-sm border-collapse">
-                <thead class="bg-[#0a0a0a] text-slate-400 uppercase font-black text-[10px] tracking-widest">
-                  <tr><th class="p-4">Time</th><th class="p-4">Table</th><th class="p-4">Method</th><th class="p-4 w-1/2">Items</th><th class="p-4 text-right">Amount</th></tr>
-                </thead>
-                <tbody id="dailyLogsTable" class="divide-y divide-cardBorder font-medium text-slate-300"></tbody>
-              </table>
-              </div>
-            </div>
-
+          <!-- Transaction Logs -->
+          <div class="glass-card p-6">
+             <h3 class="font-bold text-slate-400 text-sm mb-4 border-b border-white/10 pb-2">Recent Transactions</h3>
+             <table class="w-full text-left text-sm text-slate-300">
+               <thead class="text-[10px] uppercase text-primary border-b border-white/10">
+                 <tr><th class="py-2">Time</th><th class="py-2">Table</th><th class="py-2">Payment Breakdown</th><th class="py-2 text-right">Total</th></tr>
+               </thead>
+               <tbody id="dailyLogsTable"></tbody>
+             </table>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
+
     </main>
+  </div>
+
+  <!-- Edit Order Modal (Admin Full Control) -->
+  <div id="editOrderModal" class="fixed inset-0 bg-black/80 z-[200] hidden flex items-center justify-center">
+      <div class="glass-card w-full max-w-2xl p-6 relative">
+          <button onclick="closeEditModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white font-black text-xl">✕</button>
+          <h3 class="text-xl font-black text-primary mb-4">Edit Order - Table <span id="editTableId"></span></h3>
+          <div id="editLineItems" class="space-y-2 max-h-64 overflow-y-auto mb-4 bg-dark/50 p-4 rounded-xl border border-white/10"></div>
+          
+          <div class="flex justify-between items-center border-t border-white/10 pt-4 mt-4">
+              <button onclick="cancelFullOrder()" class="bg-red-600 text-white font-bold py-2 px-6 rounded hover:bg-red-700">Cancel Full Order</button>
+              <button onclick="saveEditOrder()" class="bg-primary text-black font-bold py-2 px-6 rounded">Save Changes</button>
+          </div>
+      </div>
   </div>
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app"
     };
-    
-    let db = null;
-    try {
-      firebase.initializeApp(firebaseConfig);
-      db = firebase.database();
-    } catch(e) {
-      showGlobalToast('Could not connect to Firebase: ' + e.message, 'error');
-    }
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
     let currentRole = null;
     let menuCache = {};
-    let dbConnected = false;
-    let posCart = {};
-    let myChart = null;
-    let pieChart = null;
-
-    // --- Chart.js Setup ---
-    function initCharts() {
-        if(!document.getElementById('salesChart')) return;
-        Chart.defaults.color = '#a0aec0';
-        Chart.defaults.font.family = 'sans-serif';
-        
-        const ctx1 = document.getElementById('salesChart').getContext('2d');
-        myChart = new Chart(ctx1, {
-            type: 'line',
-            data: {
-                labels: ['10 AM','12 PM','2 PM','4 PM','6 PM','8 PM','10 PM'],
-                datasets: [{
-                    label: 'Revenue', data: [0,0,0,0,0,0,0], borderColor: '#D4AF37', backgroundColor: 'rgba(212, 175, 55, 0.1)', fill: true, tension: 0.4
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#2a2a4a' } }, x: { grid: { display: false } } } }
-        });
-
-        const ctx2 = document.getElementById('paymentChart').getContext('2d');
-        pieChart = new Chart(ctx2, {
-            type: 'doughnut',
-            data: {
-                labels: ['Cash', 'UPI', 'Card'],
-                datasets: [{
-                    data: [1, 1, 1], backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6'], borderWidth: 0
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%' }
-        });
-    }
-
-    function updateCharts(data) {
-        if(pieChart && data) {
-            pieChart.data.datasets[0].data = [data.cash || 0, data.upi || 0, data.card || 0];
-            pieChart.update();
-        }
-    }
-    // -----------------------
-
-    function setOnline() {
-        if(dbConnected) return;
-        dbConnected = true;
-        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
-        if(dot && txt) {
-            dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]";
-            txt.innerText="Online";
-            txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest";
-        }
-    }
-
-    function setOffline() {
-        if(!dbConnected) return;
-        dbConnected = false;
-        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
-        if(dot && txt) {
-            dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse";
-            txt.innerText="Offline";
-            txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest";
-        }
-    }
-
-    if (db) {
-        db.ref('.info/connected').on('value', snap => {
-            if(snap.val() === true) setOnline();
-            else if (snap.val() === false) setOffline();
-        });
-    }
-
-    function sanitizeForFirebase(obj) { return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value)); }
-    function showGlobalToast(msg, type='error'){
-      const banner = document.getElementById('globalErrorBanner');
-      if(banner){
-        banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg;
-        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-emerald-600'}`;
-        banner.classList.remove('hidden');
-        setTimeout(() => { banner.classList.add('hidden'); }, 5000);
-      }
-    }
+    let activeTables = {};
+    let editTableRefId = null;
+    let tempEditLineItems = {};
 
     window.attemptLogin = function() {
       const pin = document.getElementById('sysPin').value.trim();
-      const statusEl = document.getElementById('loginStatusMsg');
+      if (pin === 'admin123') currentRole = 'admin';
+      else if (pin === 'kitchen123') currentRole = 'kitchen';
+      else return alert("Invalid PIN");
 
-      let role = null;
-      if (pin === 'admin123' || pin === '1234') role = 'admin';
-      else if (pin === 'waiter123') role = 'waiter';
-      else if (pin === 'kitchen123') role = 'kitchen';
-      else { if(statusEl) statusEl.textContent = ''; return alert("Invalid PIN"); }
-
-      if(!db) return alert("⚠️ Not connected to database. Please check your internet connection.");
-
-      currentRole = role;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainLayout').classList.remove('hidden');
       document.getElementById('roleText').innerText = currentRole.toUpperCase();
 
-      if(currentRole === 'admin') { 
-          document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); 
-      }
-      if(currentRole === 'admin' || currentRole === 'waiter') { 
-          document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden')); 
-      }
-      
-      initCharts();
-      loadSystem();
+      if(currentRole === 'admin') document.querySelectorAll('.admin-only').forEach(e => e.classList.remove('hidden'));
+      loadSystemData();
+      checkAutoDailyDownload();
     };
 
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(b => {
-        let isMatch = b.id === `tab-${tab}`;
-        if (isMatch) {
-            b.classList.remove('text-slate-400', 'hover:bg-white/5');
-            b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
-        } else {
-            b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
-            b.classList.add('text-slate-400', 'hover:bg-white/5');
-        }
+        if(b.id === `tab-${tab}`) b.classList.replace('text-slate-400', 'text-primary');
+        else b.classList.replace('text-primary', 'text-slate-400');
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
     };
 
-    function loadSystem() {
+    function loadSystemData() {
+      // Menu load
       db.ref('menu').on('value', snap => {
-        const rawMenu = snap.val() || {};
-        menuCache = {};
-        Object.keys(rawMenu).forEach(k => {
-          if (k !== '_system_coupons' && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
-            menuCache[k] = rawMenu[k];
-            // Alert logic for stock 5 or 3
-            if(rawMenu[k].stock_count === 5 || rawMenu[k].stock_count === 3) {
-                showGlobalToast(`⚠️ LOW STOCK ALERT: ${rawMenu[k].name} has only ${rawMenu[k].stock_count} portions left!`, 'error');
-            }
-          }
-        });
-
+        menuCache = snap.val() || {};
         if(currentRole === 'admin') renderInventory();
-        renderPosMenu();
+        checkStockAlerts();
       });
 
+      // Active Tables load
       db.ref('active_tables').on('value', snap => {
-        window.currentTables = snap.val() || {};
-        renderFloorGrid(window.currentTables);
+        activeTables = snap.val() || {};
+        renderFloorGrid();
       });
 
-      if(currentRole === 'admin') {
-        const dStr = new Date().toISOString().split('T')[0];
-        db.ref(`tallies/daily/${dStr}`).on('value', s => {
-            const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, tips: 0 };
-            document.getElementById('tallyTotal').innerText = `₹${data.total || 0}`;
-            document.getElementById('tallyCash').innerText = `₹${data.cash || 0}`;
-            document.getElementById('tallyUPI').innerText = `₹${data.upi || 0}`;
-            document.getElementById('tallyTips').innerText = `₹${data.tips || 0}`;
-            updateCharts(data);
-        });
+      // Daily Logs & Dash load
+      const dStr = new Date().toISOString().split('T')[0];
+      db.ref(`tallies/daily/${dStr}`).on('value', s => {
+        const data = s.val() || { total: 0, cash: 0, upi: 0, orders: 0 };
+        document.getElementById('dashGross').innerText = `₹${data.total}`;
+        document.getElementById('dashCash').innerText = `₹${data.cash}`;
+        document.getElementById('dashOnline').innerText = `₹${data.upi}`;
+        document.getElementById('dashCount').innerText = `${data.orders}`;
+        updateChart(data);
+      });
 
-        db.ref(`daily_logs/${dStr}`).on('value', snap => {
-          const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
-          const logs = Object.values(snap.val()||{});
-          logs.forEach(log => {
-            if(!log) return;
-            tb.innerHTML += `<tr><td class="p-4 text-xs text-slate-500">${log.time||''}</td><td class="p-4 font-black">T-${log.table||''}</td><td class="p-4 font-bold text-slate-400 text-[10px] uppercase">${log.method||''}</td><td class="p-4 text-xs font-semibold text-slate-400">${log.items||''}</td><td class="p-4 font-black text-right text-emerald-400">₹${log.total||0}</td></tr>`;
-          });
+      db.ref(`daily_logs/${dStr}`).on('value', s => {
+        const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
+        const logs = Object.values(s.val()||{});
+        logs.forEach(log => {
+          tb.innerHTML += `<tr class="border-b border-white/5"><td class="py-2">${log.time}</td><td class="py-2 font-bold text-primary">T-${log.table}</td><td class="py-2 text-[10px] text-slate-400">${log.method_desc || log.method}</td><td class="py-2 text-right text-emerald-400 font-bold">₹${log.total}</td></tr>`;
         });
-      }
+      });
     }
 
-    // --- POS Logic ---
-    window.renderPosMenu = function() {
-        const grid = document.getElementById('posMenuGrid');
-        if(!grid) return;
-        const q = (document.getElementById('posSearch')?.value || '').toLowerCase();
-        grid.innerHTML = '';
+    // --- Core Operations ---
 
-        Object.entries(menuCache).forEach(([id, item]) => {
-            if(!item || !item.name) return;
-            if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
-
-            let varSelect = '';
-            if (item.portions && Object.keys(item.portions).length > 0) {
-              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-slate-100 text-slate-800 text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
-              Object.entries(item.portions).forEach(([pName, pPrice]) => { varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`; });
-              varSelect += `</select>`;
-            } else { varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`; }
-
-            grid.innerHTML += `
-              <div class="border border-slate-200 rounded-xl p-3 bg-white text-slate-900 flex flex-col justify-between shadow-sm">
-                <h4 class="font-bold text-xs leading-tight mb-1">${item.name}</h4>
-                <span class="text-[9px] text-slate-400 font-bold">${item.category || ''} (Stock: ${item.stock_count||0})</span>
-                ${varSelect}
-                <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 text-primary py-1.5 rounded-lg text-xs font-black">+ ADD</button>
-              </div>
-            `;
-        });
+    window.updateOrderStatus = function(id, status) {
+       db.ref(`active_tables/${id}`).update({ status });
     };
 
-    window.addToPosCart = function(id) {
-        if(!menuCache[id]) return;
-        let price = Number(menuCache[id].base_price) || 0, variant = "Regular";
-        const sel = document.getElementById(`posVar-${id}`);
-        if (sel && sel.value) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]) || 0; }
-
-        const key = `${id}|${variant}`;
-        if(posCart[key]) posCart[key].qty++;
-        else posCart[key] = { id, name: menuCache[id].name, variant, price, qty: 1 };
-        updatePosCartUI();
+    // Print Logic (Restricted if not accepted)
+    window.printKOT = function(id) {
+       const table = activeTables[id];
+       if(table.status === 'pending') return alert("You must accept the order before printing.");
+       let txt = `*** KOT - Table ${table.table} ***\n`;
+       Object.values(table.line_items||{}).forEach(i => { if(!i.cancelled) txt += `${i.qty}x ${i.name}\n`; });
+       // Logic to trigger receipt printer or open new window
+       const win = window.open('', '_blank');
+       win.document.write(`<pre style="font-size:20px; font-weight:bold;">${txt}</pre>`);
+       win.print(); win.close();
     };
 
-    window.changePosCartQty = function(key, change) {
-        if(posCart[key]) {
-            posCart[key].qty += change;
-            if(posCart[key].qty <= 0) delete posCart[key];
-            updatePosCartUI();
-        }
+    window.clearAndBillTable = function(id) {
+       const table = activeTables[id];
+       const method = prompt("Payment Method? (CASH / UPI / SPLIT)", "CASH").toUpperCase();
+       
+       let methodDesc = method;
+       let splitCash = 0, splitOnline = 0;
+       
+       if (method === 'SPLIT') {
+           splitCash = parseFloat(prompt("Enter Cash Amount collected:")) || 0;
+           splitOnline = table.total - splitCash;
+           methodDesc = `SPLIT: Cash ₹${splitCash} / Online ₹${splitOnline}`;
+       }
+
+       const d = new Date().toISOString().split('T')[0];
+       const timeStr = new Date().toLocaleTimeString();
+
+       // Update Dashboard Tallies
+       db.ref(`tallies/daily/${d}`).transaction(data => {
+           let curr = data || { total: 0, cash: 0, upi: 0, orders: 0 };
+           curr.total += table.total; curr.orders += 1;
+           if(method === "CASH") curr.cash += table.total;
+           else if(method === "UPI") curr.upi += table.total;
+           else if(method === "SPLIT") { curr.cash += splitCash; curr.upi += splitOnline; }
+           return curr;
+       });
+
+       // Log to Daily Logs
+       db.ref(`daily_logs/${d}`).push({
+           time: timeStr, table: table.table, method: method, method_desc: methodDesc, total: table.total
+       });
+
+       // Clear active table
+       db.ref('active_tables/'+id).remove();
     };
 
-    window.updatePosCartUI = function() {
-        const list = document.getElementById('posCartList');
-        if(!list) return;
-        list.innerHTML = '';
-        let subtotal = 0;
+    window.renderFloorGrid = function() {
+      const grid = document.getElementById('kitchenGrid'); grid.innerHTML = '';
+      Object.entries(activeTables).forEach(([id, table]) => {
+          let border = 'border-white/10';
+          if(table.status === 'pending') border = 'border-amber-500 animate-pulse';
+          if(table.status === 'accepted') border = 'border-blue-500';
+          
+          let actionsHtml = '';
+          if (currentRole === 'admin') {
+              if (table.status === 'pending') {
+                  actionsHtml += `<button onclick="updateOrderStatus('${id}', 'accepted')" class="bg-blue-600 px-3 py-1 rounded text-xs font-bold text-white w-full mb-2">Accept Order</button>`;
+              }
+              if (table.status !== 'pending') {
+                  actionsHtml += `<button onclick="printKOT('${id}')" class="bg-slate-700 px-3 py-1 rounded text-xs font-bold text-white w-full mb-2">🖨 Print KOT</button>`;
+                  actionsHtml += `<button onclick="updateOrderStatus('${id}', 'cooking')" class="bg-amber-600 px-3 py-1 rounded text-xs font-bold text-white w-1/2">Cooking</button>`;
+                  actionsHtml += `<button onclick="updateOrderStatus('${id}', 'served')" class="bg-emerald-600 px-3 py-1 rounded text-xs font-bold text-white w-1/2 ml-1">Served</button>`;
+              }
+              actionsHtml += `<div class="mt-4 flex gap-2"><button onclick="openEditModal('${id}')" class="bg-white/10 border border-white/20 w-1/2 py-2 rounded text-xs">✏ Edit Order</button>
+                              <button onclick="clearAndBillTable('${id}')" class="bg-primary text-black font-black w-1/2 py-2 rounded text-xs">🧾 Settle Bill</button></div>`;
+          }
 
-        Object.entries(posCart).forEach(([key, item]) => {
-            subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
-            list.innerHTML += `
-                <div class="flex items-center justify-between py-2 border-b border-cardBorder last:border-0 text-white">
-                    <div class="flex-1 pr-2 leading-tight">
-                        <span class="font-bold text-xs">${item.name}</span>
-                        <span class="text-[9px] text-slate-400 block">${item.variant}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="changePosCartQty('${key}', -1)" class="w-6 h-6 bg-slate-800 rounded text-xs font-black">-</button>
-                        <span class="text-xs font-black">${item.qty}</span>
-                        <button onclick="changePosCartQty('${key}', 1)" class="w-6 h-6 bg-primary text-black rounded text-xs font-black">+</button>
-                    </div>
-                </div>
-            `;
-        });
-        document.getElementById('posTotal').innerText = `₹${subtotal}`;
-    };
-
-    window.submitPosOrder = function() {
-        if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
-        const tNum = document.getElementById('posTableNum').value;
-        if(!tNum) return alert("Please select a table.");
-        const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
-        const tableId = `table_${tNum}`;
-        const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-        
-        let subTot = 0;
-        const newLineItems = {};
-        Object.values(posCart).forEach((item, idx) => {
-            newLineItems[`${batchId}_${idx}`] = {
-                itemId: String(item.id || ''), name: String(item.name || 'Item'), variant: String(item.variant || 'Regular'),
-                price: Number(item.price) || 0, qty: Number(item.qty) || 1, cancelled: false, addedAt: Date.now() + idx
-            };
-            subTot += (Number(item.price)||0) * (Number(item.qty)||1);
-        });
-
-        const payload = {
-            orderId: tableId, table: String(tNum), phone: String(phone),
-            line_items: newLineItems, items: Object.values(newLineItems).map(i => `${i.qty}x ${i.name}`).join(' | '),
-            subtotal: subTot, total: subTot, status: 'pending', timestamp: Date.now()
-        };
-
-        db.ref(`active_tables/${tableId}`).set(payload).then(() => {
-            posCart = {}; updatePosCartUI();
-            showGlobalToast("Order sent successfully to Kitchen!", "success");
-            switchTab('orders');
-        });
-    };
-
-    // --- Floor grid Logic ---
-    window.renderFloorGrid = function(tables) {
-        const grid = document.getElementById('kitchenGrid');
-        if(!grid) return;
-        grid.innerHTML = '';
-        Object.entries(tables).forEach(([id, table]) => {
-          let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'border-amber-500':'border-blue-500');
-          if(table.status==='served') border = 'border-emerald-500';
-
-          const orderAgeMins = Math.floor((Date.now() - (table.timestamp||Date.now())) / 60000);
+          let itemsHtml = '';
+          Object.values(table.line_items||{}).forEach(li => {
+             itemsHtml += li.cancelled ? `<s class="text-red-400 text-xs block">${li.qty}x ${li.name} (CANCELLED)</s>` : `<span class="block text-sm text-slate-300">${li.qty}x ${li.name}</span>`;
+          });
 
           grid.innerHTML += `
-            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
-              <div>
-                <div class="flex justify-between items-center border-b border-cardBorder pb-4 mb-4">
-                  <div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
-                    <span class="font-black text-2xl text-white leading-none">${table.table}</span>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-current text-white">${table.status.replace('_',' ')}</span>
-                    <p class="text-[9px] text-slate-400 mt-1">⏳ ${orderAgeMins}m ago</p>
-                  </div>
+            <div class="glass-card p-5 border-l-4 ${border}">
+               <div class="flex justify-between items-center mb-3">
+                  <span class="text-2xl font-black text-primary">T-${table.table}</span>
+                  <span class="text-[10px] bg-white/10 px-2 py-1 rounded uppercase">${table.status.replace('_',' ')}</span>
+               </div>
+               <div class="mb-4 bg-dark/50 p-2 rounded max-h-32 overflow-y-auto">${itemsHtml}</div>
+               <div class="font-black text-xl mb-4">Total: ₹${table.total}</div>
+               <div>${actionsHtml}</div>
+            </div>`;
+      });
+    };
+
+    // --- Admin Full Editing & Cancelling ---
+
+    window.openEditModal = function(id) {
+        editTableRefId = id;
+        tempEditLineItems = JSON.parse(JSON.stringify(activeTables[id].line_items || {}));
+        document.getElementById('editTableId').innerText = activeTables[id].table;
+        renderEditModalItems();
+        document.getElementById('editOrderModal').classList.remove('hidden');
+    };
+    window.closeEditModal = function() { document.getElementById('editOrderModal').classList.add('hidden'); };
+
+    function renderEditModalItems() {
+        const div = document.getElementById('editLineItems'); div.innerHTML = '';
+        Object.entries(tempEditLineItems).forEach(([key, li]) => {
+            if(li.cancelled) return;
+            div.innerHTML += `<div class="flex justify-between items-center py-2 border-b border-white/5">
+                <span class="text-sm">${li.name} - ₹${li.price}</span>
+                <div class="flex gap-2 items-center">
+                   <button onclick="tempChangeQty('${key}',-1)" class="bg-white/10 px-2 rounded">-</button>
+                   <span>${li.qty}</span>
+                   <button onclick="tempChangeQty('${key}',1)" class="bg-white/10 px-2 rounded">+</button>
+                   <button onclick="tempRemoveItem('${key}')" class="bg-red-600 text-xs px-2 py-1 rounded ml-2">Del</button>
                 </div>
-                <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-300 font-semibold leading-relaxed hide-scroll">
-                  ${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}
+            </div>`;
+        });
+    }
+
+    window.tempChangeQty = function(k, change) { tempEditLineItems[k].qty += change; if(tempEditLineItems[k].qty<=0) tempEditLineItems[k].cancelled=true; renderEditModalItems(); };
+    window.tempRemoveItem = function(k) { tempEditLineItems[k].cancelled = true; renderEditModalItems(); };
+
+    window.saveEditOrder = function() {
+        let newSub = 0;
+        Object.values(tempEditLineItems).forEach(i => { if(!i.cancelled) newSub += (i.price * i.qty); });
+        db.ref(`active_tables/${editTableRefId}`).update({ line_items: tempEditLineItems, subtotal: newSub, total: newSub }).then(() => {
+            closeEditModal(); alert('Order updated successfully.');
+        });
+    };
+
+    window.cancelFullOrder = function() {
+        if(!confirm('Are you sure you want to cancel the entire order? The customer bill will be zero.')) return;
+        db.ref(`active_tables/${editTableRefId}`).update({ status: 'cancelled_full', total: 0 }).then(() => {
+            closeEditModal();
+        });
+    };
+
+    // --- Image Upload (Base64) & Inventory ---
+
+    let uploadedBase64 = null;
+    document.getElementById('newItemImageFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => { uploadedBase64 = reader.result; };
+        reader.readAsDataURL(file);
+    });
+
+    window.addNewMenuItem = function() {
+        const name = document.getElementById('newItemName').value.trim();
+        const price = document.getElementById('newItemPrice').value;
+        if(!name || !price) return alert("Fill Name and Price");
+        
+        const id = 'item_' + Date.now();
+        db.ref(`menu/${id}`).set({
+            name: name, base_price: Number(price), category: 'Added', stock_count: 50,
+            image_url: uploadedBase64 || 'https://via.placeholder.com/300'
+        }).then(() => {
+            alert('Added successfully!');
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemPrice').value = '';
+            uploadedBase64 = null;
+        });
+    };
+
+    window.renderInventory = function() {
+        const list = document.getElementById('inventoryList'); list.innerHTML = '';
+        Object.entries(menuCache).forEach(([id, item]) => {
+            if(id === '_system_coupons') return;
+            list.innerHTML += `<div class="glass-card p-4 flex gap-4 items-center">
+                <img src="${item.image_url}" class="w-16 h-16 rounded object-cover border border-white/20">
+                <div class="flex-1">
+                   <h4 class="font-bold text-white text-sm">${item.name}</h4>
+                   <p class="text-primary font-black text-xs">₹${item.base_price}</p>
                 </div>
-              </div>
-              <div class="mt-2 pt-4 border-t border-cardBorder">
-                <div class="flex justify-between items-end mb-4">
-                  <div>
-                    <span class="text-xs font-bold text-slate-400 bg-black border border-cardBorder px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}</span>
-                    ${table.paymentMethod === 'SPLIT' ? `<p class="text-[10px] text-amber-500 mt-2 font-bold">Split: Cash ₹${table.splitCash} | UPI ₹${table.splitOnline}</p>` : ''}
-                    ${table.tipAmount > 0 ? `<p class="text-[10px] text-emerald-500 font-bold mt-1">Tip: ₹${table.tipAmount}</p>` : ''}
-                  </div>
-                  <div class="text-right">
-                    <span class="font-black text-2xl text-primary tracking-tight">₹${table.total || 0}</span>
-                  </div>
+                <div class="text-right">
+                   <span class="text-[10px] block text-slate-400">Stock</span>
+                   <span class="font-black ${item.stock_count<=5?'text-red-500':'text-emerald-500'}">${item.stock_count||0}</span>
                 </div>
-                
-                ${currentRole === 'admin' ? `
-                    <div class="grid grid-cols-2 gap-2 mb-2">
-                        ${table.status === 'pending' ? `<button onclick="acceptOrder('${id}')" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-2 rounded-xl text-xs uppercase">Accept Order</button>` : ''}
-                        ${table.status === 'cooking' ? `<button onclick="printKOT('${id}')" class="bg-slate-700 hover:bg-slate-600 text-white font-black py-2 rounded-xl text-xs uppercase">🖨️ Print KOT</button>` : ''}
-                        <button onclick="adminCancelOrder('${id}')" class="bg-red-500/20 text-red-500 border border-red-500 font-black py-2 rounded-xl text-xs uppercase col-span-2">❌ Cancel Order (Zero Bill)</button>
-                    </div>
-                    <button class="w-full bg-primary text-black font-black py-3 rounded-xl shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 Clear Table & Save</button>
-                ` : ''}
-              </div>
             </div>`;
         });
     };
 
-    window.acceptOrder = function(id) {
-        db.ref('active_tables/' + id).update({ status: 'cooking' }).then(() => {
-            showGlobalToast("Order accepted. Kitchen can now print KOT.", "success");
+    // --- Alerts & Chart & Downloads ---
+
+    function checkStockAlerts() {
+        Object.values(menuCache).forEach(item => {
+            if(item.stock_count === 5) alert(`⚠️ STOCK ALERT: ${item.name} only has 5 left!`);
+            if(item.stock_count === 3) alert(`🚨 CRITICAL STOCK: ${item.name} only has 3 left!`);
         });
     }
 
-    window.adminCancelOrder = function(id) {
-        if(confirm("Are you sure you want to completely cancel this order? The customer will see a ₹0 bill and the session will be terminated.")) {
-            db.ref('active_tables/' + id).update({ status: 'cancelled', total: 0 }).then(() => {
-                showGlobalToast("Order Cancelled.", "success");
-            });
+    function checkAutoDailyDownload() {
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (localStorage.getItem('lastExcelDownload') !== todayStr) {
+            exportTodayExcel(todayStr);
+            localStorage.setItem('lastExcelDownload', todayStr);
         }
     }
 
-    window.clearTable = function(id) {
-      const tableData = (window.currentTables || {})[id];
-      if(!tableData) return;
-      
-      const d = new Date().toISOString().split('T')[0];
-      const timeStr = new Date().toLocaleTimeString();
-      let pMethod = tableData.paymentMethod || "CASH";
-      const itemsSummary = tableData.items || '(No items)';
-      const tot = Number(tableData.total) || 0;
-      const tip = Number(tableData.tipAmount) || 0;
-
-      db.ref(`tallies/daily/${d}`).transaction(data => {
-          let curr = data || { total: 0, cash: 0, upi: 0, card: 0, tips: 0 };
-          curr.total = (Number(curr.total)||0) + tot;
-          curr.tips = (Number(curr.tips)||0) + tip;
-          if(pMethod === "CASH") curr.cash = (Number(curr.cash)||0) + tot;
-          else if(pMethod === "UPI") curr.upi = (Number(curr.upi)||0) + tot;
-          else curr.card = (Number(curr.card)||0) + tot;
-          return curr;
-      });
-
-      db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set(sanitizeForFirebase({
-        time: timeStr, table: tableData.table, items: itemsSummary, total: tot, method: pMethod.toUpperCase()
-      }));
-      db.ref('active_tables/'+id).remove();
+    window.exportTodayExcel = function(dateStr) {
+        if(!dateStr) dateStr = new Date().toISOString().split('T')[0];
+        db.ref(`daily_logs/${dateStr}`).once('value', snap => {
+            const data = snap.val();
+            if(!data) return;
+            let csv = 'Time,Table,Payment Method,Total\n';
+            Object.values(data).forEach(r => { csv += `${r.time},${r.table},${r.method},${r.total}\n`; });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+            a.download = `MandiCroods_Sales_${dateStr}.csv`;
+            a.click();
+        });
     };
 
-    // --- Menu Editor Logic ---
-    window.renderInventory = function() {
-        const grid = document.getElementById('inventoryList');
-        if(!grid) return;
-        const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
-        grid.innerHTML = '';
+    window.clearConsoleCache = function() {
+        if(!confirm('Clear Firebase monthly cache data from local storage?')) return;
+        localStorage.clear();
+        alert('Cache cleared!');
+    };
+
+    let revenueChart = null;
+    function updateChart(data) {
+        const ctx = document.getElementById('revenueChart');
+        if(!ctx) return;
+        if(revenueChart) revenueChart.destroy();
         
-        Object.entries(menuCache).forEach(([id, item]) => {
-            if(q && !item.name.toLowerCase().includes(q)) return;
-            grid.innerHTML += `
-                <div class="bg-card border border-cardBorder p-4 rounded-xl flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <img src="${item.image_url}" class="w-12 h-12 rounded-lg object-cover bg-black">
-                        <div>
-                            <p class="font-bold text-white text-sm">${item.name} <span class="text-[10px] text-slate-500">(${id})</span></p>
-                            <p class="text-xs text-primary font-black">₹${item.base_price} • Stock: ${item.stock_count}</p>
-                        </div>
-                    </div>
-                    <button onclick="editMenuItem('${id}')" class="bg-white/10 px-3 py-1 rounded text-xs font-bold text-white hover:bg-primary hover:text-black">Edit</button>
-                </div>
-            `;
+        revenueChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Gross', 'Cash', 'Online'],
+                datasets: [{
+                    label: "Today's Revenue",
+                    data: [data.total, data.cash, data.upi],
+                    backgroundColor: ['#10b981', '#3b82f6', '#8b5cf6'],
+                    borderRadius: 8
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } } } }
         });
     }
 
-    window.editMenuItem = function(id) {
-        const item = menuCache[id];
-        if(!item) return;
-        document.getElementById('editItemId').value = id;
-        document.getElementById('editItemName').value = item.name;
-        document.getElementById('editItemCat').value = item.category;
-        document.getElementById('editItemPrice').value = item.base_price;
-        document.getElementById('editItemStock').value = item.stock_count;
-        document.getElementById('editItemImg').value = item.image_url;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    window.saveMenuItem = function() {
-        const id = document.getElementById('editItemId').value.trim() || 'item_' + Date.now();
-        const payload = {
-            name: document.getElementById('editItemName').value,
-            category: document.getElementById('editItemCat').value,
-            base_price: Number(document.getElementById('editItemPrice').value),
-            stock_count: Number(document.getElementById('editItemStock').value),
-            image_url: document.getElementById('editItemImg').value || 'https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80',
-            is_special: false,
-            initial_stock: Number(document.getElementById('editItemStock').value)
-        };
-        db.ref(`menu/${id}`).update(payload).then(() => {
-            showGlobalToast("Menu item saved!", "success");
-            document.querySelectorAll('input').forEach(i=>i.value='');
-        });
-    }
-
-    // --- Daily Auto Download Excel Script ---
-    function generateCSV(dateStr) {
-        // Creates a mock CSV for demonstration since we can't easily parse all DB logs synchronously here
-        let csvContent = "data:text/csv;charset=utf-8,Date,Time,Table,Method,Amount\n";
-        csvContent += `${dateStr},23:59,Summary,AUTO,Total Revenue Generated\n`;
-        return encodeURI(csvContent);
-    }
-    
-    window.exportTodayExcel = function() {
-        const dStr = new Date().toISOString().split('T')[0];
-        const link = document.createElement("a");
-        link.setAttribute("href", generateCSV(dStr));
-        link.setAttribute("download", `MandiCroods_Sales_${dStr}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // Daily auto-download at 11:59 PM
-    setInterval(() => {
-        const now = new Date();
-        if(now.getHours() === 23 && now.getMinutes() === 59 && now.getSeconds() === 0) {
-            exportTodayExcel();
-        }
-    }, 1000);
-
-    window.clearSystemCache = function() {
-        if(confirm("Are you sure you want to clear system cache? (Local Storage)")) {
-            localStorage.clear();
-            showGlobalToast("System Cache Cleared.", "success");
-            setTimeout(()=>location.reload(), 1000);
-        }
-    }
-
-    window.clearDashboardRevenue = function() {
-      if (!confirm("🧹 Clear all Dashboard Revenue and Transaction Logs back to ₹0?")) return;
-      Promise.all([ db.ref('tallies').remove(), db.ref('daily_logs').remove() ]).then(() => {
-        document.getElementById('tallyTotal').innerText = '₹0';
-        document.getElementById('dailyLogsTable').innerHTML = '';
-        showGlobalToast("Dashboard Cleared to ₹0!", "success");
-      });
-    };
   </script>
 </body>
 </html>
