@@ -78,7 +78,7 @@
   <!-- Developer Footer -->
   <div class="bg-dark text-primary/80 px-5 py-2 flex justify-between items-center text-[10px] font-bold z-[105] relative border-b border-primary/20">
     <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center hover:text-primary transition-colors w-1/2 truncate cursor-pointer">
-      <img src="dev-logo.png(1).png">
+      <img src="https://ui-avatars.com/api/?name=H+F&background=D4AF37&color=000&rounded=true" class="h-4 w-4 rounded-full mr-2 object-cover border border-primary/50">
       Dev: Syed Zeeshaan Ali | High-Fledged AI
     </a>
     <div class="flex items-center gap-2">
@@ -406,8 +406,8 @@
         'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
         'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
         'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: false, portions: {}, image_url: IEX },
-        'ex5': { name: "Ice Creams", category: "Beverages", base_price: 90, stock_count: 200, is_special: false, portions: {}, image_url: IEX },
+        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
+        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
         'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
@@ -1036,7 +1036,7 @@
 
       if(change > 0) {
         playClick(); vibrate(15);
-        if(cart[cartKey]) cart[cartKey].qty++; else cart[cartKey] = { id, name: menuData[id].name, variant: varName, price: finalPrice, qty: 1 };
+        if(cart[cartKey]) cart[cartKey].qty++; else cart[cartKey] = { id, name: menuData[id].name, variant: varName, price: finalPrice, qty: 1, image_url: menuData[id].image_url };
       } else {
         if(cart[cartKey]) {
           cart[cartKey].qty--;
@@ -1076,10 +1076,14 @@
       Object.values(cart).forEach(i => {
         total += (Number(i.price)||0) * (Number(i.qty)||0);
         totalQty += (Number(i.qty)||0);
+        // Added item thumbnail image in cart for complete visual richness
         uiHtml += `<div class="py-3 flex items-center justify-between border-b border-white/10 last:border-0 text-sm">
-          <div class="flex flex-col flex-1 pr-2">
-            <span class="font-bold text-white leading-tight">${translateItem(i.name)} <small class="text-primary opacity-80 font-semibold block">${translateItem(i.variant)}</small></span>
-            <span class="text-primary font-black mt-0.5">₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span>
+          <div class="flex items-center gap-3 flex-1 pr-2">
+            <img src="${i.image_url || 'https://images.unsplash.com/photo-1544025162-8111142154ea?w=100&q=80'}" class="w-10 h-10 rounded-lg object-cover border border-primary/30 shrink-0">
+            <div class="flex flex-col flex-1">
+              <span class="font-bold text-white leading-tight">${translateItem(i.name)} <small class="text-primary opacity-80 font-semibold block">${translateItem(i.variant)}</small></span>
+              <span class="text-primary font-black mt-0.5">₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span>
+            </div>
           </div>
           <div class="flex items-center bg-white/10 rounded-lg p-1 shrink-0">
             <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', -1)" class="w-8 h-8 bg-dark rounded-md font-black shadow-sm text-white active:scale-90 transition-transform border border-white/20">-</button>
@@ -1153,7 +1157,7 @@
       const dType = order.discountType || 'flat';
       const dVal = Math.max(0, Number(order.discountValue) || 0);
       if (!dVal || sub <= 0) return 0;
-      const d = dType === 'percent' ? Math.round((sub * Math.min(100, dVal)) / 100) : dVal;
+      const d = dType === 'percent' ? Math.round((sub * Math.min(100, val)) / 100) : val;
       return Math.min(sub, Math.round(d * 100) / 100);
     }
 
@@ -1165,13 +1169,13 @@
       const coupon = couponsData[rawCode];
       if (!coupon || !coupon.active) {
         playError(); vibrate(25);
-        return alert("Invalid or expired coupon code. Please ask our staff for a valid coupon or admin discount.");
+        return alert("Invalid or expired coupon code.");
       }
 
       const sub = computeOrderTotal(activeTableData.line_items) || Number(activeTableData.subtotal) || Number(activeTableData.total) || 0;
       if (coupon.minOrder && sub < Number(coupon.minOrder)) {
         playError();
-        return alert(`Minimum order of ₹${coupon.minOrder} is required to use coupon ${rawCode}.`);
+        return alert(`Minimum order of ₹${coupon.minOrder} is required.`);
       }
 
       const dAmt = coupon.type === 'percent'
@@ -1211,7 +1215,6 @@
       });
     };
 
-    /* ---------- Tip feature ---------- */
     window.setTip = function(amount){
       if (!activeTableData) { playError(); return alert('Place an order first to add a tip.'); }
       playClick();
@@ -1237,7 +1240,6 @@
       db.ref(`active_tables/${tableId}`).update({ splitCount: nextSplit });
     };
 
-    /* ---------- Split Cash + Online ---------- */
     window.showSplitPay = function(){
       playClick();
       document.getElementById('splitPayPanel').classList.toggle('hidden');
@@ -1300,7 +1302,6 @@
       return `=== MANDI CROODS ===\nTable: ${order.table}\nMobile: ${order.phone || customerPhone}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${body}\n------------------\n${extraLines}TOTAL: Rs. ${order.total}\n==================\nThank you for dining with Mandi Croods! 👑`;
     }
 
-    // 2-MIN CANCELLATION UPDATER
     function renderOrderedItemsList(order, tableId){
       const div = document.getElementById('customerOrderedItems');
       const lines = buildLineItemsArray(order);
