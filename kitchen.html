@@ -17,10 +17,23 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: '#D4AF37', dark: '#0a0a0a', sidebar: '#14141d', light: '#1e1e2d', card: '#2b2b40' } } } }
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#D4AF37',
+            dark: '#0a0a0a',
+            sidebar: '#14141d',
+            light: '#1e1e2d',
+            card: '#2b2b40'
+          }
+        }
+      }
+    }
   </script>
   <style>
     .hide-scroll::-webkit-scrollbar { display: none; }
+    .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     .dash-card { box-shadow: 0 4px 25px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s; }
     body { background-color: #1e1e2d; color: #ffffff; }
     
@@ -45,189 +58,211 @@
     /* PREMIUM THERMAL PRINTING CSS */
     #printableReceipt { display: none; }
     @media print {
-        body * { visibility: hidden; }
-        body { background-color: white !important; margin: 0; padding: 0; }
-        #printableReceipt, #printableReceipt * { visibility: visible; }
-        #printableReceipt { 
-            display: block; 
-            position: absolute; 
-            left: 0; top: 0; 
-            width: 80mm; 
-            padding: 5mm; 
-            background: white !important; 
-            color: black !important; 
-            font-family: 'Space Mono', monospace; 
-            font-size: 12px;
-            line-height: 1.4;
-        }
-        .receipt-brand { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; text-align: center; border-bottom: 2px dashed #000; margin-bottom: 10px; padding-bottom: 5px; }
-        .receipt-line { display: flex; justify-content: space-between; }
-        .receipt-divider { border-bottom: 1px dashed #000; margin: 8px 0; }
-        .receipt-footer { text-align: center; font-size: 10px; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
-        .no-print { display: none !important; }
+      body * { visibility: hidden; }
+      body { background-color: white !important; margin: 0; padding: 0; }
+      #printableReceipt, #printableReceipt * { visibility: visible; }
+      #printableReceipt { 
+        display: block; 
+        position: absolute; 
+        left: 0; top: 0; 
+        width: 80mm; 
+        padding: 5mm; 
+        background: white !important; 
+        color: black !important; 
+        font-family: 'Space Mono', monospace; 
+        font-size: 12px;
+        line-height: 1.4;
+      }
+      .receipt-brand { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; text-align: center; border-bottom: 2px dashed #000; margin-bottom: 10px; padding-bottom: 5px; }
+      .receipt-line { display: flex; justify-content: space-between; }
+      .receipt-divider { border-bottom: 1px dashed #000; margin: 8px 0; }
+      .receipt-footer { text-align: center; font-size: 10px; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
+      .no-print { display: none !important; }
     }
   </style>
-<base target="_blank">
 </head>
 <body class="font-sans antialiased text-white">
 
   <!-- Hidden Premium Receipt Template for Printing -->
   <div id="printableReceipt"></div>
 
+  <!-- Hidden Global File Input for Weekly Mobile Photo Updates -->
+  <input type="file" id="globalImageUpdaterInput" accept="image/*" class="hidden" onchange="handleGlobalImageUpdate(event)">
+
   <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
   <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
     ⚠ Connection lost — reconnecting to Mandi Croods servers...
   </div>
 
+  <!-- Login Screen -->
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
     <div class="bg-[#1e1e2d] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
       <div class="w-16 h-16 gold-gradient text-black rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg">MC</div>
       <h2 class="text-2xl font-black text-white mb-2 tracking-tight">System Login</h2>
+      <p class="text-[11px] font-bold text-slate-400 mb-5">Enter Admin, Waiter, or Kitchen PIN</p>
       <input type="password" id="sysPin" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') attemptLogin()" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
       <button id="loginBtn" onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">ACCESS WORKSPACE</button>
       <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
     </div>
   </div>
 
+  <!-- Top Developer Banner (No Admin Phone Number Shown Here) -->
   <div class="bg-dark text-white px-5 py-2.5 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20 no-print" style="background:#0a0a0a;">
-    <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" class="flex items-center text-primary hover:text-white transition-colors w-2/3 truncate cursor-pointer">
-      <img src="dev-logo.png (1).png" class="h-6 w-6 rounded-full mr-2 object-cover border border-primary">
-      <div class="flex flex-col leading-tight">
-          <span class="font-black tracking-wide">Built by Syed Zeeshaan Ali 07</span>
-          <span class="text-slate-400 text-[8px] uppercase tracking-widest">Admin Support: 91334 33655</span>
+    <div class="flex items-center gap-2.5 overflow-hidden">
+      <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="shrink-0">
+        <img src="dev-logo.png (1).png" onerror="this.src='https://ui-avatars.com/api/?name=SZ&background=D4AF37&color=0a0a0a&bold=true'" class="h-7 w-7 rounded-full object-cover border border-primary shadow-sm" alt="Dev Logo">
+      </a>
+      <div class="flex flex-col leading-tight truncate">
+        <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="text-primary hover:text-white font-black tracking-wide transition-colors truncate">
+          🌐 Built by High-Fledged Solutions (Tap to Visit)
+        </a>
+        <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="text-slate-400 hover:text-pink-400 text-[9px] font-extrabold tracking-wider transition-colors truncate mt-0.5">
+          📸 Instagram: <span class="text-primary underline">@syedzeeshaanali07</span>
+        </a>
       </div>
-    </a>
-    <div class="flex items-center gap-2">
-      <select id="adminLangSelect" onchange="changeAdminLanguage(this.value)" class="bg-dark text-primary font-black border border-primary/30 rounded px-2 py-1 outline-none">
-        <option value="en">ENG</option><option value="hi">हिंदी</option><option value="te">తెలుగు</option>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+      <select id="adminLangSelect" onchange="changeAdminLanguage(this.value)" class="bg-dark text-primary font-black border border-primary/30 rounded px-2 py-1 outline-none cursor-pointer">
+        <option value="en">ENG</option>
+        <option value="hi">हिंदी</option>
+        <option value="te">తెలుగు</option>
       </select>
     </div>
   </div>
 
-  <div class="flex h-[calc(100vh-45px)] overflow-hidden hidden no-print" id="mainLayout">
-    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-xl z-20 border-r border-[#2b2b40]">
+  <!-- Main Workspace Layout -->
+  <div class="flex h-[calc(100vh-48px)] overflow-hidden hidden no-print" id="mainLayout">
+    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-xl z-20 border-r border-[#2b2b40] shrink-0">
       <div class="p-6 border-b border-[#2b2b40]">
         <h1 class="font-black text-xl leading-tight tracking-tight gold-text">Mandi Croods</h1>
         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
         <div class="flex items-center gap-1.5 mt-3">
-            <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
+          <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+          <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
         </div>
       </div>
       <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
         <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn" data-i18n="nav_floor">📦 Active Floor</button>
         <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
-        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">
-            <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
-            <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
+        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
+          <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
+          <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
         <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Food Stock</button>
         <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🥩 Raw Materials</button>
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
       </nav>
-      <div class="p-4 border-t border-[#2b2b40]">
-        <button onclick="clearConsoleCache()" class="w-full mb-3 bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold py-2 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-xs uppercase tracking-widest admin-only hidden">🧹 Clear Console Cache</button>
-        <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all text-sm uppercase tracking-widest" data-i18n="logout">Log Out</button>
+      <div class="p-4 border-t border-[#2b2b40] space-y-2">
+        <button onclick="openSupportWhatsApp()" class="w-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all text-xs uppercase tracking-widest">💬 WhatsApp Support</button>
+        <button onclick="clearConsoleCache()" class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold py-2 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-xs uppercase tracking-widest admin-only hidden">🧹 Clear Console Cache</button>
+        <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs uppercase tracking-widest" data-i18n="logout">Log Out</button>
       </div>
     </aside>
 
     <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
-      <div class="p-8 pb-32">
+      <div class="p-6 md:p-8 pb-32">
 
-        <!-- Floor Operations -->
+        <!-- 1. Floor Operations & Kitchen Display -->
         <section id="view-orders" class="tab-section">
-          <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_floor">Floor Operations</h2>
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+            <h2 class="text-3xl font-black text-white tracking-tight" data-i18n="title_floor">Floor & Kitchen Operations</h2>
+            <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
+              <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Pending = New Order</span>
+              <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">Cooking = In Kitchen</span>
+              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Served = At Table</span>
+            </div>
+          </div>
 
           <div class="mb-8 bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
-              <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy (All Cabins & Tables)</h3>
-              <div id="occupancyMap" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-2 max-h-48 overflow-y-auto pr-2"></div>
+            <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy (All Cabins & Tables)</h3>
+            <div id="occupancyMap" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 max-h-48 overflow-y-auto pr-2"></div>
           </div>
 
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- Service Requests Tab -->
+        <!-- 2. Service Requests Tab -->
         <section id="view-services" class="tab-section hidden">
           <h2 class="text-3xl font-black text-white mb-6 tracking-tight">🛎️ Active Service Calls</h2>
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- POS / Direct Order -->
+        <!-- 3. POS / Direct Order -->
         <section id="view-pos" class="tab-section hidden no-print">
-            <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
-                    <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-[#4b4b6a] text-white rounded-xl font-bold text-sm outline-none focus:border-primary">
-                    <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
-                </div>
-
-                <div class="bg-card p-6 rounded-3xl dash-card border border-[#4b4b6a] h-[75vh] flex flex-col">
-                    <h3 class="text-lg font-black text-white mb-4 border-b border-[#4b4b6a] pb-2" data-i18n="new_order">New Order</h3>
-
-                    <div class="flex gap-2 mb-4">
-                        <select id="posTableNum" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
-                            <option value="" disabled selected>Select Table / Cabin</option>
-                            <optgroup label="Standard Tables">
-                              <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
-                              <option value="6">Table 6</option><option value="7">Table 7</option><option value="8">Table 8</option><option value="9">Table 9</option><option value="10">Table 10</option>
-                            </optgroup>
-                            <optgroup label="R-Section">
-                              <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option><option value="R4">R4</option><option value="R5">R5</option><option value="R6">R6</option><option value="R7">R7</option><option value="R8">R8</option><option value="R9">R9</option><option value="R10">R10</option><option value="R11">R11</option>
-                            </optgroup>
-                            <optgroup label="L-Section">
-                              <option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option><option value="L6">L6</option><option value="L7">L7</option>
-                            </optgroup>
-                            <optgroup label="BH-Section">
-                              <option value="BH1">BH1</option><option value="BH2">BH2</option><option value="BH3">BH3</option>
-                            </optgroup>
-                            <optgroup label="C-Section">
-                              <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option><option value="C6">C6</option><option value="C7">C7</option><option value="C8">C8</option>
-                            </optgroup>
-                            <optgroup label="Takeaway">
-                              <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
-                            </optgroup>
-                        </select>
-                        <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
-                    </div>
-
-                    <!-- Direct Order Edit capability for admin built into the posCartList rendering below -->
-                    <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-[#4b4b6a] rounded-xl p-2 hide-scroll"></div>
-
-                    <div class="bg-light p-3 rounded-2xl border border-[#4b4b6a] mb-3 space-y-2">
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black uppercase text-slate-500 w-16">Discount:</span>
-                            <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" placeholder="0" class="w-20 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
-                            <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
-                                <option value="flat">₹ Flat</option>
-                                <option value="percent">% Off</option>
-                            </select>
-                            <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs uppercase outline-none">
-                        </div>
-                        <div class="flex items-center justify-between pt-1 border-t border-[#4b4b6a]">
-                            <span class="text-[10px] font-black uppercase text-slate-500">Split Bill:</span>
-                            <div class="flex items-center gap-2">
-                                <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs text-center outline-none">
-                                <span class="text-[10px] font-bold text-slate-500">Persons</span>
-                                <span id="posSplitEach" class="text-xs font-black text-emerald-400 ml-1">₹0/each</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-auto pt-2 border-t border-[#4b4b6a]">
-                        <div class="flex justify-between font-black text-lg mb-3">
-                            <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
-                        </div>
-                        <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
-                    </div>
-                </div>
+            <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
+              <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-[#4b4b6a] text-white rounded-xl font-bold text-sm outline-none focus:border-primary">
+              <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
             </div>
+
+            <div class="bg-card p-6 rounded-3xl dash-card border border-[#4b4b6a] h-[75vh] flex flex-col">
+              <h3 class="text-lg font-black text-white mb-4 border-b border-[#4b4b6a] pb-2" data-i18n="new_order">New / Active Table Order</h3>
+
+              <div class="flex gap-2 mb-4">
+                <select id="posTableNum" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
+                  <option value="" disabled selected>Select Table / Cabin</option>
+                  <optgroup label="Standard Tables">
+                    <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
+                    <option value="6">Table 6</option><option value="7">Table 7</option><option value="8">Table 8</option><option value="9">Table 9</option><option value="10">Table 10</option>
+                  </optgroup>
+                  <optgroup label="R-Section">
+                    <option value="R1">R1</option><option value="R2">R2</option><option value="R3">R3</option><option value="R4">R4</option><option value="R5">R5</option><option value="R6">R6</option><option value="R7">R7</option><option value="R8">R8</option><option value="R9">R9</option><option value="R10">R10</option><option value="R11">R11</option>
+                  </optgroup>
+                  <optgroup label="L-Section">
+                    <option value="L1">L1</option><option value="L2">L2</option><option value="L3">L3</option><option value="L4">L4</option><option value="L5">L5</option><option value="L6">L6</option><option value="L7">L7</option>
+                  </optgroup>
+                  <optgroup label="BH-Section">
+                    <option value="BH1">BH1</option><option value="BH2">BH2</option><option value="BH3">BH3</option>
+                  </optgroup>
+                  <optgroup label="C-Section">
+                    <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option><option value="C4">C4</option><option value="C5">C5</option><option value="C6">C6</option><option value="C7">C7</option><option value="C8">C8</option>
+                  </optgroup>
+                  <optgroup label="Takeaway">
+                    <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
+                  </optgroup>
+                </select>
+                <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
+              </div>
+
+              <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-[#4b4b6a] rounded-xl p-2 hide-scroll"></div>
+
+              <div class="bg-light p-3 rounded-2xl border border-[#4b4b6a] mb-3 space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-black uppercase text-slate-500 w-16">Discount:</span>
+                  <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" placeholder="0" class="w-20 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
+                  <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
+                    <option value="flat">₹ Flat</option>
+                    <option value="percent">% Off</option>
+                  </select>
+                  <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs uppercase outline-none">
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-[#4b4b6a]">
+                  <span class="text-[10px] font-black uppercase text-slate-500">Split Bill:</span>
+                  <div class="flex items-center gap-2">
+                    <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs text-center outline-none">
+                    <span class="text-[10px] font-bold text-slate-500">Persons</span>
+                    <span id="posSplitEach" class="text-xs font-black text-emerald-400 ml-1">₹0/each</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-auto pt-2 border-t border-[#4b4b6a]">
+                <div class="flex justify-between font-black text-lg mb-3">
+                  <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
+                </div>
+                <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
+              </div>
+            </div>
+          </div>
         </section>
 
-        <!-- Inventory & Menu Management -->
+        <!-- 4. Inventory, Weekly Drinks/Desserts Photo Manager & Menu Control -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-white mb-8 tracking-tight" data-i18n="title_menu">Menu & Food Stock Control</h2>
           
+          <!-- Customer Coupon Codes -->
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-emerald-500">
             <h3 class="text-lg font-black text-white mb-2">🎟️ Customer Coupon Codes</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-4">
@@ -244,40 +279,63 @@
               </div>
               <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Value</label>
-                <input type="number" id="newCouponVal" min="1" class="w-full p-3 bg-light rounded-xl font-black text-sm outline-none border border-[#4b4b6a]">
+                <input type="number" id="newCouponVal" min="1" placeholder="10" class="w-full p-3 bg-light rounded-xl font-black text-sm outline-none border border-[#4b4b6a]">
               </div>
               <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Min Bill (₹)</label>
                 <input type="number" id="newCouponMin" min="0" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
               </div>
               <div>
-                <button onclick="saveCouponCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs">+ Save Coupon</button>
+                <button onclick="saveCouponCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Save Coupon</button>
               </div>
             </div>
             <div id="couponsListAdmin" class="flex flex-wrap gap-2 pt-2 border-t border-[#4b4b6a]"></div>
           </div>
 
+          <!-- Weekly Cool Drinks, Desserts & Add-ons Mobile Photo Manager -->
+          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-primary">
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+              <div>
+                <h3 class="text-lg font-black text-white">🥤🍨 Weekly Cool Drinks, Desserts & Cart Add-ons Manager</h3>
+                <p class="text-xs text-slate-400">Items in <span class="text-primary font-bold">Beverages / Cool Drinks / Desserts</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> from your phone anytime to update weekly specials.</p>
+              </div>
+            </div>
+            <div id="drinksDessertsSpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+          </div>
+
+          <!-- Add New Menu Item (Mobile Camera/Gallery Upload) -->
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-blue-500">
-            <h3 class="text-lg font-black text-white mb-4">📸 Add New Menu Item (Mobile Photo Upload)</h3>
+            <h3 class="text-lg font-black text-white mb-4">📸 Add New Menu Item (Direct Mobile Photo Upload)</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div>
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Image (Required)</label>
-                 <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border border-[#4b4b6a] text-slate-300">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Image (Phone/Gallery)</label>
+                <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border border-[#4b4b6a] text-slate-300">
               </div>
               <div>
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Name</label>
-                 <input type="text" id="newItemName" placeholder="Item Name" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Name</label>
+                <input type="text" id="newItemName" placeholder="e.g. Choco Lava Cake" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
               </div>
               <div>
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
-                 <input type="text" id="newItemCategory" placeholder="e.g. Beverages" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
+                <select id="newItemCategory" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                  <option value="Beverages">🥤 Cool Drinks & Desserts (Cart Upsell)</option>
+                  <option value="Chicken Mandi">Chicken Mandi</option>
+                  <option value="Mutton Mandi">Mutton Mandi</option>
+                  <option value="Veg Mandi">Veg Mandi</option>
+                  <option value="Fish & Prawns Mandi">Fish & Prawns Mandi</option>
+                  <option value="Specials">👑 Royal Specials</option>
+                  <option value="Chicken Starters">Chicken Starters</option>
+                  <option value="Mutton Starters">Mutton Starters</option>
+                  <option value="Veg Starters">Veg Starters</option>
+                  <option value="Fish & Prawns Starters">Fish & Prawns Starters</option>
+                </select>
               </div>
               <div>
-                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Price (₹)</label>
-                 <input type="number" id="newItemPrice" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Price (₹)</label>
+                <input type="number" id="newItemPrice" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
               </div>
               <div>
-                 <button onclick="adminQuickAddItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs">+ Add to Menu</button>
+                <button id="addMenuBtn" onclick="adminQuickAddItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Add to Menu</button>
               </div>
             </div>
           </div>
@@ -289,50 +347,50 @@
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- Premium Raw Material Kitchen Inventory -->
+        <!-- 5. Premium Raw Material Kitchen Inventory -->
         <section id="view-kitchen-inv" class="tab-section hidden no-print">
-            <h2 class="text-3xl font-black text-white mb-8 tracking-tight">🥩 Kitchen Raw Materials</h2>
-            
-            <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-amber-500">
-                <h3 class="text-lg font-black text-white mb-4">Add Raw Ingredient</h3>
-                <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ingredient Name</label>
-                        <input type="text" id="rawName" placeholder="e.g. Basmati Rice" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Unit</label>
-                        <select id="rawUnit" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
-                            <option value="Kg">Kilograms (Kg)</option>
-                            <option value="L">Liters (L)</option>
-                            <option value="Pcs">Pieces (Pcs)</option>
-                            <option value="Packs">Packs</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Current Stock</label>
-                        <input type="number" id="rawStock" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Alert Threshold</label>
-                        <input type="number" id="rawThreshold" placeholder="e.g. 5" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]" title="Alert when stock falls below this number">
-                    </div>
-                    <div>
-                        <button onclick="addKitchenRawMaterial()" class="w-full bg-amber-500 hover:bg-amber-600 text-dark font-black py-3 rounded-xl shadow-md h-[46px] text-xs">+ Add Ingredient</button>
-                    </div>
-                </div>
+          <h2 class="text-3xl font-black text-white mb-8 tracking-tight">🥩 Kitchen Raw Materials</h2>
+          
+          <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-amber-500">
+            <h3 class="text-lg font-black text-white mb-4">Add Raw Ingredient</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ingredient Name</label>
+                <input type="text" id="rawName" placeholder="e.g. Basmati Rice" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Unit</label>
+                <select id="rawUnit" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                  <option value="Kg">Kilograms (Kg)</option>
+                  <option value="L">Liters (L)</option>
+                  <option value="Pcs">Pieces (Pcs)</option>
+                  <option value="Packs">Packs</option>
+                </select>
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Current Stock</label>
+                <input type="number" id="rawStock" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Alert Threshold</label>
+                <input type="number" id="rawThreshold" placeholder="e.g. 5" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]" title="Alert when stock falls below this number">
+              </div>
+              <div>
+                <button onclick="addKitchenRawMaterial()" class="w-full bg-amber-500 hover:bg-amber-600 text-dark font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Add Ingredient</button>
+              </div>
             </div>
+          </div>
 
-            <div id="rawMaterialsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          <div id="rawMaterialsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- Dashboard (Premium Dark Analytics Theme) -->
+        <!-- 6. Analytics Dashboard -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
             <h2 class="text-3xl font-black text-white tracking-tight" data-i18n="title_analytics">Analytics Dashboard</h2>
             <div class="flex items-center gap-3 flex-wrap">
               <button onclick="exportTodayExcel()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Auto-Download Today's Excel</button>
-              <button onclick="exportAllLogsExcel()" class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-blue-600 hover:text-white transition-all">📥 Full History (CSV)</button>
+              <button onclick="exportAllLogsExcel()" class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-blue-600 hover:text-white transition-all">📥 Full History (Excel)</button>
             </div>
           </div>
 
@@ -368,14 +426,20 @@
             </div>
             
             <div class="w-full bg-light rounded-2xl p-4 border border-[#4b4b6a] mb-10 no-print shadow-inner">
-                <canvas id="revenueChart" height="80"></canvas>
+              <canvas id="revenueChart" height="80"></canvas>
             </div>
 
-            <div class="mb-10">
+            <div class="mb-10 overflow-x-auto">
               <h3 class="text-lg font-black text-white mb-6 border-b border-[#4b4b6a] pb-3">Completed Transactions</h3>
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="bg-sidebar text-slate-400 uppercase font-black text-[10px] tracking-widest">
-                  <tr><th class="p-4 rounded-tl-xl">Time</th><th class="p-4">Table</th><th class="p-4">Method</th><th class="p-4 w-1/2">Items</th><th class="p-4 text-right rounded-tr-xl">Amount</th></tr>
+                  <tr>
+                    <th class="p-4 rounded-tl-xl">Time</th>
+                    <th class="p-4">Table</th>
+                    <th class="p-4">Method</th>
+                    <th class="p-4 w-1/2">Items</th>
+                    <th class="p-4 text-right rounded-tr-xl">Amount</th>
+                  </tr>
                 </thead>
                 <tbody id="dailyLogsTable" class="divide-y divide-[#4b4b6a] font-medium text-slate-300"></tbody>
               </table>
@@ -384,21 +448,29 @@
             <div class="mt-16 pt-8 border-t border-[#4b4b6a] text-center no-print flex flex-wrap justify-center gap-4">
               <button onclick="clearDashboardRevenue()" class="bg-red-900/40 text-red-400 border border-red-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-red-600 hover:text-white transition-all">🧹 Clear Dashboard & Revenue (₹0)</button>
               <button onclick="factoryResetSystem()" class="bg-red-500 text-white border border-red-600 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md">
-                ⚠️ FACTORY RESET: Load Full Menu
+                ⚠️ FACTORY RESET: Load Full Default Menu
               </button>
             </div>
           </div>
         </section>
+
       </div>
     </main>
   </div>
 
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ", authDomain: "fusionmandi999-36066.firebaseapp.com", databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app", projectId: "fusionmandi999-36066", storageBucket: "fusionmandi999-36066.firebasestorage.app", messagingSenderId: "312237706440", appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
+      apiKey: "AIzaSyBBKJxglt7aeg7uZ7jxNzX5aaIX0gJSIrQ",
+      authDomain: "fusionmandi999-36066.firebaseapp.com",
+      databaseURL: "https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "fusionmandi999-36066",
+      storageBucket: "fusionmandi999-36066.firebasestorage.app",
+      messagingSenderId: "312237706440",
+      appId: "1:312237706440:web:f58610144c8e06a32ce9fd"
     };
     
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
+    const SUPPORT_WHATSAPP_NUMBER = "919133433655";
 
     let db = null;
     try {
@@ -410,63 +482,233 @@
 
     let currentRole = null;
     let menuCache = {};
+    let couponsCache = {};
     let rawMatsCache = {};
     let dbConnected = false;
     let connBannerTimer = null;
     let chartInstance = null;
     let posCart = {};
     let pendingAlarmInterval = null;
+    let pendingImageUpdateItemId = null;
+
+    // Default Master Menu for Factory Reset & Fallback
+    function getDefaultMasterMenu() {
+      const IVM = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80";
+      const ICM = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80";
+      const IMM = "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&q=80";
+      const IFM = "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80";
+      const IPM = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80";
+      const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
+      const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80";
+      const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&q=80";
+      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
+      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
+      const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
+      const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
+      const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
+      const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
+      const P_C3 = { "2P": 529, "3P": 779, "4P (Gang)": 1049, "5P (Gang)": 1339 };
+      const P_M1 = { "2P": 719, "3P": 950, "4P (Gang)": 1310, "5P (Gang)": 1599 };
+      const P_M2 = { "2P": 699, "3P": 929, "4P (Gang)": 1230, "5P (Gang)": 1599 };
+
+      return {
+        'vm1': { name: "Paneer Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
+        'vm2': { name: "Paneer Fry Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
+        'vm3': { name: "Mushroom Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
+        'vm4': { name: "Baby Corn Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
+        'vm5': { name: "Special Veg Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: true, portions: P_VM, image_url: IVM },
+        'cm1': { name: "Rara Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
+        'cm2': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
+        'cm3': { name: "Chicken Dill Kush Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
+        'cm4': { name: "Murgh Musallam Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
+        'cm5': { name: "Chicken BBQ Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
+        'cm6': { name: "Chicken Juicy Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: true, portions: P_C2, image_url: ICM },
+        'cm7': { name: "Chicken Al Faham Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: P_C2, image_url: ICM },
+        'cm8': { name: "Chicken Fry Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
+        'cm9': { name: "Drumstick Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
+        'mm1': { name: "Mutton Rara Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
+        'mm2': { name: "Mutton F2 Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
+        'mm3': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M2, image_url: IMM },
+        'mm4': { name: "Mutton BBQ Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
+        'mm5': { name: "Mutton Ghee Roast Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
+        'mm6': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
+        'mm7': { name: "Mutton Tandoori Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 699, "3P": 929, "4P (Gang)": 1290, "5P (Gang)": 1599 }, image_url: IMM },
+        'fm1': { name: "Fish Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
+        'fm2': { name: "Grill Fish Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
+        'pm1': { name: "Prawns Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
+        'pm2': { name: "Prawns Masala Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
+        'spm1': { name: "Zurbiyan Mandi (4P Pack)", category: "Specials", base_price: 1399, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1399 }, image_url: ISM },
+        'spm2': { name: "M.C Special Mix Mandi (8 Items - 4P)", category: "Specials", base_price: 1799, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1799 }, image_url: ISM },
+        'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
+        'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
+        'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
+        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
+        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
+        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=500&q=80" },
+        'ex7': { name: "Arabian Kunafa Dessert", category: "Beverages", base_price: 180, stock_count: 80, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=500&q=80" },
+        'ex8': { name: "Mint Mojito Cooler", category: "Beverages", base_price: 99, stock_count: 120, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80" },
+        'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs4': { name: "Paneer Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs5': { name: "Mushroom Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs6': { name: "Baby Corn Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs7': { name: "Chilly Pepper", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs8': { name: "Chilly Baby Corn", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs9': { name: "Chilly Mushroom", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs10': { name: "Paneer Finger", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs11': { name: "Corn Salad Pepper", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'cs1': { name: "Chicken 65", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs2': { name: "Chilly Chicken", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs3': { name: "Chicken Manchuria", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs4': { name: "Chicken Majestic", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
+        'cs5': { name: "Chicken Lollipop", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
+        'cs6': { name: "Dragon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs7': { name: "Garlic Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs8': { name: "Lemon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs9': { name: "Chicken Drumstick", category: "Chicken Starters", base_price: 249, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs10': { name: "Chicken Wings Chilly", category: "Chicken Starters", base_price: 199, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs11': { name: "Chicken Stick", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs12': { name: "Turkish Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
+        'cs13': { name: "Lemonies Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs14': { name: "Chicken Fingers", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'ms1': { name: "BBQ Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: true, portions: {}, image_url: IMS },
+        'ms2': { name: "Tandoori Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
+        'ms3': { name: "Mutton Fry Starter", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
+        'fs1': { name: "Apollo Fish", category: "Fish & Prawns Starters", base_price: 349, stock_count: 45, is_special: true, portions: {}, image_url: ISS },
+        'fs2': { name: "Fish Fingers", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
+        'fs3': { name: "Arabian Fish", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
+        'fs4': { name: "Grill Fish Starter", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
+        'ps1': { name: "Prawns Butter Fry", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
+        'ps2': { name: "Golden Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: true, portions: {}, image_url: IPM },
+        'ps3': { name: "Prawns 65", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
+        'ps4': { name: "Crispy Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM }
+      };
+    }
+
+    // Smart Client-Side Image Compressor for Phone Uploads (Keeps Firebase RTDB Fast)
+    function compressImageFile(file, maxWidth = 600, quality = 0.78) {
+      return new Promise((resolve, reject) => {
+        if (!file) return reject(new Error("No file selected"));
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', quality));
+          };
+          img.onerror = reject;
+          img.src = event.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    window.openSupportWhatsApp = function() {
+      const msg = "Hello Admin Support, I need assistance with the Mandi Croods POS Console.";
+      window.open(`https://wa.me/${SUPPORT_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    const adminI18n = {
+      en: {
+        nav_floor: "📦 Active Floor", nav_pos: "🧾 POS Order", nav_service: "🛎️ Service Req",
+        nav_menu: "🍔 Menu & Food Stock", nav_analytics: "📈 Analytics", logout: "Log Out",
+        title_floor: "Floor & Kitchen Operations", occupancy: "Live Table Occupancy (All Cabins & Tables)",
+        title_pos: "POS / Direct Order", new_order: "New / Active Table Order",
+        btn_send_kitchen: "Send to Kitchen", title_menu: "Menu & Food Stock Control",
+        title_analytics: "Analytics Dashboard"
+      },
+      hi: {
+        nav_floor: "📦 एक्टिव फ्लोर", nav_pos: "🧾 POS ऑर्डर", nav_service: "🛎️ सर्विस कॉल",
+        nav_menu: "🍔 मेनू और स्टॉक", nav_analytics: "📈 एनालिटिक्स", logout: "लॉग आउट",
+        title_floor: "फ्लोर और किचन ऑपरेशन्स", occupancy: "लाइव टेबल स्थिति",
+        title_pos: "POS / डायरेक्ट ऑर्डर", new_order: "नया ऑर्डर",
+        btn_send_kitchen: "किचन में भेजें", title_menu: "मेनू और स्टॉक कंट्रोल",
+        title_analytics: "एनालिटिक्स डैशबोर्ड"
+      },
+      te: {
+        nav_floor: "📦 యాక్టివ్ ఫ్లోర్", nav_pos: "🧾 POS ఆర్డర్", nav_service: "🛎️ సర్వీస్ కాల్స్",
+        nav_menu: "🍔 మెనూ & స్టాక్", nav_analytics: "📈 అనలిటిక్స్", logout: "లాగ్ అవుట్",
+        title_floor: "ఫ్లోర్ & కిచెన్ ఆపరేషన్స్", occupancy: "లైవ్ టేబుల్ ఆక్యుపెన్సీ",
+        title_pos: "POS / డైరెక్ట్ ఆర్డర్", new_order: "కొత్త ఆర్డర్",
+        btn_send_kitchen: "కిచెన్‌కు పంపండి", title_menu: "మెనూ & స్టాక్ కంట్రోల్",
+        title_analytics: "అనలిటిక్స్ డాష్‌బోర్డ్"
+      }
+    };
+
+    window.changeAdminLanguage = function(langCode) {
+      const dict = adminI18n[langCode] || adminI18n.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+    };
 
     function setOnline() {
-        if(dbConnected) return;
-        dbConnected = true;
-        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
-        if(dot && txt) {
-            dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]";
-            txt.innerText="Online";
-            txt.className="text-[9px] font-bold text-emerald-400 uppercase tracking-widest";
-        }
-        clearTimeout(connBannerTimer);
-        const banner = document.getElementById('connectionBanner');
-        if(banner) { banner.classList.remove('show'); banner.classList.add('hidden'); }
+      if(dbConnected) return;
+      dbConnected = true;
+      const dot = document.getElementById('connStatus');
+      const txt = document.getElementById('connText');
+      if(dot && txt) {
+        dot.className = "w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,1)]";
+        txt.innerText = "Online";
+        txt.className = "text-[9px] font-bold text-emerald-400 uppercase tracking-widest";
+      }
+      clearTimeout(connBannerTimer);
+      const banner = document.getElementById('connectionBanner');
+      if(banner) { banner.classList.remove('show'); banner.classList.add('hidden'); }
     }
 
     function setOffline() {
-        if(!dbConnected) return;
-        dbConnected = false;
-        const dot = document.getElementById('connStatus'); const txt = document.getElementById('connText');
-        if(dot && txt) {
-            dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse";
-            txt.innerText="Offline";
-            txt.className="text-[9px] font-bold text-red-500 uppercase tracking-widest";
+      if(!dbConnected) return;
+      dbConnected = false;
+      const dot = document.getElementById('connStatus');
+      const txt = document.getElementById('connText');
+      if(dot && txt) {
+        dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse";
+        txt.innerText = "Offline";
+        txt.className = "text-[9px] font-bold text-red-500 uppercase tracking-widest";
+      }
+      clearTimeout(connBannerTimer);
+      connBannerTimer = setTimeout(() => {
+        if(!dbConnected) {
+          const banner = document.getElementById('connectionBanner');
+          if(banner) { banner.classList.remove('hidden'); banner.classList.add('show'); }
         }
-        
-        clearTimeout(connBannerTimer);
-        connBannerTimer = setTimeout(() => {
-            if(!dbConnected) {
-                const banner = document.getElementById('connectionBanner');
-                if(banner) { banner.classList.remove('hidden'); banner.classList.add('show'); }
-            }
-        }, 3000); 
+      }, 3000);
     }
 
     if (db) {
-        db.ref('.info/connected').on('value', snap => {
-            if(snap.val() === true) setOnline();
-            else if (snap.val() === false) setOffline();
-        });
-        db.ref('active_tables').on('value', () => setOnline());
-        db.ref('menu').on('value', () => setOnline());
+      db.ref('.info/connected').on('value', snap => {
+        if(snap.val() === true) setOnline();
+        else if (snap.val() === false) setOffline();
+      });
+      db.ref('active_tables').on('value', () => setOnline());
+      db.ref('menu').on('value', () => setOnline());
     }
 
-    function sanitizeForFirebase(obj) { return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value)); }
-    function showGlobalToast(msg, type='error'){
+    function sanitizeForFirebase(obj) {
+      return JSON.parse(JSON.stringify(obj, (key, value) => value === undefined ? null : value));
+    }
+
+    function showGlobalToast(msg, type='error') {
       const banner = document.getElementById('globalErrorBanner');
-      if(banner){
-        banner.textContent = (type==='error'?'⚠️ ':'🛎️ ') + msg;
-        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error'?'bg-red-600':'bg-emerald-600'}`;
+      if(banner) {
+        banner.textContent = (type==='error' ? '⚠️ ' : '✅ ') + msg;
+        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error' ? 'bg-red-600' : 'bg-emerald-600'}`;
         banner.classList.remove('hidden');
-        setTimeout(() => { banner.classList.add('hidden'); }, 5000);
+        setTimeout(() => { banner.classList.add('hidden'); }, 4500);
       }
     }
 
@@ -487,7 +729,10 @@
       if (pin === 'admin123' || pin === '1234') role = 'admin';
       else if (pin === 'waiter123') role = 'waiter';
       else if (pin === 'kitchen123') role = 'kitchen';
-      else { if(statusEl) statusEl.textContent = ''; return alert("Invalid PIN"); }
+      else {
+        if(statusEl) statusEl.textContent = 'Invalid PIN. Try admin123, waiter123, or kitchen123';
+        return alert("Invalid PIN");
+      }
 
       if(!db) return alert("⚠️ Not connected to database. Please check your internet connection.");
 
@@ -496,29 +741,33 @@
       document.getElementById('mainLayout').classList.remove('hidden');
       document.getElementById('roleText').innerText = currentRole.toUpperCase();
 
-      if(currentRole === 'admin') { document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden')); }
-      if(currentRole === 'admin' || currentRole === 'waiter') { document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden')); }
+      if(currentRole === 'admin') {
+        document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+      }
+      if(currentRole === 'admin' || currentRole === 'waiter') {
+        document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden'));
+      }
       
       loadSystem();
       initChart();
     };
 
     window.clearConsoleCache = function() {
-        if(!confirm("Clear Admin Console Cache? (Will log you out)")) return;
-        localStorage.clear();
-        location.reload();
-    }
+      if(!confirm("Clear Admin Console Cache? (Will log you out)")) return;
+      localStorage.clear();
+      location.reload();
+    };
 
     window.switchTab = function(tab) {
       document.querySelectorAll('.tab-section').forEach(sec => sec.classList.add('hidden'));
       document.querySelectorAll('.tab-btn').forEach(b => {
         let isMatch = b.id === `tab-${tab}`;
         if (isMatch) {
-            b.classList.remove('text-slate-400', 'hover:bg-white/5');
-            b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
+          b.classList.remove('text-slate-400', 'hover:bg-white/5');
+          b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
         } else {
-            b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
-            b.classList.add('text-slate-400', 'hover:bg-white/5');
+          b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
+          b.classList.add('text-slate-400', 'hover:bg-white/5');
         }
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
@@ -530,6 +779,7 @@
     function loadSystem() {
       if(!db) return;
 
+      // Sync Menu & Auto-Seed if empty
       db.ref('menu').on('value', snap => {
         const rawMenu = snap.val() || {};
         menuCache = {};
@@ -538,70 +788,85 @@
             menuCache[k] = rawMenu[k];
             const stock = Number(menuCache[k].stock_count);
             if (stock === 5 || stock === 3) {
-                showGlobalToast(`LOW STOCK ALERT: ${menuCache[k].name} has only ${stock} portions left!`, 'error');
+              showGlobalToast(`LOW STOCK ALERT: ${menuCache[k].name} has only ${stock} portions left!`, 'error');
             }
           }
         });
 
+        // If Firebase has no menu items yet, load the default menu locally so POS & Inventory are never blank
+        if (Object.keys(menuCache).length === 0) {
+          menuCache = getDefaultMasterMenu();
+        }
+
         if(currentRole === 'admin') {
-            renderInventory();
+          renderInventory();
+          renderDrinksDessertsSpotlight();
         }
         renderPosMenu();
       });
 
-      // Raw Materials Sync
-      db.ref('raw_materials').on('value', snap => {
-          rawMatsCache = snap.val() || {};
-          if(currentRole === 'admin') renderKitchenInventory();
-          
-          Object.values(rawMatsCache).forEach(mat => {
-             if (mat.stock <= mat.threshold && mat.stock > 0) {
-                 showGlobalToast(`KITCHEN ALERT: ${mat.name} is running low (${mat.stock} ${mat.unit} left!)`, 'error');
-             }
-          });
+      // Sync Coupons
+      db.ref('coupons').on('value', snap => {
+        couponsCache = snap.val() || {};
+        if(currentRole === 'admin') renderCouponsAdmin();
       });
 
+      // Sync Raw Materials
+      db.ref('raw_materials').on('value', snap => {
+        rawMatsCache = snap.val() || {};
+        if(currentRole === 'admin') renderKitchenInventory();
+        Object.values(rawMatsCache).forEach(mat => {
+          if (mat && mat.stock <= mat.threshold && mat.stock > 0) {
+            showGlobalToast(`KITCHEN ALERT: ${mat.name} is running low (${mat.stock} ${mat.unit} left!)`, 'error');
+          }
+        });
+      });
+
+      // Sync Active Floor Orders
       db.ref('active_tables').on('value', snap => {
         window.currentTables = snap.val() || {};
         renderFloorGrid(window.currentTables);
         renderOccupancyMap(window.currentTables);
+        updatePosCartUI();
 
         let hasPending = Object.values(window.currentTables).some(o => o && o.status === 'pending');
         if (hasPending) {
-            if (!pendingAlarmInterval) {
-                playAlarmTone();
-                pendingAlarmInterval = setInterval(() => {
-                    playAlarmTone();
-                }, 30000);
-            }
+          if (!pendingAlarmInterval) {
+            playAlarmTone();
+            pendingAlarmInterval = setInterval(playAlarmTone, 30000);
+          }
         } else {
-            if (pendingAlarmInterval) {
-                clearInterval(pendingAlarmInterval);
-                pendingAlarmInterval = null;
-            }
+          if (pendingAlarmInterval) {
+            clearInterval(pendingAlarmInterval);
+            pendingAlarmInterval = null;
+          }
         }
       });
 
+      // Sync Customer Service Requests
       db.ref('service_requests').on('value', snap => {
-          const reqs = snap.val() || {};
-          renderServiceRequests(reqs);
+        const reqs = snap.val() || {};
+        renderServiceRequests(reqs);
       });
 
+      // Sync Analytics & Revenue Tallies
       if(currentRole === 'admin') {
         const dStr = new Date().toISOString().split('T')[0];
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
-            const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
-            document.getElementById('tallyTotal').innerText = `₹${data.total || 0}`;
-            document.getElementById('tallyCash').innerText = `₹${data.cash || 0}`;
-            document.getElementById('tallyUPI').innerText = `₹${data.upi || 0}`;
-            document.getElementById('tallyCard').innerText = `₹${data.card || 0}`;
-            document.getElementById('tallyOrders').innerText = data.orderCount || 0;
-            updateChartData(data);
+          const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
+          document.getElementById('tallyTotal').innerText = `₹${data.total || 0}`;
+          document.getElementById('tallyCash').innerText = `₹${data.cash || 0}`;
+          document.getElementById('tallyUPI').innerText = `₹${data.upi || 0}`;
+          document.getElementById('tallyCard').innerText = `₹${data.card || 0}`;
+          document.getElementById('tallyOrders').innerText = data.orderCount || 0;
+          updateChartData(data);
         });
 
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
-          const tb = document.getElementById('dailyLogsTable'); tb.innerHTML = '';
-          const logs = Object.values(snap.val()||{});
+          const tb = document.getElementById('dailyLogsTable');
+          if(!tb) return;
+          tb.innerHTML = '';
+          const logs = Object.values(snap.val() || {});
           logs.forEach(log => {
             if(!log) return;
             tb.innerHTML += `<tr class="border-b border-[#4b4b6a]"><td class="p-4 text-xs text-slate-400">${log.time||''}</td><td class="p-4 font-black text-white">T-${log.table||''}</td><td class="p-4 font-bold text-slate-400 text-[10px] uppercase">${log.method||''}</td><td class="p-4 text-xs font-semibold text-slate-300">${log.items||''}</td><td class="p-4 font-black text-right text-emerald-400">₹${log.total||0}</td></tr>`;
@@ -611,601 +876,781 @@
     }
 
     function playAlarmTone() {
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(440, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(); osc.stop(ctx.currentTime + 0.6);
-        } catch(e) {}
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.6);
+      } catch(e) {}
     }
 
     function initChart() {
-        const ctx = document.getElementById('revenueChart');
-        if (!ctx) return;
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Cash', 'Online/UPI', 'Card'],
-                datasets: [{
-                    label: 'Today Revenue (₹)',
-                    data: [0, 0, 0],
-                    backgroundColor: ['#10b981', '#3b82f6', '#a855f7'],
-                    borderRadius: 8
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { labels: { color: '#ffffff' } } },
-                scales: {
-                    y: { grid: { color: '#4b4b6a' }, ticks: { color: '#a1a1aa' } },
-                    x: { grid: { display: false }, ticks: { color: '#ffffff', font: { weight: 'bold' } } }
-                }
-            }
-        });
+      const ctx = document.getElementById('revenueChart');
+      if (!ctx) return;
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Cash', 'Online/UPI', 'Card'],
+          datasets: [{
+            label: 'Today Revenue (₹)',
+            data: [0, 0, 0],
+            backgroundColor: ['#10b981', '#3b82f6', '#a855f7'],
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { labels: { color: '#ffffff' } } },
+          scales: {
+            y: { grid: { color: '#4b4b6a' }, ticks: { color: '#a1a1aa' } },
+            x: { grid: { display: false }, ticks: { color: '#ffffff', font: { weight: 'bold' } } }
+          }
+        }
+      });
     }
 
     function updateChartData(data) {
-        if(chartInstance) {
-            chartInstance.data.datasets[0].data = [data.cash || 0, data.upi || 0, data.card || 0];
-            chartInstance.update();
-        }
+      if(chartInstance) {
+        chartInstance.data.datasets[0].data = [data.cash || 0, data.upi || 0, data.card || 0];
+        chartInstance.update();
+      }
     }
 
-    /* ---- Raw Materials / Kitchen Inventory Logging ---- */
-    window.addKitchenRawMaterial = function() {
-        const name = document.getElementById('rawName').value.trim();
-        const unit = document.getElementById('rawUnit').value;
-        const stock = parseFloat(document.getElementById('rawStock').value);
-        const threshold = parseFloat(document.getElementById('rawThreshold').value);
+    /* ---- Coupon Management ---- */
+    window.saveCouponCode = function() {
+      const code = (document.getElementById('newCouponCode').value || '').trim().toUpperCase();
+      const type = document.getElementById('newCouponType').value || 'percent';
+      const value = parseFloat(document.getElementById('newCouponVal').value);
+      const minOrder = parseFloat(document.getElementById('newCouponMin').value) || 0;
 
-        if(!name || isNaN(stock) || isNaN(threshold)) return alert("Fill all fields correctly.");
+      if (!code || isNaN(value) || value <= 0) {
+        return alert("Please enter a valid coupon code and discount value.");
+      }
 
-        const id = 'raw_' + Date.now();
-        db.ref(`raw_materials/${id}`).set({
-            name: name, unit: unit, stock: stock, threshold: threshold
-        }).then(() => {
-            showGlobalToast("Raw material added successfully!", "success");
-            document.getElementById('rawName').value = '';
-            document.getElementById('rawStock').value = '';
-            document.getElementById('rawThreshold').value = '';
+      const couponObj = { code, type, value, minOrder, active: true, updatedAt: Date.now() };
+      Promise.all([
+        db.ref(`coupons/${code}`).set(couponObj),
+        db.ref(`menu/_system_coupons/${code}`).set(couponObj)
+      ]).then(() => {
+        showGlobalToast(`Coupon ${code} saved!`, 'success');
+        document.getElementById('newCouponCode').value = '';
+        document.getElementById('newCouponVal').value = '';
+        document.getElementById('newCouponMin').value = '';
+      });
+    };
+
+    window.deleteCouponCode = function(code) {
+      if(!confirm(`Delete coupon ${code}?`)) return;
+      Promise.all([
+        db.ref(`coupons/${code}`).remove(),
+        db.ref(`menu/_system_coupons/${code}`).remove()
+      ]).then(() => showGlobalToast(`Coupon ${code} deleted`, 'success'));
+    };
+
+    function renderCouponsAdmin() {
+      const container = document.getElementById('couponsListAdmin');
+      if(!container) return;
+      const entries = Object.entries(couponsCache);
+      if(entries.length === 0) {
+        container.innerHTML = `<span class="text-xs text-slate-400">No active coupons created yet.</span>`;
+        return;
+      }
+      container.innerHTML = entries.map(([code, c]) => `
+        <div class="flex items-center gap-2 bg-light border border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs">
+          <span class="font-black text-emerald-400">${code}</span>
+          <span class="text-slate-300 font-bold">${c.type === 'percent' ? c.value + '% OFF' : '₹' + c.value + ' OFF'} (Min ₹${c.minOrder || 0})</span>
+          <button onclick="deleteCouponCode('${code}')" class="text-red-400 hover:text-red-300 font-black ml-1">✕</button>
+        </div>
+      `).join('');
+    }
+
+    window.applyPosCouponCode = function(rawCode) {
+      const code = (rawCode || '').trim().toUpperCase();
+      if(!code || !couponsCache[code]) return;
+      const c = couponsCache[code];
+      document.getElementById('posDiscType').value = c.type;
+      document.getElementById('posDiscVal').value = c.value;
+      updatePosCartUI();
+      showGlobalToast(`POS Coupon ${code} applied!`, 'success');
+    };
+
+    /* ---- Weekly Mobile Photo Upload & Update System ---- */
+    window.triggerItemPhotoUpdate = function(itemId) {
+      pendingImageUpdateItemId = itemId;
+      const fileInput = document.getElementById('globalImageUpdaterInput');
+      if(fileInput) {
+        fileInput.value = '';
+        fileInput.click();
+      }
+    };
+
+    window.handleGlobalImageUpdate = async function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file || !pendingImageUpdateItemId) return;
+      const targetId = pendingImageUpdateItemId;
+      pendingImageUpdateItemId = null;
+
+      try {
+        showGlobalToast("Compressing & uploading photo from phone...", "success");
+        const compressedDataUrl = await compressImageFile(file, 600, 0.78);
+        const existingItem = menuCache[targetId] || {};
+        await db.ref(`menu/${targetId}`).update({
+          ...existingItem,
+          image_url: compressedDataUrl,
+          lastPhotoUpdate: Date.now()
         });
+        showGlobalToast(`Photo updated for ${existingItem.name || 'item'}! Synced to Customer Menu.`, "success");
+      } catch(err) {
+        alert("Failed to update photo: " + err.message);
+      }
+    };
+
+    window.adminUpdateItemPrice = function(itemId, newPrice) {
+      const p = parseFloat(newPrice);
+      if(isNaN(p) || p < 0) return;
+      const existingItem = menuCache[itemId] || {};
+      db.ref(`menu/${itemId}`).update({
+        ...existingItem,
+        base_price: p
+      }).then(() => showGlobalToast(`Price updated to ₹${p}`, "success"));
+    };
+
+    function renderDrinksDessertsSpotlight() {
+      const grid = document.getElementById('drinksDessertsSpotlightGrid');
+      if(!grid) return;
+      grid.innerHTML = '';
+
+      const upsellItems = Object.entries(menuCache).filter(([, item]) => {
+        if(!item || !item.name) return false;
+        const cat = (item.category || '').toLowerCase();
+        return cat.includes('bev') || cat.includes('drink') || cat.includes('dessert') || cat.includes('extra') || cat.includes('ice');
+      });
+
+      if(upsellItems.length === 0) {
+        grid.innerHTML = `<p class="text-xs text-slate-400 col-span-full">No Cool Drinks or Desserts found. Add one below under the "Cool Drinks & Desserts" category!</p>`;
+        return;
+      }
+
+      upsellItems.forEach(([id, item]) => {
+        grid.innerHTML += `
+          <div class="bg-light p-4 rounded-2xl border border-primary/40 flex items-center gap-3.5 shadow-md">
+            <div class="relative w-16 h-16 shrink-0">
+              <img src="${item.image_url}" class="w-16 h-16 rounded-xl object-cover border border-primary">
+              <button onclick="triggerItemPhotoUpdate('${id}')" class="absolute -bottom-1 -right-1 bg-primary text-dark rounded-full w-7 h-7 flex items-center justify-center text-xs font-black shadow-md active:scale-90" title="Upload new photo from phone">📷</button>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
+              <span class="text-[10px] font-bold text-primary uppercase">Cart Upsell Active</span>
+              <div class="flex items-center gap-2 mt-1.5">
+                <span class="text-xs text-slate-400 font-bold">₹</span>
+                <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-20 p-1 rounded bg-card border border-[#4b4b6a] text-xs font-black text-white">
+                <button onclick="triggerItemPhotoUpdate('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-dark border border-primary/40 px-2.5 py-1 rounded-lg text-[10px] font-black transition">📷 Change Photo</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    /* ---- Raw Materials / Kitchen Inventory ---- */
+    window.addKitchenRawMaterial = function() {
+      const name = document.getElementById('rawName').value.trim();
+      const unit = document.getElementById('rawUnit').value;
+      const stock = parseFloat(document.getElementById('rawStock').value);
+      const threshold = parseFloat(document.getElementById('rawThreshold').value);
+
+      if(!name || isNaN(stock) || isNaN(threshold)) return alert("Fill all fields correctly.");
+
+      const id = 'raw_' + Date.now();
+      db.ref(`raw_materials/${id}`).set({
+        name, unit, stock, threshold
+      }).then(() => {
+        showGlobalToast("Raw material added successfully!", "success");
+        document.getElementById('rawName').value = '';
+        document.getElementById('rawStock').value = '';
+        document.getElementById('rawThreshold').value = '';
+      });
     };
 
     window.renderKitchenInventory = function() {
-        const grid = document.getElementById('rawMaterialsGrid');
-        if(!grid) return;
-        grid.innerHTML = '';
+      const grid = document.getElementById('rawMaterialsGrid');
+      if(!grid) return;
+      grid.innerHTML = '';
 
-        if(Object.keys(rawMatsCache).length === 0) {
-            grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-4">No raw materials added yet. Track rice, chicken, oil, etc.</p>`;
-            return;
-        }
+      if(Object.keys(rawMatsCache).length === 0) {
+        grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-4">No raw materials added yet. Track rice, chicken, oil, etc.</p>`;
+        return;
+      }
 
-        Object.entries(rawMatsCache).forEach(([id, mat]) => {
-            const isLow = mat.stock <= mat.threshold;
-            const border = isLow ? 'border-red-500 bg-red-900/20' : 'border-[#4b4b6a] bg-card';
-            const alertText = isLow ? `<span class="text-[10px] font-black uppercase text-red-500 mt-1 block">⚠️ Low Stock Alert</span>` : '';
+      Object.entries(rawMatsCache).forEach(([id, mat]) => {
+        const isLow = mat.stock <= mat.threshold;
+        const border = isLow ? 'border-red-500 bg-red-900/20' : 'border-[#4b4b6a] bg-card';
+        const alertText = isLow ? `<span class="text-[10px] font-black uppercase text-red-500 mt-1 block">⚠️ Low Stock Alert</span>` : '';
 
-            grid.innerHTML += `
-                <div class="p-5 rounded-2xl border ${border} flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-black text-white text-lg">${mat.name}</h4>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-light px-2 py-1 rounded border border-[#4b4b6a]">${mat.unit}</span>
-                        </div>
-                        <p class="text-3xl font-black ${isLow ? 'text-red-400' : 'text-primary'}">${mat.stock}</p>
-                        ${alertText}
-                    </div>
-                    <div class="mt-4 flex gap-2">
-                        <button onclick="updateRawStock('${id}', -1)" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-white font-black">-1</button>
-                        <button onclick="updateRawStock('${id}', 1)" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-white font-black">+1</button>
-                        <button onclick="deleteRawMaterial('${id}')" class="w-10 h-10 ml-auto bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-sm font-black">🗑️</button>
-                    </div>
-                </div>
-            `;
-        });
+        grid.innerHTML += `
+          <div class="p-5 rounded-2xl border ${border} flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <h4 class="font-black text-white text-lg">${mat.name}</h4>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-light px-2 py-1 rounded border border-[#4b4b6a]">${mat.unit}</span>
+              </div>
+              <p class="text-3xl font-black ${isLow ? 'text-red-400' : 'text-primary'}">${mat.stock}</p>
+              ${alertText}
+            </div>
+            <div class="mt-4 flex gap-2">
+              <button onclick="updateRawStock('${id}', -1)" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-white font-black">-1</button>
+              <button onclick="updateRawStock('${id}', 1)" class="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-xl text-white font-black">+1</button>
+              <button onclick="deleteRawMaterial('${id}')" class="w-10 h-10 ml-auto bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded-xl text-sm font-black">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
     };
 
     window.updateRawStock = function(id, change) {
-        if(!rawMatsCache[id]) return;
-        const newStock = Math.max(0, rawMatsCache[id].stock + change);
-        db.ref(`raw_materials/${id}/stock`).set(newStock);
+      if(!rawMatsCache[id]) return;
+      const newStock = Math.max(0, rawMatsCache[id].stock + change);
+      db.ref(`raw_materials/${id}/stock`).set(newStock);
     };
 
     window.deleteRawMaterial = function(id) {
-        if(confirm("Remove this raw material from tracking?")) {
-            db.ref(`raw_materials/${id}`).remove().then(() => showGlobalToast("Material deleted", "info"));
-        }
+      if(confirm("Remove this raw material from tracking?")) {
+        db.ref(`raw_materials/${id}`).remove().then(() => showGlobalToast("Material deleted", "success"));
+      }
     };
 
     window.renderInventory = function() {
-        const list = document.getElementById('inventoryList');
-        if (!list) return;
-        const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
-        list.innerHTML = '';
-        
-        let count = 0;
-        Object.entries(menuCache).forEach(([id, item]) => {
-            if(!item || !item.name) return;
-            if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
-            count++;
+      const list = document.getElementById('inventoryList');
+      if (!list) return;
+      const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
+      list.innerHTML = '';
+      
+      let count = 0;
+      Object.entries(menuCache).forEach(([id, item]) => {
+        if(!item || !item.name) return;
+        if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
+        count++;
 
-            list.innerHTML += `
-                <div class="bg-card p-4 rounded-2xl border border-[#4b4b6a] flex items-center justify-between gap-4">
-                    <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover border border-primary/40 shrink-0">
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
-                        <span class="text-[10px] font-bold text-slate-400">${item.category || 'Mandi'}</span>
-                        <div class="flex items-center gap-3 mt-1">
-                            <span class="text-primary font-black text-xs">₹${item.base_price}</span>
-                            <span class="text-xs font-bold ${item.stock_count <= 5 ? 'text-red-400' : 'text-emerald-400'}">Stock: ${item.stock_count ?? 50}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="adminEditItemStock('${id}', ${(item.stock_count ?? 50) + 10})" class="bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg text-xs font-black">+10 Stock</button>
-                        <button onclick="adminDeleteMenuItem('${id}')" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-black">🗑️</button>
-                    </div>
-                </div>
-            `;
-        });
-        const cntLbl = document.getElementById('menuCountLabel');
-        if(cntLbl) cntLbl.innerText = `${count} items in inventory`;
+        list.innerHTML += `
+          <div class="bg-card p-4 rounded-2xl border border-[#4b4b6a] flex items-center justify-between gap-4">
+            <div class="relative w-14 h-14 shrink-0">
+              <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover border border-primary/40">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
+              <span class="text-[10px] font-bold text-slate-400">${item.category || 'Mandi'}</span>
+              <div class="flex items-center gap-3 mt-1">
+                <span class="text-primary font-black text-xs">₹${item.base_price}</span>
+                <span class="text-xs font-bold ${item.stock_count <= 5 ? 'text-red-400' : 'text-emerald-400'}">Stock: ${item.stock_count ?? 50}</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 flex-wrap justify-end">
+              <button onclick="triggerItemPhotoUpdate('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-dark border border-primary/40 px-2.5 py-1.5 rounded-lg text-xs font-black transition" title="Upload New Photo from Phone">📷 Photo</button>
+              <button onclick="adminEditItemStock('${id}', ${(item.stock_count ?? 50) + 10})" class="bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg text-xs font-black">+10</button>
+              <button onclick="adminEditItemStock('${id}', 0)" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-dark px-2.5 py-1.5 rounded-lg text-xs font-black">Sold Out</button>
+              <button onclick="adminDeleteMenuItem('${id}')" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-black">🗑️</button>
+            </div>
+          </div>
+        `;
+      });
+      const cntLbl = document.getElementById('menuCountLabel');
+      if(cntLbl) cntLbl.innerText = `${count} items in inventory`;
     };
 
     window.adminEditItemStock = function(id, newStock) {
-        db.ref(`menu/${id}/stock_count`).set(newStock).then(() => showGlobalToast("Stock updated", "success"));
+      const existing = menuCache[id] || {};
+      db.ref(`menu/${id}`).update({ ...existing, stock_count: Math.max(0, newStock) })
+        .then(() => showGlobalToast("Stock updated", "success"));
     };
 
     window.adminDeleteMenuItem = function(id) {
-        if(!confirm("Remove item from menu?")) return;
-        db.ref(`menu/${id}`).remove().then(() => showGlobalToast("Item removed", "info"));
+      if(!confirm("Remove item from menu?")) return;
+      db.ref(`menu/${id}`).remove().then(() => showGlobalToast("Item removed", "success"));
     };
 
-    window.adminQuickAddItem = function() {
-        const name = document.getElementById('newItemName').value.trim();
-        const price = document.getElementById('newItemPrice').value;
-        const category = document.getElementById('newItemCategory').value.trim() || 'Specials';
-        const fileInput = document.getElementById('newItemImageFile');
-        if(!name || !price) return alert("Enter item name and price.");
+    window.adminQuickAddItem = async function() {
+      const name = document.getElementById('newItemName').value.trim();
+      const price = document.getElementById('newItemPrice').value;
+      const category = document.getElementById('newItemCategory').value.trim() || 'Beverages';
+      const fileInput = document.getElementById('newItemImageFile');
+      if(!name || !price) return alert("Enter item name and price.");
 
-        let image_url = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
+      const btn = document.getElementById('addMenuBtn');
+      if(btn) btn.disabled = true;
 
-        const processAdd = (url) => {
-            const newId = 'item_' + Date.now();
-            db.ref(`menu/${newId}`).set({
-                name: name,
-                category: category,
-                base_price: Number(price),
-                stock_count: 50,
-                is_special: false,
-                image_url: url
-            }).then(() => {
-                showGlobalToast("New item added to inventory!", "success");
-                document.getElementById('newItemName').value = '';
-                document.getElementById('newItemPrice').value = '';
-                document.getElementById('newItemCategory').value = '';
-                fileInput.value = '';
-            });
-        };
+      let image_url = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
 
+      try {
         if(fileInput.files && fileInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) { processAdd(e.target.result); };
-            reader.readAsDataURL(fileInput.files[0]);
-        } else {
-            alert("Please select an image file to upload.");
+          image_url = await compressImageFile(fileInput.files[0], 600, 0.78);
         }
+        const newId = 'item_' + Date.now();
+        await db.ref(`menu/${newId}`).set({
+          name: name,
+          category: category,
+          base_price: Number(price),
+          stock_count: 50,
+          is_special: category === 'Beverages',
+          portions: {},
+          image_url: image_url
+        });
+        showGlobalToast("New item added to Customer Menu!", "success");
+        document.getElementById('newItemName').value = '';
+        document.getElementById('newItemPrice').value = '';
+        fileInput.value = '';
+      } catch(err) {
+        alert("Failed to add item: " + err.message);
+      } finally {
+        if(btn) btn.disabled = false;
+      }
+    };
+
+    window.factoryResetSystem = function() {
+      if(!confirm("⚠️ Reload the entire default Mandi Croods Menu into Firebase? (Your custom added items will remain safe)")) return;
+      const defaults = getDefaultMasterMenu();
+      db.ref('menu').update(defaults).then(() => {
+        showGlobalToast("Default Master Menu loaded into Firebase!", "success");
+      });
     };
 
     function renderOccupancyMap(tables) {
-        const mapDiv = document.getElementById('occupancyMap');
-        if(!mapDiv) return;
-        mapDiv.innerHTML = '';
+      const mapDiv = document.getElementById('occupancyMap');
+      if(!mapDiv) return;
+      mapDiv.innerHTML = '';
 
-        const allCabins = [
-            ...Array.from({length: 10}, (_,i) => String(i+1)),
-            ...Array.from({length: 3}, (_,i) => `TA${i+1}`),
-            ...Array.from({length: 8}, (_,i) => `C${i+1}`),
-            ...Array.from({length: 3}, (_,i) => `BH${i+1}`),
-            ...Array.from({length: 11}, (_,i) => `R${i+1}`),
-            ...Array.from({length: 7}, (_,i) => `L${i+1}`)
-        ];
+      const allCabins = [
+        ...Array.from({length: 10}, (_,i) => String(i+1)),
+        ...Array.from({length: 11}, (_,i) => `R${i+1}`),
+        ...Array.from({length: 7}, (_,i) => `L${i+1}`),
+        ...Array.from({length: 3}, (_,i) => `BH${i+1}`),
+        ...Array.from({length: 8}, (_,i) => `C${i+1}`),
+        ...Array.from({length: 3}, (_,i) => `TA${i+1}`)
+      ];
 
-        allCabins.forEach(cab => {
-            const tableId = `table_${cab}`;
-            const isOccupied = tables && tables[tableId];
-            const status = isOccupied ? (isOccupied.status === 'pending' ? 'Pending' : 'Occupied') : 'Available';
-            
-            let bg = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
-            if(isOccupied) {
-                bg = isOccupied.status === 'pending' ? 'bg-amber-500/30 border-amber-500 text-amber-300 urgent-alarm' : 'bg-blue-600/30 border-blue-500 text-blue-200';
-            }
+      allCabins.forEach(cab => {
+        const tableId = `table_${cab}`;
+        const isOccupied = tables && tables[tableId];
+        const status = isOccupied ? (isOccupied.status === 'pending' ? 'Pending' : isOccupied.status.toUpperCase()) : 'Available';
+        
+        let bg = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
+        if(isOccupied) {
+          bg = isOccupied.status === 'pending'
+            ? 'bg-amber-500/30 border-amber-500 text-amber-300 urgent-alarm'
+            : 'bg-blue-600/30 border-blue-500 text-blue-200';
+        }
 
-            mapDiv.innerHTML += `
-                <div class="p-2 rounded-xl border ${bg} flex flex-col justify-between items-center text-center cursor-default">
-                    <span class="font-black text-xs">T-${cab}</span>
-                    <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5">${status}</span>
-                </div>
-            `;
-        });
+        mapDiv.innerHTML += `
+          <div class="p-2 rounded-xl border ${bg} flex flex-col justify-between items-center text-center cursor-default">
+            <span class="font-black text-xs">T-${cab}</span>
+            <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5 truncate max-w-full">${status}</span>
+          </div>
+        `;
+      });
     }
 
     function renderServiceRequests(reqs) {
-        const grid = document.getElementById('serviceRequestsGrid');
-        const badge = document.getElementById('serviceBadge');
-        if(!grid) return;
-        grid.innerHTML = '';
+      const grid = document.getElementById('serviceRequestsGrid');
+      const badge = document.getElementById('serviceBadge');
+      if(!grid) return;
+      grid.innerHTML = '';
 
-        let pendingCount = 0;
-        const entries = Object.entries(reqs);
-        
-        entries.forEach(([key, req]) => {
-            if(!req || req.status === 'resolved') return;
-            pendingCount++;
+      let pendingCount = 0;
+      const entries = Object.entries(reqs);
+      
+      entries.forEach(([key, req]) => {
+        if(!req || req.status === 'resolved') return;
+        pendingCount++;
 
-            grid.innerHTML += `
-                <div class="dash-card bg-card p-5 rounded-2xl border-2 border-amber-500 flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="font-black text-lg text-white">Table ${req.table}</span>
-                            <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-black uppercase">Pending Call</span>
-                        </div>
-                        <p class="font-bold text-primary text-sm mb-1">${req.request_type}</p>
-                        ${req.note ? `<p class="text-xs text-slate-300 italic mb-3">"${req.note}"</p>` : ''}
-                    </div>
-                    <button onclick="resolveServiceRequest('${key}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Mark Resolved ✅</button>
-                </div>
-            `;
-        });
+        grid.innerHTML += `
+          <div class="dash-card bg-card p-5 rounded-2xl border-2 border-amber-500 flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-black text-lg text-white">Table ${req.table}</span>
+                <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-black uppercase">Pending Call</span>
+              </div>
+              <p class="font-bold text-primary text-sm mb-1">${req.request_type}</p>
+              ${req.note ? `<p class="text-xs text-slate-300 italic mb-3">"${req.note}"</p>` : ''}
+            </div>
+            <button onclick="resolveServiceRequest('${key}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Mark Resolved ✅</button>
+          </div>
+        `;
+      });
 
+      if(badge) {
         if(pendingCount > 0) {
-            badge.innerText = pendingCount;
-            badge.classList.remove('hidden');
+          badge.innerText = pendingCount;
+          badge.classList.remove('hidden');
         } else {
-            badge.classList.add('hidden');
-            grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-6 text-center">No active service calls at the moment.</p>`;
+          badge.classList.add('hidden');
         }
+      }
+      if(pendingCount === 0) {
+        grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-6 text-center">No active service calls at the moment.</p>`;
+      }
     }
 
     window.resolveServiceRequest = function(key) {
-        db.ref(`service_requests/${key}`).update({ status: 'resolved' }).then(() => {
-            showGlobalToast("Service request resolved", "success");
-        });
+      db.ref(`service_requests/${key}`).update({ status: 'resolved' }).then(() => {
+        showGlobalToast("Service request resolved", "success");
+      });
     };
 
     window.acceptOrder = function(id) {
-        db.ref(`active_tables/${id}`).update({ status: 'cooking' }).then(()=> {
-            showGlobalToast("Order Accepted. Status: Cooking", "success");
-        });
+      db.ref(`active_tables/${id}`).update({ status: 'cooking' }).then(() => {
+        showGlobalToast("Order Accepted! Status: Cooking", "success");
+      });
+    };
+
+    window.markOrderServed = function(id) {
+      db.ref(`active_tables/${id}`).update({ status: 'served' }).then(() => {
+        showGlobalToast("Order Marked as Served! 🍽️", "success");
+      });
+    };
+
+    window.markBillReady = function(id) {
+      db.ref(`active_tables/${id}`).update({ status: 'bill_ready' }).then(() => {
+        showGlobalToast("Bill sent to customer screen!", "success");
+      });
     };
 
     window.adminCancelOrder = function(id) {
-        if(!confirm("Are you sure you want to cancel this entire order? The customer bill will become zero.")) return;
-        db.ref(`active_tables/${id}`).update({ 
-            status: 'cancelled', 
-            total: 0, 
-            subtotal: 0,
-            discountAmount: 0
-        }).then(()=> showGlobalToast("Order Cancelled. Customer bill set to ₹0", "success"));
+      if(!confirm("Are you sure you want to cancel this entire order? The customer bill will become zero.")) return;
+      db.ref(`active_tables/${id}`).update({ 
+        status: 'cancelled', 
+        total: 0, 
+        subtotal: 0,
+        discountAmount: 0
+      }).then(() => showGlobalToast("Order Cancelled. Customer bill set to ₹0", "success"));
     };
 
     window.setPrepSpeed = function(id, inputId) {
-        const mins = document.getElementById(inputId).value;
-        if(mins > 0) {
-            db.ref(`active_tables/${id}`).update({ prepSpeed: parseInt(mins) })
-              .then(()=> showGlobalToast(`Speed set to ${mins} mins! Customer app updated.`, "success"));
-        }
-    }
+      const mins = document.getElementById(inputId).value;
+      if(mins > 0) {
+        db.ref(`active_tables/${id}`).update({ prepSpeed: parseInt(mins) })
+          .then(() => showGlobalToast(`ETA set to ${mins} mins! Customer screen updated.`, "success"));
+      }
+    };
 
-    /* ---- PREMIUM THERMAL BILL PRINTING SYSTEM (Separated KOT and Bill) ---- */
-    
-    // 1. Print KOT (Kitchen Copy)
+    /* ---- PREMIUM THERMAL BILL & KOT PRINTING ---- */
     window.printPremiumKOT = function(id) {
-        const tableData = (window.currentTables || {})[id];
-        if(!tableData) return alert("Order data not found.");
-        
-        const d = new Date().toISOString().split('T')[0];
-        const timeStr = new Date().toLocaleTimeString();
+      const tableData = (window.currentTables || {})[id];
+      if(!tableData) return alert("Order data not found.");
+      
+      const d = new Date().toISOString().split('T')[0];
+      const timeStr = new Date().toLocaleTimeString();
 
-        let itemsHtml = '';
-        if(tableData.line_items) {
-            Object.values(tableData.line_items).forEach(li => {
-                if(!li.cancelled) {
-                    itemsHtml += `<div style="font-weight:700; margin-bottom:4px;">[ ${li.qty} ] x ${li.name.toUpperCase()}</div>`;
-                    if(li.variant && li.variant !== 'Regular') itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">- ${li.variant}</div>`;
-                    if(li.note) itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">* Note: ${li.note}</div>`;
-                }
-            });
-        }
+      let itemsHtml = '';
+      if(tableData.line_items) {
+        Object.values(tableData.line_items).forEach(li => {
+          if(li && !li.cancelled) {
+            itemsHtml += `<div style="font-weight:700; margin-bottom:4px;">[ ${li.qty} ] x ${li.name.toUpperCase()}</div>`;
+            if(li.variant && li.variant !== 'Regular') itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">- ${li.variant}</div>`;
+            if(li.note) itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">* Note: ${li.note}</div>`;
+          }
+        });
+      }
 
-        const receiptDiv = document.getElementById('printableReceipt');
-        receiptDiv.innerHTML = `
-            <div style="font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 900; text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom:10px;">*** KITCHEN KOT ***</div>
-            <div class="receipt-line"><span>Table:</span><span style="font-size:18px; font-weight:900;">${tableData.table}</span></div>
-            <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
-            <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
-            <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
-            <div style="font-size: 14px; margin-top:5px; margin-bottom:5px;">
-            ${itemsHtml}
-            </div>
-            <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
-        `;
-        
-        window.print();
-        if(tableData.status === 'pending') acceptOrder(id);
+      const receiptDiv = document.getElementById('printableReceipt');
+      receiptDiv.innerHTML = `
+        <div style="font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 900; text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom:10px;">*** KITCHEN KOT ***</div>
+        <div class="receipt-line"><span>Table:</span><span style="font-size:18px; font-weight:900;">${tableData.table}</span></div>
+        <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
+        <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
+        <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
+        <div style="font-size: 14px; margin-top:5px; margin-bottom:5px;">
+        ${itemsHtml}
+        </div>
+        <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
+      `;
+      
+      window.print();
+      if(tableData.status === 'pending') acceptOrder(id);
     };
 
-    // 2. Print Final Bill (Customer Copy)
     window.printPremiumBill = function(id) {
-        const tableData = (window.currentTables || {})[id];
-        if(!tableData) return alert("Order data not found.");
-        
-        const d = new Date().toISOString().split('T')[0];
-        const timeStr = new Date().toLocaleTimeString();
-        let pMethod = tableData.paymentMethod || "PENDING";
-        const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | UPI Rs.${tableData.splitOnline}` : '';
+      const tableData = (window.currentTables || {})[id];
+      if(!tableData) return alert("Order data not found.");
+      
+      const d = new Date().toISOString().split('T')[0];
+      const timeStr = new Date().toLocaleTimeString();
+      let pMethod = tableData.paymentMethod || "PENDING";
+      const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | UPI Rs.${tableData.splitOnline}` : '';
 
-        let itemsHtml = '';
-        if(tableData.line_items) {
-            Object.values(tableData.line_items).forEach(li => {
-                if(!li.cancelled) {
-                    const lineTot = (Number(li.price)||0) * (Number(li.qty)||0);
-                    itemsHtml += `<div class="receipt-line"><span>${li.qty}x ${li.name.substring(0,18)}</span><span>Rs.${lineTot}</span></div>`;
-                }
-            });
-        } else {
-            itemsHtml = `<div class="receipt-line"><span>${tableData.items || 'No items'}</span></div>`;
-        }
+      let itemsHtml = '';
+      if(tableData.line_items) {
+        Object.values(tableData.line_items).forEach(li => {
+          if(li && !li.cancelled) {
+            const lineTot = (Number(li.price)||0) * (Number(li.qty)||0);
+            itemsHtml += `<div class="receipt-line"><span>${li.qty}x ${li.name.substring(0,18)}</span><span>Rs.${lineTot}</span></div>`;
+          }
+        });
+      } else {
+        itemsHtml = `<div class="receipt-line"><span>${tableData.items || 'No items'}</span></div>`;
+      }
 
-        const discountHtml = Number(tableData.discountAmount) > 0 ? `<div class="receipt-line"><span>Discount</span><span>-Rs.${tableData.discountAmount}</span></div>` : '';
-        const tipHtml = Number(tableData.tipAmount) > 0 ? `<div class="receipt-line"><span>Tip</span><span>Rs.${tableData.tipAmount}</span></div>` : '';
+      const discountHtml = Number(tableData.discountAmount) > 0 ? `<div class="receipt-line"><span>Discount</span><span>-Rs.${tableData.discountAmount}</span></div>` : '';
+      const tipHtml = Number(tableData.tipAmount) > 0 ? `<div class="receipt-line"><span>Tip</span><span>Rs.${tableData.tipAmount}</span></div>` : '';
 
-        const receiptDiv = document.getElementById('printableReceipt');
-        receiptDiv.innerHTML = `
-            <div class="receipt-brand">✦ MANDI CROODS ✦</div>
-            <div style="text-align:center; font-size:10px; margin-bottom:10px;">Premium Dining Experience<br>Khammam, Telangana</div>
-            <div class="receipt-divider"></div>
-            <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
-            <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
-            <div class="receipt-line"><span>Table:</span><span>${tableData.table}</span></div>
-            <div class="receipt-line"><span>Mob:</span><span>${tableData.phone || 'Walk-in'}</span></div>
-            <div class="receipt-divider"></div>
-            ${itemsHtml}
-            <div class="receipt-divider"></div>
-            <div class="receipt-line"><span>Subtotal</span><span>Rs.${tableData.subtotal || tableData.total}</span></div>
-            ${discountHtml}
-            ${tipHtml}
-            <div class="receipt-divider" style="border-width:2px;"></div>
-            <div class="receipt-line" style="font-weight:700; font-size:14px;"><span>TOTAL</span><span>Rs.${tableData.total}</span></div>
-            <div class="receipt-divider" style="border-width:2px;"></div>
-            <div style="text-align:center; margin-top:5px; font-weight:bold;">Method: ${pMethod} ${splitText}</div>
-            <div class="receipt-footer">Thank you for dining with us!<br>Scan QR to rate your experience.<br>*** CUSTOMER COPY ***</div>
-        `;
+      const receiptDiv = document.getElementById('printableReceipt');
+      receiptDiv.innerHTML = `
+        <div class="receipt-brand">✦ MANDI CROODS ✦</div>
+        <div style="text-align:center; font-size:10px; margin-bottom:10px;">Premium Dining Experience<br>Khammam, Telangana</div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
+        <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
+        <div class="receipt-line"><span>Table:</span><span>${tableData.table}</span></div>
+        <div class="receipt-line"><span>Mob:</span><span>${tableData.phone || 'Walk-in'}</span></div>
+        <div class="receipt-divider"></div>
+        ${itemsHtml}
+        <div class="receipt-divider"></div>
+        <div class="receipt-line"><span>Subtotal</span><span>Rs.${tableData.subtotal || tableData.total}</span></div>
+        ${discountHtml}
+        ${tipHtml}
+        <div class="receipt-divider" style="border-width:2px;"></div>
+        <div class="receipt-line" style="font-weight:700; font-size:14px;"><span>TOTAL</span><span>Rs.${tableData.total}</span></div>
+        <div class="receipt-divider" style="border-width:2px;"></div>
+        <div style="text-align:center; margin-top:5px; font-weight:bold;">Method: ${pMethod} ${splitText}</div>
+        <div class="receipt-footer">Thank you for dining with us!<br>Scan QR to rate your experience.<br>*** CUSTOMER COPY ***</div>
+      `;
 
-        window.print();
-        if(tableData.status === 'pending') acceptOrder(id);
+      window.print();
+      if(tableData.status === 'bill_requested') markBillReady(id);
     };
 
+    /* ---- POS Direct Ordering ---- */
     window.submitPosOrder = function() {
-        if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
-        const tNum = document.getElementById('posTableNum').value;
-        if(!tNum) return alert("Please select a table or takeaway slot.");
+      if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
+      const tNum = document.getElementById('posTableNum').value;
+      if(!tNum) return alert("Please select a table or takeaway slot.");
 
-        const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
-        const tableId = `table_${tNum}`;
-        const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+      const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
+      const tableId = `table_${tNum}`;
+      const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
 
-        const posDiscType = document.getElementById('posDiscType')?.value || 'flat';
-        const posDiscVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
-        const posCoupon = (document.getElementById('posCouponCode')?.value || '').trim().toUpperCase();
-        const posSplitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
+      const posDiscType = document.getElementById('posDiscType')?.value || 'flat';
+      const posDiscVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
+      const posCoupon = (document.getElementById('posCouponCode')?.value || '').trim().toUpperCase();
+      const posSplitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
 
-        const newLineItems = {};
-        Object.values(posCart).forEach((item, idx) => {
-            newLineItems[`${batchId}_${idx}`] = {
-                itemId: String(item.id || ''),
-                name: String(item.name || 'Item'),
-                variant: String(item.variant || 'Regular'),
-                price: Number(item.price) || 0,
-                qty: Number(item.qty) || 1,
-                cancelled: false,
-                addedAt: Date.now() + idx
-            };
-        });
+      const newLineItems = {};
+      Object.values(posCart).forEach((item, idx) => {
+        newLineItems[`${batchId}_${idx}`] = {
+          itemId: String(item.id || ''),
+          name: String(item.name || 'Item'),
+          variant: String(item.variant || 'Regular'),
+          price: Number(item.price) || 0,
+          qty: Number(item.qty) || 1,
+          cancelled: false,
+          addedAt: Date.now() + idx
+        };
+      });
 
-        const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : { table: tNum, phone: phone, status: 'pending', line_items: {} };
-        const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
-        const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
-        const subTot = Object.values(mergedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
+      const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : { table: tNum, phone: phone, status: 'pending', line_items: {} };
+      const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
+      const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
+      const subTot = Object.values(mergedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
 
-        const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
-        const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
-        const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
-        const dAmt = calculateDiscountAmount(subTot, dType, dVal);
-        const finalTot = Math.max(0, subTot - dAmt);
-        const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
+      const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
+      const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
+      const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
+      const dAmt = calculateDiscountAmount(subTot, dType, dVal);
+      const tipAmt = Number(existing.tipAmount) || 0;
+      const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
+      const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
 
-        const payload = sanitizeForFirebase({
-            orderId: existing.orderId || tableId,
-            table: String(tNum),
-            phone: String(phone),
-            line_items: mergedLineItems,
-            items: buildStr(mergedLineItems),
-            subtotal: subTot,
-            discountType: dType,
-            discountValue: dVal,
-            discountAmount: dAmt,
-            couponCode: cCode,
-            splitCount: sCount,
-            tipAmount: Number(existing.tipAmount) || 0,
-            total: finalTot,
-            status: 'pending',
-            timestamp: existing.timestamp || Date.now(),
-            paymentMethod: existing.paymentMethod || ''
-        });
+      const payload = sanitizeForFirebase({
+        orderId: existing.orderId || tableId,
+        table: String(tNum),
+        phone: String(phone),
+        line_items: mergedLineItems,
+        items: buildStr(mergedLineItems),
+        subtotal: subTot,
+        discountType: dType,
+        discountValue: dVal,
+        discountAmount: dAmt,
+        couponCode: cCode,
+        splitCount: sCount,
+        tipAmount: tipAmt,
+        total: finalTot,
+        status: 'pending',
+        timestamp: existing.timestamp || Date.now(),
+        paymentMethod: existing.paymentMethod || ''
+      });
 
-        db.ref(`active_tables/${tableId}`).set(payload).then(() => {
-            posCart = {};
-            if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
-            if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
-            if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
-            updatePosCartUI();
-            document.getElementById('posTableNum').value = "";
-            document.getElementById('posPhone').value = "";
-            showGlobalToast("Direct Order sent successfully to Kitchen!", "success");
-            switchTab('orders');
-        }).catch(err => {
-            alert("Failed to send order: " + err.message);
-        });
+      db.ref(`active_tables/${tableId}`).set(payload).then(() => {
+        posCart = {};
+        if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
+        if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
+        if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
+        updatePosCartUI();
+        document.getElementById('posTableNum').value = "";
+        document.getElementById('posPhone').value = "";
+        showGlobalToast("Direct Order sent successfully to Kitchen!", "success");
+        switchTab('orders');
+      }).catch(err => {
+        alert("Failed to send order: " + err.message);
+      });
     };
 
     window.adminCancelOrderItemInPos = function(tableId, lineItemKey) {
-        if(!confirm("Remove this item from the active order?")) return;
-        const existing = window.currentTables[tableId];
-        if(!existing || !existing.line_items || !existing.line_items[lineItemKey]) return;
+      if(!confirm("Remove this item from the active order?")) return;
+      const existing = window.currentTables[tableId];
+      if(!existing || !existing.line_items || !existing.line_items[lineItemKey]) return;
 
-        const updatedLineItems = Object.assign({}, existing.line_items);
-        updatedLineItems[lineItemKey].cancelled = true;
+      const updatedLineItems = Object.assign({}, existing.line_items);
+      updatedLineItems[lineItemKey].cancelled = true;
 
-        const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
-        const subTot = Object.values(updatedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
+      const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
+      const subTot = Object.values(updatedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
 
-        const dAmt = calculateDiscountAmount(subTot, existing.discountType || 'flat', Number(existing.discountValue) || 0);
-        const finalTot = Math.max(0, subTot - dAmt);
+      const dAmt = calculateDiscountAmount(subTot, existing.discountType || 'flat', Number(existing.discountValue) || 0);
+      const tipAmt = Number(existing.tipAmount) || 0;
+      const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
 
-        db.ref(`active_tables/${tableId}`).update({
-            line_items: updatedLineItems,
-            items: buildStr(updatedLineItems),
-            subtotal: subTot,
-            discountAmount: dAmt,
-            total: finalTot
-        }).then(() => showGlobalToast("Item removed from order", "info"));
+      db.ref(`active_tables/${tableId}`).update({
+        line_items: updatedLineItems,
+        items: buildStr(updatedLineItems),
+        subtotal: subTot,
+        discountAmount: dAmt,
+        total: finalTot
+      }).then(() => showGlobalToast("Item removed from order", "success"));
     };
 
     window.renderPosMenu = function() {
-        const grid = document.getElementById('posMenuGrid');
-        if(!grid) return;
-        const q = (document.getElementById('posSearch')?.value || '').toLowerCase();
-        grid.innerHTML = '';
+      const grid = document.getElementById('posMenuGrid');
+      if(!grid) return;
+      const q = (document.getElementById('posSearch')?.value || '').toLowerCase();
+      grid.innerHTML = '';
 
-        Object.entries(menuCache).forEach(([id, item]) => {
-            if(!item || !item.name) return;
-            if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
+      Object.entries(menuCache).forEach(([id, item]) => {
+        if(!item || !item.name) return;
+        if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
 
-            let varSelect = '';
-            if (item.portions && Object.keys(item.portions).length > 0) {
-              varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-[#1e1e2d] text-white text-[10px] font-bold border border-[#4b4b6a] outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
-              Object.entries(item.portions).forEach(([pName, pPrice]) => {
-                  varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`;
-              });
-              varSelect += `</select>`;
-            } else { varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`; }
+        let varSelect = '';
+        if (item.portions && Object.keys(item.portions).length > 0) {
+          varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-[#1e1e2d] text-white text-[10px] font-bold border border-[#4b4b6a] outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
+          Object.entries(item.portions).forEach(([pName, pPrice]) => {
+            varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`;
+          });
+          varSelect += `</select>`;
+        } else {
+          varSelect = `<div class="font-black text-sm text-primary mt-1">₹${item.base_price}</div>`;
+        }
 
-            grid.innerHTML += `
-              <div class="border border-[#4b4b6a] rounded-xl p-3 bg-card flex flex-col justify-between shadow-sm">
-                <h4 class="font-bold text-xs text-white leading-tight mb-1">${item.name}</h4>
-                <span class="text-[9px] text-slate-400 font-bold">${item.category || ''}</span>
-                ${varSelect}
-                <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 text-primary py-1.5 rounded-lg text-xs font-black">+ ADD</button>
-              </div>
-            `;
-        });
-        updatePosCartUI();
+        grid.innerHTML += `
+          <div class="border border-[#4b4b6a] rounded-xl p-3 bg-card flex flex-col justify-between shadow-sm">
+            <div>
+              <img src="${item.image_url}" class="w-full h-20 object-cover rounded-lg mb-2 border border-[#4b4b6a]">
+              <h4 class="font-bold text-xs text-white leading-tight mb-0.5">${item.name}</h4>
+              <span class="text-[9px] text-slate-400 font-bold block">${item.category || ''}</span>
+            </div>
+            <div>
+              ${varSelect}
+              <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 hover:bg-black text-primary border border-primary/30 py-1.5 rounded-lg text-xs font-black transition">+ ADD</button>
+            </div>
+          </div>
+        `;
+      });
+      updatePosCartUI();
     };
 
     window.addToPosCart = function(id) {
-        if(!menuCache[id]) return;
-        let price = Number(menuCache[id].base_price) || 0, variant = "Regular";
-        const sel = document.getElementById(`posVar-${id}`);
-        if (sel && sel.value) { const pts = sel.value.split('|'); variant = pts[0]; price = parseFloat(pts[1]) || 0; }
+      if(!menuCache[id]) return;
+      let price = Number(menuCache[id].base_price) || 0, variant = "Regular";
+      const sel = document.getElementById(`posVar-${id}`);
+      if (sel && sel.value) {
+        const pts = sel.value.split('|');
+        variant = pts[0];
+        price = parseFloat(pts[1]) || 0;
+      }
 
-        const key = `${id}|${variant}`;
-        if(posCart[key]) posCart[key].qty++;
-        else posCart[key] = { id, name: menuCache[id].name, variant, price, qty: 1 };
-        updatePosCartUI();
+      const key = `${id}|${variant}`;
+      if(posCart[key]) posCart[key].qty++;
+      else posCart[key] = { id, name: menuCache[id].name, variant, price, qty: 1 };
+      updatePosCartUI();
     };
 
     window.changePosCartQty = function(key, change) {
-        if(posCart[key]) {
-            posCart[key].qty += change;
-            if(posCart[key].qty <= 0) delete posCart[key];
-            updatePosCartUI();
-        }
+      if(posCart[key]) {
+        posCart[key].qty += change;
+        if(posCart[key].qty <= 0) delete posCart[key];
+        updatePosCartUI();
+      }
     };
 
     window.updatePosCartUI = function() {
-        const list = document.getElementById('posCartList');
-        if(!list) return;
-        list.innerHTML = '';
-        
-        const tNum = document.getElementById('posTableNum').value;
-        const tableId = `table_${tNum}`;
-        const existingTable = window.currentTables && window.currentTables[tableId];
+      const list = document.getElementById('posCartList');
+      if(!list) return;
+      list.innerHTML = '';
+      
+      const tNum = document.getElementById('posTableNum')?.value;
+      const tableId = `table_${tNum}`;
+      const existingTable = window.currentTables && window.currentTables[tableId];
 
-        // 1. Render existing items on the selected table (Allows Admin to delete)
-        if (existingTable && existingTable.line_items) {
-            list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mb-2 pb-1 border-b border-[#4b4b6a]">Currently on Table</div>`;
-            Object.entries(existingTable.line_items).forEach(([k, item]) => {
-                if(!item.cancelled) {
-                    list.innerHTML += `
-                    <div class="flex items-center justify-between py-1.5 text-slate-400">
-                        <div class="flex-1 pr-2 leading-tight">
-                            <span class="font-bold text-xs">${item.qty}x ${item.name}</span>
-                            <span class="text-[9px] block">${item.variant}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-black text-white">₹${item.price * item.qty}</span>
-                            <button onclick="adminCancelOrderItemInPos('${tableId}', '${k}')" class="w-6 h-6 bg-red-500/20 text-red-500 rounded text-xs font-black">✕</button>
-                        </div>
-                    </div>`;
-                }
-            });
-            list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-[#4b4b6a]">New Items to Add</div>`;
-        }
-
-        // 2. Render new items in POS Cart
-        let subtotal = 0;
-        Object.entries(posCart).forEach(([key, item]) => {
-            subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
+      if (existingTable && existingTable.line_items) {
+        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mb-2 pb-1 border-b border-[#4b4b6a]">Currently on Table ${tNum}</div>`;
+        Object.entries(existingTable.line_items).forEach(([k, item]) => {
+          if(item && !item.cancelled) {
             list.innerHTML += `
-                <div class="flex items-center justify-between py-2 border-b border-[#4b4b6a] last:border-0 text-white">
-                    <div class="flex-1 pr-2 leading-tight">
-                        <span class="font-bold text-xs">${item.name}</span>
-                        <span class="text-[9px] text-slate-400 block">${item.variant}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="changePosCartQty('${key}', -1)" class="w-6 h-6 bg-[#4b4b6a] rounded text-xs font-black">-</button>
-                        <span class="text-xs font-black">${item.qty}</span>
-                        <button onclick="changePosCartQty('${key}', 1)" class="w-6 h-6 bg-primary text-dark rounded text-xs font-black">+</button>
-                    </div>
+              <div class="flex items-center justify-between py-1.5 text-slate-300">
+                <div class="flex-1 pr-2 leading-tight">
+                  <span class="font-bold text-xs">${item.qty}x ${item.name}</span>
+                  <span class="text-[9px] text-slate-400 block">${item.variant}</span>
                 </div>
-            `;
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-black text-white">₹${item.price * item.qty}</span>
+                  <button onclick="adminCancelOrderItemInPos('${tableId}', '${k}')" class="w-6 h-6 bg-red-500/20 text-red-500 rounded text-xs font-black">✕</button>
+                </div>
+              </div>`;
+          }
         });
+        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-[#4b4b6a]">New Items to Add</div>`;
+      }
 
-        // Calculate combined total for display
-        const existingSub = existingTable ? Number(existingTable.subtotal) : 0;
-        const totalSub = existingSub + subtotal;
+      let subtotal = 0;
+      Object.entries(posCart).forEach(([key, item]) => {
+        subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
+        const safeKey = key.replace(/'/g, "\\'");
+        list.innerHTML += `
+          <div class="flex items-center justify-between py-2 border-b border-[#4b4b6a] last:border-0 text-white">
+            <div class="flex-1 pr-2 leading-tight">
+              <span class="font-bold text-xs">${item.name}</span>
+              <span class="text-[9px] text-slate-400 block">${item.variant} (₹${item.price})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="changePosCartQty('${safeKey}', -1)" class="w-6 h-6 bg-[#4b4b6a] rounded text-xs font-black">-</button>
+              <span class="text-xs font-black">${item.qty}</span>
+              <button onclick="changePosCartQty('${safeKey}', 1)" class="w-6 h-6 bg-primary text-dark rounded text-xs font-black">+</button>
+            </div>
+          </div>
+        `;
+      });
 
-        const discType = document.getElementById('posDiscType')?.value || 'flat';
-        const discVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
-        const discAmt = calculateDiscountAmount(totalSub, discType, discVal);
-        const finalTotal = Math.max(0, totalSub - discAmt);
-        const splitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
-        const perPerson = Math.ceil(finalTotal / splitCount);
+      const existingSub = existingTable ? Number(existingTable.subtotal) || 0 : 0;
+      const totalSub = existingSub + subtotal;
 
-        document.getElementById('posTotal').innerText = `₹${finalTotal}`;
-        const splitEl = document.getElementById('posSplitEach');
-        if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
+      const discType = document.getElementById('posDiscType')?.value || 'flat';
+      const discVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
+      const discAmt = calculateDiscountAmount(totalSub, discType, discVal);
+      const finalTotal = Math.max(0, totalSub - discAmt);
+      const splitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
+      const perPerson = Math.ceil(finalTotal / splitCount);
+
+      const posTotEl = document.getElementById('posTotal');
+      if(posTotEl) posTotEl.innerText = `₹${finalTotal}`;
+      const splitEl = document.getElementById('posSplitEach');
+      if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
     };
 
-    // Re-render POS cart UI when table is switched
-    document.getElementById('posTableNum').addEventListener('change', updatePosCartUI);
+    document.getElementById('posTableNum')?.addEventListener('change', updatePosCartUI);
 
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
@@ -1221,7 +1666,7 @@
       const tot = Number(tableData.total) || 0;
 
       if(pMethod === 'SPLIT') {
-          pMethod = `SPLIT (Cash: ₹${tableData.splitCash} | UPI: ₹${tableData.splitOnline})`;
+        pMethod = `SPLIT (Cash: ₹${tableData.splitCash} | UPI: ₹${tableData.splitOnline})`;
       }
 
       try {
@@ -1229,36 +1674,36 @@
           orderId: tableData.orderId || id, date: d, time: timeStr, table: tableData.table,
           phone: tableData.phone || 'Walk-in', items: itemsSummary,
           subtotal: Number(tableData.subtotal) || tot, discountAmount: Number(tableData.discountAmount) || 0,
-          total: tot, paymentMethod: pMethod, method: pMethod,
+          total: tot, paymentMethod: pMethod, method: pMethod
         };
         fetch(GOOGLE_SHEET_WEBHOOK_URL, {
           method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(sheetPayload)
         }).catch(err => console.error(err));
-      } catch(e) { }
+      } catch(e) {}
 
       db.ref(`tallies/daily/${d}`).transaction(data => {
-          let curr = data || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
-          curr.total = (Number(curr.total)||0) + tot;
-          curr.orderCount = (Number(curr.orderCount)||0) + 1;
-          
-          if(tableData.paymentMethod === "SPLIT") {
-              curr.cash = (Number(curr.cash)||0) + (Number(tableData.splitCash)||0);
-              curr.upi = (Number(curr.upi)||0) + (Number(tableData.splitOnline)||0);
-          } else if(pMethod === "CASH") {
-              curr.cash = (Number(curr.cash)||0) + tot;
-          } else if(pMethod === "UPI") {
-              curr.upi = (Number(curr.upi)||0) + tot;
-          } else {
-              curr.card = (Number(curr.card)||0) + tot;
-          }
-          return curr;
+        let curr = data || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
+        curr.total = (Number(curr.total)||0) + tot;
+        curr.orderCount = (Number(curr.orderCount)||0) + 1;
+        
+        if(tableData.paymentMethod === "SPLIT") {
+          curr.cash = (Number(curr.cash)||0) + (Number(tableData.splitCash)||0);
+          curr.upi = (Number(curr.upi)||0) + (Number(tableData.splitOnline)||0);
+        } else if(pMethod === "CASH") {
+          curr.cash = (Number(curr.cash)||0) + tot;
+        } else if(pMethod === "UPI") {
+          curr.upi = (Number(curr.upi)||0) + tot;
+        } else {
+          curr.card = (Number(curr.card)||0) + tot;
+        }
+        return curr;
       });
 
       db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set(sanitizeForFirebase({
         time: timeStr, table: tableData.table, items: itemsSummary, total: tot, method: pMethod
       }));
-      db.ref('active_tables/'+id).remove();
+      db.ref('active_tables/' + id).remove();
 
       const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nTotal: Rs. ${tot}\nMethod: ${pMethod}`;
       const a = document.createElement('a');
@@ -1268,109 +1713,128 @@
       a.click();
       document.body.removeChild(a);
       
-      showGlobalToast("Table cleared successfully!", "success");
+      showGlobalToast("Table cleared & logged successfully!", "success");
     };
 
     window.sendBillToWhatsApp = function(phone, tableNum, total) {
-        if (!phone || phone === 'Walk-in') {
-            const entered = prompt("Enter customer WhatsApp phone number (with country code, e.g. 919876543210):");
-            if (!entered) return;
-            phone = entered;
-        }
-        const msg = `Hello from Mandi Croods! 👑🍖 Your bill for Table ${tableNum} is ₹${total}. Thank you for dining with us!`;
-        const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
-        window.open(waUrl, '_blank');
+      if (!phone || phone === 'Walk-in') {
+        const entered = prompt("Enter customer WhatsApp phone number (with country code, e.g. 919876543210):");
+        if (!entered) return;
+        phone = entered;
+      }
+      const cleanPhone = phone.replace(/\D/g, '');
+      const fullPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
+      const msg = `Hello from Mandi Croods! 👑🍖 Your total bill for Table ${tableNum} is ₹${total}. Thank you for dining with us!`;
+      window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`, '_blank');
     };
 
     window.exportTodayExcel = function() {
-        const dStr = new Date().toISOString().split('T')[0];
-        db.ref(`daily_logs/${dStr}`).once('value').then(snap => {
-            const logs = snap.val();
-            if(!logs) return alert("No sales data found for today.");
-            const data = Object.values(logs).map(l => ({
-                Date: dStr, Time: l.time, Table: l.table, Method: l.method, Items: l.items, Amount: l.total
-            }));
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "TodaySales");
-            XLSX.writeFile(wb, `MandiCroods_Sales_${dStr}.xlsx`);
-        });
+      const dStr = new Date().toISOString().split('T')[0];
+      db.ref(`daily_logs/${dStr}`).once('value').then(snap => {
+        const logs = snap.val();
+        if(!logs) return alert("No sales data found for today.");
+        const data = Object.values(logs).map(l => ({
+          Date: dStr, Time: l.time, Table: l.table, Method: l.method, Items: l.items, Amount: l.total
+        }));
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "TodaySales");
+        XLSX.writeFile(wb, `MandiCroods_Sales_${dStr}.xlsx`);
+      });
     };
 
     window.exportAllLogsExcel = function() {
-        db.ref('daily_logs').once('value').then(snap => {
-            const allDays = snap.val();
-            if(!allDays) return alert("No history found.");
-            let data = [];
-            Object.keys(allDays).forEach(date => {
-                Object.values(allDays[date]).forEach(l => {
-                    data.push({ Date: date, Time: l.time, Table: l.table, Method: l.method, Items: l.items, Amount: l.total });
-                });
-            });
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "AllHistory");
-            XLSX.writeFile(wb, `MandiCroods_Full_History.xlsx`);
+      db.ref('daily_logs').once('value').then(snap => {
+        const allDays = snap.val();
+        if(!allDays) return alert("No history found.");
+        let data = [];
+        Object.keys(allDays).forEach(date => {
+          Object.values(allDays[date]).forEach(l => {
+            data.push({ Date: date, Time: l.time, Table: l.table, Method: l.method, Items: l.items, Amount: l.total });
+          });
         });
-    }
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "AllHistory");
+        XLSX.writeFile(wb, `MandiCroods_Full_History.xlsx`);
+      });
+    };
 
     window.renderFloorGrid = function(tables) {
-        const grid = document.getElementById('kitchenGrid');
-        if(!grid) return;
-        grid.innerHTML = '';
-        Object.entries(tables).forEach(([id, table]) => {
-          let border = table.status==='pending'?'urgent-alarm':(table.status==='bill_requested'?'urgent-alarm border-amber-500':'border-blue-500');
-          if(table.status==='served') border = 'border-emerald-500';
+      const grid = document.getElementById('kitchenGrid');
+      if(!grid) return;
+      grid.innerHTML = '';
 
-          grid.innerHTML += `
-            <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
-              <div>
-                <div class="flex justify-between items-center border-b border-[#4b4b6a] pb-4 mb-4">
-                  <div>
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
-                    <span class="font-black text-2xl text-white leading-none">${table.table}</span>
-                  </div>
-                  <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-current">${table.status.replace('_',' ')}</span>
+      const entries = Object.entries(tables || {});
+      if(entries.length === 0) {
+        grid.innerHTML = `<div class="col-span-full bg-card p-10 rounded-3xl text-center text-slate-400 font-bold border border-[#4b4b6a]">No active tables right now. Orders placed by customers or POS will appear here live.</div>`;
+        return;
+      }
+
+      entries.forEach(([id, table]) => {
+        if(!table) return;
+        let border = table.status === 'pending'
+          ? 'urgent-alarm'
+          : (table.status === 'bill_requested' ? 'urgent-alarm border-amber-500' : 'border-blue-500');
+        if(table.status === 'served') border = 'border-emerald-500';
+
+        const canKitchenAct = (currentRole === 'admin' || currentRole === 'kitchen' || currentRole === 'waiter');
+        const isAdminOrWaiter = (currentRole === 'admin' || currentRole === 'waiter');
+
+        grid.innerHTML += `
+          <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center border-b border-[#4b4b6a] pb-4 mb-4">
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
+                  <span class="font-black text-2xl text-white leading-none">${table.table}</span>
                 </div>
-                <div class="max-h-40 overflow-y-auto pr-2 mb-2 text-sm text-slate-300 font-semibold leading-relaxed">
-                  ${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}
-                  ${table.paymentMethod === 'SPLIT' ? `<br><span class="text-amber-400 mt-2 block text-xs">⚠️ SPLIT: Cash ₹${table.splitCash} | Online ₹${table.splitOnline}</span>` : ''}
+                <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-current">${(table.status || 'pending').replace('_',' ')}</span>
+              </div>
+              <div class="max-h-44 overflow-y-auto pr-2 mb-2 text-sm text-slate-300 font-semibold leading-relaxed">
+                ${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}
+                ${table.paymentMethod ? `<br><span class="text-primary mt-2 block text-xs font-black">💳 Payment: ${table.paymentMethod}</span>` : ''}
+                ${table.paymentMethod === 'SPLIT' ? `<span class="text-amber-400 mt-1 block text-xs">⚠️ SPLIT: Cash ₹${table.splitCash} | Online ₹${table.splitOnline}</span>` : ''}
+              </div>
+            </div>
+            <div class="mt-2 pt-4 border-t border-[#4b4b6a]">
+              <div class="flex justify-between items-end mb-5">
+                <span class="text-xs font-bold text-slate-400 bg-light border border-[#4b4b6a] px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}</span>
+                <div class="text-right">
+                  ${Number(table.discountAmount) > 0 ? `<span class="text-[10px] text-emerald-400 font-bold block">Saved ₹${table.discountAmount}</span>` : ''}
+                  <span class="font-black text-2xl text-white tracking-tight">₹${table.total || 0}</span>
                 </div>
               </div>
-              <div class="mt-2 pt-4 border-t border-[#4b4b6a]">
-                <div class="flex justify-between items-end mb-5">
-                  <span class="text-xs font-bold text-slate-400 bg-light border border-[#4b4b6a] px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}</span>
-                  <div class="text-right">
-                    <span class="font-black text-2xl text-white tracking-tight">₹${table.total || 0}</span>
-                  </div>
-                </div>
-                
-                ${currentRole==='admin' ? `
-                    ${table.status === 'pending' ? `
-                        <button class="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-sm" onclick="acceptOrder('${id}')">👨‍🍳 Accept & Start Cooking</button>
-                    ` : ''}
-                    
-                    ${table.status === 'cooking' ? `
-                        <div class="flex gap-2 mb-2">
-                           <input type="number" id="speed_${id}" placeholder="Mins" class="w-20 p-2 bg-light text-white border border-[#4b4b6a] rounded-lg outline-none">
-                           <button onclick="setPrepSpeed('${id}', 'speed_${id}')" class="flex-1 bg-amber-500 text-dark font-black rounded-lg text-xs">Set ETA</button>
-                        </div>
-                    ` : ''}
-                    
-                    ${table.status !== 'pending' ? `
-                        <div class="grid grid-cols-2 gap-2 mb-2">
-                           <button class="bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumKOT('${id}')">🖨️ KOT</button>
-                           <button class="bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-500 py-3 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumBill('${id}')">🧾 BILL</button>
-                        </div>
-                        <button class="w-full mb-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-black text-xs uppercase tracking-wider" onclick="sendBillToWhatsApp('${table.phone}', '${table.table}', '${table.total}')">💬 Send Bill to WhatsApp</button>
-                    ` : ''}
-                    
-                    <button class="w-full mb-2 bg-slate-900 hover:bg-black text-primary border-2 border-primary py-4 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 Clear Table & Settle</button>
-                    <button class="w-full bg-red-900/40 hover:bg-red-600 text-red-500 hover:text-white border border-red-500 py-2 rounded-xl font-black text-xs uppercase" onclick="adminCancelOrder('${id}')">✕ Cancel Entire Order</button>
+              
+              ${canKitchenAct ? `
+                ${table.status === 'pending' ? `
+                  <button class="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-sm transition" onclick="acceptOrder('${id}')">👨‍🍳 Accept & Start Cooking</button>
                 ` : ''}
-              </div>
-            </div>`;
-        });
+                
+                ${table.status === 'cooking' ? `
+                  <div class="flex gap-2 mb-2">
+                    <input type="number" id="speed_${id}" value="${table.prepSpeed || 15}" placeholder="Mins" class="w-20 p-2 bg-light text-white border border-[#4b4b6a] rounded-lg outline-none text-xs font-black">
+                    <button onclick="setPrepSpeed('${id}', 'speed_${id}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-dark font-black rounded-lg text-xs uppercase">⏱️ Set ETA</button>
+                  </div>
+                  <button class="w-full mb-2 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition" onclick="markOrderServed('${id}')">🍽️ Mark Food Served</button>
+                ` : ''}
+              ` : ''}
+
+              ${isAdminOrWaiter ? `
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                  <button class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 py-2.5 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumKOT('${id}')">🖨️ KOT</button>
+                  <button class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 py-2.5 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumBill('${id}')">🧾 BILL</button>
+                </div>
+                <button class="w-full mb-2 bg-emerald-600/90 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-black text-xs uppercase tracking-wider" onclick="sendBillToWhatsApp('${table.phone}', '${table.table}', '${table.total}')">💬 Send Bill to WhatsApp</button>
+              ` : ''}
+
+              ${currentRole === 'admin' ? `
+                <button class="w-full mb-2 bg-slate-900 hover:bg-black text-primary border-2 border-primary py-3.5 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 Clear Table & Settle</button>
+                <button class="w-full bg-red-900/40 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/50 py-2 rounded-xl font-black text-xs uppercase transition" onclick="adminCancelOrder('${id}')">✕ Cancel Entire Order</button>
+              ` : ''}
+            </div>
+          </div>`;
+      });
     };
 
     window.clearDashboardRevenue = function() {
@@ -1379,10 +1843,10 @@
         document.getElementById('tallyTotal').innerText = '₹0';
         document.getElementById('dailyLogsTable').innerHTML = '';
         if (chartInstance) {
-            chartInstance.data.datasets[0].data = [0, 0, 0];
-            chartInstance.update();
+          chartInstance.data.datasets[0].data = [0, 0, 0];
+          chartInstance.update();
         }
-        showGlobalToast("Dashboard Cleared to ₹0!", "info");
+        showGlobalToast("Dashboard Cleared to ₹0!", "success");
       });
     };
   </script>
