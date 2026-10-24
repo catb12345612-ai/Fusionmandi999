@@ -8,7 +8,7 @@
   <!-- Premium Fonts for Dashboard and Receipt Printing -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -20,12 +20,17 @@
     tailwind.config = {
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+            mono: ['Space Mono', 'monospace']
+          },
           colors: {
             primary: '#D4AF37',
             dark: '#0a0a0a',
-            sidebar: '#14141d',
-            light: '#1e1e2d',
-            card: '#2b2b40'
+            sidebar: '#12121a',
+            light: '#181824',
+            card: '#222233'
           }
         }
       }
@@ -34,26 +39,36 @@
   <style>
     .hide-scroll::-webkit-scrollbar { display: none; }
     .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-    .dash-card { box-shadow: 0 4px 25px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); transition: transform 0.2s; }
-    body { background-color: #1e1e2d; color: #ffffff; }
+    
+    /* Custom Subtle Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #12121a; }
+    ::-webkit-scrollbar-thumb { background: #3f3f5a; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+
+    .dash-card { 
+      box-shadow: 0 10px 35px -5px rgba(0,0,0,0.5); 
+      border: 1px solid rgba(255,255,255,0.07); 
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+    }
+    .dash-card:hover {
+      border-color: rgba(212, 175, 55, 0.28);
+    }
+    body { background-color: #181824; color: #ffffff; }
     
     @keyframes redBlueFlash {
-      0% { box-shadow: inset 0 0 0 3px #ef4444; border-color: #ef4444; }
-      50% { box-shadow: inset 0 0 0 3px #f59e0b; border-color: #f59e0b; }
-      100% { box-shadow: inset 0 0 0 3px #ef4444; border-color: #ef4444; }
+      0% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), inset 0 0 0 2px #ef4444; border-color: #ef4444; }
+      50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.35), inset 0 0 0 2px #f59e0b; border-color: #f59e0b; }
+      100% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), inset 0 0 0 2px #ef4444; border-color: #ef4444; }
     }
-    .urgent-alarm { animation: redBlueFlash 1.5s infinite; }
-    .gold-gradient { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); }
-    .gold-text { background: linear-gradient(135deg, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .bg-card { background-color: #2b2b40; }
-    .text-slate-900 { color: #ffffff; }
-    .text-slate-800 { color: #f1f1f1; }
-    .text-slate-600 { color: #d1d1d1; }
-    .text-slate-500 { color: #a1a1aa; }
-    .border-slate-100 { border-color: #3f3f5a; }
-    .border-slate-200 { border-color: #4b4b6a; }
-    .bg-light { background-color: #1e1e2d; }
-    input, select { background-color: #1e1e2d !important; color: white !important; border-color: #4b4b6a !important; }
+    .urgent-alarm { animation: redBlueFlash 1.6s infinite; }
+    .gold-gradient { background: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #AA8C2C 100%); }
+    .gold-text { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .bg-card { background-color: #222233; }
+    .bg-light { background-color: #181824; }
+    .glass-panel { background: rgba(34, 34, 51, 0.85); backdrop-filter: blur(16px); }
+    input, select { background-color: #151520 !important; color: white !important; border-color: #3b3b54 !important; }
+    input:focus, select:focus { border-color: #D4AF37 !important; box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15) !important; }
 
     /* PREMIUM THERMAL PRINTING CSS */
     #printableReceipt { display: none; }
@@ -81,7 +96,7 @@
     }
   </style>
 </head>
-<body class="font-sans antialiased text-white">
+<body class="font-sans antialiased text-white selection:bg-primary selection:text-black">
 
   <!-- Hidden Premium Receipt Template for Printing -->
   <div id="printableReceipt"></div>
@@ -89,15 +104,190 @@
   <!-- Hidden Global File Input for Weekly Mobile Photo Updates -->
   <input type="file" id="globalImageUpdaterInput" accept="image/*" class="hidden" onchange="handleGlobalImageUpdate(event)">
 
-  <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
-  <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[200] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
+  <div id="globalErrorBanner" class="hidden fixed top-0 left-0 right-0 z-[250] bg-red-600 text-white text-xs font-bold text-center py-2.5 px-4 shadow-lg transition-colors duration-300"></div>
+  <div id="connectionBanner" class="hidden fixed top-0 left-0 right-0 z-[250] bg-red-600 text-white text-center text-xs font-black py-1.5 shadow-md">
     ⚠ Connection lost — reconnecting to Mandi Croods servers...
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 1: LIVE ORDER EDITOR & ITEM REPLACEMENT / ADDITION PORTAL           -->
+  <!-- ========================================================================= -->
+  <div id="orderEditModal" class="hidden fixed inset-0 z-[180] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 md:p-6 no-print">
+    <div class="bg-card border-2 border-primary/50 rounded-3xl w-full max-w-6xl h-[90vh] flex flex-col shadow-[0_25px_70px_rgba(0,0,0,0.85)] overflow-hidden">
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-sidebar border-b border-white/10 flex flex-wrap justify-between items-center gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-2xl gold-gradient text-black font-black flex items-center justify-center text-lg shadow-md">✏️</div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-xl font-black text-white tracking-tight">Live Order Editor — <span id="editModalTableTitle" class="text-primary">Table</span></h3>
+              <span id="editModalStatusBadge" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/40">ACTIVE</span>
+            </div>
+            <p class="text-xs text-slate-400">Modify quantities, remove wrong dishes, click <span class="text-amber-400 font-bold">🔄 Replace</span> on any item to swap it, or add new items directly from the menu.</p>
+          </div>
+        </div>
+        <button onclick="closeOrderEditor()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider transition">✕ Close Editor</button>
+      </div>
+
+      <!-- Replacement Mode Active Banner -->
+      <div id="replaceModeBanner" class="hidden bg-amber-500/20 border-b border-amber-500/50 px-6 py-2.5 flex items-center justify-between">
+        <div class="flex items-center gap-2 text-xs font-black text-amber-300">
+          <span class="animate-ping w-2 h-2 rounded-full bg-amber-400"></span>
+          <span>REPLACEMENT MODE ACTIVE: Select any dish & portion on the right to replace <u id="replaceTargetName" class="text-white"></u></span>
+        </div>
+        <button onclick="cancelReplaceMode()" class="text-[11px] bg-amber-500 text-black font-black px-3 py-1 rounded-lg uppercase">Cancel Replace</button>
+      </div>
+
+      <!-- Modal Body: Split View -->
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden">
+        
+        <!-- Left Column: Current Items in Order (5 Cols) -->
+        <div class="lg:col-span-5 border-r border-white/10 flex flex-col h-full bg-light/60 overflow-hidden">
+          <div class="p-4 border-b border-white/10 flex justify-between items-center">
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">📋 Current Ordered Items</span>
+            <span id="editModalItemCount" class="text-xs font-black text-primary">0 Items</span>
+          </div>
+          
+          <div id="editModalLineItems" class="flex-1 overflow-y-auto p-4 space-y-2.5"></div>
+
+          <!-- Order Totals & Quick Discount Footer -->
+          <div class="p-4 bg-sidebar border-t border-white/10 space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-bold">Subtotal:</span>
+              <span id="editModalSubtotal" class="font-black text-white">₹0</span>
+            </div>
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400 font-bold">Discount Applied:</span>
+              <span id="editModalDiscount" class="font-black text-emerald-400">-₹0</span>
+            </div>
+            <div class="flex items-center justify-between pt-2 border-t border-white/10">
+              <span class="text-sm font-black uppercase tracking-wider text-slate-300">Updated Grand Total:</span>
+              <span id="editModalTotal" class="text-2xl font-black text-primary">₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Full Menu Picker to Replace or Add (7 Cols) -->
+        <div class="lg:col-span-7 flex flex-col h-full overflow-hidden bg-card">
+          <div class="p-4 border-b border-white/10 space-y-3">
+            <div class="flex flex-wrap gap-2">
+              <input type="text" id="editModalMenuSearch" oninput="renderEditModalMenu()" placeholder="🔍 Search dish to add or replace (e.g. Juicy Mandi, 65, Drinks)..." class="flex-1 p-3 rounded-xl text-sm font-bold outline-none border">
+              <select id="editModalCategoryFilter" onchange="renderEditModalMenu()" class="p-3 rounded-xl text-xs font-black outline-none border">
+                <option value="ALL">All Categories</option>
+                <option value="Chicken Mandi">Chicken Mandi</option>
+                <option value="Mutton Mandi">Mutton Mandi</option>
+                <option value="Veg Mandi">Veg Mandi</option>
+                <option value="Fish & Prawns Mandi">Fish & Prawns Mandi</option>
+                <option value="Specials">👑 Royal Specials</option>
+                <option value="Chicken Starters">Chicken Starters</option>
+                <option value="Mutton Starters">Mutton Starters</option>
+                <option value="Veg Starters">Veg Starters</option>
+                <option value="Fish & Prawns Starters">Fish & Prawns Starters</option>
+                <option value="Beverages">🥤 Cool Drinks & Desserts</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="editModalMenuGrid" class="flex-1 overflow-y-auto p-4 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 content-start"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL 2: FLEXIBLE MENU ITEM & PORTION / VARIANT EDITOR MODAL              -->
+  <!-- ========================================================================= -->
+  <div id="itemFlexModal" class="hidden fixed inset-0 z-[190] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 no-print">
+    <div class="bg-card border-2 border-primary/50 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 bg-sidebar border-b border-white/10 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-black text-white">⚙️ Flexible Item, Price & Portion Editor</h3>
+          <p class="text-xs text-slate-400">Configure base price, stock, and custom portions (2 Pcs, 3 Pcs, Half, Full, 2P, 4P Gang, etc.)</p>
+        </div>
+        <button onclick="closeItemFlexModal()" class="text-slate-400 hover:text-white font-black text-sm">✕</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-5 flex-1">
+        <input type="hidden" id="flexEditItemId">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dish Name</label>
+            <input type="text" id="flexEditName" class="w-full p-3 rounded-xl font-bold text-sm border outline-none">
+          </div>
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
+            <select id="flexEditCategory" class="w-full p-3 rounded-xl font-bold text-sm border outline-none">
+              <option value="Beverages">🥤 Cool Drinks & Desserts (Cart Upsell)</option>
+              <option value="Chicken Mandi">Chicken Mandi</option>
+              <option value="Mutton Mandi">Mutton Mandi</option>
+              <option value="Veg Mandi">Veg Mandi</option>
+              <option value="Fish & Prawns Mandi">Fish & Prawns Mandi</option>
+              <option value="Specials">👑 Royal Specials</option>
+              <option value="Chicken Starters">Chicken Starters</option>
+              <option value="Mutton Starters">Mutton Starters</option>
+              <option value="Veg Starters">Veg Starters</option>
+              <option value="Fish & Prawns Starters">Fish & Prawns Starters</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base / Regular (1P) Price (₹)</label>
+            <input type="number" id="flexEditBasePrice" class="w-full p-3 rounded-xl font-black text-sm border outline-none">
+          </div>
+          <div>
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Available Stock Count</label>
+            <input type="number" id="flexEditStock" class="w-full p-3 rounded-xl font-black text-sm border outline-none">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between bg-light p-3.5 rounded-2xl border border-white/10">
+          <div>
+            <span class="text-xs font-black text-white block">👑 Highlight as Royal Special / Upsell</span>
+            <span class="text-[10px] text-slate-400">Marks this item with a Special badge on the customer menu</span>
+          </div>
+          <input type="checkbox" id="flexEditSpecial" class="w-5 h-5 accent-amber-400 cursor-pointer">
+        </div>
+
+        <!-- Dynamic Portions / Variants Builder -->
+        <div class="bg-light p-4 rounded-2xl border border-primary/30">
+          <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
+            <div>
+              <h4 class="text-xs font-black uppercase tracking-widest text-primary">🍗 Custom Portions / Pieces / Variants</h4>
+              <p class="text-[11px] text-slate-400">Add options like <span class="text-white font-bold">Half, Full, 2 Pcs, 3 Pcs, 4 Pcs, 2P, 3P, 4P (Gang), 5P (Gang)</span></p>
+            </div>
+            <button type="button" onclick="addFlexPortionRow('', '')" class="bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40 px-3 py-1.5 rounded-xl text-xs font-black transition">+ Add Portion / Variant</button>
+          </div>
+
+          <!-- Quick Preset Portion Pills -->
+          <div class="flex flex-wrap gap-1.5 mb-3 pb-3 border-b border-white/10">
+            <span class="text-[10px] font-bold text-slate-400 self-center mr-1">Quick Presets:</span>
+            <button type="button" onclick="addFlexPortionRow('Half', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ Half</button>
+            <button type="button" onclick="addFlexPortionRow('Full', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ Full</button>
+            <button type="button" onclick="addFlexPortionRow('2 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 2 Pcs</button>
+            <button type="button" onclick="addFlexPortionRow('3 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 3 Pcs</button>
+            <button type="button" onclick="addFlexPortionRow('4 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 4 Pcs</button>
+            <button type="button" onclick="addFlexPortionRow('2P', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 2P</button>
+            <button type="button" onclick="addFlexPortionRow('3P', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 3P</button>
+            <button type="button" onclick="addFlexPortionRow('4P (Gang)', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 4P (Gang)</button>
+            <button type="button" onclick="addFlexPortionRow('5P (Gang)', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 5P (Gang)</button>
+          </div>
+
+          <div id="flexPortionsContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+
+      <div class="px-6 py-4 bg-sidebar border-t border-white/10 flex justify-end gap-3">
+        <button onclick="closeItemFlexModal()" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-black uppercase tracking-wider">Cancel</button>
+        <button onclick="saveItemFlexChanges()" class="px-6 py-2.5 rounded-xl gold-gradient text-black text-xs font-black uppercase tracking-wider shadow-lg active:scale-95 transition">💾 Save Item & Portions</button>
+      </div>
+    </div>
   </div>
 
   <!-- Login Screen -->
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
     <div class="bg-[#1e1e2d] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
-      <div class="w-16 h-16 gold-gradient text-black rounded-xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg">MC</div>
+      <div class="w-16 h-16 gold-gradient text-black rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg font-serif">MC</div>
       <h2 class="text-2xl font-black text-white mb-2 tracking-tight">System Login</h2>
       <p class="text-[11px] font-bold text-slate-400 mb-5">Enter Admin, Waiter, or Kitchen PIN</p>
       <input type="password" id="sysPin" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') attemptLogin()" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
@@ -132,17 +322,28 @@
 
   <!-- Main Workspace Layout -->
   <div class="flex h-[calc(100vh-48px)] overflow-hidden hidden no-print" id="mainLayout">
-    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-xl z-20 border-r border-[#2b2b40] shrink-0">
-      <div class="p-6 border-b border-[#2b2b40]">
-        <h1 class="font-black text-xl leading-tight tracking-tight gold-text">Mandi Croods</h1>
-        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
-        <div class="flex items-center gap-1.5 mt-3">
-          <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-          <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
+    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-2xl z-20 border-r border-white/10 shrink-0">
+      <div class="p-6 border-b border-white/10">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl gold-gradient text-black font-black flex items-center justify-center font-serif text-sm shadow">MC</div>
+          <div>
+            <h1 class="font-black text-lg leading-tight tracking-tight gold-text font-serif">Mandi Croods</h1>
+            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-white/5">
+          <div class="flex items-center gap-1.5">
+            <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+            <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
+          </div>
+          <span id="liveClockSidebar" class="text-[9px] font-mono text-slate-400 font-bold"></span>
         </div>
       </div>
-      <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
-        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn" data-i18n="nav_floor">📦 Active Floor</button>
+      <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn">
+          <span data-i18n="nav_floor">📦 Active Floor</span>
+          <span id="activeOrdersBadge" class="text-[10px] bg-primary text-black font-black px-2 py-0.5 rounded-full">0</span>
+        </button>
         <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
         <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
           <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
@@ -152,7 +353,7 @@
         <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🥩 Raw Materials</button>
         <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
       </nav>
-      <div class="p-4 border-t border-[#2b2b40] space-y-2">
+      <div class="p-4 border-t border-white/10 space-y-2">
         <button onclick="openSupportWhatsApp()" class="w-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all text-xs uppercase tracking-widest">💬 WhatsApp Support</button>
         <button onclick="clearConsoleCache()" class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold py-2 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-xs uppercase tracking-widest admin-only hidden">🧹 Clear Console Cache</button>
         <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs uppercase tracking-widest" data-i18n="logout">Log Out</button>
@@ -162,42 +363,79 @@
     <main class="flex-1 flex flex-col overflow-y-auto bg-light relative" id="mainContent">
       <div class="p-6 md:p-8 pb-32">
 
-        <!-- 1. Floor Operations & Kitchen Display -->
+        <!-- ========================================================================= -->
+        <!-- 1. CLASSY & LUXURY FLOOR OPERATIONS & ORDER RECEIVING PORTAL              -->
+        <!-- ========================================================================= -->
         <section id="view-orders" class="tab-section">
-          <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
-            <h2 class="text-3xl font-black text-white tracking-tight" data-i18n="title_floor">Floor & Kitchen Operations</h2>
-            <div class="flex items-center gap-2 text-xs font-bold text-slate-400">
-              <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Pending = New Order</span>
-              <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/40">Cooking = In Kitchen</span>
-              <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Served = At Table</span>
+          <!-- Luxury Portal Header & Filter Pills -->
+          <div class="bg-card p-6 rounded-3xl dash-card mb-6 border-l-4 border-primary flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-primary block mb-1">✦ Real-Time Command Center</span>
+              <h2 class="text-3xl font-black text-white tracking-tight font-serif" data-i18n="title_floor">Floor & Kitchen Operations</h2>
+            </div>
+
+            <!-- Interactive Status Filter Bar -->
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="setFloorFilter('ALL')" id="flt-ALL" class="floor-flt-btn px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-primary text-black shadow">All Active (<span id="cnt-ALL">0</span>)</button>
+              <button onclick="setFloorFilter('pending')" id="flt-pending" class="floor-flt-btn px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/40 hover:bg-amber-500/25">🔔 New / Pending (<span id="cnt-pending">0</span>)</button>
+              <button onclick="setFloorFilter('cooking')" id="flt-cooking" class="floor-flt-btn px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-blue-500/15 text-blue-300 border border-blue-500/40 hover:bg-blue-500/25">🔥 Cooking (<span id="cnt-cooking">0</span>)</button>
+              <button onclick="setFloorFilter('served')" id="flt-served" class="floor-flt-btn px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/25">🍽️ Served (<span id="cnt-served">0</span>)</button>
+              <button onclick="setFloorFilter('bill_requested')" id="flt-bill_requested" class="floor-flt-btn px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider bg-purple-500/15 text-purple-300 border border-purple-500/40 hover:bg-purple-500/25">🧾 Bill Req (<span id="cnt-bill">0</span>)</button>
             </div>
           </div>
 
+          <!-- Collapsible / Interactive Live Table Occupancy Matrix -->
           <div class="mb-8 bg-card p-5 rounded-3xl dash-card border-t-4 border-primary">
-            <h3 class="text-sm font-black text-white mb-4 uppercase tracking-widest" data-i18n="occupancy">Live Table Occupancy (All Cabins & Tables)</h3>
-            <div id="occupancyMap" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 max-h-48 overflow-y-auto pr-2"></div>
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+              <h3 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-primary inline-block"></span>
+                <span data-i18n="occupancy">Live Table Occupancy (Click Any Table to Open POS or Edit Order)</span>
+              </h3>
+              <div class="flex items-center gap-4 text-[10px] font-black uppercase tracking-wider">
+                <span class="flex items-center gap-1.5 text-emerald-400"><span class="w-2 h-2 rounded-full bg-emerald-400"></span> Free</span>
+                <span class="flex items-center gap-1.5 text-amber-400"><span class="w-2 h-2 rounded-full bg-amber-400"></span> New Order</span>
+                <span class="flex items-center gap-1.5 text-blue-400"><span class="w-2 h-2 rounded-full bg-blue-400"></span> Occupied</span>
+              </div>
+            </div>
+            <div id="occupancyMap" class="grid grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-11 gap-2 max-h-48 overflow-y-auto pr-1"></div>
           </div>
 
+          <!-- Classy Order Receiving Portal Grid -->
           <div id="kitchenGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
         </section>
 
         <!-- 2. Service Requests Tab -->
         <section id="view-services" class="tab-section hidden">
-          <h2 class="text-3xl font-black text-white mb-6 tracking-tight">🛎️ Active Service Calls</h2>
+          <h2 class="text-3xl font-black text-white mb-6 tracking-tight font-serif">🛎️ Active Service Calls</h2>
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
         <!-- 3. POS / Direct Order -->
         <section id="view-pos" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-white mb-6 tracking-tight" data-i18n="title_pos">POS / Direct Order</h2>
+          <h2 class="text-3xl font-black text-white mb-6 tracking-tight font-serif" data-i18n="title_pos">POS / Direct Order</h2>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[75vh] flex flex-col">
-              <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="w-full p-3 mb-4 bg-light border border-[#4b4b6a] text-white rounded-xl font-bold text-sm outline-none focus:border-primary">
-              <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll"></div>
+            <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[78vh] flex flex-col">
+              <div class="flex flex-wrap gap-2 mb-4">
+                <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="flex-1 p-3 bg-light border border-[#4b4b6a] text-white rounded-xl font-bold text-sm outline-none focus:border-primary">
+                <select id="posCatFilter" onchange="renderPosMenu()" class="p-3 rounded-xl text-xs font-black outline-none border">
+                  <option value="ALL">All Categories</option>
+                  <option value="Chicken Mandi">Chicken Mandi</option>
+                  <option value="Mutton Mandi">Mutton Mandi</option>
+                  <option value="Veg Mandi">Veg Mandi</option>
+                  <option value="Fish & Prawns Mandi">Fish & Prawns Mandi</option>
+                  <option value="Specials">👑 Specials</option>
+                  <option value="Chicken Starters">Chicken Starters</option>
+                  <option value="Mutton Starters">Mutton Starters</option>
+                  <option value="Veg Starters">Veg Starters</option>
+                  <option value="Fish & Prawns Starters">Fish & Prawns Starters</option>
+                  <option value="Beverages">🥤 Drinks & Desserts</option>
+                </select>
+              </div>
+              <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll content-start"></div>
             </div>
 
-            <div class="bg-card p-6 rounded-3xl dash-card border border-[#4b4b6a] h-[75vh] flex flex-col">
+            <div class="bg-card p-6 rounded-3xl dash-card border border-[#4b4b6a] h-[78vh] flex flex-col">
               <h3 class="text-lg font-black text-white mb-4 border-b border-[#4b4b6a] pb-2" data-i18n="new_order">New / Active Table Order</h3>
 
               <div class="flex gap-2 mb-4">
@@ -226,7 +464,7 @@
                 <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
               </div>
 
-              <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-[#4b4b6a] rounded-xl p-2 hide-scroll"></div>
+              <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-[#4b4b6a] rounded-xl p-2.5 hide-scroll"></div>
 
               <div class="bg-light p-3 rounded-2xl border border-[#4b4b6a] mb-3 space-y-2">
                 <div class="flex items-center gap-2">
@@ -258,9 +496,11 @@
           </div>
         </section>
 
-        <!-- 4. Inventory, Weekly Drinks/Desserts Photo Manager & Menu Control -->
+        <!-- ========================================================================= -->
+        <!-- 4. FLEXIBLE INVENTORY, PORTIONS/VARIANTS & MENU CONTROL                   -->
+        <!-- ========================================================================= -->
         <section id="view-inventory" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-white mb-8 tracking-tight" data-i18n="title_menu">Menu & Food Stock Control</h2>
+          <h2 class="text-3xl font-black text-white mb-8 tracking-tight font-serif" data-i18n="title_menu">Menu & Food Stock Control</h2>
           
           <!-- Customer Coupon Codes -->
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-emerald-500">
@@ -297,23 +537,23 @@
             <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
               <div>
                 <h3 class="text-lg font-black text-white">🥤🍨 Weekly Cool Drinks, Desserts & Cart Add-ons Manager</h3>
-                <p class="text-xs text-slate-400">Items in <span class="text-primary font-bold">Beverages / Cool Drinks / Desserts</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> from your phone anytime to update weekly specials.</p>
+                <p class="text-xs text-slate-400">Items in <span class="text-primary font-bold">Beverages / Cool Drinks / Desserts</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> or <span class="text-primary font-bold">⚙️ Portions</span> anytime.</p>
               </div>
             </div>
             <div id="drinksDessertsSpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
           </div>
 
-          <!-- Add New Menu Item (Mobile Camera/Gallery Upload) -->
+          <!-- Add New Menu Item (With Custom Portions Support) -->
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-blue-500">
-            <h3 class="text-lg font-black text-white mb-4">📸 Add New Menu Item (Direct Mobile Photo Upload)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
+            <h3 class="text-lg font-black text-white mb-4">📸 Add New Menu Item (With Optional Portions / Variants)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
               <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Image (Phone/Gallery)</label>
                 <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border border-[#4b4b6a] text-slate-300">
               </div>
               <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Name</label>
-                <input type="text" id="newItemName" placeholder="e.g. Choco Lava Cake" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <input type="text" id="newItemName" placeholder="e.g. Crispy Chicken Wings" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
               </div>
               <div>
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
@@ -331,8 +571,12 @@
                 </select>
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Price (₹)</label>
-                <input type="number" id="newItemPrice" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base Price (₹)</label>
+                <input type="number" id="newItemPrice" placeholder="299" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Optional Portions (Name:Price)</label>
+                <input type="text" id="newItemPortionsRaw" placeholder="e.g. Half:180, Full:320, 4 Pcs:240" class="w-full p-3 bg-light rounded-xl font-bold text-xs outline-none border border-[#4b4b6a]" title="Comma separated, e.g. 2 Pcs:150, 4 Pcs:280">
               </div>
               <div>
                 <button id="addMenuBtn" onclick="adminQuickAddItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Add to Menu</button>
@@ -340,16 +584,31 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-3 mb-4 flex-wrap">
-            <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-sm p-3 bg-card border border-[#4b4b6a] rounded-xl font-bold text-sm outline-none focus:border-primary">
-            <span id="menuCountLabel" class="text-xs font-black text-slate-400 uppercase tracking-widest whitespace-nowrap"></span>
+          <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+            <div class="flex items-center gap-3 flex-1 min-w-[260px]">
+              <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-md p-3 bg-card border border-[#4b4b6a] rounded-xl font-bold text-sm outline-none focus:border-primary">
+              <select id="invCategoryFilter" onchange="renderInventory()" class="p-3 rounded-xl text-xs font-black outline-none border">
+                <option value="ALL">All Categories</option>
+                <option value="Chicken Mandi">Chicken Mandi</option>
+                <option value="Mutton Mandi">Mutton Mandi</option>
+                <option value="Veg Mandi">Veg Mandi</option>
+                <option value="Fish & Prawns Mandi">Fish & Prawns Mandi</option>
+                <option value="Specials">👑 Specials</option>
+                <option value="Chicken Starters">Chicken Starters</option>
+                <option value="Mutton Starters">Mutton Starters</option>
+                <option value="Veg Starters">Veg Starters</option>
+                <option value="Fish & Prawns Starters">Fish & Prawns Starters</option>
+                <option value="Beverages">🥤 Drinks & Desserts</option>
+              </select>
+            </div>
+            <span id="menuCountLabel" class="text-xs font-black text-primary uppercase tracking-widest whitespace-nowrap bg-card px-4 py-2 rounded-xl border border-primary/30"></span>
           </div>
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
         <!-- 5. Premium Raw Material Kitchen Inventory -->
         <section id="view-kitchen-inv" class="tab-section hidden no-print">
-          <h2 class="text-3xl font-black text-white mb-8 tracking-tight">🥩 Kitchen Raw Materials</h2>
+          <h2 class="text-3xl font-black text-white mb-8 tracking-tight font-serif">🥩 Kitchen Raw Materials</h2>
           
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-amber-500">
             <h3 class="text-lg font-black text-white mb-4">Add Raw Ingredient</h3>
@@ -384,53 +643,116 @@
           <div id="rawMaterialsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- 6. Analytics Dashboard -->
+        <!-- ========================================================================= -->
+        <!-- 6. EXECUTIVE ANALYTICS DASHBOARD & ITEM SALES INTELLIGENCE                -->
+        <!-- ========================================================================= -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
-            <h2 class="text-3xl font-black text-white tracking-tight" data-i18n="title_analytics">Analytics Dashboard</h2>
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-primary block mb-1">✦ Executive Financial & Item Intelligence</span>
+              <h2 class="text-3xl font-black text-white tracking-tight font-serif" data-i18n="title_analytics">Analytics Dashboard</h2>
+            </div>
             <div class="flex items-center gap-3 flex-wrap">
               <button onclick="exportTodayExcel()" class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Auto-Download Today's Excel</button>
               <button onclick="exportAllLogsExcel()" class="bg-blue-500/20 text-blue-400 border border-blue-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-blue-600 hover:text-white transition-all">📥 Full History (Excel)</button>
             </div>
           </div>
 
-          <div id="printArea" class="bg-card p-8 rounded-3xl dash-card">
-            <h2 class="text-2xl font-black text-white mb-6 text-center border-b border-[#4b4b6a] pb-4">Mandi Croods - Daily Revenue</h2>
+          <div id="printArea" class="bg-card p-6 md:p-8 rounded-3xl dash-card">
+            <div class="flex flex-wrap justify-between items-center border-b border-white/10 pb-4 mb-6">
+              <h2 class="text-2xl font-black text-white font-serif">Mandi Croods — Live Performance & Item Sales</h2>
+              <span id="analyticsDateBadge" class="text-xs font-mono font-bold text-primary bg-light px-3.5 py-1.5 rounded-xl border border-primary/30"></span>
+            </div>
             
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
-              <div class="bg-light text-primary p-6 rounded-2xl print-card-bg border border-primary/50 relative overflow-hidden">
+            <!-- 6 KPI Cards Including Average Order Value & Total Units Sold -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+              <div class="bg-light text-primary p-5 rounded-2xl border border-primary/50 relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 w-16 h-16 bg-primary/20 rounded-full blur-xl"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Total Gross</p>
-                <p id="tallyTotal" class="text-3xl font-black text-primary">₹0</p>
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1 opacity-80">Total Gross</p>
+                <p id="tallyTotal" class="text-2xl xl:text-3xl font-black text-primary">₹0</p>
               </div>
-              <div class="bg-light text-white p-6 rounded-2xl print-card-bg border border-[#4b4b6a] relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-1 opacity-80">Orders Served</p>
-                <p id="tallyOrders" class="text-3xl font-black text-white">0</p>
+              <div class="bg-light text-white p-5 rounded-2xl border border-white/10 relative overflow-hidden">
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1 text-slate-400">Orders Served</p>
+                <p id="tallyOrders" class="text-2xl xl:text-3xl font-black text-white">0</p>
               </div>
-              <div class="bg-light text-emerald-400 border border-emerald-500/30 p-6 rounded-2xl print-card-bg relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-1">CASH Revenue</p>
-                <p id="tallyCash" class="text-3xl font-black">₹0</p>
+              <div class="bg-light text-amber-300 p-5 rounded-2xl border border-amber-500/30 relative overflow-hidden">
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1">Dishes Sold</p>
+                <p id="tallyItemsSoldCount" class="text-2xl xl:text-3xl font-black">0</p>
               </div>
-              <div class="bg-light text-blue-400 border border-blue-500/30 p-6 rounded-2xl print-card-bg relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-blue-500/10 rounded-full blur-xl"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-1">ONLINE / UPI</p>
-                <p id="tallyUPI" class="text-3xl font-black">₹0</p>
+              <div class="bg-light text-emerald-400 border border-emerald-500/30 p-5 rounded-2xl relative overflow-hidden">
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1">CASH Revenue</p>
+                <p id="tallyCash" class="text-2xl xl:text-3xl font-black">₹0</p>
               </div>
-              <div class="bg-light text-purple-400 border border-purple-500/30 p-6 rounded-2xl print-card-bg relative overflow-hidden">
-                <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-500/10 rounded-full blur-xl"></div>
-                <p class="text-[10px] font-bold uppercase tracking-widest mb-1">CARD Swipes</p>
-                <p id="tallyCard" class="text-3xl font-black">₹0</p>
+              <div class="bg-light text-blue-400 border border-blue-500/30 p-5 rounded-2xl relative overflow-hidden">
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1">ONLINE / UPI</p>
+                <p id="tallyUPI" class="text-2xl xl:text-3xl font-black">₹0</p>
+              </div>
+              <div class="bg-light text-purple-400 border border-purple-500/30 p-5 rounded-2xl relative overflow-hidden">
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1">CARD / AVG BILL</p>
+                <p id="tallyCard" class="text-xl font-black">₹0</p>
+                <p id="tallyAvgOrder" class="text-[10px] font-bold text-slate-400 mt-0.5">Avg: ₹0/order</p>
               </div>
             </div>
             
-            <div class="w-full bg-light rounded-2xl p-4 border border-[#4b4b6a] mb-10 no-print shadow-inner">
-              <canvas id="revenueChart" height="80"></canvas>
+            <!-- Dual Smooth Animated Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10 no-print">
+              <!-- Chart 1: Revenue by Payment Channel (Doughnut + Bar Toggle) -->
+              <div class="lg:col-span-5 bg-light rounded-3xl p-5 border border-white/10 shadow-inner flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-3">
+                  <div>
+                    <h4 class="text-sm font-black text-white uppercase tracking-wider">💳 Payment Split</h4>
+                    <p class="text-[11px] text-slate-400">Cash vs UPI vs Card Breakdown</p>
+                  </div>
+                </div>
+                <div class="relative h-64 flex items-center justify-center">
+                  <canvas id="revenueChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Chart 2: Top Selling Dishes Horizontal Bar Chart -->
+              <div class="lg:col-span-7 bg-light rounded-3xl p-5 border border-white/10 shadow-inner flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-3">
+                  <div>
+                    <h4 class="text-sm font-black text-primary uppercase tracking-wider">🏆 Top Selling Dishes Today</h4>
+                    <p class="text-[11px] text-slate-400">Live quantity sold per dish (Completed + Active Floor Orders)</p>
+                  </div>
+                  <span id="topDishCrownBadge" class="text-[10px] font-black bg-primary/20 text-primary border border-primary/40 px-3 py-1 rounded-full">👑 Bestseller</span>
+                </div>
+                <div class="relative h-64">
+                  <canvas id="topItemsChart"></canvas>
+                </div>
+              </div>
             </div>
 
-            <div class="mb-10 overflow-x-auto">
-              <h3 class="text-lg font-black text-white mb-6 border-b border-[#4b4b6a] pb-3">Completed Transactions</h3>
+            <!-- Item-Wise Sales Breakdown Leaderboard Table -->
+            <div class="mb-10 bg-light rounded-3xl p-6 border border-white/10">
+              <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
+                <div>
+                  <h3 class="text-lg font-black text-white">🍗 What Sold & How Many — Item-Wise Sales Breakdown</h3>
+                  <p class="text-xs text-slate-400">Exact count of every Mandi, Starter, and Beverage sold today with portion breakdown and revenue share.</p>
+                </div>
+                <input type="text" id="soldItemsSearch" oninput="renderSoldItemsBreakdown()" placeholder="🔍 Filter sold items..." class="p-2.5 rounded-xl text-xs font-bold border outline-none w-56">
+              </div>
+              <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-left text-sm border-collapse">
+                  <thead class="bg-sidebar text-slate-400 uppercase font-black text-[10px] tracking-widest sticky top-0">
+                    <tr>
+                      <th class="p-3.5 rounded-tl-xl">Rank</th>
+                      <th class="p-3.5">Dish / Item Name</th>
+                      <th class="p-3.5">Portion / Variant Breakdown</th>
+                      <th class="p-3.5 text-center">Total Qty Sold</th>
+                      <th class="p-3.5 w-1/4">Demand Share</th>
+                      <th class="p-3.5 text-right rounded-tr-xl">Est. Revenue</th>
+                    </tr>
+                  </thead>
+                  <tbody id="itemSalesBreakdownTable" class="divide-y divide-white/5 font-medium text-slate-300"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Completed Transactions Table -->
+            <div class="mb-10 overflow-x-auto bg-light rounded-3xl p-6 border border-white/10">
+              <h3 class="text-lg font-black text-white mb-4 border-b border-white/10 pb-3">🧾 Completed Table Transactions</h3>
               <table class="w-full text-left text-sm border-collapse">
                 <thead class="bg-sidebar text-slate-400 uppercase font-black text-[10px] tracking-widest">
                   <tr>
@@ -441,11 +763,11 @@
                     <th class="p-4 text-right rounded-tr-xl">Amount</th>
                   </tr>
                 </thead>
-                <tbody id="dailyLogsTable" class="divide-y divide-[#4b4b6a] font-medium text-slate-300"></tbody>
+                <tbody id="dailyLogsTable" class="divide-y divide-white/5 font-medium text-slate-300"></tbody>
               </table>
             </div>
 
-            <div class="mt-16 pt-8 border-t border-[#4b4b6a] text-center no-print flex flex-wrap justify-center gap-4">
+            <div class="mt-12 pt-8 border-t border-white/10 text-center no-print flex flex-wrap justify-center gap-4">
               <button onclick="clearDashboardRevenue()" class="bg-red-900/40 text-red-400 border border-red-500/50 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-red-600 hover:text-white transition-all">🧹 Clear Dashboard & Revenue (₹0)</button>
               <button onclick="factoryResetSystem()" class="bg-red-500 text-white border border-red-600 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md">
                 ⚠️ FACTORY RESET: Load Full Default Menu
@@ -484,12 +806,25 @@
     let menuCache = {};
     let couponsCache = {};
     let rawMatsCache = {};
+    let dailyLogsCache = {};
     let dbConnected = false;
     let connBannerTimer = null;
     let chartInstance = null;
+    let topItemsChartInstance = null;
     let posCart = {};
     let pendingAlarmInterval = null;
     let pendingImageUpdateItemId = null;
+    let currentFloorFilter = 'ALL';
+
+    // Live Order Editor Modal State
+    let activeEditTableId = null;
+    let replaceModeLineKey = null;
+
+    // Live Sidebar Clock
+    setInterval(() => {
+      const el = document.getElementById('liveClockSidebar');
+      if (el) el.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }, 1000);
 
     // Default Master Menu for Factory Reset & Fallback
     function getDefaultMasterMenu() {
@@ -586,7 +921,7 @@
       };
     }
 
-    // Smart Client-Side Image Compressor for Phone Uploads (Keeps Firebase RTDB Fast)
+    // Smart Client-Side Image Compressor for Phone Uploads
     function compressImageFile(file, maxWidth = 600, quality = 0.78) {
       return new Promise((resolve, reject) => {
         if (!file) return reject(new Error("No file selected"));
@@ -624,7 +959,7 @@
       en: {
         nav_floor: "📦 Active Floor", nav_pos: "🧾 POS Order", nav_service: "🛎️ Service Req",
         nav_menu: "🍔 Menu & Food Stock", nav_analytics: "📈 Analytics", logout: "Log Out",
-        title_floor: "Floor & Kitchen Operations", occupancy: "Live Table Occupancy (All Cabins & Tables)",
+        title_floor: "Floor & Kitchen Operations", occupancy: "Live Table Occupancy (Click Any Table to Open POS or Edit Order)",
         title_pos: "POS / Direct Order", new_order: "New / Active Table Order",
         btn_send_kitchen: "Send to Kitchen", title_menu: "Menu & Food Stock Control",
         title_analytics: "Analytics Dashboard"
@@ -706,9 +1041,9 @@
       const banner = document.getElementById('globalErrorBanner');
       if(banner) {
         banner.textContent = (type==='error' ? '⚠️ ' : '✅ ') + msg;
-        banner.className = `fixed top-0 left-0 right-0 z-[200] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error' ? 'bg-red-600' : 'bg-emerald-600'}`;
+        banner.className = `fixed top-0 left-0 right-0 z-[250] text-white text-xs font-bold text-center py-3 px-4 shadow-lg transition-colors duration-300 ${type==='error' ? 'bg-red-600' : 'bg-emerald-600'}`;
         banner.classList.remove('hidden');
-        setTimeout(() => { banner.classList.add('hidden'); }, 4500);
+        setTimeout(() => { banner.classList.add('hidden'); }, 4000);
       }
     }
 
@@ -718,6 +1053,49 @@
       if (!val || sub <= 0) return 0;
       let d = discType === 'percent' ? Math.round((sub * Math.min(100, val)) / 100) : val;
       return Math.min(sub, Math.round(d * 100) / 100);
+    }
+
+    function buildItemsStringFromLineItems(liObj) {
+      return Object.values(liObj || {})
+        .filter(Boolean)
+        .map(i => `${i.qty}x ${i.name}${i.variant && i.variant !== 'Regular' ? ' (' + i.variant + ')' : ''}${i.cancelled ? ' [CANCELLED]' : ''}`)
+        .join(' | ');
+    }
+
+    // Legacy string parser if an order only has `items` string and no `line_items` object
+    function ensureLineItemsObject(tableData) {
+      if (tableData.line_items && Object.keys(tableData.line_items).length > 0) {
+        return JSON.parse(JSON.stringify(tableData.line_items));
+      }
+      const fallback = {};
+      const rawStr = tableData.items || '';
+      if (!rawStr) return fallback;
+      rawStr.split('|').map(s => s.trim()).filter(Boolean).forEach((part, idx) => {
+        const cancelled = part.includes('[CANCELLED]');
+        const clean = part.replace('[CANCELLED]', '').trim();
+        const m = clean.match(/^(\d+)x\s+(.+?)(?:\s+\((.+)\))?$/i);
+        if (m) {
+          const qty = parseInt(m[1]) || 1;
+          const name = m[2].trim();
+          const variant = (m[3] || 'Regular').trim();
+          // Find price from menuCache
+          let price = 250;
+          const foundEntry = Object.entries(menuCache).find(([, it]) => it && it.name && it.name.toLowerCase() === name.toLowerCase());
+          if (foundEntry) {
+            const [, it] = foundEntry;
+            price = (variant !== 'Regular' && it.portions && it.portions[variant]) ? Number(it.portions[variant]) : Number(it.base_price);
+          }
+          fallback[`legacy_${idx}`] = {
+            itemId: foundEntry ? foundEntry[0] : '',
+            name,
+            variant,
+            price,
+            qty,
+            cancelled
+          };
+        }
+      });
+      return fallback;
     }
 
     window.attemptLogin = function() {
@@ -748,8 +1126,8 @@
         document.querySelectorAll('.admin-waiter-only').forEach(el => el.classList.remove('hidden'));
       }
       
-      loadSystem();
       initChart();
+      loadSystem();
     };
 
     window.clearConsoleCache = function() {
@@ -772,7 +1150,11 @@
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
       if (tab === 'pos') renderPosMenu();
-      if (tab === 'dashboard' && chartInstance) chartInstance.update();
+      if (tab === 'dashboard') {
+        if (chartInstance) chartInstance.update();
+        if (topItemsChartInstance) topItemsChartInstance.update();
+        renderSoldItemsBreakdown();
+      }
       if (tab === 'kitchen-inv') renderKitchenInventory();
     };
 
@@ -793,7 +1175,6 @@
           }
         });
 
-        // If Firebase has no menu items yet, load the default menu locally so POS & Inventory are never blank
         if (Object.keys(menuCache).length === 0) {
           menuCache = getDefaultMasterMenu();
         }
@@ -803,6 +1184,7 @@
           renderDrinksDessertsSpotlight();
         }
         renderPosMenu();
+        if (activeEditTableId) renderEditModalMenu();
       });
 
       // Sync Coupons
@@ -829,6 +1211,20 @@
         renderOccupancyMap(window.currentTables);
         updatePosCartUI();
 
+        // Keep Live Order Editor synced if open
+        if (activeEditTableId) {
+          if (window.currentTables[activeEditTableId]) {
+            renderEditModalCurrentOrder();
+          } else {
+            closeOrderEditor();
+          }
+        }
+
+        // Refresh Item Analytics so active orders are reflected too
+        if (currentRole === 'admin') {
+          renderSoldItemsBreakdown();
+        }
+
         let hasPending = Object.values(window.currentTables).some(o => o && o.status === 'pending');
         if (hasPending) {
           if (!pendingAlarmInterval) {
@@ -852,25 +1248,49 @@
       // Sync Analytics & Revenue Tallies
       if(currentRole === 'admin') {
         const dStr = new Date().toISOString().split('T')[0];
+        const dateBadge = document.getElementById('analyticsDateBadge');
+        if (dateBadge) dateBadge.textContent = `📅 Date: ${dStr}`;
+
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
           const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
-          document.getElementById('tallyTotal').innerText = `₹${data.total || 0}`;
-          document.getElementById('tallyCash').innerText = `₹${data.cash || 0}`;
-          document.getElementById('tallyUPI').innerText = `₹${data.upi || 0}`;
-          document.getElementById('tallyCard').innerText = `₹${data.card || 0}`;
-          document.getElementById('tallyOrders').innerText = data.orderCount || 0;
+          const total = Number(data.total) || 0;
+          const orders = Number(data.orderCount) || 0;
+          const avg = orders > 0 ? Math.round(total / orders) : 0;
+
+          document.getElementById('tallyTotal').innerText = `₹${total.toLocaleString('en-IN')}`;
+          document.getElementById('tallyCash').innerText = `₹${(Number(data.cash) || 0).toLocaleString('en-IN')}`;
+          document.getElementById('tallyUPI').innerText = `₹${(Number(data.upi) || 0).toLocaleString('en-IN')}`;
+          document.getElementById('tallyCard').innerText = `₹${(Number(data.card) || 0).toLocaleString('en-IN')}`;
+          document.getElementById('tallyOrders').innerText = orders;
+          const avgEl = document.getElementById('tallyAvgOrder');
+          if (avgEl) avgEl.innerText = `Avg Bill: ₹${avg}`;
+
           updateChartData(data);
         });
 
         db.ref(`daily_logs/${dStr}`).on('value', snap => {
+          dailyLogsCache = snap.val() || {};
           const tb = document.getElementById('dailyLogsTable');
-          if(!tb) return;
-          tb.innerHTML = '';
-          const logs = Object.values(snap.val() || {});
-          logs.forEach(log => {
-            if(!log) return;
-            tb.innerHTML += `<tr class="border-b border-[#4b4b6a]"><td class="p-4 text-xs text-slate-400">${log.time||''}</td><td class="p-4 font-black text-white">T-${log.table||''}</td><td class="p-4 font-bold text-slate-400 text-[10px] uppercase">${log.method||''}</td><td class="p-4 text-xs font-semibold text-slate-300">${log.items||''}</td><td class="p-4 font-black text-right text-emerald-400">₹${log.total||0}</td></tr>`;
-          });
+          if(tb) {
+            tb.innerHTML = '';
+            const logs = Object.values(dailyLogsCache);
+            if (logs.length === 0) {
+              tb.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 font-bold">No completed transactions settled yet today.</td></tr>`;
+            } else {
+              logs.slice().reverse().forEach(log => {
+                if(!log) return;
+                tb.innerHTML += `
+                  <tr class="hover:bg-white/5 transition">
+                    <td class="p-4 text-xs font-mono text-slate-400">${log.time||''}</td>
+                    <td class="p-4 font-black text-white"><span class="bg-primary/20 text-primary border border-primary/40 px-2.5 py-1 rounded-lg text-xs">T-${log.table||''}</span></td>
+                    <td class="p-4 font-bold text-slate-300 text-[10px] uppercase">${log.method||''}</td>
+                    <td class="p-4 text-xs font-semibold text-slate-300">${log.items||''}</td>
+                    <td class="p-4 font-black text-right text-emerald-400 text-base">₹${log.total||0}</td>
+                  </tr>`;
+              });
+            }
+          }
+          renderSoldItemsBreakdown();
         });
       }
     }
@@ -892,29 +1312,85 @@
       } catch(e) {}
     }
 
+    /* ========================================================================= */
+    /* SMOOTH PREMIUM CHARTS & ITEM-WISE SALES INTELLIGENCE                      */
+    /* ========================================================================= */
     function initChart() {
       const ctx = document.getElementById('revenueChart');
-      if (!ctx) return;
-      chartInstance = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Cash', 'Online/UPI', 'Card'],
-          datasets: [{
-            label: 'Today Revenue (₹)',
-            data: [0, 0, 0],
-            backgroundColor: ['#10b981', '#3b82f6', '#a855f7'],
-            borderRadius: 8
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { labels: { color: '#ffffff' } } },
-          scales: {
-            y: { grid: { color: '#4b4b6a' }, ticks: { color: '#a1a1aa' } },
-            x: { grid: { display: false }, ticks: { color: '#ffffff', font: { weight: 'bold' } } }
+      if (ctx) {
+        chartInstance = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Cash Revenue (₹)', 'Online / UPI (₹)', 'Card Swipes (₹)'],
+            datasets: [{
+              label: 'Today Revenue (₹)',
+              data: [0, 0, 0],
+              backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(59, 130, 246, 0.85)', 'rgba(168, 85, 247, 0.85)'],
+              borderColor: ['#10b981', '#3b82f6', '#a855f7'],
+              borderWidth: 2,
+              hoverOffset: 10
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '66%',
+            animation: {
+              animateScale: true,
+              animateRotate: true,
+              duration: 1100,
+              easing: 'easeOutQuart'
+            },
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { color: '#e2e8f0', padding: 16, font: { weight: 'bold', size: 11 } }
+              }
+            }
           }
-        }
-      });
+        });
+      }
+
+      const topCtx = document.getElementById('topItemsChart');
+      if (topCtx) {
+        topItemsChartInstance = new Chart(topCtx, {
+          type: 'bar',
+          data: {
+            labels: ['No sales yet'],
+            datasets: [{
+              label: 'Units Sold',
+              data: [0],
+              backgroundColor: 'rgba(212, 175, 55, 0.85)',
+              borderColor: '#F9E596',
+              borderWidth: 1,
+              borderRadius: 8
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: {
+              duration: 1000,
+              easing: 'easeOutQuart'
+            },
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: 'rgba(255,255,255,0.06)' },
+                ticks: { color: '#a1a1aa', precision: 0, font: { weight: 'bold' } }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { color: '#ffffff', font: { weight: 'bold', size: 11 } }
+              }
+            }
+          }
+        });
+      }
     }
 
     function updateChartData(data) {
@@ -923,6 +1399,453 @@
         chartInstance.update();
       }
     }
+
+    // Parses both completed daily_logs and active_tables to compute exact dish-by-dish sales
+    window.renderSoldItemsBreakdown = function() {
+      const tbody = document.getElementById('itemSalesBreakdownTable');
+      if (!tbody) return;
+
+      const itemStats = {}; // key: dishName -> { name, totalQty, estRev, variants: { '2P': 3 } }
+
+      const recordItemSale = (rawName, variant, qty, unitPrice) => {
+        if (!rawName || qty <= 0) return;
+        const cleanName = rawName.trim();
+        const key = cleanName.toLowerCase();
+        if (!itemStats[key]) {
+          itemStats[key] = { name: cleanName, totalQty: 0, estRev: 0, variants: {} };
+        }
+        itemStats[key].totalQty += qty;
+        itemStats[key].estRev += (qty * unitPrice);
+        const vLabel = variant || 'Regular';
+        itemStats[key].variants[vLabel] = (itemStats[key].variants[vLabel] || 0) + qty;
+      };
+
+      const lookupMenuPrice = (dishName, variant) => {
+        const entry = Object.values(menuCache).find(m => m && m.name && m.name.toLowerCase() === dishName.toLowerCase());
+        if (!entry) return 280;
+        if (variant && variant !== 'Regular' && entry.portions && entry.portions[variant]) {
+          return Number(entry.portions[variant]) || Number(entry.base_price) || 0;
+        }
+        return Number(entry.base_price) || 0;
+      };
+
+      // 1. Parse Completed Daily Logs
+      Object.values(dailyLogsCache || {}).forEach(log => {
+        if (!log || !log.items) return;
+        log.items.split('|').map(s => s.trim()).filter(Boolean).forEach(part => {
+          if (part.includes('[CANCELLED]')) return;
+          const m = part.match(/^(\d+)x\s+(.+?)(?:\s+\((.+)\))?$/i);
+          if (m) {
+            const qty = parseInt(m[1]) || 1;
+            const dName = m[2].trim();
+            const variant = (m[3] || 'Regular').trim();
+            const uPrice = lookupMenuPrice(dName, variant);
+            recordItemSale(dName, variant, qty, uPrice);
+          }
+        });
+      });
+
+      // 2. Also include Active Non-Cancelled Floor Orders so Admin sees live item velocity immediately
+      Object.values(window.currentTables || {}).forEach(tbl => {
+        if (!tbl || tbl.status === 'cancelled') return;
+        const liObj = ensureLineItemsObject(tbl);
+        Object.values(liObj).forEach(li => {
+          if (li && !li.cancelled) {
+            recordItemSale(li.name, li.variant || 'Regular', Number(li.qty) || 1, Number(li.price) || lookupMenuPrice(li.name, li.variant));
+          }
+        });
+      });
+
+      const sorted = Object.values(itemStats).sort((a, b) => b.totalQty - a.totalQty);
+      const totalUnitsAll = sorted.reduce((acc, it) => acc + it.totalQty, 0);
+
+      const unitsKpi = document.getElementById('tallyItemsSoldCount');
+      if (unitsKpi) unitsKpi.innerText = totalUnitsAll;
+
+      const crownBadge = document.getElementById('topDishCrownBadge');
+      if (crownBadge) {
+        crownBadge.textContent = sorted.length > 0 ? `👑 #1: ${sorted[0].name} (${sorted[0].totalQty} sold)` : '👑 Bestseller';
+      }
+
+      // Update Top Selling Horizontal Bar Chart
+      if (topItemsChartInstance) {
+        const top7 = sorted.slice(0, 7);
+        if (top7.length > 0) {
+          topItemsChartInstance.data.labels = top7.map(i => i.name.length > 22 ? i.name.slice(0, 20) + '…' : i.name);
+          topItemsChartInstance.data.datasets[0].data = top7.map(i => i.totalQty);
+        } else {
+          topItemsChartInstance.data.labels = ['No items sold yet'];
+          topItemsChartInstance.data.datasets[0].data = [0];
+        }
+        topItemsChartInstance.update();
+      }
+
+      const searchQ = (document.getElementById('soldItemsSearch')?.value || '').trim().toLowerCase();
+      const filtered = searchQ ? sorted.filter(i => i.name.toLowerCase().includes(searchQ)) : sorted;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-bold">No dishes sold matching your filter yet today.</td></tr>`;
+        return;
+      }
+
+      const maxQty = sorted[0]?.totalQty || 1;
+      tbody.innerHTML = filtered.map((item, idx) => {
+        const sharePct = Math.round((item.totalQty / totalUnitsAll) * 100);
+        const barWidth = Math.max(8, Math.round((item.totalQty / maxQty) * 100));
+        const variantPills = Object.entries(item.variants).map(([v, q]) =>
+          `<span class="inline-block bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-300 mr-1 mb-1">${v}: <b class="text-primary">${q}</b></span>`
+        ).join('');
+
+        return `
+          <tr class="hover:bg-white/5 transition">
+            <td class="p-3.5 font-black text-xs ${idx === 0 ? 'text-primary' : 'text-slate-400'}">#${idx + 1}</td>
+            <td class="p-3.5 font-black text-white text-sm">${item.name}</td>
+            <td class="p-3.5">${variantPills}</td>
+            <td class="p-3.5 text-center">
+              <span class="px-3 py-1 rounded-full bg-primary/20 text-primary border border-primary/40 font-black text-xs">${item.totalQty} Sold</span>
+            </td>
+            <td class="p-3.5">
+              <div class="w-full bg-sidebar rounded-full h-2.5 overflow-hidden border border-white/10">
+                <div class="gold-gradient h-full rounded-full transition-all duration-700" style="width:${barWidth}%"></div>
+              </div>
+              <span class="text-[10px] font-bold text-slate-400 mt-1 block">${sharePct}% of total items</span>
+            </td>
+            <td class="p-3.5 font-black text-right text-emerald-400">₹${item.estRev.toLocaleString('en-IN')}</td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    /* ========================================================================= */
+    /* LIVE ORDER EDITOR & ITEM REPLACEMENT PORTAL FUNCTIONS                     */
+    /* ========================================================================= */
+    window.openOrderEditor = function(tableId) {
+      const tbl = (window.currentTables || {})[tableId];
+      if (!tbl) return alert("Order not found.");
+      activeEditTableId = tableId;
+      replaceModeLineKey = null;
+
+      // Ensure structured line_items exist in Firebase so every item is individually editable
+      if (!tbl.line_items || Object.keys(tbl.line_items).length === 0) {
+        const converted = ensureLineItemsObject(tbl);
+        db.ref(`active_tables/${tableId}/line_items`).set(converted);
+        tbl.line_items = converted;
+      }
+
+      document.getElementById('orderEditModal').classList.remove('hidden');
+      document.getElementById('replaceModeBanner').classList.add('hidden');
+      renderEditModalCurrentOrder();
+      renderEditModalMenu();
+    };
+
+    window.closeOrderEditor = function() {
+      activeEditTableId = null;
+      replaceModeLineKey = null;
+      document.getElementById('orderEditModal').classList.add('hidden');
+    };
+
+    window.startReplaceItemMode = function(lineKey, currentName) {
+      replaceModeLineKey = lineKey;
+      const banner = document.getElementById('replaceModeBanner');
+      const targetNameEl = document.getElementById('replaceTargetName');
+      if (targetNameEl) targetNameEl.textContent = currentName;
+      if (banner) banner.classList.remove('hidden');
+      renderEditModalCurrentOrder();
+      renderEditModalMenu();
+    };
+
+    window.cancelReplaceMode = function() {
+      replaceModeLineKey = null;
+      document.getElementById('replaceModeBanner').classList.add('hidden');
+      renderEditModalCurrentOrder();
+      renderEditModalMenu();
+    };
+
+    function syncEditedTableToFirebase(tableId, updatedLineItems) {
+      const existing = (window.currentTables || {})[tableId];
+      if (!existing) return;
+
+      const subTot = Object.values(updatedLineItems).filter(Boolean).reduce((s, i) => {
+        return s + (i.cancelled ? 0 : (Number(i.price) || 0) * (Number(i.qty) || 1));
+      }, 0);
+
+      const dAmt = calculateDiscountAmount(subTot, existing.discountType || 'flat', Number(existing.discountValue) || 0);
+      const tipAmt = Number(existing.tipAmount) || 0;
+      const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
+      const itemsSummary = buildItemsStringFromLineItems(updatedLineItems);
+
+      db.ref(`active_tables/${tableId}`).update(sanitizeForFirebase({
+        line_items: updatedLineItems,
+        items: itemsSummary,
+        subtotal: subTot,
+        discountAmount: dAmt,
+        total: finalTot
+      }));
+    }
+
+    window.editModalChangeQty = function(lineKey, delta) {
+      if (!activeEditTableId) return;
+      const tbl = window.currentTables[activeEditTableId];
+      if (!tbl) return;
+      const liObj = ensureLineItemsObject(tbl);
+      if (!liObj[lineKey]) return;
+
+      const newQty = (Number(liObj[lineKey].qty) || 1) + delta;
+      if (newQty <= 0) {
+        delete liObj[lineKey];
+      } else {
+        liObj[lineKey].qty = newQty;
+      }
+      syncEditedTableToFirebase(activeEditTableId, liObj);
+      showGlobalToast("Order quantity updated!", "success");
+    };
+
+    window.editModalDeleteLine = function(lineKey) {
+      if (!activeEditTableId) return;
+      const tbl = window.currentTables[activeEditTableId];
+      if (!tbl) return;
+      const liObj = ensureLineItemsObject(tbl);
+      delete liObj[lineKey];
+      if (replaceModeLineKey === lineKey) cancelReplaceMode();
+      syncEditedTableToFirebase(activeEditTableId, liObj);
+      showGlobalToast("Item removed from order", "success");
+    };
+
+    window.editModalSelectMenuItem = function(itemId) {
+      if (!activeEditTableId || !menuCache[itemId]) return;
+      const item = menuCache[itemId];
+      const tbl = window.currentTables[activeEditTableId];
+      if (!tbl) return;
+
+      let variant = 'Regular';
+      let price = Number(item.base_price) || 0;
+      const selEl = document.getElementById(`editModalVar-${itemId}`);
+      if (selEl && selEl.value) {
+        const parts = selEl.value.split('|');
+        variant = parts[0];
+        price = parseFloat(parts[1]) || price;
+      }
+
+      const liObj = ensureLineItemsObject(tbl);
+
+      if (replaceModeLineKey && liObj[replaceModeLineKey]) {
+        // Replace existing item in-place while keeping its quantity (or resetting to 1 if desired)
+        const oldName = liObj[replaceModeLineKey].name;
+        const keepQty = Number(liObj[replaceModeLineKey].qty) || 1;
+        liObj[replaceModeLineKey] = {
+          itemId: String(itemId),
+          name: item.name,
+          variant: variant,
+          price: price,
+          qty: keepQty,
+          cancelled: false,
+          addedAt: Date.now()
+        };
+        cancelReplaceMode();
+        syncEditedTableToFirebase(activeEditTableId, liObj);
+        showGlobalToast(`Replaced "${oldName}" with "${item.name} (${variant})"!`, "success");
+      } else {
+        // Check if same item + variant already exists in active lines
+        const existingKey = Object.keys(liObj).find(k =>
+          liObj[k] && !liObj[k].cancelled && liObj[k].name === item.name && (liObj[k].variant || 'Regular') === variant
+        );
+        if (existingKey) {
+          liObj[existingKey].qty = (Number(liObj[existingKey].qty) || 1) + 1;
+        } else {
+          const newKey = `adm_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+          liObj[newKey] = {
+            itemId: String(itemId),
+            name: item.name,
+            variant: variant,
+            price: price,
+            qty: 1,
+            cancelled: false,
+            addedAt: Date.now()
+          };
+        }
+        syncEditedTableToFirebase(activeEditTableId, liObj);
+        showGlobalToast(`Added "${item.name} (${variant})" to Table ${tbl.table}!`, "success");
+      }
+    };
+
+    function renderEditModalCurrentOrder() {
+      if (!activeEditTableId) return;
+      const tbl = (window.currentTables || {})[activeEditTableId];
+      if (!tbl) return;
+
+      document.getElementById('editModalTableTitle').textContent = `Table ${tbl.table}`;
+      document.getElementById('editModalStatusBadge').textContent = (tbl.status || 'pending').replace('_', ' ').toUpperCase();
+
+      const container = document.getElementById('editModalLineItems');
+      const liObj = ensureLineItemsObject(tbl);
+      const activeEntries = Object.entries(liObj).filter(([, li]) => li && !li.cancelled);
+
+      document.getElementById('editModalItemCount').textContent = `${activeEntries.length} Dish${activeEntries.length === 1 ? '' : 'es'}`;
+
+      if (activeEntries.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs font-bold border border-dashed border-white/10 rounded-2xl">No active items in this order. Pick an item on the right to add!</div>`;
+      } else {
+        container.innerHTML = activeEntries.map(([lineKey, li]) => {
+          const isBeingReplaced = replaceModeLineKey === lineKey;
+          const safeName = (li.name || '').replace(/'/g, "\\'");
+          return `
+            <div class="p-3.5 rounded-2xl border transition-all ${isBeingReplaced ? 'bg-amber-500/20 border-amber-400 shadow-lg' : 'bg-card border-white/10'}">
+              <div class="flex justify-between items-start gap-2 mb-2.5">
+                <div>
+                  <h4 class="font-black text-white text-sm leading-snug">${li.name}</h4>
+                  <span class="inline-block mt-0.5 text-[10px] font-black uppercase px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30">${li.variant || 'Regular'} • ₹${li.price} each</span>
+                </div>
+                <span class="font-black text-base text-emerald-400">₹${(Number(li.price) || 0) * (Number(li.qty) || 1)}</span>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-2 border-t border-white/5">
+                <div class="flex items-center gap-1.5">
+                  <button onclick="editModalChangeQty('${lineKey}', -1)" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white font-black text-xs">-</button>
+                  <span class="w-7 text-center font-black text-xs text-white">${li.qty}</span>
+                  <button onclick="editModalChangeQty('${lineKey}', 1)" class="w-7 h-7 rounded-lg bg-primary text-black font-black text-xs">+</button>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <button onclick="startReplaceItemMode('${lineKey}', '${safeName}')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${isBeingReplaced ? 'bg-amber-400 text-black' : 'bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-500/40'}">
+                    🔄 ${isBeingReplaced ? 'Select New Dish →' : 'Replace Item'}
+                  </button>
+                  <button onclick="editModalDeleteLine('${lineKey}')" class="px-2.5 py-1.5 rounded-lg bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white text-[10px] font-black uppercase transition" title="Remove Item">🗑️</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('editModalSubtotal').textContent = `₹${tbl.subtotal || tbl.total || 0}`;
+      document.getElementById('editModalDiscount').textContent = `-₹${tbl.discountAmount || 0}`;
+      document.getElementById('editModalTotal').textContent = `₹${tbl.total || 0}`;
+    }
+
+    window.renderEditModalMenu = function() {
+      const grid = document.getElementById('editModalMenuGrid');
+      if (!grid) return;
+      const q = (document.getElementById('editModalMenuSearch')?.value || '').trim().toLowerCase();
+      const catFilter = document.getElementById('editModalCategoryFilter')?.value || 'ALL';
+
+      const entries = Object.entries(menuCache).filter(([, item]) => {
+        if (!item || !item.name) return false;
+        if (catFilter !== 'ALL' && item.category !== catFilter) return false;
+        if (q && !item.name.toLowerCase().includes(q) && !(item.category || '').toLowerCase().includes(q)) return false;
+        return true;
+      });
+
+      const isReplacing = Boolean(replaceModeLineKey);
+
+      grid.innerHTML = entries.map(([id, item]) => {
+        let variantDropdown = '';
+        if (item.portions && Object.keys(item.portions).length > 0) {
+          variantDropdown = `<select id="editModalVar-${id}" class="w-full mt-1.5 p-1.5 rounded-lg text-[11px] font-bold border outline-none">
+            <option value="Regular|${item.base_price}">Regular (1P) — ₹${item.base_price}</option>
+            ${Object.entries(item.portions).map(([pName, pVal]) => `<option value="${pName}|${pVal}">${pName} — ₹${pVal}</option>`).join('')}
+          </select>`;
+        } else {
+          variantDropdown = `<div class="text-xs font-black text-primary mt-1.5">Regular — ₹${item.base_price}</div>`;
+        }
+
+        return `
+          <div class="p-3 rounded-2xl bg-light border ${isReplacing ? 'border-amber-500/50 hover:border-amber-400' : 'border-white/10 hover:border-primary/50'} flex flex-col justify-between transition">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <img src="${item.image_url}" class="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0">
+                <div class="min-w-0">
+                  <h5 class="font-black text-xs text-white truncate">${item.name}</h5>
+                  <span class="text-[9px] font-bold text-slate-400 block truncate">${item.category || ''}</span>
+                </div>
+              </div>
+              ${variantDropdown}
+            </div>
+            <button onclick="editModalSelectMenuItem('${id}')" class="mt-2.5 w-full py-2 rounded-xl font-black text-[11px] uppercase tracking-wider transition ${isReplacing ? 'bg-amber-500 hover:bg-amber-400 text-black shadow-md' : 'bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40'}">
+              ${isReplacing ? '🔄 Swap With This' : '+ Add to Order'}
+            </button>
+          </div>
+        `;
+      }).join('');
+    };
+
+    /* ========================================================================= */
+    /* FLEXIBLE MENU ITEM, PRICE, STOCK & PORTIONS / VARIANTS MODAL              */
+    /* ========================================================================= */
+    window.openItemFlexModal = function(itemId) {
+      const item = menuCache[itemId];
+      if (!item) return;
+
+      document.getElementById('flexEditItemId').value = itemId;
+      document.getElementById('flexEditName').value = item.name || '';
+      document.getElementById('flexEditCategory').value = item.category || 'Chicken Mandi';
+      document.getElementById('flexEditBasePrice').value = item.base_price ?? 0;
+      document.getElementById('flexEditStock').value = item.stock_count ?? 50;
+      document.getElementById('flexEditSpecial').checked = Boolean(item.is_special);
+
+      const container = document.getElementById('flexPortionsContainer');
+      container.innerHTML = '';
+      const portions = item.portions || {};
+      Object.entries(portions).forEach(([pLabel, pPrice]) => {
+        addFlexPortionRow(pLabel, pPrice);
+      });
+
+      document.getElementById('itemFlexModal').classList.remove('hidden');
+    };
+
+    window.closeItemFlexModal = function() {
+      document.getElementById('itemFlexModal').classList.add('hidden');
+    };
+
+    window.addFlexPortionRow = function(label = '', price = '') {
+      const container = document.getElementById('flexPortionsContainer');
+      if (!container) return;
+      const row = document.createElement('div');
+      row.className = 'flex items-center gap-2 flex-portion-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Portion Label (e.g. 2 Pcs, Half, 4P Gang)" value="${label}" class="flex-1 p-2.5 rounded-xl text-xs font-black border outline-none portion-label-inp">
+        <div class="flex items-center gap-1">
+          <span class="text-xs font-bold text-slate-400">₹</span>
+          <input type="number" placeholder="Price" value="${price}" class="w-28 p-2.5 rounded-xl text-xs font-black border outline-none portion-price-inp">
+        </div>
+        <button type="button" onclick="this.parentElement.remove()" class="w-9 h-9 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white font-black text-xs">✕</button>
+      `;
+      container.appendChild(row);
+    };
+
+    window.saveItemFlexChanges = function() {
+      const id = document.getElementById('flexEditItemId').value;
+      if (!id || !menuCache[id]) return;
+
+      const name = document.getElementById('flexEditName').value.trim();
+      const category = document.getElementById('flexEditCategory').value;
+      const base_price = parseFloat(document.getElementById('flexEditBasePrice').value) || 0;
+      const stock_count = Math.max(0, parseInt(document.getElementById('flexEditStock').value) || 0);
+      const is_special = document.getElementById('flexEditSpecial').checked;
+
+      if (!name) return alert("Dish name cannot be empty.");
+
+      const portions = {};
+      document.querySelectorAll('#flexPortionsContainer .flex-portion-row').forEach(row => {
+        const lbl = row.querySelector('.portion-label-inp')?.value.trim();
+        const prc = parseFloat(row.querySelector('.portion-price-inp')?.value);
+        if (lbl && !isNaN(prc) && prc >= 0) {
+          portions[lbl] = prc;
+        }
+      });
+
+      const updatedObj = {
+        ...menuCache[id],
+        name,
+        category,
+        base_price,
+        stock_count,
+        is_special,
+        portions
+      };
+
+      db.ref(`menu/${id}`).set(sanitizeForFirebase(updatedObj)).then(() => {
+        showGlobalToast(`Saved "${name}" with ${Object.keys(portions).length} custom portions!`, 'success');
+        closeItemFlexModal();
+      });
+    };
 
     /* ---- Coupon Management ---- */
     window.saveCouponCode = function() {
@@ -1020,7 +1943,7 @@
       db.ref(`menu/${itemId}`).update({
         ...existingItem,
         base_price: p
-      }).then(() => showGlobalToast(`Price updated to ₹${p}`, "success"));
+      }).then(() => showGlobalToast(`Base price updated to ₹${p}`, "success"));
     };
 
     function renderDrinksDessertsSpotlight() {
@@ -1048,11 +1971,12 @@
             </div>
             <div class="flex-1 min-w-0">
               <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
-              <span class="text-[10px] font-bold text-primary uppercase">Cart Upsell Active</span>
-              <div class="flex items-center gap-2 mt-1.5">
+              <span class="text-[10px] font-bold text-primary uppercase">Cart Upsell • Stock: ${item.stock_count ?? 50}</span>
+              <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
                 <span class="text-xs text-slate-400 font-bold">₹</span>
-                <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-20 p-1 rounded bg-card border border-[#4b4b6a] text-xs font-black text-white">
-                <button onclick="triggerItemPhotoUpdate('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-dark border border-primary/40 px-2.5 py-1 rounded-lg text-[10px] font-black transition">📷 Change Photo</button>
+                <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-16 p-1 rounded bg-card border border-[#4b4b6a] text-xs font-black text-white">
+                <button onclick="openItemFlexModal('${id}')" class="bg-blue-500/20 hover:bg-blue-500 text-blue-300 hover:text-white border border-blue-500/40 px-2 py-1 rounded-lg text-[10px] font-black transition">⚙️ Portions</button>
+                <button onclick="triggerItemPhotoUpdate('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-dark border border-primary/40 px-2 py-1 rounded-lg text-[10px] font-black transition">📷 Photo</button>
               </div>
             </div>
           </div>
@@ -1127,42 +2051,77 @@
       }
     };
 
+    /* ========================================================================= */
+    /* FLEXIBLE INVENTORY LIST RENDERER (WITH INLINE PRICE, STOCK & PORTIONS)    */
+    /* ========================================================================= */
     window.renderInventory = function() {
       const list = document.getElementById('inventoryList');
       if (!list) return;
       const q = (document.getElementById('menuSearchInput')?.value || '').toLowerCase();
+      const catFlt = document.getElementById('invCategoryFilter')?.value || 'ALL';
       list.innerHTML = '';
       
       let count = 0;
       Object.entries(menuCache).forEach(([id, item]) => {
         if(!item || !item.name) return;
+        if(catFlt !== 'ALL' && item.category !== catFlt) return;
         if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
         count++;
 
+        const portionsObj = item.portions || {};
+        const portionBadges = Object.entries(portionsObj).map(([pName, pPrice]) =>
+          `<span class="inline-block bg-light border border-primary/30 text-slate-200 text-[10px] font-bold px-2 py-0.5 rounded-lg mr-1 mt-1">${pName}: <b class="text-primary">₹${pPrice}</b></span>`
+        ).join('');
+
         list.innerHTML += `
-          <div class="bg-card p-4 rounded-2xl border border-[#4b4b6a] flex items-center justify-between gap-4">
-            <div class="relative w-14 h-14 shrink-0">
-              <img src="${item.image_url}" class="w-14 h-14 rounded-xl object-cover border border-primary/40">
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
-              <span class="text-[10px] font-bold text-slate-400">${item.category || 'Mandi'}</span>
-              <div class="flex items-center gap-3 mt-1">
-                <span class="text-primary font-black text-xs">₹${item.base_price}</span>
-                <span class="text-xs font-bold ${item.stock_count <= 5 ? 'text-red-400' : 'text-emerald-400'}">Stock: ${item.stock_count ?? 50}</span>
+          <div class="bg-card p-4 rounded-2xl border border-white/10 hover:border-primary/40 transition flex flex-col justify-between gap-3">
+            <div class="flex items-start justify-between gap-3.5">
+              <div class="relative w-16 h-16 shrink-0">
+                <img src="${item.image_url}" class="w-16 h-16 rounded-xl object-cover border border-primary/40">
+                <button onclick="triggerItemPhotoUpdate('${id}')" class="absolute -bottom-1 -right-1 bg-primary text-black rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-black shadow" title="Change Photo">📷</button>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
+                  ${item.is_special ? `<span class="text-[9px] bg-primary/20 text-primary border border-primary/40 px-2 py-0.5 rounded font-black uppercase">👑 Special</span>` : ''}
+                </div>
+                <span class="text-[10px] font-bold text-slate-400 block">${item.category || 'Mandi'}</span>
+                
+                <!-- Inline Base Price & Stock Quick Edit -->
+                <div class="flex flex-wrap items-center gap-3 mt-2">
+                  <div class="flex items-center gap-1 bg-light px-2.5 py-1 rounded-lg border border-white/10">
+                    <span class="text-[10px] font-bold text-slate-400">Base ₹</span>
+                    <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-16 text-xs font-black text-primary bg-transparent border-0 outline-none p-0">
+                  </div>
+                  <div class="flex items-center gap-1 bg-light px-2.5 py-1 rounded-lg border border-white/10">
+                    <span class="text-[10px] font-bold text-slate-400">Stock:</span>
+                    <input type="number" value="${item.stock_count ?? 50}" onchange="adminEditItemStock('${id}', parseInt(this.value)||0)" class="w-14 text-xs font-black ${(item.stock_count ?? 50) <= 5 ? 'text-red-400' : 'text-emerald-400'} bg-transparent border-0 outline-none p-0">
+                  </div>
+                </div>
+
+                <!-- Active Portions / Variants Display -->
+                <div class="mt-1.5">
+                  ${portionBadges || `<span class="text-[10px] text-slate-500 italic">Single Regular price only — click "⚙️ Portions & Price" to add Half/Full/2 Pcs/4P</span>`}
+                </div>
               </div>
             </div>
-            <div class="flex items-center gap-1.5 flex-wrap justify-end">
-              <button onclick="triggerItemPhotoUpdate('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-dark border border-primary/40 px-2.5 py-1.5 rounded-lg text-xs font-black transition" title="Upload New Photo from Phone">📷 Photo</button>
-              <button onclick="adminEditItemStock('${id}', ${(item.stock_count ?? 50) + 10})" class="bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg text-xs font-black">+10</button>
-              <button onclick="adminEditItemStock('${id}', 0)" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-dark px-2.5 py-1.5 rounded-lg text-xs font-black">Sold Out</button>
-              <button onclick="adminDeleteMenuItem('${id}')" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-black">🗑️</button>
+
+            <!-- Action Toolbar -->
+            <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-white/5 flex-wrap">
+              <button onclick="openItemFlexModal('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40 px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1">
+                ⚙️ Edit Price & Portions (2 Pcs / Half / Full)
+              </button>
+              <div class="flex items-center gap-1.5">
+                <button onclick="adminEditItemStock('${id}', ${(item.stock_count ?? 50) + 10})" class="bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg text-xs font-black" title="Add 10 to stock">+10 Stock</button>
+                <button onclick="adminEditItemStock('${id}', 0)" class="bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-dark px-2.5 py-1.5 rounded-lg text-xs font-black">Sold Out</button>
+                <button onclick="adminDeleteMenuItem('${id}')" class="bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white px-2.5 py-1.5 rounded-lg text-xs font-black">🗑️</button>
+              </div>
             </div>
           </div>
         `;
       });
       const cntLbl = document.getElementById('menuCountLabel');
-      if(cntLbl) cntLbl.innerText = `${count} items in inventory`;
+      if(cntLbl) cntLbl.innerText = `${count} Items Listed`;
     };
 
     window.adminEditItemStock = function(id, newStock) {
@@ -1180,8 +2139,22 @@
       const name = document.getElementById('newItemName').value.trim();
       const price = document.getElementById('newItemPrice').value;
       const category = document.getElementById('newItemCategory').value.trim() || 'Beverages';
+      const rawPortionsStr = (document.getElementById('newItemPortionsRaw')?.value || '').trim();
       const fileInput = document.getElementById('newItemImageFile');
-      if(!name || !price) return alert("Enter item name and price.");
+      if(!name || !price) return alert("Enter item name and base price.");
+
+      // Parse optional quick portions string e.g. "Half:180, Full:320, 2 Pcs:150"
+      const portionsObj = {};
+      if (rawPortionsStr) {
+        rawPortionsStr.split(',').forEach(pair => {
+          const pts = pair.split(':');
+          if (pts.length === 2) {
+            const pLabel = pts[0].trim();
+            const pVal = parseFloat(pts[1].trim());
+            if (pLabel && !isNaN(pVal)) portionsObj[pLabel] = pVal;
+          }
+        });
+      }
 
       const btn = document.getElementById('addMenuBtn');
       if(btn) btn.disabled = true;
@@ -1199,12 +2172,13 @@
           base_price: Number(price),
           stock_count: 50,
           is_special: category === 'Beverages',
-          portions: {},
+          portions: portionsObj,
           image_url: image_url
         });
         showGlobalToast("New item added to Customer Menu!", "success");
         document.getElementById('newItemName').value = '';
         document.getElementById('newItemPrice').value = '';
+        if (document.getElementById('newItemPortionsRaw')) document.getElementById('newItemPortionsRaw').value = '';
         fileInput.value = '';
       } catch(err) {
         alert("Failed to add item: " + err.message);
@@ -1219,6 +2193,24 @@
       db.ref('menu').update(defaults).then(() => {
         showGlobalToast("Default Master Menu loaded into Firebase!", "success");
       });
+    };
+
+    /* ========================================================================= */
+    /* LUXURY OCCUPANCY MAP & CLASSY ORDER RECEIVING PORTAL                      */
+    /* ========================================================================= */
+    window.handleOccupancyTableClick = function(cab) {
+      const tableId = `table_${cab}`;
+      const isOccupied = window.currentTables && window.currentTables[tableId];
+      if (isOccupied) {
+        openOrderEditor(tableId);
+      } else {
+        switchTab('pos');
+        const sel = document.getElementById('posTableNum');
+        if (sel) {
+          sel.value = cab;
+          updatePosCartUI();
+        }
+      }
     };
 
     function renderOccupancyMap(tables) {
@@ -1238,23 +2230,35 @@
       allCabins.forEach(cab => {
         const tableId = `table_${cab}`;
         const isOccupied = tables && tables[tableId];
-        const status = isOccupied ? (isOccupied.status === 'pending' ? 'Pending' : isOccupied.status.toUpperCase()) : 'Available';
+        const status = isOccupied ? (isOccupied.status === 'pending' ? 'NEW' : isOccupied.status.replace('_',' ').toUpperCase()) : 'FREE';
         
-        let bg = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
+        let bg = 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20';
         if(isOccupied) {
           bg = isOccupied.status === 'pending'
-            ? 'bg-amber-500/30 border-amber-500 text-amber-300 urgent-alarm'
-            : 'bg-blue-600/30 border-blue-500 text-blue-200';
+            ? 'bg-amber-500/30 border-amber-500 text-amber-200 urgent-alarm'
+            : 'bg-blue-600/25 border-blue-400 text-blue-200 hover:bg-blue-600/35';
         }
 
         mapDiv.innerHTML += `
-          <div class="p-2 rounded-xl border ${bg} flex flex-col justify-between items-center text-center cursor-default">
+          <div onclick="handleOccupancyTableClick('${cab}')" class="p-2 rounded-xl border ${bg} flex flex-col justify-between items-center text-center cursor-pointer transition active:scale-95" title="${isOccupied ? 'Click to Edit Order on T-' + cab : 'Click to Create POS Order for T-' + cab}">
             <span class="font-black text-xs">T-${cab}</span>
-            <span class="text-[8px] font-bold uppercase tracking-wider mt-0.5 truncate max-w-full">${status}</span>
+            <span class="text-[8px] font-black uppercase tracking-wider mt-0.5 truncate max-w-full">${isOccupied ? '₹' + (isOccupied.total || 0) : status}</span>
           </div>
         `;
       });
     }
+
+    window.setFloorFilter = function(flt) {
+      currentFloorFilter = flt;
+      document.querySelectorAll('.floor-flt-btn').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-black', 'shadow');
+      });
+      const activeBtn = document.getElementById(`flt-${flt}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-primary', 'text-black', 'shadow');
+      }
+      renderFloorGrid(window.currentTables || {});
+    };
 
     function renderServiceRequests(reqs) {
       const grid = document.getElementById('serviceRequestsGrid');
@@ -1348,15 +2352,14 @@
       const timeStr = new Date().toLocaleTimeString();
 
       let itemsHtml = '';
-      if(tableData.line_items) {
-        Object.values(tableData.line_items).forEach(li => {
-          if(li && !li.cancelled) {
-            itemsHtml += `<div style="font-weight:700; margin-bottom:4px;">[ ${li.qty} ] x ${li.name.toUpperCase()}</div>`;
-            if(li.variant && li.variant !== 'Regular') itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">- ${li.variant}</div>`;
-            if(li.note) itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">* Note: ${li.note}</div>`;
-          }
-        });
-      }
+      const liObj = ensureLineItemsObject(tableData);
+      Object.values(liObj).forEach(li => {
+        if(li && !li.cancelled) {
+          itemsHtml += `<div style="font-weight:700; margin-bottom:4px;">[ ${li.qty} ] x ${li.name.toUpperCase()}</div>`;
+          if(li.variant && li.variant !== 'Regular') itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">- Portion: ${li.variant}</div>`;
+          if(li.note) itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">* Note: ${li.note}</div>`;
+        }
+      });
 
       const receiptDiv = document.getElementById('printableReceipt');
       receiptDiv.innerHTML = `
@@ -1385,11 +2388,13 @@
       const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | UPI Rs.${tableData.splitOnline}` : '';
 
       let itemsHtml = '';
-      if(tableData.line_items) {
-        Object.values(tableData.line_items).forEach(li => {
+      const liObj = ensureLineItemsObject(tableData);
+      if(Object.keys(liObj).length > 0) {
+        Object.values(liObj).forEach(li => {
           if(li && !li.cancelled) {
             const lineTot = (Number(li.price)||0) * (Number(li.qty)||0);
-            itemsHtml += `<div class="receipt-line"><span>${li.qty}x ${li.name.substring(0,18)}</span><span>Rs.${lineTot}</span></div>`;
+            const vTag = (li.variant && li.variant !== 'Regular') ? ` (${li.variant})` : '';
+            itemsHtml += `<div class="receipt-line"><span>${li.qty}x ${(li.name + vTag).substring(0,20)}</span><span>Rs.${lineTot}</span></div>`;
           }
         });
       } else {
@@ -1454,8 +2459,7 @@
       });
 
       const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : { table: tNum, phone: phone, status: 'pending', line_items: {} };
-      const mergedLineItems = Object.assign({}, existing.line_items || {}, newLineItems);
-      const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
+      const mergedLineItems = Object.assign({}, ensureLineItemsObject(existing), newLineItems);
       const subTot = Object.values(mergedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
 
       const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
@@ -1471,7 +2475,7 @@
         table: String(tNum),
         phone: String(phone),
         line_items: mergedLineItems,
-        items: buildStr(mergedLineItems),
+        items: buildItemsStringFromLineItems(mergedLineItems),
         subtotal: subTot,
         discountType: dType,
         discountValue: dVal,
@@ -1503,40 +2507,31 @@
     window.adminCancelOrderItemInPos = function(tableId, lineItemKey) {
       if(!confirm("Remove this item from the active order?")) return;
       const existing = window.currentTables[tableId];
-      if(!existing || !existing.line_items || !existing.line_items[lineItemKey]) return;
+      if(!existing) return;
 
-      const updatedLineItems = Object.assign({}, existing.line_items);
-      updatedLineItems[lineItemKey].cancelled = true;
+      const updatedLineItems = ensureLineItemsObject(existing);
+      if (!updatedLineItems[lineItemKey]) return;
+      delete updatedLineItems[lineItemKey];
 
-      const buildStr = (liObj) => Object.values(liObj).filter(Boolean).map(i => `${i.qty}x ${i.name}${i.variant && i.variant!=='Regular'?' ('+i.variant+')':''}${i.cancelled?' [CANCELLED]':''}`).join(' | ');
-      const subTot = Object.values(updatedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
-
-      const dAmt = calculateDiscountAmount(subTot, existing.discountType || 'flat', Number(existing.discountValue) || 0);
-      const tipAmt = Number(existing.tipAmount) || 0;
-      const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
-
-      db.ref(`active_tables/${tableId}`).update({
-        line_items: updatedLineItems,
-        items: buildStr(updatedLineItems),
-        subtotal: subTot,
-        discountAmount: dAmt,
-        total: finalTot
-      }).then(() => showGlobalToast("Item removed from order", "success"));
+      syncEditedTableToFirebase(tableId, updatedLineItems);
+      showGlobalToast("Item removed from order", "success");
     };
 
     window.renderPosMenu = function() {
       const grid = document.getElementById('posMenuGrid');
       if(!grid) return;
       const q = (document.getElementById('posSearch')?.value || '').toLowerCase();
+      const catFlt = document.getElementById('posCatFilter')?.value || 'ALL';
       grid.innerHTML = '';
 
       Object.entries(menuCache).forEach(([id, item]) => {
         if(!item || !item.name) return;
+        if(catFlt !== 'ALL' && item.category !== catFlt) return;
         if(q && !item.name.toLowerCase().includes(q) && !(item.category||'').toLowerCase().includes(q)) return;
 
         let varSelect = '';
         if (item.portions && Object.keys(item.portions).length > 0) {
-          varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1 rounded bg-[#1e1e2d] text-white text-[10px] font-bold border border-[#4b4b6a] outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
+          varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1.5 rounded-lg bg-[#1e1e2d] text-white text-[10px] font-bold border border-[#4b4b6a] outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
           Object.entries(item.portions).forEach(([pName, pPrice]) => {
             varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`;
           });
@@ -1546,15 +2541,15 @@
         }
 
         grid.innerHTML += `
-          <div class="border border-[#4b4b6a] rounded-xl p-3 bg-card flex flex-col justify-between shadow-sm">
+          <div class="border border-white/10 hover:border-primary/40 rounded-2xl p-3 bg-light flex flex-col justify-between shadow-sm transition">
             <div>
-              <img src="${item.image_url}" class="w-full h-20 object-cover rounded-lg mb-2 border border-[#4b4b6a]">
-              <h4 class="font-bold text-xs text-white leading-tight mb-0.5">${item.name}</h4>
+              <img src="${item.image_url}" class="w-full h-24 object-cover rounded-xl mb-2 border border-white/10">
+              <h4 class="font-black text-xs text-white leading-tight mb-0.5">${item.name}</h4>
               <span class="text-[9px] text-slate-400 font-bold block">${item.category || ''}</span>
             </div>
             <div>
               ${varSelect}
-              <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-slate-900 hover:bg-black text-primary border border-primary/30 py-1.5 rounded-lg text-xs font-black transition">+ ADD</button>
+              <button onclick="addToPosCart('${id}')" class="mt-2 w-full bg-sidebar hover:bg-primary text-primary hover:text-black border border-primary/40 py-2 rounded-xl text-xs font-black transition">+ ADD TO BILL</button>
             </div>
           </div>
         `;
@@ -1595,9 +2590,14 @@
       const tableId = `table_${tNum}`;
       const existingTable = window.currentTables && window.currentTables[tableId];
 
-      if (existingTable && existingTable.line_items) {
-        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mb-2 pb-1 border-b border-[#4b4b6a]">Currently on Table ${tNum}</div>`;
-        Object.entries(existingTable.line_items).forEach(([k, item]) => {
+      if (existingTable) {
+        const existingLines = ensureLineItemsObject(existingTable);
+        list.innerHTML += `
+          <div class="flex justify-between items-center mb-2 pb-1 border-b border-[#4b4b6a]">
+            <span class="text-[10px] text-primary font-black uppercase tracking-widest">Active on Table ${tNum}</span>
+            <button onclick="openOrderEditor('${tableId}')" class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded font-black">✏️ Full Replace/Edit</button>
+          </div>`;
+        Object.entries(existingLines).forEach(([k, item]) => {
           if(item && !item.cancelled) {
             list.innerHTML += `
               <div class="flex items-center justify-between py-1.5 text-slate-300">
@@ -1612,7 +2612,7 @@
               </div>`;
           }
         });
-        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-[#4b4b6a]">New Items to Add</div>`;
+        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-[#4b4b6a]">New Items to Append</div>`;
       }
 
       let subtotal = 0;
@@ -1655,14 +2655,14 @@
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
       if(!tableData) return;
-      const pin = prompt("Enter Admin PIN to clear table:");
+      const pin = prompt("Enter Admin PIN to settle & clear table:");
       if(pin === null) return;
       if(pin.trim() !== "admin123" && pin.trim() !== "1234") return alert("Invalid PIN.");
 
       const d = new Date().toISOString().split('T')[0];
       const timeStr = new Date().toLocaleTimeString();
       let pMethod = tableData.paymentMethod || "CASH";
-      const itemsSummary = tableData.items || '(No items)';
+      const itemsSummary = tableData.items || buildItemsStringFromLineItems(tableData.line_items) || '(No items)';
       const tot = Number(tableData.total) || 0;
 
       if(pMethod === 'SPLIT') {
@@ -1760,77 +2760,172 @@
       });
     };
 
+    /* ========================================================================= */
+    /* CLASSY, LUXURY ORDER RECEIVING PORTAL CARD RENDERER                       */
+    /* ========================================================================= */
     window.renderFloorGrid = function(tables) {
       const grid = document.getElementById('kitchenGrid');
       if(!grid) return;
       grid.innerHTML = '';
 
-      const entries = Object.entries(tables || {});
-      if(entries.length === 0) {
-        grid.innerHTML = `<div class="col-span-full bg-card p-10 rounded-3xl text-center text-slate-400 font-bold border border-[#4b4b6a]">No active tables right now. Orders placed by customers or POS will appear here live.</div>`;
+      const allEntries = Object.entries(tables || {}).filter(([, t]) => t && typeof t === 'object');
+      
+      // Update filter counts
+      const cntAll = allEntries.length;
+      const cntPending = allEntries.filter(([, t]) => t.status === 'pending').length;
+      const cntCooking = allEntries.filter(([, t]) => t.status === 'cooking').length;
+      const cntServed = allEntries.filter(([, t]) => t.status === 'served').length;
+      const cntBill = allEntries.filter(([, t]) => t.status === 'bill_requested' || t.status === 'bill_ready').length;
+
+      if (document.getElementById('activeOrdersBadge')) document.getElementById('activeOrdersBadge').textContent = cntAll;
+      if (document.getElementById('cnt-ALL')) document.getElementById('cnt-ALL').textContent = cntAll;
+      if (document.getElementById('cnt-pending')) document.getElementById('cnt-pending').textContent = cntPending;
+      if (document.getElementById('cnt-cooking')) document.getElementById('cnt-cooking').textContent = cntCooking;
+      if (document.getElementById('cnt-served')) document.getElementById('cnt-served').textContent = cntServed;
+      if (document.getElementById('cnt-bill')) document.getElementById('cnt-bill').textContent = cntBill;
+
+      const filteredEntries = allEntries.filter(([, t]) => {
+        if (currentFloorFilter === 'ALL') return true;
+        if (currentFloorFilter === 'bill_requested') return t.status === 'bill_requested' || t.status === 'bill_ready';
+        return t.status === currentFloorFilter;
+      });
+
+      if(filteredEntries.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full bg-card p-12 rounded-3xl text-center border border-white/10 dash-card">
+            <div class="w-14 h-14 rounded-2xl bg-primary/15 text-primary border border-primary/30 flex items-center justify-center mx-auto mb-3 text-2xl">✦</div>
+            <h4 class="font-serif font-black text-xl text-white mb-1">Floor Quiet & Ready</h4>
+            <p class="text-slate-400 text-xs font-semibold">No active tables matching "${currentFloorFilter}". Incoming QR & POS orders will appear here live with sound alerts.</p>
+          </div>`;
         return;
       }
 
-      entries.forEach(([id, table]) => {
-        if(!table) return;
-        let border = table.status === 'pending'
-          ? 'urgent-alarm'
-          : (table.status === 'bill_requested' ? 'urgent-alarm border-amber-500' : 'border-blue-500');
-        if(table.status === 'served') border = 'border-emerald-500';
+      filteredEntries.forEach(([id, table]) => {
+        let cardBorder = 'border-blue-500/60';
+        let statusPill = 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+        let headerGlow = 'from-blue-500/15 to-transparent';
+
+        if (table.status === 'pending') {
+          cardBorder = 'urgent-alarm';
+          statusPill = 'bg-red-500/25 text-amber-300 border-amber-400';
+          headerGlow = 'from-red-500/25 to-transparent';
+        } else if (table.status === 'served') {
+          cardBorder = 'border-emerald-500/60';
+          statusPill = 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+          headerGlow = 'from-emerald-500/15 to-transparent';
+        } else if (table.status === 'bill_requested') {
+          cardBorder = 'urgent-alarm border-amber-500';
+          statusPill = 'bg-amber-500/25 text-amber-200 border-amber-400';
+          headerGlow = 'from-amber-500/20 to-transparent';
+        }
+
+        const elapsedMins = table.timestamp ? Math.max(0, Math.floor((Date.now() - Number(table.timestamp)) / 60000)) : 0;
+        const elapsedText = elapsedMins === 0 ? 'Just now' : `${elapsedMins}m ago`;
 
         const canKitchenAct = (currentRole === 'admin' || currentRole === 'kitchen' || currentRole === 'waiter');
         const isAdminOrWaiter = (currentRole === 'admin' || currentRole === 'waiter');
 
-        grid.innerHTML += `
-          <div class="dash-card bg-card p-6 rounded-3xl border-4 ${border} flex flex-col justify-between">
-            <div>
-              <div class="flex justify-between items-center border-b border-[#4b4b6a] pb-4 mb-4">
-                <div>
-                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-0.5">Table</span>
-                  <span class="font-black text-2xl text-white leading-none">${table.table}</span>
+        // Build structured item rows
+        const liObj = ensureLineItemsObject(table);
+        const liList = Object.values(liObj).filter(Boolean);
+        let structuredItemsHtml = '';
+
+        if (liList.length > 0) {
+          structuredItemsHtml = liList.map(li => `
+            <div class="flex items-center justify-between py-2 px-3 rounded-xl bg-light/90 border border-white/5 ${li.cancelled ? 'opacity-40 line-through' : ''}">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-7 h-7 rounded-lg gold-gradient text-black font-black text-xs flex items-center justify-center shrink-0 shadow">${li.qty}x</span>
+                <div class="min-w-0">
+                  <p class="font-bold text-white text-xs truncate">${li.name}</p>
+                  ${li.variant && li.variant !== 'Regular' ? `<span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 inline-block mt-0.5">${li.variant}</span>` : ''}
                 </div>
-                <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg border border-current">${(table.status || 'pending').replace('_',' ')}</span>
               </div>
-              <div class="max-h-44 overflow-y-auto pr-2 mb-2 text-sm text-slate-300 font-semibold leading-relaxed">
-                ${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}
-                ${table.paymentMethod ? `<br><span class="text-primary mt-2 block text-xs font-black">💳 Payment: ${table.paymentMethod}</span>` : ''}
-                ${table.paymentMethod === 'SPLIT' ? `<span class="text-amber-400 mt-1 block text-xs">⚠️ SPLIT: Cash ₹${table.splitCash} | Online ₹${table.splitOnline}</span>` : ''}
+              <span class="text-xs font-black text-slate-300 ml-2 shrink-0">₹${(Number(li.price)||0)*(Number(li.qty)||1)}</span>
+            </div>
+          `).join('');
+        } else {
+          structuredItemsHtml = `<div class="p-3 rounded-xl bg-light text-xs text-slate-300 font-semibold">${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}</div>`;
+        }
+
+        grid.innerHTML += `
+          <div class="dash-card bg-card rounded-3xl border-2 ${cardBorder} flex flex-col justify-between overflow-hidden">
+            <!-- Luxury Card Top Header -->
+            <div>
+              <div class="p-5 bg-gradient-to-b ${headerGlow} border-b border-white/10 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-2xl bg-sidebar border border-primary/40 flex flex-col items-center justify-center shadow-inner">
+                    <span class="text-[8px] font-black uppercase text-slate-400 leading-none">TABLE</span>
+                    <span class="font-black text-lg text-primary leading-tight">${table.table}</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold text-slate-300">📞 ${table.phone || 'Walk-in Guest'}</span>
+                    </div>
+                    <span class="text-[10px] font-mono font-bold text-slate-400 block mt-0.5">⏱️ Ordered ${elapsedText} ${table.prepSpeed ? `• ETA: ${table.prepSpeed}m` : ''}</span>
+                  </div>
+                </div>
+                <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border ${statusPill} tracking-wider">${(table.status || 'pending').replace('_',' ')}</span>
+              </div>
+
+              <!-- Ordered Dishes List -->
+              <div class="p-5">
+                <div class="flex justify-between items-center mb-2.5">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Ordered Delicacies (${liList.filter(i=>!i.cancelled).length})</span>
+                  ${isAdminOrWaiter ? `
+                    <button onclick="openOrderEditor('${id}')" class="text-[10px] font-black uppercase tracking-wider bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40 px-2.5 py-1 rounded-lg transition">
+                      ✏️ Edit / Replace Items
+                    </button>
+                  ` : ''}
+                </div>
+                <div class="max-h-52 overflow-y-auto space-y-1.5 pr-1">
+                  ${structuredItemsHtml}
+                </div>
+
+                ${table.paymentMethod ? `
+                  <div class="mt-3 p-2.5 rounded-xl bg-sidebar border border-primary/30 flex items-center justify-between text-xs">
+                    <span class="font-bold text-slate-400">💳 Payment Mode:</span>
+                    <span class="font-black text-primary">${table.paymentMethod} ${table.paymentMethod === 'SPLIT' ? `(Cash ₹${table.splitCash} | UPI ₹${table.splitOnline})` : ''}</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
-            <div class="mt-2 pt-4 border-t border-[#4b4b6a]">
-              <div class="flex justify-between items-end mb-5">
-                <span class="text-xs font-bold text-slate-400 bg-light border border-[#4b4b6a] px-2 py-1 rounded-md">📞 ${table.phone || 'Walk-in'}</span>
-                <div class="text-right">
-                  ${Number(table.discountAmount) > 0 ? `<span class="text-[10px] text-emerald-400 font-bold block">Saved ₹${table.discountAmount}</span>` : ''}
-                  <span class="font-black text-2xl text-white tracking-tight">₹${table.total || 0}</span>
+
+            <!-- Card Footer & Operations -->
+            <div class="p-5 pt-3 bg-sidebar/60 border-t border-white/10">
+              <div class="flex justify-between items-end mb-4">
+                <div>
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Grand Total</span>
+                  ${Number(table.discountAmount) > 0 ? `<span class="text-[10px] text-emerald-400 font-bold">Discount Applied: -₹${table.discountAmount}</span>` : ''}
                 </div>
+                <span class="font-black text-3xl text-primary tracking-tight font-serif">₹${table.total || 0}</span>
               </div>
               
               ${canKitchenAct ? `
                 ${table.status === 'pending' ? `
-                  <button class="w-full mb-2 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-sm transition" onclick="acceptOrder('${id}')">👨‍🍳 Accept & Start Cooking</button>
+                  <button class="w-full mb-2.5 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition active:scale-95" onclick="acceptOrder('${id}')">👨‍🍳 Accept & Start Cooking</button>
                 ` : ''}
                 
                 ${table.status === 'cooking' ? `
-                  <div class="flex gap-2 mb-2">
-                    <input type="number" id="speed_${id}" value="${table.prepSpeed || 15}" placeholder="Mins" class="w-20 p-2 bg-light text-white border border-[#4b4b6a] rounded-lg outline-none text-xs font-black">
-                    <button onclick="setPrepSpeed('${id}', 'speed_${id}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-dark font-black rounded-lg text-xs uppercase">⏱️ Set ETA</button>
+                  <div class="flex gap-2 mb-2.5">
+                    <input type="number" id="speed_${id}" value="${table.prepSpeed || 15}" placeholder="Mins" class="w-20 p-2 bg-light text-white border border-[#4b4b6a] rounded-xl outline-none text-xs font-black text-center">
+                    <button onclick="setPrepSpeed('${id}', 'speed_${id}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-dark font-black rounded-xl text-xs uppercase">⏱️ Update Live ETA</button>
                   </div>
-                  <button class="w-full mb-2 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition" onclick="markOrderServed('${id}')">🍽️ Mark Food Served</button>
+                  <button class="w-full mb-2.5 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition active:scale-95" onclick="markOrderServed('${id}')">🍽️ Mark Food Served at Table</button>
                 ` : ''}
               ` : ''}
 
               ${isAdminOrWaiter ? `
-                <div class="grid grid-cols-2 gap-2 mb-2">
-                  <button class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 py-2.5 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumKOT('${id}')">🖨️ KOT</button>
-                  <button class="bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 py-2.5 rounded-xl font-black active:scale-95 uppercase text-xs" onclick="printPremiumBill('${id}')">🧾 BILL</button>
+                <div class="grid grid-cols-3 gap-2 mb-2.5">
+                  <button class="bg-white/10 hover:bg-white/20 text-white border border-white/15 py-2.5 rounded-xl font-black active:scale-95 uppercase text-[11px]" onclick="printPremiumKOT('${id}')">🖨️ KOT</button>
+                  <button class="bg-white/10 hover:bg-white/20 text-white border border-white/15 py-2.5 rounded-xl font-black active:scale-95 uppercase text-[11px]" onclick="printPremiumBill('${id}')">🧾 BILL</button>
+                  <button class="bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40 py-2.5 rounded-xl font-black active:scale-95 uppercase text-[11px] transition" onclick="openOrderEditor('${id}')">✏️ EDIT</button>
                 </div>
-                <button class="w-full mb-2 bg-emerald-600/90 hover:bg-emerald-500 text-white py-2.5 rounded-xl font-black text-xs uppercase tracking-wider" onclick="sendBillToWhatsApp('${table.phone}', '${table.table}', '${table.total}')">💬 Send Bill to WhatsApp</button>
+                <button class="w-full mb-2.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/40 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition" onclick="sendBillToWhatsApp('${table.phone}', '${table.table}', '${table.total}')">💬 Send Bill on WhatsApp</button>
               ` : ''}
 
               ${currentRole === 'admin' ? `
-                <button class="w-full mb-2 bg-slate-900 hover:bg-black text-primary border-2 border-primary py-3.5 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-sm" onclick="clearTable('${id}')">🧾 Clear Table & Settle</button>
-                <button class="w-full bg-red-900/40 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/50 py-2 rounded-xl font-black text-xs uppercase transition" onclick="adminCancelOrder('${id}')">✕ Cancel Entire Order</button>
+                <button class="w-full mb-2 gold-gradient text-black py-3 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-xs" onclick="clearTable('${id}')">✅ Settle & Clear Table</button>
+                <button class="w-full bg-red-900/30 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/40 py-2 rounded-xl font-black text-[11px] uppercase transition" onclick="adminCancelOrder('${id}')">✕ Cancel Entire Order</button>
               ` : ''}
             </div>
           </div>`;
