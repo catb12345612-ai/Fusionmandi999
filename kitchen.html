@@ -70,28 +70,126 @@
     input, select { background-color: #151520 !important; color: white !important; border-color: #3b3b54 !important; }
     input:focus, select:focus { border-color: #D4AF37 !important; box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15) !important; }
 
-    /* PREMIUM THERMAL PRINTING CSS */
+    /* PREMIUM HIGH-CONTRAST THERMAL PRINTING CSS (80mm / 58mm Optimized) */
     #printableReceipt { display: none; }
     @media print {
-      body * { visibility: hidden; }
-      body { background-color: white !important; margin: 0; padding: 0; }
-      #printableReceipt, #printableReceipt * { visibility: visible; }
-      #printableReceipt { 
-        display: block; 
-        position: absolute; 
-        left: 0; top: 0; 
-        width: 80mm; 
-        padding: 5mm; 
-        background: white !important; 
-        color: black !important; 
-        font-family: 'Space Mono', monospace; 
-        font-size: 12px;
-        line-height: 1.4;
+      @page {
+        size: 80mm auto;
+        margin: 0mm;
       }
-      .receipt-brand { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; text-align: center; border-bottom: 2px dashed #000; margin-bottom: 10px; padding-bottom: 5px; }
-      .receipt-line { display: flex; justify-content: space-between; }
-      .receipt-divider { border-bottom: 1px dashed #000; margin: 8px 0; }
-      .receipt-footer { text-align: center; font-size: 10px; margin-top: 15px; border-top: 2px dashed #000; padding-top: 10px; }
+      html, body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 80mm !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      body * { visibility: hidden; }
+      #printableReceipt, #printableReceipt * {
+        visibility: visible;
+        color: #000000 !important;
+      }
+      #printableReceipt { 
+        display: block !important; 
+        position: absolute; 
+        left: 0;
+        top: 0; 
+        width: 76mm !important; 
+        max-width: 76mm !important;
+        padding: 2mm 3mm !important; 
+        margin: 0 !important;
+        background: #ffffff !important; 
+        color: #000000 !important; 
+        font-family: 'Space Mono', 'Courier New', Courier, monospace !important; 
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        line-height: 1.35 !important;
+        box-sizing: border-box !important;
+      }
+      .receipt-brand {
+        font-family: 'Arial Black', 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 22px !important;
+        font-weight: 900 !important;
+        text-align: center;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #000000 !important;
+        margin-bottom: 6px;
+        padding-bottom: 4px;
+      }
+      .kot-header-banner {
+        font-family: 'Arial Black', 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 20px !important;
+        font-weight: 900 !important;
+        text-align: center;
+        border: 2px solid #000000 !important;
+        padding: 4px 2px !important;
+        margin-bottom: 6px !important;
+        text-transform: uppercase;
+      }
+      .kot-table-box {
+        font-family: 'Arial Black', 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 24px !important;
+        font-weight: 900 !important;
+        text-align: center;
+        padding: 4px 0 !important;
+        border-bottom: 2px dashed #000000 !important;
+        margin-bottom: 6px !important;
+      }
+      .kot-item-row {
+        font-family: 'Arial Black', 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 16px !important;
+        font-weight: 900 !important;
+        line-height: 1.25 !important;
+        padding: 4px 0 !important;
+        border-bottom: 1px dotted #000000 !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .kot-item-sub {
+        font-family: 'Space Mono', monospace !important;
+        font-size: 13px !important;
+        font-weight: 900 !important;
+        margin-left: 8px !important;
+        margin-top: 2px !important;
+      }
+      .receipt-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        margin: 3px 0;
+        gap: 6px;
+      }
+      .receipt-line-bold {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-family: 'Arial Black', 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 17px !important;
+        font-weight: 900 !important;
+        margin: 4px 0;
+      }
+      .receipt-divider {
+        border-bottom: 1.5px dashed #000000 !important;
+        margin: 6px 0;
+      }
+      .receipt-divider-solid {
+        border-bottom: 2px solid #000000 !important;
+        margin: 6px 0;
+      }
+      .receipt-footer {
+        text-align: center;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        margin-top: 10px;
+        border-top: 2px dashed #000000 !important;
+        padding-top: 6px;
+      }
       .no-print { display: none !important; }
     }
   </style>
@@ -2343,35 +2441,51 @@
       }
     };
 
-    /* ---- PREMIUM THERMAL BILL & KOT PRINTING ---- */
+    /* ---- PREMIUM THERMAL BILL & KOT PRINTING (High-Contrast Bold Thermal Ready) ---- */
     window.printPremiumKOT = function(id) {
       const tableData = (window.currentTables || {})[id];
       if(!tableData) return alert("Order data not found.");
       
       const d = new Date().toISOString().split('T')[0];
-      const timeStr = new Date().toLocaleTimeString();
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       let itemsHtml = '';
+      let totalQtyCount = 0;
       const liObj = ensureLineItemsObject(tableData);
       Object.values(liObj).forEach(li => {
         if(li && !li.cancelled) {
-          itemsHtml += `<div style="font-weight:700; margin-bottom:4px;">[ ${li.qty} ] x ${li.name.toUpperCase()}</div>`;
-          if(li.variant && li.variant !== 'Regular') itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">- Portion: ${li.variant}</div>`;
-          if(li.note) itemsHtml += `<div style="font-size:10px; margin-left:10px; margin-bottom:4px;">* Note: ${li.note}</div>`;
+          const q = Number(li.qty) || 1;
+          totalQtyCount += q;
+          itemsHtml += `
+            <div style="padding: 5px 0; border-bottom: 1.5px dashed #000;">
+              <div class="kot-item-row" style="border-bottom: none; padding: 0;">
+                <span style="font-size: 18px; font-weight: 900;">${q} x ${li.name.toUpperCase()}</span>
+              </div>
+              ${li.variant && li.variant !== 'Regular' ? `<div class="kot-item-sub">► PORTION: ${li.variant.toUpperCase()}</div>` : ''}
+              ${li.note ? `<div class="kot-item-sub">★ NOTE: ${li.note.toUpperCase()}</div>` : ''}
+            </div>
+          `;
         }
       });
 
       const receiptDiv = document.getElementById('printableReceipt');
       receiptDiv.innerHTML = `
-        <div style="font-family: 'Space Mono', monospace; font-size: 16px; font-weight: 900; text-align: center; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom:10px;">*** KITCHEN KOT ***</div>
-        <div class="receipt-line"><span>Table:</span><span style="font-size:18px; font-weight:900;">${tableData.table}</span></div>
-        <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
-        <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
-        <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
-        <div style="font-size: 14px; margin-top:5px; margin-bottom:5px;">
-        ${itemsHtml}
+        <div class="kot-header-banner">*** KITCHEN KOT ***</div>
+        <div class="kot-table-box">TABLE: ${tableData.table}</div>
+        <div class="receipt-line"><span>DATE: ${d}</span><span>TIME: ${timeStr}</span></div>
+        <div class="receipt-divider-solid"></div>
+        <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:900; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 4px;">
+          <span>QTY &amp; DISH DESCRIPTION</span>
         </div>
-        <div class="receipt-divider" style="border-top: 2px solid #000;"></div>
+        <div style="margin-top: 2px; margin-bottom: 6px;">
+          ${itemsHtml || '<div style="font-weight:900; font-size:15px;">NO ACTIVE ITEMS</div>'}
+        </div>
+        <div class="receipt-divider-solid"></div>
+        <div class="receipt-line-bold">
+          <span>TOTAL ITEMS QTY:</span>
+          <span>${totalQtyCount}</span>
+        </div>
+        <div class="receipt-divider"></div>
       `;
       
       window.print();
@@ -2383,7 +2497,7 @@
       if(!tableData) return alert("Order data not found.");
       
       const d = new Date().toISOString().split('T')[0];
-      const timeStr = new Date().toLocaleTimeString();
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       let pMethod = tableData.paymentMethod || "PENDING";
       const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | UPI Rs.${tableData.splitOnline}` : '';
 
@@ -2394,35 +2508,40 @@
           if(li && !li.cancelled) {
             const lineTot = (Number(li.price)||0) * (Number(li.qty)||0);
             const vTag = (li.variant && li.variant !== 'Regular') ? ` (${li.variant})` : '';
-            itemsHtml += `<div class="receipt-line"><span>${li.qty}x ${(li.name + vTag).substring(0,20)}</span><span>Rs.${lineTot}</span></div>`;
+            itemsHtml += `
+              <div class="receipt-line" style="font-size:13px; font-weight:900; padding: 2px 0;">
+                <span style="max-width: 72%; word-break: break-word;">${li.qty}x ${li.name}${vTag}</span>
+                <span style="white-space: nowrap; font-weight:900;">Rs.${lineTot}</span>
+              </div>`;
           }
         });
       } else {
-        itemsHtml = `<div class="receipt-line"><span>${tableData.items || 'No items'}</span></div>`;
+        itemsHtml = `<div class="receipt-line" style="font-weight:900;"><span>${tableData.items || 'No items'}</span></div>`;
       }
 
-      const discountHtml = Number(tableData.discountAmount) > 0 ? `<div class="receipt-line"><span>Discount</span><span>-Rs.${tableData.discountAmount}</span></div>` : '';
-      const tipHtml = Number(tableData.tipAmount) > 0 ? `<div class="receipt-line"><span>Tip</span><span>Rs.${tableData.tipAmount}</span></div>` : '';
+      const discountHtml = Number(tableData.discountAmount) > 0 ? `<div class="receipt-line" style="font-weight:900;"><span>Discount</span><span>-Rs.${tableData.discountAmount}</span></div>` : '';
+      const tipHtml = Number(tableData.tipAmount) > 0 ? `<div class="receipt-line" style="font-weight:900;"><span>Tip</span><span>Rs.${tableData.tipAmount}</span></div>` : '';
 
       const receiptDiv = document.getElementById('printableReceipt');
       receiptDiv.innerHTML = `
         <div class="receipt-brand">✦ MANDI CROODS ✦</div>
-        <div style="text-align:center; font-size:10px; margin-bottom:10px;">Premium Dining Experience<br>Khammam, Telangana</div>
-        <div class="receipt-divider"></div>
-        <div class="receipt-line"><span>Date:</span><span>${d}</span></div>
-        <div class="receipt-line"><span>Time:</span><span>${timeStr}</span></div>
-        <div class="receipt-line"><span>Table:</span><span>${tableData.table}</span></div>
-        <div class="receipt-line"><span>Mob:</span><span>${tableData.phone || 'Walk-in'}</span></div>
-        <div class="receipt-divider"></div>
+        <div style="text-align:center; font-size:12px; font-weight:900; margin-bottom:8px;">Premium Dining Experience<br>Khammam, Telangana</div>
+        <div class="receipt-divider-solid"></div>
+        <div class="receipt-line" style="font-size:14px; font-weight:900;"><span>TABLE: ${tableData.table}</span><span>${d}</span></div>
+        <div class="receipt-line"><span>Mob: ${tableData.phone || 'Walk-in'}</span><span>${timeStr}</span></div>
+        <div class="receipt-divider-solid"></div>
+        <div class="receipt-line" style="font-size:12px; font-weight:900; border-bottom:1px dashed #000; padding-bottom:3px; margin-bottom:4px;">
+          <span>ITEM</span><span>AMOUNT</span>
+        </div>
         ${itemsHtml}
-        <div class="receipt-divider"></div>
-        <div class="receipt-line"><span>Subtotal</span><span>Rs.${tableData.subtotal || tableData.total}</span></div>
+        <div class="receipt-divider-solid"></div>
+        <div class="receipt-line" style="font-weight:900;"><span>Subtotal</span><span>Rs.${tableData.subtotal || tableData.total}</span></div>
         ${discountHtml}
         ${tipHtml}
-        <div class="receipt-divider" style="border-width:2px;"></div>
-        <div class="receipt-line" style="font-weight:700; font-size:14px;"><span>TOTAL</span><span>Rs.${tableData.total}</span></div>
-        <div class="receipt-divider" style="border-width:2px;"></div>
-        <div style="text-align:center; margin-top:5px; font-weight:bold;">Method: ${pMethod} ${splitText}</div>
+        <div class="receipt-divider-solid"></div>
+        <div class="receipt-line-bold" style="font-size:19px;"><span>GRAND TOTAL</span><span>Rs.${tableData.total}</span></div>
+        <div class="receipt-divider-solid"></div>
+        <div style="text-align:center; margin-top:6px; font-size:13px; font-weight:900;">PAYMENT: ${pMethod} ${splitText}</div>
         <div class="receipt-footer">Thank you for dining with us!<br>Scan QR to rate your experience.<br>*** CUSTOMER COPY ***</div>
       `;
 
