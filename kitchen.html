@@ -582,6 +582,27 @@
                     <span id="posSplitEach" class="text-xs font-black text-emerald-400 ml-1">₹0/each</span>
                   </div>
                 </div>
+                <!-- PAYMENT METHOD: CASH / ONLINE (UPI) / CARD / SPLIT -->
+                <div class="flex items-center justify-between pt-1.5 border-t border-[#4b4b6a]">
+                  <span class="text-[10px] font-black uppercase text-slate-500">Payment:</span>
+                  <select id="posPaymentMethod" onchange="togglePosSplitInputs()" class="flex-1 ml-2 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
+                    <option value="">⏳ Pay Later / Unpaid</option>
+                    <option value="CASH">💵 CASH</option>
+                    <option value="UPI">📱 ONLINE / UPI</option>
+                    <option value="CARD">💳 CARD</option>
+                    <option value="SPLIT">⚖️ SPLIT (Cash + Online)</option>
+                  </select>
+                </div>
+                <div id="posSplitPaymentBox" class="hidden grid grid-cols-2 gap-2 pt-1">
+                  <div>
+                    <label class="text-[9px] font-black uppercase text-emerald-400 block mb-0.5">Cash Amount (₹)</label>
+                    <input type="number" id="posSplitCash" min="0" value="0" oninput="onPosSplitCashInput()" placeholder="Cash ₹" class="w-full p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
+                  </div>
+                  <div>
+                    <label class="text-[9px] font-black uppercase text-blue-400 block mb-0.5">Online / UPI (₹)</label>
+                    <input type="number" id="posSplitOnline" min="0" value="0" oninput="onPosSplitOnlineInput()" placeholder="Online ₹" class="w-full p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
+                  </div>
+                </div>
               </div>
 
               <div class="mt-auto pt-2 border-t border-[#4b4b6a]">
@@ -2549,20 +2570,56 @@
       if(tableData.status === 'bill_requested') markBillReady(id);
     };
 
-    /* ---- POS Direct Ordering ---- */
+    /* ---- POS Direct Ordering & Payment Method Controls ---- */
+    window.togglePosSplitInputs = function() {
+      const pm = document.getElementById('posPaymentMethod')?.value || '';
+      const box = document.getElementById('posSplitPaymentBox');
+      if (!box) return;
+      if (pm === 'SPLIT') {
+        box.classList.remove('hidden');
+        const totText = (document.getElementById('posTotal')?.innerText || '0').replace(/[^\d.]/g, '');
+        const totalNum = parseFloat(totText) || 0;
+        const half = Math.floor(totalNum / 2);
+        document.getElementById('posSplitCash').value = half;
+        document.getElementById('posSplitOnline').value = Math.max(0, totalNum - half);
+      } else {
+        box.classList.add('hidden');
+      }
+    };
+
+    window.onPosSplitCashInput = function() {
+      const totText = (document.getElementById('posTotal')?.innerText || '0').replace(/[^\d.]/g, '');
+      const totalNum = parseFloat(totText) || 0;
+      const cashVal = Math.max(0, parseFloat(document.getElementById('posSplitCash')?.value) || 0);
+      const onlineEl = document.getElementById('posSplitOnline');
+      if (onlineEl) onlineEl.value = Math.max(0, totalNum - cashVal);
+    };
+
+    window.onPosSplitOnlineInput = function() {
+      const totText = (document.getElementById('posTotal')?.innerText || '0').replace(/[^\d.]/g, '');
+      const totalNum = parseFloat(totText) || 0;
+      const onlineVal = Math.max(0, parseFloat(document.getElementById('posSplitOnline')?.value) || 0);
+      const cashEl = document.getElementById('posSplitCash');
+      if (cashEl) cashEl.value = Math.max(0, totalNum - onlineVal);
+    };
+
     window.submitPosOrder = function() {
-      if(Object.keys(posCart).length === 0) return alert("Cart is empty.");
       const tNum = document.getElementById('posTableNum').value;
       if(!tNum) return alert("Please select a table or takeaway slot.");
 
-      const phone = document.getElementById('posPhone').value.trim() || 'Walk-in';
       const tableId = `table_${tNum}`;
+      const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : null;
+
+      if(Object.keys(posCart).length === 0 && !existing) return alert("Cart is empty.");
+
+      const phone = document.getElementById('posPhone').value.trim() || (existing && existing.phone ? existing.phone : 'Walk-in');
       const batchId = `${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
 
       const posDiscType = document.getElementById('posDiscType')?.value || 'flat';
       const posDiscVal = parseFloat(document.getElementById('posDiscVal')?.value) || 0;
       const posCoupon = (document.getElementById('posCouponCode')?.value || '').trim().toUpperCase();
       const posSplitCount = Math.max(1, parseInt(document.getElementById('posSplitCount')?.value) || 1);
+      const selectedPayMethod = document.getElementById('posPaymentMethod')?.value || '';
 
       const newLineItems = {};
       Object.values(posCart).forEach((item, idx) => {
@@ -2577,20 +2634,31 @@
         };
       });
 
-      const existing = (window.currentTables && window.currentTables[tableId]) ? window.currentTables[tableId] : { table: tNum, phone: phone, status: 'pending', line_items: {} };
-      const mergedLineItems = Object.assign({}, ensureLineItemsObject(existing), newLineItems);
+      const baseExisting = existing || { table: tNum, phone: phone, status: 'pending', line_items: {} };
+      const mergedLineItems = Object.assign({}, ensureLineItemsObject(baseExisting), newLineItems);
       const subTot = Object.values(mergedLineItems).filter(Boolean).reduce((s,i)=>s+(i.cancelled?0:(Number(i.price)||0)*(Number(i.qty)||1)), 0);
 
-      const dType = posDiscVal > 0 ? posDiscType : (existing.discountType || 'flat');
-      const dVal = posDiscVal > 0 ? posDiscVal : (Number(existing.discountValue) || 0);
-      const cCode = posCoupon || existing.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
+      const dType = posDiscVal > 0 ? posDiscType : (baseExisting.discountType || 'flat');
+      const dVal = posDiscVal > 0 ? posDiscVal : (Number(baseExisting.discountValue) || 0);
+      const cCode = posCoupon || baseExisting.couponCode || (posDiscVal > 0 ? 'ADMIN' : '');
       const dAmt = calculateDiscountAmount(subTot, dType, dVal);
-      const tipAmt = Number(existing.tipAmount) || 0;
+      const tipAmt = Number(baseExisting.tipAmount) || 0;
       const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
-      const sCount = posSplitCount > 1 ? posSplitCount : (existing.splitCount || 1);
+      const sCount = posSplitCount > 1 ? posSplitCount : (baseExisting.splitCount || 1);
+
+      const finalPayMethod = selectedPayMethod || baseExisting.paymentMethod || '';
+      let splitCash = Number(baseExisting.splitCash) || 0;
+      let splitOnline = Number(baseExisting.splitOnline) || 0;
+      if (finalPayMethod === 'SPLIT') {
+        splitCash = parseFloat(document.getElementById('posSplitCash')?.value) || 0;
+        splitOnline = parseFloat(document.getElementById('posSplitOnline')?.value) || Math.max(0, finalTot - splitCash);
+      } else {
+        splitCash = 0;
+        splitOnline = 0;
+      }
 
       const payload = sanitizeForFirebase({
-        orderId: existing.orderId || tableId,
+        orderId: baseExisting.orderId || tableId,
         table: String(tNum),
         phone: String(phone),
         line_items: mergedLineItems,
@@ -2603,9 +2671,11 @@
         splitCount: sCount,
         tipAmount: tipAmt,
         total: finalTot,
-        status: 'pending',
-        timestamp: existing.timestamp || Date.now(),
-        paymentMethod: existing.paymentMethod || ''
+        status: Object.keys(newLineItems).length > 0 ? 'pending' : (baseExisting.status || 'pending'),
+        timestamp: baseExisting.timestamp || Date.now(),
+        paymentMethod: finalPayMethod,
+        splitCash: splitCash,
+        splitOnline: splitOnline
       });
 
       db.ref(`active_tables/${tableId}`).set(payload).then(() => {
@@ -2613,6 +2683,10 @@
         if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
         if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
         if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
+        if(document.getElementById('posPaymentMethod')) document.getElementById('posPaymentMethod').value = '';
+        if(document.getElementById('posSplitPaymentBox')) document.getElementById('posSplitPaymentBox').classList.add('hidden');
+        if(document.getElementById('posSplitCash')) document.getElementById('posSplitCash').value = 0;
+        if(document.getElementById('posSplitOnline')) document.getElementById('posSplitOnline').value = 0;
         updatePosCartUI();
         document.getElementById('posTableNum').value = "";
         document.getElementById('posPhone').value = "";
@@ -2767,9 +2841,28 @@
       if(posTotEl) posTotEl.innerText = `₹${finalTotal}`;
       const splitEl = document.getElementById('posSplitEach');
       if (splitEl) splitEl.innerText = `₹${perPerson}/each`;
+
+      if (document.getElementById('posPaymentMethod')?.value === 'SPLIT') {
+        const cashVal = Math.max(0, parseFloat(document.getElementById('posSplitCash')?.value) || 0);
+        const onlineEl = document.getElementById('posSplitOnline');
+        if (onlineEl) onlineEl.value = Math.max(0, finalTotal - cashVal);
+      }
     };
 
-    document.getElementById('posTableNum')?.addEventListener('change', updatePosCartUI);
+    document.getElementById('posTableNum')?.addEventListener('change', function() {
+      const tNum = this.value;
+      const existingTable = window.currentTables && window.currentTables[`table_${tNum}`];
+      const pmSel = document.getElementById('posPaymentMethod');
+      if (pmSel) {
+        pmSel.value = (existingTable && existingTable.paymentMethod) ? existingTable.paymentMethod : '';
+        togglePosSplitInputs();
+        if (existingTable && existingTable.paymentMethod === 'SPLIT') {
+          document.getElementById('posSplitCash').value = existingTable.splitCash || 0;
+          document.getElementById('posSplitOnline').value = existingTable.splitOnline || 0;
+        }
+      }
+      updatePosCartUI();
+    });
 
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
