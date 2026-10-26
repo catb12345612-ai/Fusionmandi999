@@ -27,10 +27,10 @@
           },
           colors: {
             primary: '#D4AF37',
-            dark: '#0a0a0a',
-            sidebar: '#12121a',
-            light: '#181824',
-            card: '#222233'
+            dark: '#040811',
+            sidebar: '#070e1c',
+            light: '#0b1528',
+            card: '#11203a'
           }
         }
       }
@@ -40,21 +40,25 @@
     .hide-scroll::-webkit-scrollbar { display: none; }
     .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     
-    /* Custom Subtle Scrollbar */
+    /* Custom Subtle Scrollbar - PC Royal Blue Theme */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #12121a; }
-    ::-webkit-scrollbar-thumb { background: #3f3f5a; border-radius: 9999px; }
+    ::-webkit-scrollbar-track { background: #070e1c; }
+    ::-webkit-scrollbar-thumb { background: #233862; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
 
     .dash-card { 
-      box-shadow: 0 10px 35px -5px rgba(0,0,0,0.5); 
-      border: 1px solid rgba(255,255,255,0.07); 
+      box-shadow: 0 10px 35px -5px rgba(2, 6, 17, 0.7); 
+      border: 1px solid rgba(147, 197, 253, 0.12); 
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
     }
     .dash-card:hover {
-      border-color: rgba(212, 175, 55, 0.28);
+      border-color: rgba(212, 175, 55, 0.35);
     }
-    body { background-color: #181824; color: #ffffff; }
+    body { 
+      background: radial-gradient(circle at top right, #132547 0%, #0b1528 55%, #070e1c 100%);
+      background-color: #0b1528; 
+      color: #ffffff; 
+    }
     
     @keyframes redBlueFlash {
       0% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), inset 0 0 0 2px #ef4444; border-color: #ef4444; }
@@ -64,11 +68,11 @@
     .urgent-alarm { animation: redBlueFlash 1.6s infinite; }
     .gold-gradient { background: linear-gradient(135deg, #F9E596 0%, #D4AF37 50%, #AA8C2C 100%); }
     .gold-text { background: linear-gradient(135deg, #F9E596, #D4AF37, #AA8C2C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .bg-card { background-color: #222233; }
-    .bg-light { background-color: #181824; }
-    .glass-panel { background: rgba(34, 34, 51, 0.85); backdrop-filter: blur(16px); }
-    input, select { background-color: #151520 !important; color: white !important; border-color: #3b3b54 !important; }
-    input:focus, select:focus { border-color: #D4AF37 !important; box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.15) !important; }
+    .bg-card { background-color: #11203a; }
+    .bg-light { background-color: #0b1528; }
+    .glass-panel { background: rgba(17, 32, 58, 0.88); backdrop-filter: blur(16px); }
+    input, select { background-color: #081121 !important; color: white !important; border-color: #233862 !important; }
+    input:focus, select:focus { border-color: #D4AF37 !important; box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.18) !important; }
 
     /* PREMIUM HIGH-CONTRAST THERMAL PRINTING CSS (80mm / 58mm Optimized) */
     #printableReceipt { display: none; }
@@ -78,6 +82,7 @@
         margin: 0mm;
       }
       html, body {
+        background: #ffffff !important;
         background-color: #ffffff !important;
         color: #000000 !important;
         margin: 0 !important;
@@ -221,7 +226,7 @@
               <h3 class="text-xl font-black text-white tracking-tight">Live Order Editor — <span id="editModalTableTitle" class="text-primary">Table</span></h3>
               <span id="editModalStatusBadge" class="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/40">ACTIVE</span>
             </div>
-            <p class="text-xs text-slate-400">Modify quantities, remove wrong dishes, click <span class="text-amber-400 font-bold">🔄 Replace</span> on any item to swap it, or add new items directly from the menu.</p>
+            <p class="text-xs text-slate-300">Modify quantities, remove wrong dishes, click <span class="text-amber-400 font-bold">🔄 Replace</span> on any item to swap it, or add new items directly from the menu.</p>
           </div>
         </div>
         <button onclick="closeOrderEditor()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider transition">✕ Close Editor</button>
@@ -242,7 +247,7 @@
         <!-- Left Column: Current Items in Order (5 Cols) -->
         <div class="lg:col-span-5 border-r border-white/10 flex flex-col h-full bg-light/60 overflow-hidden">
           <div class="p-4 border-b border-white/10 flex justify-between items-center">
-            <span class="text-xs font-black uppercase tracking-widest text-slate-400">📋 Current Ordered Items</span>
+            <span class="text-xs font-black uppercase tracking-widest text-slate-300">📋 Current Ordered Items</span>
             <span id="editModalItemCount" class="text-xs font-black text-primary">0 Items</span>
           </div>
           
@@ -251,15 +256,15 @@
           <!-- Order Totals & Quick Discount Footer -->
           <div class="p-4 bg-sidebar border-t border-white/10 space-y-3">
             <div class="flex items-center justify-between text-xs">
-              <span class="text-slate-400 font-bold">Subtotal:</span>
+              <span class="text-slate-300 font-bold">Subtotal:</span>
               <span id="editModalSubtotal" class="font-black text-white">₹0</span>
             </div>
             <div class="flex items-center justify-between text-xs">
-              <span class="text-slate-400 font-bold">Discount Applied:</span>
+              <span class="text-slate-300 font-bold">Discount Applied:</span>
               <span id="editModalDiscount" class="font-black text-emerald-400">-₹0</span>
             </div>
             <div class="flex items-center justify-between pt-2 border-t border-white/10">
-              <span class="text-sm font-black uppercase tracking-wider text-slate-300">Updated Grand Total:</span>
+              <span class="text-sm font-black uppercase tracking-wider text-slate-200">Updated Grand Total:</span>
               <span id="editModalTotal" class="text-2xl font-black text-primary">₹0</span>
             </div>
           </div>
@@ -301,9 +306,9 @@
       <div class="px-6 py-4 bg-sidebar border-b border-white/10 flex justify-between items-center">
         <div>
           <h3 class="text-lg font-black text-white">⚙️ Flexible Item, Price & Portion Editor</h3>
-          <p class="text-xs text-slate-400">Configure base price, stock, and custom portions (2 Pcs, 3 Pcs, Half, Full, 2P, 4P Gang, etc.)</p>
+          <p class="text-xs text-slate-300">Configure base price, stock, and custom portions (2 Pcs, 3 Pcs, Half, Full, 2P, 4P Gang, etc.)</p>
         </div>
-        <button onclick="closeItemFlexModal()" class="text-slate-400 hover:text-white font-black text-sm">✕</button>
+        <button onclick="closeItemFlexModal()" class="text-slate-300 hover:text-white font-black text-sm">✕</button>
       </div>
 
       <div class="p-6 overflow-y-auto space-y-5 flex-1">
@@ -311,11 +316,11 @@
         
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dish Name</label>
+            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Dish Name</label>
             <input type="text" id="flexEditName" class="w-full p-3 rounded-xl font-bold text-sm border outline-none">
           </div>
           <div>
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
+            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Category</label>
             <select id="flexEditCategory" class="w-full p-3 rounded-xl font-bold text-sm border outline-none">
               <option value="Beverages">🥤 Cool Drinks & Desserts (Cart Upsell)</option>
               <option value="Chicken Mandi">Chicken Mandi</option>
@@ -330,11 +335,11 @@
             </select>
           </div>
           <div>
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base / Regular (1P) Price (₹)</label>
+            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Base / Regular (1P) Price (₹)</label>
             <input type="number" id="flexEditBasePrice" class="w-full p-3 rounded-xl font-black text-sm border outline-none">
           </div>
           <div>
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Available Stock Count</label>
+            <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Available Stock Count</label>
             <input type="number" id="flexEditStock" class="w-full p-3 rounded-xl font-black text-sm border outline-none">
           </div>
         </div>
@@ -342,7 +347,7 @@
         <div class="flex items-center justify-between bg-light p-3.5 rounded-2xl border border-white/10">
           <div>
             <span class="text-xs font-black text-white block">👑 Highlight as Royal Special / Upsell</span>
-            <span class="text-[10px] text-slate-400">Marks this item with a Special badge on the customer menu</span>
+            <span class="text-[10px] text-slate-300">Marks this item with a Special badge on the customer menu</span>
           </div>
           <input type="checkbox" id="flexEditSpecial" class="w-5 h-5 accent-amber-400 cursor-pointer">
         </div>
@@ -352,23 +357,23 @@
           <div class="flex flex-wrap justify-between items-center gap-2 mb-3">
             <div>
               <h4 class="text-xs font-black uppercase tracking-widest text-primary">🍗 Custom Portions / Pieces / Variants</h4>
-              <p class="text-[11px] text-slate-400">Add options like <span class="text-white font-bold">Half, Full, 2 Pcs, 3 Pcs, 4 Pcs, 2P, 3P, 4P (Gang), 5P (Gang)</span></p>
+              <p class="text-[11px] text-slate-300">Add options like <span class="text-white font-bold">Half, Full, 2 Pcs, 3 Pcs, 4 Pcs, 2P, 3P, 4P (Gang), 5P (Gang)</span></p>
             </div>
             <button type="button" onclick="addFlexPortionRow('', '')" class="bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40 px-3 py-1.5 rounded-xl text-xs font-black transition">+ Add Portion / Variant</button>
           </div>
 
           <!-- Quick Preset Portion Pills -->
           <div class="flex flex-wrap gap-1.5 mb-3 pb-3 border-b border-white/10">
-            <span class="text-[10px] font-bold text-slate-400 self-center mr-1">Quick Presets:</span>
-            <button type="button" onclick="addFlexPortionRow('Half', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ Half</button>
-            <button type="button" onclick="addFlexPortionRow('Full', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ Full</button>
-            <button type="button" onclick="addFlexPortionRow('2 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 2 Pcs</button>
-            <button type="button" onclick="addFlexPortionRow('3 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 3 Pcs</button>
-            <button type="button" onclick="addFlexPortionRow('4 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 4 Pcs</button>
-            <button type="button" onclick="addFlexPortionRow('2P', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 2P</button>
-            <button type="button" onclick="addFlexPortionRow('3P', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 3P</button>
-            <button type="button" onclick="addFlexPortionRow('4P (Gang)', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 4P (Gang)</button>
-            <button type="button" onclick="addFlexPortionRow('5P (Gang)', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-300">+ 5P (Gang)</button>
+            <span class="text-[10px] font-bold text-slate-300 self-center mr-1">Quick Presets:</span>
+            <button type="button" onclick="addFlexPortionRow('Half', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ Half</button>
+            <button type="button" onclick="addFlexPortionRow('Full', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ Full</button>
+            <button type="button" onclick="addFlexPortionRow('2 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 2 Pcs</button>
+            <button type="button" onclick="addFlexPortionRow('3 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 3 Pcs</button>
+            <button type="button" onclick="addFlexPortionRow('4 Pcs', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 4 Pcs</button>
+            <button type="button" onclick="addFlexPortionRow('2P', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 2P</button>
+            <button type="button" onclick="addFlexPortionRow('3P', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 3P</button>
+            <button type="button" onclick="addFlexPortionRow('4P (Gang)', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 4P (Gang)</button>
+            <button type="button" onclick="addFlexPortionRow('5P (Gang)', '')" class="text-[10px] bg-white/5 hover:bg-white/15 px-2.5 py-1 rounded-lg font-bold text-slate-200">+ 5P (Gang)</button>
           </div>
 
           <div id="flexPortionsContainer" class="space-y-2 max-h-56 overflow-y-auto pr-1"></div>
@@ -384,18 +389,18 @@
 
   <!-- Login Screen -->
   <div id="loginScreen" class="fixed inset-0 bg-sidebar z-[100] flex flex-col items-center justify-center p-5">
-    <div class="bg-[#1e1e2d] border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
+    <div class="bg-card border border-primary/30 p-10 rounded-3xl text-center w-full max-w-sm shadow-[0_15px_50px_rgba(212,175,55,0.15)]">
       <div class="w-16 h-16 gold-gradient text-black rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl font-black shadow-lg font-serif">MC</div>
       <h2 class="text-2xl font-black text-white mb-2 tracking-tight">System Login</h2>
-      <p class="text-[11px] font-bold text-slate-400 mb-5">Enter Admin, Waiter, or Kitchen PIN</p>
+      <p class="text-[11px] font-bold text-slate-300 mb-5">Enter Admin, Waiter, or Kitchen PIN</p>
       <input type="password" id="sysPin" placeholder="Enter PIN" onkeydown="if(event.key==='Enter') attemptLogin()" class="w-full text-center p-4 bg-white/10 border border-white/20 text-white rounded-xl font-black text-xl outline-none mb-4 tracking-widest transition-all">
       <button id="loginBtn" onclick="attemptLogin()" class="w-full gold-gradient text-black font-black py-4 rounded-xl shadow-lg active:scale-95 transition-transform uppercase tracking-widest">ACCESS WORKSPACE</button>
-      <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-400 mt-4"></p>
+      <p id="loginStatusMsg" class="text-[11px] font-bold text-slate-300 mt-4"></p>
     </div>
   </div>
 
   <!-- Top Developer Banner (No Admin Phone Number Shown Here) -->
-  <div class="bg-dark text-white px-5 py-2.5 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20 no-print" style="background:#0a0a0a;">
+  <div class="bg-dark text-white px-5 py-2.5 flex justify-between items-center text-[10px] font-bold z-50 relative border-b border-primary/20 no-print" style="background:#040811;">
     <div class="flex items-center gap-2.5 overflow-hidden">
       <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="shrink-0">
         <img src="dev-logo.png (1).png" onerror="this.src='https://ui-avatars.com/api/?name=SZ&background=D4AF37&color=0a0a0a&bold=true'" class="h-7 w-7 rounded-full object-cover border border-primary shadow-sm" alt="Dev Logo">
@@ -404,7 +409,7 @@
         <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="text-primary hover:text-white font-black tracking-wide transition-colors truncate">
           🌐 Built by High-Fledged Solutions (Tap to Visit)
         </a>
-        <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="text-slate-400 hover:text-pink-400 text-[9px] font-extrabold tracking-wider transition-colors truncate mt-0.5">
+        <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="text-slate-300 hover:text-pink-400 text-[9px] font-extrabold tracking-wider transition-colors truncate mt-0.5">
           📸 Instagram: <span class="text-primary underline">@syedzeeshaanali07</span>
         </a>
       </div>
@@ -420,21 +425,21 @@
 
   <!-- Main Workspace Layout -->
   <div class="flex h-[calc(100vh-48px)] overflow-hidden hidden no-print" id="mainLayout">
-    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-2xl z-20 border-r border-white/10 shrink-0">
-      <div class="p-6 border-b border-white/10">
+    <aside class="w-64 bg-sidebar text-white flex flex-col shadow-2xl z-20 border-r border-blue-400/15 shrink-0">
+      <div class="p-6 border-b border-blue-400/15">
         <div class="flex items-center gap-2.5">
           <div class="w-9 h-9 rounded-xl gold-gradient text-black font-black flex items-center justify-center font-serif text-sm shadow">MC</div>
           <div>
             <h1 class="font-black text-lg leading-tight tracking-tight gold-text font-serif">Mandi Croods</h1>
-            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
+            <p class="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Role: <span id="roleText" class="text-primary">Waitstaff</span></p>
           </div>
         </div>
         <div class="flex items-center justify-between mt-3 pt-2.5 border-t border-white/5">
           <div class="flex items-center gap-1.5">
             <div id="connStatus" class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
-            <span id="connText" class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Offline</span>
+            <span id="connText" class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Offline</span>
           </div>
-          <span id="liveClockSidebar" class="text-[9px] font-mono text-slate-400 font-bold"></span>
+          <span id="liveClockSidebar" class="text-[9px] font-mono text-slate-300 font-bold"></span>
         </div>
       </div>
       <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
@@ -442,16 +447,16 @@
           <span data-i18n="nav_floor">📦 Active Floor</span>
           <span id="activeOrdersBadge" class="text-[10px] bg-primary text-black font-black px-2 py-0.5 rounded-full">0</span>
         </button>
-        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
-        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-waiter-only hidden">
+        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
+        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden">
           <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
           <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Food Stock</button>
-        <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden">🥩 Raw Materials</button>
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-400 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Food Stock</button>
+        <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden">🥩 Raw Materials</button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_analytics">📈 Analytics</button>
       </nav>
-      <div class="p-4 border-t border-white/10 space-y-2">
+      <div class="p-4 border-t border-blue-400/15 space-y-2">
         <button onclick="openSupportWhatsApp()" class="w-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold py-2 rounded-xl hover:bg-emerald-600 hover:text-white transition-all text-xs uppercase tracking-widest">💬 WhatsApp Support</button>
         <button onclick="clearConsoleCache()" class="w-full bg-amber-500/10 border border-amber-500/30 text-amber-500 font-bold py-2 rounded-xl hover:bg-amber-500 hover:text-white transition-all text-xs uppercase tracking-widest admin-only hidden">🧹 Clear Console Cache</button>
         <button onclick="location.reload()" class="w-full bg-red-500/10 border border-red-500/30 text-red-500 font-bold py-2.5 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs uppercase tracking-widest" data-i18n="logout">Log Out</button>
@@ -508,14 +513,16 @@
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
-        <!-- 3. POS / Direct Order -->
+        <!-- ========================================================================= -->
+        <!-- 3. POS / DIRECT ORDER (WITH FIXED CASH / ONLINE / CARD / SPLIT SELECTOR)  -->
+        <!-- ========================================================================= -->
         <section id="view-pos" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-white mb-6 tracking-tight font-serif" data-i18n="title_pos">POS / Direct Order</h2>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[78vh] flex flex-col">
+            <div class="lg:col-span-2 bg-card p-6 rounded-3xl dash-card border-t-4 border-primary h-[82vh] flex flex-col">
               <div class="flex flex-wrap gap-2 mb-4">
-                <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="flex-1 p-3 bg-light border border-[#4b4b6a] text-white rounded-xl font-bold text-sm outline-none focus:border-primary">
+                <input type="text" id="posSearch" oninput="renderPosMenu()" placeholder="🔍 Search menu to add..." class="flex-1 p-3 bg-light border border-blue-400/20 text-white rounded-xl font-bold text-sm outline-none focus:border-primary">
                 <select id="posCatFilter" onchange="renderPosMenu()" class="p-3 rounded-xl text-xs font-black outline-none border">
                   <option value="ALL">All Categories</option>
                   <option value="Chicken Mandi">Chicken Mandi</option>
@@ -533,11 +540,11 @@
               <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll content-start"></div>
             </div>
 
-            <div class="bg-card p-6 rounded-3xl dash-card border border-[#4b4b6a] h-[78vh] flex flex-col">
-              <h3 class="text-lg font-black text-white mb-4 border-b border-[#4b4b6a] pb-2" data-i18n="new_order">New / Active Table Order</h3>
+            <div class="bg-card p-6 rounded-3xl dash-card border border-blue-400/20 h-[82vh] flex flex-col">
+              <h3 class="text-lg font-black text-white mb-3 border-b border-blue-400/20 pb-2" data-i18n="new_order">New / Active Table Order</h3>
 
-              <div class="flex gap-2 mb-4">
-                <select id="posTableNum" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
+              <div class="flex gap-2 mb-3">
+                <select id="posTableNum" class="flex-1 bg-light border border-blue-400/20 text-white p-2.5 rounded-xl font-black text-sm outline-none focus:border-primary">
                   <option value="" disabled selected>Select Table / Cabin</option>
                   <optgroup label="Standard Tables">
                     <option value="1">Table 1</option><option value="2">Table 2</option><option value="3">Table 3</option><option value="4">Table 4</option><option value="5">Table 5</option>
@@ -559,55 +566,63 @@
                     <option value="TA1">Takeaway 1</option><option value="TA2">Takeaway 2</option><option value="TA3">Takeaway 3</option>
                   </optgroup>
                 </select>
-                <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-[#4b4b6a] text-white p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
+                <input type="text" id="posPhone" placeholder="Phone (Optional)" class="flex-1 bg-light border border-blue-400/20 text-white p-2.5 rounded-xl font-bold text-sm outline-none focus:border-primary">
               </div>
 
-              <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-[#4b4b6a] rounded-xl p-2.5 hide-scroll"></div>
+              <div id="posCartList" class="flex-1 overflow-y-auto mb-3 border border-blue-400/20 rounded-xl p-2.5 bg-light/50 hide-scroll"></div>
 
-              <div class="bg-light p-3 rounded-2xl border border-[#4b4b6a] mb-3 space-y-2">
+              <!-- Discount & Bill Split Box -->
+              <div class="bg-light p-3 rounded-2xl border border-blue-400/20 mb-2.5 space-y-2">
                 <div class="flex items-center gap-2">
-                  <span class="text-[10px] font-black uppercase text-slate-500 w-16">Discount:</span>
-                  <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" placeholder="0" class="w-20 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
-                  <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
+                  <span class="text-[10px] font-black uppercase text-slate-300 w-16">Discount:</span>
+                  <input type="number" id="posDiscVal" min="0" value="0" oninput="updatePosCartUI()" placeholder="0" class="w-16 p-1.5 rounded-lg font-black text-xs outline-none border">
+                  <select id="posDiscType" onchange="updatePosCartUI()" class="p-1.5 rounded-lg font-black text-xs outline-none border">
                     <option value="flat">₹ Flat</option>
                     <option value="percent">% Off</option>
                   </select>
-                  <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs uppercase outline-none">
+                  <input type="text" id="posCouponCode" oninput="applyPosCouponCode(this.value)" placeholder="Or Coupon" class="flex-1 p-1.5 rounded-lg font-black text-xs uppercase outline-none border">
                 </div>
-                <div class="flex items-center justify-between pt-1 border-t border-[#4b4b6a]">
-                  <span class="text-[10px] font-black uppercase text-slate-500">Split Bill:</span>
+                <div class="flex items-center justify-between pt-1.5 border-t border-blue-400/15">
+                  <span class="text-[10px] font-black uppercase text-slate-300">Split Persons:</span>
                   <div class="flex items-center gap-2">
-                    <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs text-center outline-none">
-                    <span class="text-[10px] font-bold text-slate-500">Persons</span>
+                    <input type="number" id="posSplitCount" min="1" max="50" value="1" oninput="updatePosCartUI()" class="w-14 p-1 rounded-lg font-black text-xs text-center outline-none border">
+                    <span class="text-[10px] font-bold text-slate-300">Persons</span>
                     <span id="posSplitEach" class="text-xs font-black text-emerald-400 ml-1">₹0/each</span>
-                  </div>
-                </div>
-                <!-- PAYMENT METHOD: CASH / ONLINE (UPI) / CARD / SPLIT -->
-                <div class="flex items-center justify-between pt-1.5 border-t border-[#4b4b6a]">
-                  <span class="text-[10px] font-black uppercase text-slate-500">Payment:</span>
-                  <select id="posPaymentMethod" onchange="togglePosSplitInputs()" class="flex-1 ml-2 p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
-                    <option value="">⏳ Pay Later / Unpaid</option>
-                    <option value="CASH">💵 CASH</option>
-                    <option value="UPI">📱 ONLINE / UPI</option>
-                    <option value="CARD">💳 CARD</option>
-                    <option value="SPLIT">⚖️ SPLIT (Cash + Online)</option>
-                  </select>
-                </div>
-                <div id="posSplitPaymentBox" class="hidden grid grid-cols-2 gap-2 pt-1">
-                  <div>
-                    <label class="text-[9px] font-black uppercase text-emerald-400 block mb-0.5">Cash Amount (₹)</label>
-                    <input type="number" id="posSplitCash" min="0" value="0" oninput="onPosSplitCashInput()" placeholder="Cash ₹" class="w-full p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
-                  </div>
-                  <div>
-                    <label class="text-[9px] font-black uppercase text-blue-400 block mb-0.5">Online / UPI (₹)</label>
-                    <input type="number" id="posSplitOnline" min="0" value="0" oninput="onPosSplitOnlineInput()" placeholder="Online ₹" class="w-full p-1.5 bg-[#2b2b40] border border-[#4b4b6a] rounded-lg font-black text-xs outline-none">
                   </div>
                 </div>
               </div>
 
-              <div class="mt-auto pt-2 border-t border-[#4b4b6a]">
-                <div class="flex justify-between font-black text-lg mb-3">
-                  <span>Total:</span> <span id="posTotal" class="text-primary">₹0</span>
+              <!-- LAST POINT: DEDICATED PAYMENT METHOD SELECTION (CASH / ONLINE / CARD / SPLIT) -->
+              <div class="bg-sidebar/90 p-3 rounded-2xl border border-primary/40 mb-3">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-primary">💳 Select Payment Option:</span>
+                  <span id="posSelectedPayBadge" class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">⏳ Unpaid / Pay Later</span>
+                </div>
+                <input type="hidden" id="posPaymentMethod" value="">
+                <div class="grid grid-cols-5 gap-1.5">
+                  <button type="button" onclick="selectPosPaymentMethod('')" id="posPayBtn-UNPAID" class="pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-amber-500 text-black border-amber-400 shadow transition">⏳ Later</button>
+                  <button type="button" onclick="selectPosPaymentMethod('CASH')" id="posPayBtn-CASH" class="pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-white/5 text-slate-200 border-white/10 hover:bg-emerald-500/20 transition">💵 Cash</button>
+                  <button type="button" onclick="selectPosPaymentMethod('UPI')" id="posPayBtn-UPI" class="pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-white/5 text-slate-200 border-white/10 hover:bg-blue-500/20 transition">📱 Online</button>
+                  <button type="button" onclick="selectPosPaymentMethod('CARD')" id="posPayBtn-CARD" class="pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-white/5 text-slate-200 border-white/10 hover:bg-purple-500/20 transition">💳 Card</button>
+                  <button type="button" onclick="selectPosPaymentMethod('SPLIT')" id="posPayBtn-SPLIT" class="pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-white/5 text-slate-200 border-white/10 hover:bg-primary/20 transition">⚖️ Split</button>
+                </div>
+
+                <!-- Split Cash + Online Inputs -->
+                <div id="posSplitPaymentBox" class="hidden grid grid-cols-2 gap-2 pt-2.5 mt-2 border-t border-white/10">
+                  <div>
+                    <label class="text-[9px] font-black uppercase text-emerald-400 block mb-0.5">Cash Amount (₹)</label>
+                    <input type="number" id="posSplitCash" min="0" value="0" oninput="onPosSplitCashInput()" placeholder="Cash ₹" class="w-full p-1.5 rounded-lg font-black text-xs outline-none border">
+                  </div>
+                  <div>
+                    <label class="text-[9px] font-black uppercase text-blue-400 block mb-0.5">Online / UPI (₹)</label>
+                    <input type="number" id="posSplitOnline" min="0" value="0" oninput="onPosSplitOnlineInput()" placeholder="Online ₹" class="w-full p-1.5 rounded-lg font-black text-xs outline-none border">
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-auto pt-2 border-t border-blue-400/20">
+                <div class="flex justify-between font-black text-lg mb-2.5">
+                  <span>Grand Total:</span> <span id="posTotal" class="text-primary">₹0</span>
                 </div>
                 <button onclick="submitPosOrder()" class="w-full gold-gradient text-black font-black py-3.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-md" data-i18n="btn_send_kitchen">Send to Kitchen</button>
               </div>
@@ -626,29 +641,29 @@
             <h3 class="text-lg font-black text-white mb-2">🎟️ Customer Coupon Codes</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-4">
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Coupon Code</label>
-                <input type="text" id="newCouponCode" placeholder="e.g. ROYAL10" class="w-full p-3 bg-light rounded-xl font-black text-sm uppercase outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Coupon Code</label>
+                <input type="text" id="newCouponCode" placeholder="e.g. ROYAL10" class="w-full p-3 bg-light rounded-xl font-black text-sm uppercase outline-none border">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Type</label>
-                <select id="newCouponType" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Discount Type</label>
+                <select id="newCouponType" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
                   <option value="percent">Percentage (%)</option>
                   <option value="flat">Flat Amount (₹)</option>
                 </select>
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Discount Value</label>
-                <input type="number" id="newCouponVal" min="1" placeholder="10" class="w-full p-3 bg-light rounded-xl font-black text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Discount Value</label>
+                <input type="number" id="newCouponVal" min="1" placeholder="10" class="w-full p-3 bg-light rounded-xl font-black text-sm outline-none border">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Min Bill (₹)</label>
-                <input type="number" id="newCouponMin" min="0" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Min Bill (₹)</label>
+                <input type="number" id="newCouponMin" min="0" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
               </div>
               <div>
                 <button onclick="saveCouponCode()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Save Coupon</button>
               </div>
             </div>
-            <div id="couponsListAdmin" class="flex flex-wrap gap-2 pt-2 border-t border-[#4b4b6a]"></div>
+            <div id="couponsListAdmin" class="flex flex-wrap gap-2 pt-2 border-t border-blue-400/20"></div>
           </div>
 
           <!-- Weekly Cool Drinks, Desserts & Add-ons Mobile Photo Manager -->
@@ -656,7 +671,7 @@
             <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
               <div>
                 <h3 class="text-lg font-black text-white">🥤🍨 Weekly Cool Drinks, Desserts & Cart Add-ons Manager</h3>
-                <p class="text-xs text-slate-400">Items in <span class="text-primary font-bold">Beverages / Cool Drinks / Desserts</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> or <span class="text-primary font-bold">⚙️ Portions</span> anytime.</p>
+                <p class="text-xs text-slate-300">Items in <span class="text-primary font-bold">Beverages / Cool Drinks / Desserts</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> or <span class="text-primary font-bold">⚙️ Portions</span> anytime.</p>
               </div>
             </div>
             <div id="drinksDessertsSpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -667,16 +682,16 @@
             <h3 class="text-lg font-black text-white mb-4">📸 Add New Menu Item (With Optional Portions / Variants)</h3>
             <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Image (Phone/Gallery)</label>
-                <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border border-[#4b4b6a] text-slate-300">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Item Image (Phone/Gallery)</label>
+                <input type="file" id="newItemImageFile" accept="image/*" class="w-full p-2 bg-light rounded-xl text-xs outline-none border text-slate-300">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Item Name</label>
-                <input type="text" id="newItemName" placeholder="e.g. Crispy Chicken Wings" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Item Name</label>
+                <input type="text" id="newItemName" placeholder="e.g. Crispy Chicken Wings" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Category</label>
-                <select id="newItemCategory" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Category</label>
+                <select id="newItemCategory" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
                   <option value="Beverages">🥤 Cool Drinks & Desserts (Cart Upsell)</option>
                   <option value="Chicken Mandi">Chicken Mandi</option>
                   <option value="Mutton Mandi">Mutton Mandi</option>
@@ -690,12 +705,12 @@
                 </select>
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Base Price (₹)</label>
-                <input type="number" id="newItemPrice" placeholder="299" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Base Price (₹)</label>
+                <input type="number" id="newItemPrice" placeholder="299" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Optional Portions (Name:Price)</label>
-                <input type="text" id="newItemPortionsRaw" placeholder="e.g. Half:180, Full:320, 4 Pcs:240" class="w-full p-3 bg-light rounded-xl font-bold text-xs outline-none border border-[#4b4b6a]" title="Comma separated, e.g. 2 Pcs:150, 4 Pcs:280">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Optional Portions (Name:Price)</label>
+                <input type="text" id="newItemPortionsRaw" placeholder="e.g. Half:180, Full:320, 4 Pcs:240" class="w-full p-3 bg-light rounded-xl font-bold text-xs outline-none border" title="Comma separated, e.g. 2 Pcs:150, 4 Pcs:280">
               </div>
               <div>
                 <button id="addMenuBtn" onclick="adminQuickAddItem()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Add to Menu</button>
@@ -705,7 +720,7 @@
 
           <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
             <div class="flex items-center gap-3 flex-1 min-w-[260px]">
-              <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-md p-3 bg-card border border-[#4b4b6a] rounded-xl font-bold text-sm outline-none focus:border-primary">
+              <input type="text" id="menuSearchInput" oninput="renderInventory()" placeholder="🔍 Search menu by name or category..." class="w-full max-w-md p-3 bg-card border rounded-xl font-bold text-sm outline-none focus:border-primary">
               <select id="invCategoryFilter" onchange="renderInventory()" class="p-3 rounded-xl text-xs font-black outline-none border">
                 <option value="ALL">All Categories</option>
                 <option value="Chicken Mandi">Chicken Mandi</option>
@@ -733,12 +748,12 @@
             <h3 class="text-lg font-black text-white mb-4">Add Raw Ingredient</h3>
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3 items-end">
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Ingredient Name</label>
-                <input type="text" id="rawName" placeholder="e.g. Basmati Rice" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Ingredient Name</label>
+                <input type="text" id="rawName" placeholder="e.g. Basmati Rice" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Unit</label>
-                <select id="rawUnit" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Unit</label>
+                <select id="rawUnit" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
                   <option value="Kg">Kilograms (Kg)</option>
                   <option value="L">Liters (L)</option>
                   <option value="Pcs">Pieces (Pcs)</option>
@@ -746,12 +761,12 @@
                 </select>
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Current Stock</label>
-                <input type="number" id="rawStock" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Current Stock</label>
+                <input type="number" id="rawStock" placeholder="0" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
               </div>
               <div>
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Alert Threshold</label>
-                <input type="number" id="rawThreshold" placeholder="e.g. 5" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border border-[#4b4b6a]" title="Alert when stock falls below this number">
+                <label class="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">Alert Threshold</label>
+                <input type="number" id="rawThreshold" placeholder="e.g. 5" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border" title="Alert when stock falls below this number">
               </div>
               <div>
                 <button onclick="addKitchenRawMaterial()" class="w-full bg-amber-500 hover:bg-amber-600 text-dark font-black py-3 rounded-xl shadow-md h-[46px] text-xs uppercase tracking-wider">+ Add Ingredient</button>
@@ -791,7 +806,7 @@
                 <p id="tallyTotal" class="text-2xl xl:text-3xl font-black text-primary">₹0</p>
               </div>
               <div class="bg-light text-white p-5 rounded-2xl border border-white/10 relative overflow-hidden">
-                <p class="text-[10px] font-black uppercase tracking-widest mb-1 text-slate-400">Orders Served</p>
+                <p class="text-[10px] font-black uppercase tracking-widest mb-1 text-slate-300">Orders Served</p>
                 <p id="tallyOrders" class="text-2xl xl:text-3xl font-black text-white">0</p>
               </div>
               <div class="bg-light text-amber-300 p-5 rounded-2xl border border-amber-500/30 relative overflow-hidden">
@@ -809,18 +824,18 @@
               <div class="bg-light text-purple-400 border border-purple-500/30 p-5 rounded-2xl relative overflow-hidden">
                 <p class="text-[10px] font-black uppercase tracking-widest mb-1">CARD / AVG BILL</p>
                 <p id="tallyCard" class="text-xl font-black">₹0</p>
-                <p id="tallyAvgOrder" class="text-[10px] font-bold text-slate-400 mt-0.5">Avg: ₹0/order</p>
+                <p id="tallyAvgOrder" class="text-[10px] font-bold text-slate-300 mt-0.5">Avg: ₹0/order</p>
               </div>
             </div>
             
             <!-- Dual Smooth Animated Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10 no-print">
-              <!-- Chart 1: Revenue by Payment Channel (Doughnut + Bar Toggle) -->
+              <!-- Chart 1: Revenue by Payment Channel -->
               <div class="lg:col-span-5 bg-light rounded-3xl p-5 border border-white/10 shadow-inner flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                   <div>
                     <h4 class="text-sm font-black text-white uppercase tracking-wider">💳 Payment Split</h4>
-                    <p class="text-[11px] text-slate-400">Cash vs UPI vs Card Breakdown</p>
+                    <p class="text-[11px] text-slate-300">Cash vs UPI vs Card Breakdown</p>
                   </div>
                 </div>
                 <div class="relative h-64 flex items-center justify-center">
@@ -833,7 +848,7 @@
                 <div class="flex justify-between items-center mb-3">
                   <div>
                     <h4 class="text-sm font-black text-primary uppercase tracking-wider">🏆 Top Selling Dishes Today</h4>
-                    <p class="text-[11px] text-slate-400">Live quantity sold per dish (Completed + Active Floor Orders)</p>
+                    <p class="text-[11px] text-slate-300">Live quantity sold per dish (Completed + Active Floor Orders)</p>
                   </div>
                   <span id="topDishCrownBadge" class="text-[10px] font-black bg-primary/20 text-primary border border-primary/40 px-3 py-1 rounded-full">👑 Bestseller</span>
                 </div>
@@ -848,13 +863,13 @@
               <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
                 <div>
                   <h3 class="text-lg font-black text-white">🍗 What Sold & How Many — Item-Wise Sales Breakdown</h3>
-                  <p class="text-xs text-slate-400">Exact count of every Mandi, Starter, and Beverage sold today with portion breakdown and revenue share.</p>
+                  <p class="text-xs text-slate-300">Exact count of every Mandi, Starter, and Beverage sold today with portion breakdown and revenue share.</p>
                 </div>
                 <input type="text" id="soldItemsSearch" oninput="renderSoldItemsBreakdown()" placeholder="🔍 Filter sold items..." class="p-2.5 rounded-xl text-xs font-bold border outline-none w-56">
               </div>
               <div class="overflow-x-auto max-h-96">
                 <table class="w-full text-left text-sm border-collapse">
-                  <thead class="bg-sidebar text-slate-400 uppercase font-black text-[10px] tracking-widest sticky top-0">
+                  <thead class="bg-sidebar text-slate-300 uppercase font-black text-[10px] tracking-widest sticky top-0">
                     <tr>
                       <th class="p-3.5 rounded-tl-xl">Rank</th>
                       <th class="p-3.5">Dish / Item Name</th>
@@ -864,7 +879,7 @@
                       <th class="p-3.5 text-right rounded-tr-xl">Est. Revenue</th>
                     </tr>
                   </thead>
-                  <tbody id="itemSalesBreakdownTable" class="divide-y divide-white/5 font-medium text-slate-300"></tbody>
+                  <tbody id="itemSalesBreakdownTable" class="divide-y divide-white/5 font-medium text-slate-200"></tbody>
                 </table>
               </div>
             </div>
@@ -873,7 +888,7 @@
             <div class="mb-10 overflow-x-auto bg-light rounded-3xl p-6 border border-white/10">
               <h3 class="text-lg font-black text-white mb-4 border-b border-white/10 pb-3">🧾 Completed Table Transactions</h3>
               <table class="w-full text-left text-sm border-collapse">
-                <thead class="bg-sidebar text-slate-400 uppercase font-black text-[10px] tracking-widest">
+                <thead class="bg-sidebar text-slate-300 uppercase font-black text-[10px] tracking-widest">
                   <tr>
                     <th class="p-4 rounded-tl-xl">Time</th>
                     <th class="p-4">Table</th>
@@ -882,7 +897,7 @@
                     <th class="p-4 text-right rounded-tr-xl">Amount</th>
                   </tr>
                 </thead>
-                <tbody id="dailyLogsTable" class="divide-y divide-white/5 font-medium text-slate-300"></tbody>
+                <tbody id="dailyLogsTable" class="divide-y divide-white/5 font-medium text-slate-200"></tbody>
               </table>
             </div>
 
@@ -1181,7 +1196,6 @@
         .join(' | ');
     }
 
-    // Legacy string parser if an order only has `items` string and no `line_items` object
     function ensureLineItemsObject(tableData) {
       if (tableData.line_items && Object.keys(tableData.line_items).length > 0) {
         return JSON.parse(JSON.stringify(tableData.line_items));
@@ -1197,7 +1211,6 @@
           const qty = parseInt(m[1]) || 1;
           const name = m[2].trim();
           const variant = (m[3] || 'Regular').trim();
-          // Find price from menuCache
           let price = 250;
           const foundEntry = Object.entries(menuCache).find(([, it]) => it && it.name && it.name.toLowerCase() === name.toLowerCase());
           if (foundEntry) {
@@ -1260,11 +1273,11 @@
       document.querySelectorAll('.tab-btn').forEach(b => {
         let isMatch = b.id === `tab-${tab}`;
         if (isMatch) {
-          b.classList.remove('text-slate-400', 'hover:bg-white/5');
+          b.classList.remove('text-slate-300', 'hover:bg-white/5');
           b.classList.add('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
         } else {
           b.classList.remove('bg-primary/20', 'text-primary', 'border', 'border-primary/50');
-          b.classList.add('text-slate-400', 'hover:bg-white/5');
+          b.classList.add('text-slate-300', 'hover:bg-white/5');
         }
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
@@ -1330,7 +1343,6 @@
         renderOccupancyMap(window.currentTables);
         updatePosCartUI();
 
-        // Keep Live Order Editor synced if open
         if (activeEditTableId) {
           if (window.currentTables[activeEditTableId]) {
             renderEditModalCurrentOrder();
@@ -1339,7 +1351,6 @@
           }
         }
 
-        // Refresh Item Analytics so active orders are reflected too
         if (currentRole === 'admin') {
           renderSoldItemsBreakdown();
         }
@@ -1394,16 +1405,16 @@
             tb.innerHTML = '';
             const logs = Object.values(dailyLogsCache);
             if (logs.length === 0) {
-              tb.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500 font-bold">No completed transactions settled yet today.</td></tr>`;
+              tb.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400 font-bold">No completed transactions settled yet today.</td></tr>`;
             } else {
               logs.slice().reverse().forEach(log => {
                 if(!log) return;
                 tb.innerHTML += `
                   <tr class="hover:bg-white/5 transition">
-                    <td class="p-4 text-xs font-mono text-slate-400">${log.time||''}</td>
+                    <td class="p-4 text-xs font-mono text-slate-300">${log.time||''}</td>
                     <td class="p-4 font-black text-white"><span class="bg-primary/20 text-primary border border-primary/40 px-2.5 py-1 rounded-lg text-xs">T-${log.table||''}</span></td>
-                    <td class="p-4 font-bold text-slate-300 text-[10px] uppercase">${log.method||''}</td>
-                    <td class="p-4 text-xs font-semibold text-slate-300">${log.items||''}</td>
+                    <td class="p-4 font-bold text-slate-200 text-[10px] uppercase">${log.method||''}</td>
+                    <td class="p-4 text-xs font-semibold text-slate-200">${log.items||''}</td>
                     <td class="p-4 font-black text-right text-emerald-400 text-base">₹${log.total||0}</td>
                   </tr>`;
               });
@@ -1500,7 +1511,7 @@
               x: {
                 beginAtZero: true,
                 grid: { color: 'rgba(255,255,255,0.06)' },
-                ticks: { color: '#a1a1aa', precision: 0, font: { weight: 'bold' } }
+                ticks: { color: '#cbd5e1', precision: 0, font: { weight: 'bold' } }
               },
               y: {
                 grid: { display: false },
@@ -1519,12 +1530,11 @@
       }
     }
 
-    // Parses both completed daily_logs and active_tables to compute exact dish-by-dish sales
     window.renderSoldItemsBreakdown = function() {
       const tbody = document.getElementById('itemSalesBreakdownTable');
       if (!tbody) return;
 
-      const itemStats = {}; // key: dishName -> { name, totalQty, estRev, variants: { '2P': 3 } }
+      const itemStats = {};
 
       const recordItemSale = (rawName, variant, qty, unitPrice) => {
         if (!rawName || qty <= 0) return;
@@ -1564,7 +1574,7 @@
         });
       });
 
-      // 2. Also include Active Non-Cancelled Floor Orders so Admin sees live item velocity immediately
+      // 2. Also include Active Non-Cancelled Floor Orders
       Object.values(window.currentTables || {}).forEach(tbl => {
         if (!tbl || tbl.status === 'cancelled') return;
         const liObj = ensureLineItemsObject(tbl);
@@ -1586,7 +1596,6 @@
         crownBadge.textContent = sorted.length > 0 ? `👑 #1: ${sorted[0].name} (${sorted[0].totalQty} sold)` : '👑 Bestseller';
       }
 
-      // Update Top Selling Horizontal Bar Chart
       if (topItemsChartInstance) {
         const top7 = sorted.slice(0, 7);
         if (top7.length > 0) {
@@ -1603,7 +1612,7 @@
       const filtered = searchQ ? sorted.filter(i => i.name.toLowerCase().includes(searchQ)) : sorted;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-500 font-bold">No dishes sold matching your filter yet today.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 font-bold">No dishes sold matching your filter yet today.</td></tr>`;
         return;
       }
 
@@ -1612,12 +1621,12 @@
         const sharePct = Math.round((item.totalQty / totalUnitsAll) * 100);
         const barWidth = Math.max(8, Math.round((item.totalQty / maxQty) * 100));
         const variantPills = Object.entries(item.variants).map(([v, q]) =>
-          `<span class="inline-block bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-300 mr-1 mb-1">${v}: <b class="text-primary">${q}</b></span>`
+          `<span class="inline-block bg-white/5 border border-white/10 px-2 py-0.5 rounded-md text-[10px] font-bold text-slate-200 mr-1 mb-1">${v}: <b class="text-primary">${q}</b></span>`
         ).join('');
 
         return `
           <tr class="hover:bg-white/5 transition">
-            <td class="p-3.5 font-black text-xs ${idx === 0 ? 'text-primary' : 'text-slate-400'}">#${idx + 1}</td>
+            <td class="p-3.5 font-black text-xs ${idx === 0 ? 'text-primary' : 'text-slate-300'}">#${idx + 1}</td>
             <td class="p-3.5 font-black text-white text-sm">${item.name}</td>
             <td class="p-3.5">${variantPills}</td>
             <td class="p-3.5 text-center">
@@ -1627,7 +1636,7 @@
               <div class="w-full bg-sidebar rounded-full h-2.5 overflow-hidden border border-white/10">
                 <div class="gold-gradient h-full rounded-full transition-all duration-700" style="width:${barWidth}%"></div>
               </div>
-              <span class="text-[10px] font-bold text-slate-400 mt-1 block">${sharePct}% of total items</span>
+              <span class="text-[10px] font-bold text-slate-300 mt-1 block">${sharePct}% of total items</span>
             </td>
             <td class="p-3.5 font-black text-right text-emerald-400">₹${item.estRev.toLocaleString('en-IN')}</td>
           </tr>
@@ -1644,7 +1653,6 @@
       activeEditTableId = tableId;
       replaceModeLineKey = null;
 
-      // Ensure structured line_items exist in Firebase so every item is individually editable
       if (!tbl.line_items || Object.keys(tbl.line_items).length === 0) {
         const converted = ensureLineItemsObject(tbl);
         db.ref(`active_tables/${tableId}/line_items`).set(converted);
@@ -1748,7 +1756,6 @@
       const liObj = ensureLineItemsObject(tbl);
 
       if (replaceModeLineKey && liObj[replaceModeLineKey]) {
-        // Replace existing item in-place while keeping its quantity (or resetting to 1 if desired)
         const oldName = liObj[replaceModeLineKey].name;
         const keepQty = Number(liObj[replaceModeLineKey].qty) || 1;
         liObj[replaceModeLineKey] = {
@@ -1764,7 +1771,6 @@
         syncEditedTableToFirebase(activeEditTableId, liObj);
         showGlobalToast(`Replaced "${oldName}" with "${item.name} (${variant})"!`, "success");
       } else {
-        // Check if same item + variant already exists in active lines
         const existingKey = Object.keys(liObj).find(k =>
           liObj[k] && !liObj[k].cancelled && liObj[k].name === item.name && (liObj[k].variant || 'Regular') === variant
         );
@@ -1802,7 +1808,7 @@
       document.getElementById('editModalItemCount').textContent = `${activeEntries.length} Dish${activeEntries.length === 1 ? '' : 'es'}`;
 
       if (activeEntries.length === 0) {
-        container.innerHTML = `<div class="p-8 text-center text-slate-500 text-xs font-bold border border-dashed border-white/10 rounded-2xl">No active items in this order. Pick an item on the right to add!</div>`;
+        container.innerHTML = `<div class="p-8 text-center text-slate-400 text-xs font-bold border border-dashed border-white/10 rounded-2xl">No active items in this order. Pick an item on the right to add!</div>`;
       } else {
         container.innerHTML = activeEntries.map(([lineKey, li]) => {
           const isBeingReplaced = replaceModeLineKey === lineKey;
@@ -1872,7 +1878,7 @@
                 <img src="${item.image_url}" class="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0">
                 <div class="min-w-0">
                   <h5 class="font-black text-xs text-white truncate">${item.name}</h5>
-                  <span class="text-[9px] font-bold text-slate-400 block truncate">${item.category || ''}</span>
+                  <span class="text-[9px] font-bold text-slate-300 block truncate">${item.category || ''}</span>
                 </div>
               </div>
               ${variantDropdown}
@@ -1921,7 +1927,7 @@
       row.innerHTML = `
         <input type="text" placeholder="Portion Label (e.g. 2 Pcs, Half, 4P Gang)" value="${label}" class="flex-1 p-2.5 rounded-xl text-xs font-black border outline-none portion-label-inp">
         <div class="flex items-center gap-1">
-          <span class="text-xs font-bold text-slate-400">₹</span>
+          <span class="text-xs font-bold text-slate-300">₹</span>
           <input type="number" placeholder="Price" value="${price}" class="w-28 p-2.5 rounded-xl text-xs font-black border outline-none portion-price-inp">
         </div>
         <button type="button" onclick="this.parentElement.remove()" class="w-9 h-9 rounded-xl bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white font-black text-xs">✕</button>
@@ -2002,13 +2008,13 @@
       if(!container) return;
       const entries = Object.entries(couponsCache);
       if(entries.length === 0) {
-        container.innerHTML = `<span class="text-xs text-slate-400">No active coupons created yet.</span>`;
+        container.innerHTML = `<span class="text-xs text-slate-300">No active coupons created yet.</span>`;
         return;
       }
       container.innerHTML = entries.map(([code, c]) => `
         <div class="flex items-center gap-2 bg-light border border-emerald-500/40 px-3 py-1.5 rounded-xl text-xs">
           <span class="font-black text-emerald-400">${code}</span>
-          <span class="text-slate-300 font-bold">${c.type === 'percent' ? c.value + '% OFF' : '₹' + c.value + ' OFF'} (Min ₹${c.minOrder || 0})</span>
+          <span class="text-slate-200 font-bold">${c.type === 'percent' ? c.value + '% OFF' : '₹' + c.value + ' OFF'} (Min ₹${c.minOrder || 0})</span>
           <button onclick="deleteCouponCode('${code}')" class="text-red-400 hover:text-red-300 font-black ml-1">✕</button>
         </div>
       `).join('');
@@ -2077,7 +2083,7 @@
       });
 
       if(upsellItems.length === 0) {
-        grid.innerHTML = `<p class="text-xs text-slate-400 col-span-full">No Cool Drinks or Desserts found. Add one below under the "Cool Drinks & Desserts" category!</p>`;
+        grid.innerHTML = `<p class="text-xs text-slate-300 col-span-full">No Cool Drinks or Desserts found. Add one below under the "Cool Drinks & Desserts" category!</p>`;
         return;
       }
 
@@ -2092,8 +2098,8 @@
               <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
               <span class="text-[10px] font-bold text-primary uppercase">Cart Upsell • Stock: ${item.stock_count ?? 50}</span>
               <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                <span class="text-xs text-slate-400 font-bold">₹</span>
-                <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-16 p-1 rounded bg-card border border-[#4b4b6a] text-xs font-black text-white">
+                <span class="text-xs text-slate-300 font-bold">₹</span>
+                <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-16 p-1 rounded bg-card border text-xs font-black text-white">
                 <button onclick="openItemFlexModal('${id}')" class="bg-blue-500/20 hover:bg-blue-500 text-blue-300 hover:text-white border border-blue-500/40 px-2 py-1 rounded-lg text-[10px] font-black transition">⚙️ Portions</button>
                 <button onclick="triggerItemPhotoUpdate('${id}')" class="bg-primary/20 hover:bg-primary text-primary hover:text-dark border border-primary/40 px-2 py-1 rounded-lg text-[10px] font-black transition">📷 Photo</button>
               </div>
@@ -2129,13 +2135,13 @@
       grid.innerHTML = '';
 
       if(Object.keys(rawMatsCache).length === 0) {
-        grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-4">No raw materials added yet. Track rice, chicken, oil, etc.</p>`;
+        grid.innerHTML = `<p class="text-slate-300 text-sm col-span-full py-4">No raw materials added yet. Track rice, chicken, oil, etc.</p>`;
         return;
       }
 
       Object.entries(rawMatsCache).forEach(([id, mat]) => {
         const isLow = mat.stock <= mat.threshold;
-        const border = isLow ? 'border-red-500 bg-red-900/20' : 'border-[#4b4b6a] bg-card';
+        const border = isLow ? 'border-red-500 bg-red-900/20' : 'border-blue-400/20 bg-card';
         const alertText = isLow ? `<span class="text-[10px] font-black uppercase text-red-500 mt-1 block">⚠️ Low Stock Alert</span>` : '';
 
         grid.innerHTML += `
@@ -2143,7 +2149,7 @@
             <div>
               <div class="flex justify-between items-start mb-2">
                 <h4 class="font-black text-white text-lg">${mat.name}</h4>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 bg-light px-2 py-1 rounded border border-[#4b4b6a]">${mat.unit}</span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-300 bg-light px-2 py-1 rounded border border-blue-400/20">${mat.unit}</span>
               </div>
               <p class="text-3xl font-black ${isLow ? 'text-red-400' : 'text-primary'}">${mat.stock}</p>
               ${alertText}
@@ -2204,23 +2210,23 @@
                   <h4 class="font-black text-white text-sm truncate">${item.name}</h4>
                   ${item.is_special ? `<span class="text-[9px] bg-primary/20 text-primary border border-primary/40 px-2 py-0.5 rounded font-black uppercase">👑 Special</span>` : ''}
                 </div>
-                <span class="text-[10px] font-bold text-slate-400 block">${item.category || 'Mandi'}</span>
+                <span class="text-[10px] font-bold text-slate-300 block">${item.category || 'Mandi'}</span>
                 
                 <!-- Inline Base Price & Stock Quick Edit -->
                 <div class="flex flex-wrap items-center gap-3 mt-2">
                   <div class="flex items-center gap-1 bg-light px-2.5 py-1 rounded-lg border border-white/10">
-                    <span class="text-[10px] font-bold text-slate-400">Base ₹</span>
+                    <span class="text-[10px] font-bold text-slate-300">Base ₹</span>
                     <input type="number" value="${item.base_price}" onchange="adminUpdateItemPrice('${id}', this.value)" class="w-16 text-xs font-black text-primary bg-transparent border-0 outline-none p-0">
                   </div>
                   <div class="flex items-center gap-1 bg-light px-2.5 py-1 rounded-lg border border-white/10">
-                    <span class="text-[10px] font-bold text-slate-400">Stock:</span>
+                    <span class="text-[10px] font-bold text-slate-300">Stock:</span>
                     <input type="number" value="${item.stock_count ?? 50}" onchange="adminEditItemStock('${id}', parseInt(this.value)||0)" class="w-14 text-xs font-black ${(item.stock_count ?? 50) <= 5 ? 'text-red-400' : 'text-emerald-400'} bg-transparent border-0 outline-none p-0">
                   </div>
                 </div>
 
                 <!-- Active Portions / Variants Display -->
                 <div class="mt-1.5">
-                  ${portionBadges || `<span class="text-[10px] text-slate-500 italic">Single Regular price only — click "⚙️ Portions & Price" to add Half/Full/2 Pcs/4P</span>`}
+                  ${portionBadges || `<span class="text-[10px] text-slate-400 italic">Single Regular price only — click "⚙️ Portions & Price" to add Half/Full/2 Pcs/4P</span>`}
                 </div>
               </div>
             </div>
@@ -2262,7 +2268,6 @@
       const fileInput = document.getElementById('newItemImageFile');
       if(!name || !price) return alert("Enter item name and base price.");
 
-      // Parse optional quick portions string e.g. "Half:180, Full:320, 2 Pcs:150"
       const portionsObj = {};
       if (rawPortionsStr) {
         rawPortionsStr.split(',').forEach(pair => {
@@ -2400,7 +2405,7 @@
                 <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-black uppercase">Pending Call</span>
               </div>
               <p class="font-bold text-primary text-sm mb-1">${req.request_type}</p>
-              ${req.note ? `<p class="text-xs text-slate-300 italic mb-3">"${req.note}"</p>` : ''}
+              ${req.note ? `<p class="text-xs text-slate-200 italic mb-3">"${req.note}"</p>` : ''}
             </div>
             <button onclick="resolveServiceRequest('${key}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Mark Resolved ✅</button>
           </div>
@@ -2416,7 +2421,7 @@
         }
       }
       if(pendingCount === 0) {
-        grid.innerHTML = `<p class="text-slate-400 text-sm col-span-full py-6 text-center">No active service calls at the moment.</p>`;
+        grid.innerHTML = `<p class="text-slate-300 text-sm col-span-full py-6 text-center">No active service calls at the moment.</p>`;
       }
     }
 
@@ -2460,6 +2465,34 @@
         db.ref(`active_tables/${id}`).update({ prepSpeed: parseInt(mins) })
           .then(() => showGlobalToast(`ETA set to ${mins} mins! Customer screen updated.`, "success"));
       }
+    };
+
+    /* ---- LIVE FLOOR CARD PAYMENT METHOD UPDATER ---- */
+    window.updateFloorPaymentMethod = function(tableId, method) {
+      const tbl = (window.currentTables || {})[tableId];
+      if (!tbl) return;
+      const tot = Number(tbl.total) || 0;
+      let splitCash = Number(tbl.splitCash) || 0;
+      let splitOnline = Number(tbl.splitOnline) || 0;
+
+      if (method === 'SPLIT') {
+        const defaultHalf = splitCash > 0 ? splitCash : Math.floor(tot / 2);
+        const enteredCash = prompt(`Enter CASH amount (₹) out of Total ₹${tot}:`, defaultHalf);
+        if (enteredCash === null) return;
+        splitCash = Math.max(0, parseFloat(enteredCash) || 0);
+        splitOnline = Math.max(0, tot - splitCash);
+      } else {
+        splitCash = 0;
+        splitOnline = 0;
+      }
+
+      db.ref(`active_tables/${tableId}`).update({
+        paymentMethod: method,
+        splitCash: splitCash,
+        splitOnline: splitOnline
+      }).then(() => {
+        showGlobalToast(`Table ${tbl.table} payment set to ${method || 'Unpaid'}!`, 'success');
+      });
     };
 
     /* ---- PREMIUM THERMAL BILL & KOT PRINTING (High-Contrast Bold Thermal Ready) ---- */
@@ -2519,8 +2552,8 @@
       
       const d = new Date().toISOString().split('T')[0];
       const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      let pMethod = tableData.paymentMethod || "PENDING";
-      const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | UPI Rs.${tableData.splitOnline}` : '';
+      let pMethod = tableData.paymentMethod ? (tableData.paymentMethod === 'UPI' ? 'ONLINE / UPI' : tableData.paymentMethod) : "PENDING";
+      const splitText = tableData.paymentMethod === 'SPLIT' ? `<br>SPLIT: Cash Rs.${tableData.splitCash} | Online Rs.${tableData.splitOnline}` : '';
 
       let itemsHtml = '';
       const liObj = ensureLineItemsObject(tableData);
@@ -2570,7 +2603,48 @@
       if(tableData.status === 'bill_requested') markBillReady(id);
     };
 
-    /* ---- POS Direct Ordering & Payment Method Controls ---- */
+    /* ========================================================================= */
+    /* POS DIRECT ORDERING & PAYMENT METHOD BUTTON CONTROLS                      */
+    /* ========================================================================= */
+    window.selectPosPaymentMethod = function(method) {
+      const hiddenInput = document.getElementById('posPaymentMethod');
+      if (hiddenInput) hiddenInput.value = method;
+
+      // Reset all POS payment button styles
+      const allBtns = {
+        '': document.getElementById('posPayBtn-UNPAID'),
+        'CASH': document.getElementById('posPayBtn-CASH'),
+        'UPI': document.getElementById('posPayBtn-UPI'),
+        'CARD': document.getElementById('posPayBtn-CARD'),
+        'SPLIT': document.getElementById('posPayBtn-SPLIT')
+      };
+
+      Object.values(allBtns).forEach(btn => {
+        if (!btn) return;
+        btn.className = 'pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-white/5 text-slate-200 border-white/10 transition';
+      });
+
+      const badge = document.getElementById('posSelectedPayBadge');
+      if (method === 'CASH') {
+        if (allBtns['CASH']) allBtns['CASH'].className = 'pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-emerald-500 text-black border-emerald-300 shadow-md transition';
+        if (badge) { badge.textContent = '💵 CASH SELECTED'; badge.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'; }
+      } else if (method === 'UPI') {
+        if (allBtns['UPI']) allBtns['UPI'].className = 'pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-blue-500 text-white border-blue-300 shadow-md transition';
+        if (badge) { badge.textContent = '📱 ONLINE / UPI SELECTED'; badge.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/40'; }
+      } else if (method === 'CARD') {
+        if (allBtns['CARD']) allBtns['CARD'].className = 'pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-purple-500 text-white border-purple-300 shadow-md transition';
+        if (badge) { badge.textContent = '💳 CARD SELECTED'; badge.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40'; }
+      } else if (method === 'SPLIT') {
+        if (allBtns['SPLIT']) allBtns['SPLIT'].className = 'pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-primary text-black border-yellow-200 shadow-md transition';
+        if (badge) { badge.textContent = '⚖️ SPLIT (CASH + ONLINE)'; badge.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-primary/20 text-primary border border-primary/40'; }
+      } else {
+        if (allBtns['']) allBtns[''].className = 'pos-pay-btn py-2 px-1 rounded-xl text-[10px] font-black uppercase border bg-amber-500 text-black border-amber-300 shadow-md transition';
+        if (badge) { badge.textContent = '⏳ Unpaid / Pay Later'; badge.className = 'text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40'; }
+      }
+
+      togglePosSplitInputs();
+    };
+
     window.togglePosSplitInputs = function() {
       const pm = document.getElementById('posPaymentMethod')?.value || '';
       const box = document.getElementById('posSplitPaymentBox');
@@ -2646,7 +2720,7 @@
       const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
       const sCount = posSplitCount > 1 ? posSplitCount : (baseExisting.splitCount || 1);
 
-      const finalPayMethod = selectedPayMethod || baseExisting.paymentMethod || '';
+      const finalPayMethod = selectedPayMethod !== '' ? selectedPayMethod : (baseExisting.paymentMethod || '');
       let splitCash = Number(baseExisting.splitCash) || 0;
       let splitOnline = Number(baseExisting.splitOnline) || 0;
       if (finalPayMethod === 'SPLIT') {
@@ -2683,14 +2757,13 @@
         if(document.getElementById('posDiscVal')) document.getElementById('posDiscVal').value = 0;
         if(document.getElementById('posCouponCode')) document.getElementById('posCouponCode').value = '';
         if(document.getElementById('posSplitCount')) document.getElementById('posSplitCount').value = 1;
-        if(document.getElementById('posPaymentMethod')) document.getElementById('posPaymentMethod').value = '';
-        if(document.getElementById('posSplitPaymentBox')) document.getElementById('posSplitPaymentBox').classList.add('hidden');
+        selectPosPaymentMethod('');
         if(document.getElementById('posSplitCash')) document.getElementById('posSplitCash').value = 0;
         if(document.getElementById('posSplitOnline')) document.getElementById('posSplitOnline').value = 0;
         updatePosCartUI();
         document.getElementById('posTableNum').value = "";
         document.getElementById('posPhone').value = "";
-        showGlobalToast("Direct Order sent successfully to Kitchen!", "success");
+        showGlobalToast(`Order sent to Kitchen! Payment: ${finalPayMethod || 'Pay Later'}`, "success");
         switchTab('orders');
       }).catch(err => {
         alert("Failed to send order: " + err.message);
@@ -2724,7 +2797,7 @@
 
         let varSelect = '';
         if (item.portions && Object.keys(item.portions).length > 0) {
-          varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1.5 rounded-lg bg-[#1e1e2d] text-white text-[10px] font-bold border border-[#4b4b6a] outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
+          varSelect = `<select id="posVar-${id}" class="w-full mt-1 p-1.5 rounded-lg text-white text-[10px] font-bold border outline-none"><option value="Regular|${item.base_price}">Regular (1P) - ₹${item.base_price}</option>`;
           Object.entries(item.portions).forEach(([pName, pPrice]) => {
             varSelect += `<option value="${pName}|${pPrice}">${pName} - ₹${pPrice}</option>`;
           });
@@ -2738,7 +2811,7 @@
             <div>
               <img src="${item.image_url}" class="w-full h-24 object-cover rounded-xl mb-2 border border-white/10">
               <h4 class="font-black text-xs text-white leading-tight mb-0.5">${item.name}</h4>
-              <span class="text-[9px] text-slate-400 font-bold block">${item.category || ''}</span>
+              <span class="text-[9px] text-slate-300 font-bold block">${item.category || ''}</span>
             </div>
             <div>
               ${varSelect}
@@ -2786,17 +2859,17 @@
       if (existingTable) {
         const existingLines = ensureLineItemsObject(existingTable);
         list.innerHTML += `
-          <div class="flex justify-between items-center mb-2 pb-1 border-b border-[#4b4b6a]">
+          <div class="flex justify-between items-center mb-2 pb-1 border-b border-blue-400/20">
             <span class="text-[10px] text-primary font-black uppercase tracking-widest">Active on Table ${tNum}</span>
             <button onclick="openOrderEditor('${tableId}')" class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded font-black">✏️ Full Replace/Edit</button>
           </div>`;
         Object.entries(existingLines).forEach(([k, item]) => {
           if(item && !item.cancelled) {
             list.innerHTML += `
-              <div class="flex items-center justify-between py-1.5 text-slate-300">
+              <div class="flex items-center justify-between py-1.5 text-slate-200">
                 <div class="flex-1 pr-2 leading-tight">
                   <span class="font-bold text-xs">${item.qty}x ${item.name}</span>
-                  <span class="text-[9px] text-slate-400 block">${item.variant}</span>
+                  <span class="text-[9px] text-slate-300 block">${item.variant}</span>
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-black text-white">₹${item.price * item.qty}</span>
@@ -2805,7 +2878,7 @@
               </div>`;
           }
         });
-        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-[#4b4b6a]">New Items to Append</div>`;
+        list.innerHTML += `<div class="text-[10px] text-primary font-black uppercase tracking-widest mt-4 mb-2 pb-1 border-b border-blue-400/20">New Items to Append</div>`;
       }
 
       let subtotal = 0;
@@ -2813,13 +2886,13 @@
         subtotal += (Number(item.price)||0) * (Number(item.qty)||0);
         const safeKey = key.replace(/'/g, "\\'");
         list.innerHTML += `
-          <div class="flex items-center justify-between py-2 border-b border-[#4b4b6a] last:border-0 text-white">
+          <div class="flex items-center justify-between py-2 border-b border-blue-400/15 last:border-0 text-white">
             <div class="flex-1 pr-2 leading-tight">
               <span class="font-bold text-xs">${item.name}</span>
-              <span class="text-[9px] text-slate-400 block">${item.variant} (₹${item.price})</span>
+              <span class="text-[9px] text-slate-300 block">${item.variant} (₹${item.price})</span>
             </div>
             <div class="flex items-center gap-2">
-              <button onclick="changePosCartQty('${safeKey}', -1)" class="w-6 h-6 bg-[#4b4b6a] rounded text-xs font-black">-</button>
+              <button onclick="changePosCartQty('${safeKey}', -1)" class="w-6 h-6 bg-white/10 rounded text-xs font-black">-</button>
               <span class="text-xs font-black">${item.qty}</span>
               <button onclick="changePosCartQty('${safeKey}', 1)" class="w-6 h-6 bg-primary text-dark rounded text-xs font-black">+</button>
             </div>
@@ -2852,14 +2925,11 @@
     document.getElementById('posTableNum')?.addEventListener('change', function() {
       const tNum = this.value;
       const existingTable = window.currentTables && window.currentTables[`table_${tNum}`];
-      const pmSel = document.getElementById('posPaymentMethod');
-      if (pmSel) {
-        pmSel.value = (existingTable && existingTable.paymentMethod) ? existingTable.paymentMethod : '';
-        togglePosSplitInputs();
-        if (existingTable && existingTable.paymentMethod === 'SPLIT') {
-          document.getElementById('posSplitCash').value = existingTable.splitCash || 0;
-          document.getElementById('posSplitOnline').value = existingTable.splitOnline || 0;
-        }
+      const existingMethod = (existingTable && existingTable.paymentMethod) ? existingTable.paymentMethod : '';
+      selectPosPaymentMethod(existingMethod);
+      if (existingTable && existingTable.paymentMethod === 'SPLIT') {
+        document.getElementById('posSplitCash').value = existingTable.splitCash || 0;
+        document.getElementById('posSplitOnline').value = existingTable.splitOnline || 0;
       }
       updatePosCartUI();
     });
@@ -2867,18 +2937,41 @@
     window.clearTable = async function(id) {
       const tableData = (window.currentTables || {})[id];
       if(!tableData) return;
-      const pin = prompt("Enter Admin PIN to settle & clear table:");
+
+      const tot = Number(tableData.total) || 0;
+      let rawMethod = (tableData.paymentMethod || '').toUpperCase();
+
+      // If no payment method was selected yet, ask Admin which mode was used
+      if (!rawMethod) {
+        const choice = prompt(`Select Payment Mode for Table ${tableData.table} (Total ₹${tot}):\nType 1 for CASH\nType 2 for ONLINE / UPI\nType 3 for CARD\nType 4 for SPLIT (Cash + Online)`, "1");
+        if (choice === null) return;
+        const c = choice.trim().toUpperCase();
+        if (c === '2' || c === 'UPI' || c === 'ONLINE') rawMethod = 'UPI';
+        else if (c === '3' || c === 'CARD') rawMethod = 'CARD';
+        else if (c === '4' || c === 'SPLIT') rawMethod = 'SPLIT';
+        else rawMethod = 'CASH';
+      }
+
+      let splitCash = Number(tableData.splitCash) || 0;
+      let splitOnline = Number(tableData.splitOnline) || 0;
+      if (rawMethod === 'SPLIT' && (splitCash + splitOnline === 0)) {
+        const cInput = prompt(`Enter CASH portion out of ₹${tot}:`, Math.floor(tot / 2));
+        if (cInput === null) return;
+        splitCash = Math.max(0, parseFloat(cInput) || 0);
+        splitOnline = Math.max(0, tot - splitCash);
+      }
+
+      const pin = prompt(`Confirm Settlement for Table ${tableData.table} via ${rawMethod === 'UPI' ? 'ONLINE / UPI' : rawMethod} (₹${tot}).\nEnter Admin PIN:`);
       if(pin === null) return;
       if(pin.trim() !== "admin123" && pin.trim() !== "1234") return alert("Invalid PIN.");
 
       const d = new Date().toISOString().split('T')[0];
       const timeStr = new Date().toLocaleTimeString();
-      let pMethod = tableData.paymentMethod || "CASH";
       const itemsSummary = tableData.items || buildItemsStringFromLineItems(tableData.line_items) || '(No items)';
-      const tot = Number(tableData.total) || 0;
 
-      if(pMethod === 'SPLIT') {
-        pMethod = `SPLIT (Cash: ₹${tableData.splitCash} | UPI: ₹${tableData.splitOnline})`;
+      let displayMethod = rawMethod === 'UPI' ? 'ONLINE / UPI' : rawMethod;
+      if(rawMethod === 'SPLIT') {
+        displayMethod = `SPLIT (Cash: ₹${splitCash} | Online: ₹${splitOnline})`;
       }
 
       try {
@@ -2886,7 +2979,7 @@
           orderId: tableData.orderId || id, date: d, time: timeStr, table: tableData.table,
           phone: tableData.phone || 'Walk-in', items: itemsSummary,
           subtotal: Number(tableData.subtotal) || tot, discountAmount: Number(tableData.discountAmount) || 0,
-          total: tot, paymentMethod: pMethod, method: pMethod
+          total: tot, paymentMethod: displayMethod, method: displayMethod
         };
         fetch(GOOGLE_SHEET_WEBHOOK_URL, {
           method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -2899,12 +2992,12 @@
         curr.total = (Number(curr.total)||0) + tot;
         curr.orderCount = (Number(curr.orderCount)||0) + 1;
         
-        if(tableData.paymentMethod === "SPLIT") {
-          curr.cash = (Number(curr.cash)||0) + (Number(tableData.splitCash)||0);
-          curr.upi = (Number(curr.upi)||0) + (Number(tableData.splitOnline)||0);
-        } else if(pMethod === "CASH") {
+        if(rawMethod === "SPLIT") {
+          curr.cash = (Number(curr.cash)||0) + splitCash;
+          curr.upi = (Number(curr.upi)||0) + splitOnline;
+        } else if(rawMethod === "CASH") {
           curr.cash = (Number(curr.cash)||0) + tot;
-        } else if(pMethod === "UPI") {
+        } else if(rawMethod === "UPI" || rawMethod === "ONLINE") {
           curr.upi = (Number(curr.upi)||0) + tot;
         } else {
           curr.card = (Number(curr.card)||0) + tot;
@@ -2913,11 +3006,11 @@
       });
 
       db.ref(`daily_logs/${d}/${tableData.orderId || id}`).set(sanitizeForFirebase({
-        time: timeStr, table: tableData.table, items: itemsSummary, total: tot, method: pMethod
+        time: timeStr, table: tableData.table, items: itemsSummary, total: tot, method: displayMethod
       }));
       db.ref('active_tables/' + id).remove();
 
-      const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nTotal: Rs. ${tot}\nMethod: ${pMethod}`;
+      const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nTotal: Rs. ${tot}\nMethod: ${displayMethod}`;
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
       a.download = `Admin_Copy_Bill_T${tableData.table}_${Date.now()}.txt`;
@@ -2925,7 +3018,7 @@
       a.click();
       document.body.removeChild(a);
       
-      showGlobalToast("Table cleared & logged successfully!", "success");
+      showGlobalToast(`Table ${tableData.table} settled (${displayMethod}) & logged!`, "success");
     };
 
     window.sendBillToWhatsApp = function(phone, tableNum, total) {
@@ -3007,14 +3100,14 @@
           <div class="col-span-full bg-card p-12 rounded-3xl text-center border border-white/10 dash-card">
             <div class="w-14 h-14 rounded-2xl bg-primary/15 text-primary border border-primary/30 flex items-center justify-center mx-auto mb-3 text-2xl">✦</div>
             <h4 class="font-serif font-black text-xl text-white mb-1">Floor Quiet & Ready</h4>
-            <p class="text-slate-400 text-xs font-semibold">No active tables matching "${currentFloorFilter}". Incoming QR & POS orders will appear here live with sound alerts.</p>
+            <p class="text-slate-300 text-xs font-semibold">No active tables matching "${currentFloorFilter}". Incoming QR & POS orders will appear here live with sound alerts.</p>
           </div>`;
         return;
       }
 
       filteredEntries.forEach(([id, table]) => {
-        let cardBorder = 'border-blue-500/60';
-        let statusPill = 'bg-blue-500/20 text-blue-300 border-blue-500/40';
+        let cardBorder = 'border-blue-400/50';
+        let statusPill = 'bg-blue-500/20 text-blue-200 border-blue-400/40';
         let headerGlow = 'from-blue-500/15 to-transparent';
 
         if (table.status === 'pending') {
@@ -3037,7 +3130,6 @@
         const canKitchenAct = (currentRole === 'admin' || currentRole === 'kitchen' || currentRole === 'waiter');
         const isAdminOrWaiter = (currentRole === 'admin' || currentRole === 'waiter');
 
-        // Build structured item rows
         const liObj = ensureLineItemsObject(table);
         const liList = Object.values(liObj).filter(Boolean);
         let structuredItemsHtml = '';
@@ -3052,12 +3144,14 @@
                   ${li.variant && li.variant !== 'Regular' ? `<span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 inline-block mt-0.5">${li.variant}</span>` : ''}
                 </div>
               </div>
-              <span class="text-xs font-black text-slate-300 ml-2 shrink-0">₹${(Number(li.price)||0)*(Number(li.qty)||1)}</span>
+              <span class="text-xs font-black text-slate-200 ml-2 shrink-0">₹${(Number(li.price)||0)*(Number(li.qty)||1)}</span>
             </div>
           `).join('');
         } else {
-          structuredItemsHtml = `<div class="p-3 rounded-xl bg-light text-xs text-slate-300 font-semibold">${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}</div>`;
+          structuredItemsHtml = `<div class="p-3 rounded-xl bg-light text-xs text-slate-200 font-semibold">${table.items ? table.items.replace(/ \| /g, '<br>') : 'No items'}</div>`;
         }
+
+        const curPay = (table.paymentMethod || '').toUpperCase();
 
         grid.innerHTML += `
           <div class="dash-card bg-card rounded-3xl border-2 ${cardBorder} flex flex-col justify-between overflow-hidden">
@@ -3066,14 +3160,14 @@
               <div class="p-5 bg-gradient-to-b ${headerGlow} border-b border-white/10 flex justify-between items-center">
                 <div class="flex items-center gap-3">
                   <div class="w-12 h-12 rounded-2xl bg-sidebar border border-primary/40 flex flex-col items-center justify-center shadow-inner">
-                    <span class="text-[8px] font-black uppercase text-slate-400 leading-none">TABLE</span>
+                    <span class="text-[8px] font-black uppercase text-slate-300 leading-none">TABLE</span>
                     <span class="font-black text-lg text-primary leading-tight">${table.table}</span>
                   </div>
                   <div>
                     <div class="flex items-center gap-2">
-                      <span class="text-xs font-bold text-slate-300">📞 ${table.phone || 'Walk-in Guest'}</span>
+                      <span class="text-xs font-bold text-slate-200">📞 ${table.phone || 'Walk-in Guest'}</span>
                     </div>
-                    <span class="text-[10px] font-mono font-bold text-slate-400 block mt-0.5">⏱️ Ordered ${elapsedText} ${table.prepSpeed ? `• ETA: ${table.prepSpeed}m` : ''}</span>
+                    <span class="text-[10px] font-mono font-bold text-slate-300 block mt-0.5">⏱️ Ordered ${elapsedText} ${table.prepSpeed ? `• ETA: ${table.prepSpeed}m` : ''}</span>
                   </div>
                 </div>
                 <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border ${statusPill} tracking-wider">${(table.status || 'pending').replace('_',' ')}</span>
@@ -3082,7 +3176,7 @@
               <!-- Ordered Dishes List -->
               <div class="p-5">
                 <div class="flex justify-between items-center mb-2.5">
-                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Ordered Delicacies (${liList.filter(i=>!i.cancelled).length})</span>
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-300">Ordered Delicacies (${liList.filter(i=>!i.cancelled).length})</span>
                   ${isAdminOrWaiter ? `
                     <button onclick="openOrderEditor('${id}')" class="text-[10px] font-black uppercase tracking-wider bg-primary/20 hover:bg-primary text-primary hover:text-black border border-primary/40 px-2.5 py-1 rounded-lg transition">
                       ✏️ Edit / Replace Items
@@ -3093,10 +3187,22 @@
                   ${structuredItemsHtml}
                 </div>
 
-                ${table.paymentMethod ? `
-                  <div class="mt-3 p-2.5 rounded-xl bg-sidebar border border-primary/30 flex items-center justify-between text-xs">
-                    <span class="font-bold text-slate-400">💳 Payment Mode:</span>
-                    <span class="font-black text-primary">${table.paymentMethod} ${table.paymentMethod === 'SPLIT' ? `(Cash ₹${table.splitCash} | UPI ₹${table.splitOnline})` : ''}</span>
+                <!-- Interactive Payment Selector on Active Floor Card -->
+                ${isAdminOrWaiter ? `
+                  <div class="mt-3 p-2.5 rounded-xl bg-sidebar border border-primary/30">
+                    <div class="flex items-center justify-between text-[11px] mb-1.5">
+                      <span class="font-bold text-slate-300">💳 Payment Mode:</span>
+                      <span class="font-black ${curPay ? 'text-emerald-400' : 'text-amber-300'}">
+                        ${curPay === 'UPI' ? 'ONLINE / UPI' : (curPay || 'UNPAID')}
+                        ${curPay === 'SPLIT' ? ` (Cash ₹${table.splitCash} | Online ₹${table.splitOnline})` : ''}
+                      </span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1">
+                      <button onclick="updateFloorPaymentMethod('${id}', 'CASH')" class="py-1 rounded-lg text-[10px] font-black uppercase border transition ${curPay === 'CASH' ? 'bg-emerald-500 text-black border-emerald-300' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-emerald-500/20'}">💵 Cash</button>
+                      <button onclick="updateFloorPaymentMethod('${id}', 'UPI')" class="py-1 rounded-lg text-[10px] font-black uppercase border transition ${curPay === 'UPI' ? 'bg-blue-500 text-white border-blue-300' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-blue-500/20'}">📱 Online</button>
+                      <button onclick="updateFloorPaymentMethod('${id}', 'CARD')" class="py-1 rounded-lg text-[10px] font-black uppercase border transition ${curPay === 'CARD' ? 'bg-purple-500 text-white border-purple-300' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-purple-500/20'}">💳 Card</button>
+                      <button onclick="updateFloorPaymentMethod('${id}', 'SPLIT')" class="py-1 rounded-lg text-[10px] font-black uppercase border transition ${curPay === 'SPLIT' ? 'bg-primary text-black border-yellow-200' : 'bg-white/5 text-slate-300 border-white/10 hover:bg-primary/20'}">⚖️ Split</button>
+                    </div>
                   </div>
                 ` : ''}
               </div>
@@ -3106,7 +3212,7 @@
             <div class="p-5 pt-3 bg-sidebar/60 border-t border-white/10">
               <div class="flex justify-between items-end mb-4">
                 <div>
-                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Grand Total</span>
+                  <span class="text-[10px] font-black uppercase tracking-widest text-slate-300 block">Grand Total</span>
                   ${Number(table.discountAmount) > 0 ? `<span class="text-[10px] text-emerald-400 font-bold">Discount Applied: -₹${table.discountAmount}</span>` : ''}
                 </div>
                 <span class="font-black text-3xl text-primary tracking-tight font-serif">₹${table.total || 0}</span>
@@ -3119,7 +3225,7 @@
                 
                 ${table.status === 'cooking' ? `
                   <div class="flex gap-2 mb-2.5">
-                    <input type="number" id="speed_${id}" value="${table.prepSpeed || 15}" placeholder="Mins" class="w-20 p-2 bg-light text-white border border-[#4b4b6a] rounded-xl outline-none text-xs font-black text-center">
+                    <input type="number" id="speed_${id}" value="${table.prepSpeed || 15}" placeholder="Mins" class="w-20 p-2 bg-light text-white border rounded-xl outline-none text-xs font-black text-center">
                     <button onclick="setPrepSpeed('${id}', 'speed_${id}')" class="flex-1 bg-amber-500 hover:bg-amber-400 text-dark font-black rounded-xl text-xs uppercase">⏱️ Update Live ETA</button>
                   </div>
                   <button class="w-full mb-2.5 bg-emerald-600 hover:bg-emerald-500 text-white py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition active:scale-95" onclick="markOrderServed('${id}')">🍽️ Mark Food Served at Table</button>
