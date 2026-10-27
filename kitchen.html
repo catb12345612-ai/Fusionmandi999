@@ -70,14 +70,16 @@
     .gold-text { background: linear-gradient(135deg, #1e3a8a, #2563eb); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     .glass-panel { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(16px); }
 
-    /* ===== WHITE & BLUE ELEGANT THEME OVERRIDES ===== */
+    /* ===== WHITE & BLUE ELEGANT THEME OVERRIDES (FIXED CONTRAST) ===== */
     .bg-card { background-color: #ffffff !important; }
     .bg-light { background-color: #f4f8ff !important; }
-    .bg-sidebar { background-color: #1e3a8a !important; }
+    .bg-sidebar { background-color: #1e3a8a !important; color: #ffffff !important; }
+    .bg-sidebar .text-white, .bg-sidebar h3, .bg-sidebar span, .bg-sidebar th { color: #ffffff !important; }
+    .bg-sidebar .text-blue-100 { color: #dbeafe !important; }
     .bg-sidebar\/90, .bg-sidebar\/60 { background-color: #eff6ff !important; }
     .bg-dark { background-color: #1e40af !important; }
     .bg-black\/80 { background-color: rgba(11, 37, 69, 0.45) !important; }
-    .bg-primary { background-color: #2563eb !important; }
+    .bg-primary { background-color: #2563eb !important; color: #ffffff !important; }
     .bg-primary\/10, .bg-primary\/15, .bg-primary\/20 { background-color: #dbeafe !important; }
     .bg-white\/5, .bg-white\/10, .bg-white\/15 { background-color: #eff6ff !important; }
     .hover\:bg-white\/15:hover, .hover\:bg-white\/20:hover, .hover\:bg-white\/5:hover { background-color: #dbeafe !important; }
@@ -96,14 +98,22 @@
     .text-purple-400, .text-purple-300 { color: #7e22ce !important; }
     .text-red-400, .text-red-500 { color: #dc2626 !important; }
 
-    /* Buttons with coloured backgrounds keep white text */
-    .bg-blue-600, .bg-blue-500, .bg-emerald-600, .bg-emerald-500, .bg-purple-600, .bg-purple-500,
-    .bg-red-600, .bg-red-500, .bg-amber-500, .bg-amber-600, .bg-primary.text-black,
-    .gold-gradient, .bg-emerald-700, .bg-blue-700 { color: #ffffff !important; }
-    .bg-amber-500.text-black, .bg-amber-400.text-black { color: #0b2545 !important; }
+    /* Buttons, badges & banners with coloured backgrounds ALWAYS keep crisp white text */
+    .bg-primary, .bg-primary.text-white, .bg-primary.text-black, .bg-primary span,
+    .bg-blue-600, .bg-blue-500, .bg-blue-700,
+    .bg-emerald-600, .bg-emerald-500, .bg-emerald-700,
+    .bg-purple-600, .bg-purple-500,
+    .bg-red-600, .bg-red-500,
+    .bg-amber-500, .bg-amber-600,
+    .gold-gradient, .gold-gradient span,
+    #globalErrorBanner, #connectionBanner, #serviceBadge {
+      color: #ffffff !important;
+    }
+
     .hover\:bg-red-500:hover, .hover\:bg-red-600:hover, .hover\:bg-emerald-600:hover,
     .hover\:bg-emerald-500:hover, .hover\:bg-blue-600:hover, .hover\:bg-blue-500:hover,
-    .hover\:bg-primary:hover, .hover\:bg-purple-600:hover, .hover\:bg-amber-500:hover { color: #ffffff !important; }
+    .hover\:bg-primary:hover, .hover\:bg-purple-600:hover, .hover\:bg-amber-500:hover,
+    .hover\:bg-amber-400:hover { color: #ffffff !important; }
     .hover\:text-white:hover, .hover\:text-black:hover { color: #ffffff !important; }
 
     .border-white\/5, .border-white\/10, .border-white\/15, .border-white\/20,
@@ -129,6 +139,7 @@
     aside { background: linear-gradient(180deg, #1e3a8a 0%, #1e40af 100%) !important; }
     aside .text-white { color: #ffffff !important; }
     aside .text-primary { color: #ffffff !important; }
+    aside #activeOrdersBadge { color: #1d4ed8 !important; background-color: #ffffff !important; }
     aside .text-slate-300, aside .text-slate-400 { color: #dbeafe !important; }
     aside .bg-primary\/20 { background-color: rgba(255, 255, 255, 0.16) !important; }
     aside .border-primary\/50 { border-color: rgba(255, 255, 255, 0.35) !important; }
@@ -296,7 +307,7 @@
             <p class="text-xs text-blue-100">Modify quantities, remove wrong dishes, click <span class="text-white font-bold">🔄 Replace</span> on any item to swap it, or add new items directly from the menu.</p>
           </div>
         </div>
-        <button onclick="closeOrderEditor()" class="px-4 py-2 rounded-xl bg-white/15 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider transition">✕ Close Editor</button>
+        <button onclick="closeOrderEditor()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider transition">✕ Close Editor</button>
       </div>
 
       <!-- Replacement Mode Active Banner -->
@@ -517,7 +528,7 @@
         <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden" data-i18n="nav_pos">🧾 POS Order</button>
         <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden">
           <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
-          <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
+          <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black animate-bounce">0</span>
         </button>
         <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden" data-i18n="nav_menu">🍔 Menu & Food Stock</button>
         <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden">🥩 Raw Materials</button>
@@ -576,7 +587,12 @@
 
         <!-- 2. Service Requests Tab -->
         <section id="view-services" class="tab-section hidden">
-          <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight font-serif">🛎️ Active Service Calls</h2>
+          <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+            <h2 class="text-3xl font-black text-slate-900 tracking-tight font-serif">🛎️ Active Service Calls</h2>
+            <div class="flex items-center gap-2">
+              <button onclick="testServiceBellAndVoice()" class="bg-primary text-white px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider shadow active:scale-95 transition">🗣️ Test Bell &amp; Voice</button>
+            </div>
+          </div>
           <div id="serviceRequestsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </section>
 
@@ -1014,8 +1030,197 @@
     let topItemsChartInstance = null;
     let posCart = {};
     let pendingAlarmInterval = null;
+    let billAlarmInterval = null;
+    let serviceAlarmInterval = null;
+    let knownPendingServiceIds = new Set();
+    let knownTableStates = {};
+    let activePendingServiceList = [];
     let pendingImageUpdateItemId = null;
     let currentFloorFilter = 'ALL';
+    let currentAdminLang = 'en';
+
+    // Shared Audio Context for reliable loud alerts
+    let adminAudioCtx = null;
+    function getAdminAudioCtx() {
+      try {
+        if (!adminAudioCtx) {
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          if (!Ctx) return null;
+          adminAudioCtx = new Ctx();
+        }
+        if (adminAudioCtx.state === 'suspended') {
+          adminAudioCtx.resume().catch(() => {});
+        }
+        return adminAudioCtx;
+      } catch(e) { return null; }
+    }
+    document.addEventListener('pointerdown', () => { getAdminAudioCtx(); }, { once: true });
+
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    // Core Multilingual Speech Engine (English / Hindi / Telugu)
+    window.speakPosAlert = function(enText, hiText, teText) {
+      try {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+
+        let textToSpeak = enText;
+        if (currentAdminLang === 'hi' && hiText) textToSpeak = hiText;
+        else if (currentAdminLang === 'te' && teText) textToSpeak = teText;
+
+        const utter = new SpeechSynthesisUtterance(textToSpeak);
+        const voices = window.speechSynthesis.getVoices();
+        let chosenVoice = null;
+        if (currentAdminLang === 'te') {
+          chosenVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('te')) || null;
+        } else if (currentAdminLang === 'hi') {
+          chosenVoice = voices.find(v => v.lang && v.lang.toLowerCase().includes('hi')) || null;
+        }
+        if (!chosenVoice) {
+          chosenVoice = voices.find(v => v.lang && v.lang.includes('en-IN')) || voices.find(v => v.lang && v.lang.startsWith('en')) || null;
+        }
+        if (chosenVoice) utter.voice = chosenVoice;
+        utter.rate = 0.92;
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
+        window.speechSynthesis.speak(utter);
+      } catch(e) {}
+    };
+
+    // Loud Dual-Strike Reception Desk Bell Sound for Customer Service Requests
+    window.playServiceBellAlarm = function() {
+      const ctx = getAdminAudioCtx();
+      if (!ctx) return;
+      try {
+        const strike = (freq1, freq2, delay, dur) => {
+          const start = ctx.currentTime + delay;
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc1.type = 'sine';
+          osc2.type = 'triangle';
+          osc1.frequency.setValueAtTime(freq1, start);
+          osc2.frequency.setValueAtTime(freq2, start);
+          gain.gain.setValueAtTime(0.42, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ctx.destination);
+          osc1.start(start);
+          osc2.start(start);
+          osc1.stop(start + dur + 0.02);
+          osc2.stop(start + dur + 0.02);
+        };
+        // Ring-Ring-Ring Reception Bell pattern
+        strike(1318.5, 2637.0, 0.00, 0.42);
+        strike(1567.98, 3135.96, 0.18, 0.55);
+        strike(1318.5, 2637.0, 0.45, 0.42);
+        strike(1567.98, 3135.96, 0.63, 0.70);
+      } catch(e) {}
+    };
+
+    // Cash Register / Bill Request Chime
+    window.playBillRequestChime = function() {
+      const ctx = getAdminAudioCtx();
+      if (!ctx) return;
+      try {
+        const notes = [783.99, 987.77, 1174.66, 1567.98];
+        notes.forEach((freq, i) => {
+          const start = ctx.currentTime + i * 0.11;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0.32, start);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start);
+          osc.stop(start + 0.37);
+        });
+      } catch(e) {}
+    };
+
+    // 1. Spoken Voice Announcement for Service Calls
+    window.speakServiceCall = function(tableNum, reqType, customNote) {
+      const cleanTable = String(tableNum || '').replace(/^TA(\d+)$/i, 'Takeaway $1');
+      const cleanType = String(reqType || 'Assistance');
+      const cleanNote = customNote ? String(customNote).trim() : '';
+
+      let en = `Attention staff. Service call at Table ${cleanTable}, for ${cleanType}.` + (cleanNote ? ` Customer note: ${cleanNote}.` : '');
+      let hi = `कृपया ध्यान दें। टेबल ${cleanTable} पर ${cleanType} के लिए सर्विस कॉल है।` + (cleanNote ? ` नोट: ${cleanNote}।` : '');
+      let te = `సిబ్బంది గమనించగలరు. టేబుల్ ${cleanTable} వద్ద ${cleanType} కోసం సర్వీస్ కాల్ వచ్చింది.` + (cleanNote ? ` కస్టమర్ సూచన: ${cleanNote}.` : '');
+
+      speakPosAlert(en, hi, te);
+    };
+
+    // 2. Spoken Voice Announcement for Incoming New Food Orders
+    window.triggerNewOrderAlert = function(orderObj) {
+      playAlarmTone();
+      if (!orderObj) return;
+      const cleanTable = String(orderObj.table || '').replace(/^TA(\d+)$/i, 'Takeaway $1');
+      const liObj = ensureLineItemsObject(orderObj);
+      const activeItems = Object.values(liObj).filter(i => i && !i.cancelled);
+      const totalQty = activeItems.reduce((acc, i) => acc + (Number(i.qty) || 1), 0);
+      const dishNames = activeItems.slice(0, 3).map(i => `${i.qty} ${i.name}`).join(', ');
+
+      const en = `Attention Kitchen. New food order received at Table ${cleanTable}. ${totalQty} items ordered. ${dishNames}.`;
+      const hi = `किचन स्टाफ ध्यान दें। टेबल ${cleanTable} से नया फूड ऑर्डर आया है। कुल ${totalQty} आइटम।`;
+      const te = `కిచెన్ సిబ్బంది గమనించగలరు. టేబుల్ ${cleanTable} నుండి కొత్త ఫుడ్ ఆర్డర్ వచ్చింది. మొత్తం ${totalQty} వస్తువులు.`;
+
+      setTimeout(() => {
+        speakPosAlert(en, hi, te);
+      }, 650);
+    };
+
+    // 3. Spoken Voice Announcement for Customer Bill Requests
+    window.triggerBillRequestAlert = function(orderObj) {
+      playBillRequestChime();
+      if (!orderObj) return;
+      const cleanTable = String(orderObj.table || '').replace(/^TA(\d+)$/i, 'Takeaway $1');
+      const totalAmt = Number(orderObj.total) || 0;
+      const rawPay = (orderObj.paymentMethod || '').toUpperCase();
+      const paySpoken = rawPay === 'UPI' ? 'Online UPI' : (rawPay === 'SPLIT' ? 'Split Cash and Online' : (rawPay || 'Cash or Online'));
+
+      const en = `Attention Counter. Final bill requested at Table ${cleanTable}. Total amount ${totalAmt} Rupees via ${paySpoken}.`;
+      const hi = `काउंटर ध्यान दें। टेबल ${cleanTable} ने फाइनल बिल मांगा है। कुल राशि ${totalAmt} रुपये, माध्यम ${paySpoken}।`;
+      const te = `కౌంటర్ గమనించగలరు. టేబుల్ ${cleanTable} ఫైనల్ బిల్లు అడిగారు. మొత్తం బిల్లు ${totalAmt} రూపాయలు, పేమెంట్ ${paySpoken}.`;
+
+      setTimeout(() => {
+        speakPosAlert(en, hi, te);
+      }, 600);
+    };
+
+    // Manual Voice Replay for Any Active Floor Card
+    window.replayFloorOrderVoice = function(tableId) {
+      const tbl = (window.currentTables || {})[tableId];
+      if (!tbl) return;
+      if (tbl.status === 'bill_requested' || tbl.status === 'bill_ready') {
+        triggerBillRequestAlert(tbl);
+      } else {
+        triggerNewOrderAlert(tbl);
+      }
+    };
+
+    // Combined Bell + Spoken Announcement Trigger for Service Requests
+    window.triggerBellAndVoiceForService = function(reqObj) {
+      playServiceBellAlarm();
+      if (reqObj) {
+        setTimeout(() => {
+          speakServiceCall(reqObj.table, reqObj.request_type, reqObj.note);
+        }, 780);
+      }
+    };
+
+    window.testServiceBellAndVoice = function() {
+      triggerBellAndVoiceForService({
+        table: 'R1',
+        request_type: 'Water Refill',
+        note: ''
+      });
+    };
 
     // Live Order Editor Modal State
     let activeEditTableId = null;
@@ -1184,6 +1389,7 @@
     };
 
     window.changeAdminLanguage = function(langCode) {
+      currentAdminLang = langCode || 'en';
       const dict = adminI18n[langCode] || adminI18n.en;
       document.querySelectorAll('[data-i18n]').forEach(el => {
         const key = el.getAttribute('data-i18n');
@@ -1313,6 +1519,7 @@
 
       if(!db) return alert("⚠️ Not connected to database. Please check your internet connection.");
 
+      getAdminAudioCtx();
       currentRole = role;
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('mainLayout').classList.remove('hidden');
@@ -1403,7 +1610,7 @@
         });
       });
 
-      // Sync Active Floor Orders
+      // Sync Active Floor Orders (With Spoken Voice Announcements for New Orders & Bill Requests)
       db.ref('active_tables').on('value', snap => {
         window.currentTables = snap.val() || {};
         renderFloorGrid(window.currentTables);
@@ -1422,11 +1629,50 @@
           renderSoldItemsBreakdown();
         }
 
-        let hasPending = Object.values(window.currentTables).some(o => o && o.status === 'pending');
-        if (hasPending) {
+        let newestPendingOrder = null;
+        let newestBillReqOrder = null;
+        const pendingOrdersList = [];
+        const billReqOrdersList = [];
+        const currentIds = new Set(Object.keys(window.currentTables));
+
+        Object.keys(knownTableStates).forEach(id => {
+          if (!currentIds.has(id)) delete knownTableStates[id];
+        });
+
+        Object.entries(window.currentTables).forEach(([id, o]) => {
+          if (!o || typeof o !== 'object') return;
+          const prev = knownTableStates[id];
+          const itemCount = Object.keys(o.line_items || {}).length;
+
+          if (o.status === 'pending') {
+            pendingOrdersList.push(o);
+            if (!prev || prev.status !== 'pending' || itemCount > (prev.itemCount || 0)) {
+              newestPendingOrder = o;
+            }
+          } else if (o.status === 'bill_requested') {
+            billReqOrdersList.push(o);
+            if (!prev || prev.status !== 'bill_requested') {
+              newestBillReqOrder = o;
+            }
+          }
+
+          knownTableStates[id] = { status: o.status, itemCount };
+        });
+
+        if (newestPendingOrder) {
+          showGlobalToast(`🔔 NEW ORDER: Table ${newestPendingOrder.table} (₹${newestPendingOrder.total || 0})`, 'error');
+          triggerNewOrderAlert(newestPendingOrder);
+        } else if (newestBillReqOrder) {
+          showGlobalToast(`🧾 BILL REQUESTED: Table ${newestBillReqOrder.table} — ₹${newestBillReqOrder.total || 0} (${newestBillReqOrder.paymentMethod || 'Unpaid'})`, 'error');
+          triggerBillRequestAlert(newestBillReqOrder);
+        }
+
+        if (pendingOrdersList.length > 0) {
           if (!pendingAlarmInterval) {
-            playAlarmTone();
-            pendingAlarmInterval = setInterval(playAlarmTone, 30000);
+            pendingAlarmInterval = setInterval(() => {
+              const latestPending = Object.values(window.currentTables || {}).find(x => x && x.status === 'pending');
+              if (latestPending) triggerNewOrderAlert(latestPending);
+            }, 15000);
           }
         } else {
           if (pendingAlarmInterval) {
@@ -1434,12 +1680,63 @@
             pendingAlarmInterval = null;
           }
         }
+
+        if (billReqOrdersList.length > 0) {
+          if (!billAlarmInterval) {
+            billAlarmInterval = setInterval(() => {
+              const latestBill = Object.values(window.currentTables || {}).find(x => x && x.status === 'bill_requested');
+              if (latestBill) triggerBillRequestAlert(latestBill);
+            }, 12000);
+          }
+        } else {
+          if (billAlarmInterval) {
+            clearInterval(billAlarmInterval);
+            billAlarmInterval = null;
+          }
+        }
       });
 
-      // Sync Customer Service Requests
+      // Sync Customer Service Requests (With Immediate & Continuous Reception Bell + Spoken Voice Alert)
       db.ref('service_requests').on('value', snap => {
         const reqs = snap.val() || {};
         renderServiceRequests(reqs);
+
+        activePendingServiceList = [];
+        let newestReqObj = null;
+
+        Object.entries(reqs).forEach(([key, req]) => {
+          if (req && req.status !== 'resolved') {
+            activePendingServiceList.push(req);
+            if (!knownPendingServiceIds.has(key)) {
+              knownPendingServiceIds.add(key);
+              newestReqObj = req;
+            }
+          } else {
+            knownPendingServiceIds.delete(key);
+          }
+        });
+
+        if (newestReqObj) {
+          const newestLabel = `🛎️ SERVICE CALL: Table ${newestReqObj.table} — ${newestReqObj.request_type}${newestReqObj.note ? ' (' + newestReqObj.note + ')' : ''}`;
+          showGlobalToast(newestLabel, 'error');
+          triggerBellAndVoiceForService(newestReqObj);
+        }
+
+        if (activePendingServiceList.length > 0) {
+          if (!serviceAlarmInterval) {
+            serviceAlarmInterval = setInterval(() => {
+              if (activePendingServiceList.length > 0) {
+                const latestPending = activePendingServiceList[activePendingServiceList.length - 1];
+                triggerBellAndVoiceForService(latestPending);
+              }
+            }, 8000);
+          }
+        } else {
+          if (serviceAlarmInterval) {
+            clearInterval(serviceAlarmInterval);
+            serviceAlarmInterval = null;
+          }
+        }
       });
 
       // Sync Analytics & Revenue Tallies
@@ -1494,13 +1791,14 @@
 
     function playAlarmTone() {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const ctx = getAdminAudioCtx();
+        if (!ctx) return;
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(440, ctx.currentTime);
         osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.2, ctx.currentTime);
+        gain.gain.setValueAtTime(0.28, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
         osc.connect(gain);
         gain.connect(ctx.destination);
@@ -1741,7 +2039,6 @@
     window.startReplaceItemMode = function(lineKey, currentName) {
       const tbl = (window.currentTables || {})[activeEditTableId];
       if (tbl && tbl.kotPrinted) {
-        playError && playError();
         return showGlobalToast("KOT already printed — item replacement is locked.", "error");
       }
       replaceModeLineKey = lineKey;
@@ -2483,18 +2780,24 @@
       entries.forEach(([key, req]) => {
         if(!req || req.status === 'resolved') return;
         pendingCount++;
+        const safeTable = String(req.table || '').replace(/'/g, "\\'");
+        const safeType = String(req.request_type || '').replace(/'/g, "\\'");
+        const safeNote = String(req.note || '').replace(/'/g, "\\'");
 
         grid.innerHTML += `
-          <div class="dash-card bg-card p-5 rounded-2xl border-2 border-amber-400 flex flex-col justify-between">
+          <div class="dash-card urgent-alarm bg-card p-5 rounded-2xl border-2 border-amber-400 flex flex-col justify-between">
             <div>
               <div class="flex justify-between items-center mb-2">
-                <span class="font-black text-lg text-slate-900">Table ${req.table}</span>
+                <span class="font-black text-lg text-slate-900">🛎️ Table ${req.table}</span>
                 <span class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded font-black uppercase border border-amber-300">Pending Call</span>
               </div>
               <p class="font-bold text-primary text-sm mb-1">${req.request_type}</p>
               ${req.note ? `<p class="text-xs text-slate-600 italic mb-3">"${req.note}"</p>` : ''}
             </div>
-            <button onclick="resolveServiceRequest('${key}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Mark Resolved ✅</button>
+            <div class="flex gap-2 mt-2">
+              <button onclick="triggerBellAndVoiceForService({table:'${safeTable}', request_type:'${safeType}', note:'${safeNote}'})" class="px-3 bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/40 font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition" title="Replay Voice Announcement">🔊 Replay</button>
+              <button onclick="resolveServiceRequest('${key}')" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider transition">Mark Resolved ✅</button>
+            </div>
           </div>
         `;
       });
@@ -3272,7 +3575,10 @@
                   </div>
                 </div>
                 <div class="flex flex-col items-end gap-1">
-                  <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border ${statusPill} tracking-wider">${(table.status || 'pending').replace('_',' ')}</span>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="replayFloorOrderVoice('${id}')" class="px-2 py-1 rounded-lg bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/30 text-[10px] font-black transition" title="Speak Order / Bill Announcement">🔊 Voice</button>
+                    <span class="text-[10px] font-black uppercase px-3 py-1.5 rounded-xl border ${statusPill} tracking-wider">${(table.status || 'pending').replace('_',' ')}</span>
+                  </div>
                   ${kotLocked ? `<span class="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-300">🔒 KOT Printed</span>` : ''}
                 </div>
               </div>
