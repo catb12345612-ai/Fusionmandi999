@@ -4,27 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Mandi Croods - Premium Dining</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
-    tailwind.config = { theme: { extend: { colors: { primary: '#3B82F6', secondary: '#1D4ED8', dark: '#0B1F4D', light: '#F4F8FF', card: '#ffffff' } } } }
+    tailwind.config = { theme: { extend: { colors: { primary: '#1d4ed8', secondary: '#1e40af', dark: '#0b2545', light: '#f4f8ff', card: '#ffffff' } } } }
   </script>
   <style>
-    body.font-sans { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif; }
     .hide-scroll::-webkit-scrollbar { display: none; }
     .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-    .food-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 24px rgba(29, 78, 216, 0.06); border: 1px solid rgba(59, 130, 246, 0.14); }
-    .food-card:hover { transform: translateY(-5px); box-shadow: 0 18px 36px rgba(37, 99, 235, 0.16); border-color: #3B82F6; }
-    .glass-nav { background: rgba(255,255,255,0.94); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(59,130,246,0.18); }
-    .welcome-bg { background: linear-gradient(135deg, #0B1F4D 0%, #1E40AF 100%); }
-    .gold-gradient { background: linear-gradient(135deg, #DBEAFE, #93C5FD, #60A5FA); color: #0B1F4D; }
-    .gold-text { background: linear-gradient(135deg, #DBEAFE, #93C5FD, #60A5FA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .food-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 6px 24px rgba(37,99,235,0.08); border: 1px solid #dbeafe; }
+    .food-card:hover { transform: translateY(-5px); box-shadow: 0 16px 34px rgba(37,99,235,0.18); border-color: #2563eb; }
+    .glass-nav { background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid #bfdbfe; }
+    .welcome-bg { background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); }
+    .gold-gradient { background: linear-gradient(135deg, #60a5fa 0%, #2563eb 55%, #1e40af 100%); color: #ffffff; }
+    .gold-text { background: linear-gradient(135deg, #1e3a8a, #2563eb); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
     .vip-glow { animation: goldPulse 2s infinite; }
-    @keyframes goldPulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+    @keyframes goldPulse { 0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 99, 235, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); } }
     @keyframes slideUpBounce { 0% { transform: translateY(140%); opacity: 0; } 60% { transform: translateY(-8px); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
     .cart-pop-in { animation: slideUpBounce .55s cubic-bezier(.34,1.56,.64,1) both; }
     @keyframes trackerSlideIn { 0% { transform: translateY(-24px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
@@ -33,9 +29,9 @@
     .fade-in-card { animation: fadeInCard .4s ease both; }
     .fun-toast {
       position: fixed; left: 50%; top: 90px; transform: translateX(-50%) translateY(-20px);
-      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      background: linear-gradient(135deg, #2563eb, #1e40af);
       color: #ffffff; font-weight: 800; font-size: 13px; padding: 12px 24px;
-      border-radius: 999px; box-shadow: 0 10px 30px rgba(37,99,235,0.4);
+      border-radius: 999px; box-shadow: 0 10px 30px rgba(37,99,235,0.35);
       z-index: 9998; opacity: 0; animation: funToastIn .4s cubic-bezier(.34,1.56,.64,1) forwards;
       max-width: 88vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
@@ -50,24 +46,69 @@
     /* Luxury Sliding Drawer for Customer Service */
     .drawer-overlay {
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(11,31,77,0.55); backdrop-filter: blur(4px);
+        background: rgba(11,37,69,0.45); backdrop-filter: blur(4px);
         z-index: 140; opacity: 0; visibility: hidden; transition: all 0.3s ease;
     }
     .drawer-overlay.active { opacity: 1; visibility: visible; }
     .drawer-content {
         position: fixed; bottom: 0; left: 0; right: 0;
-        background: #0B1F4D; border-top: 1px solid rgba(147, 197, 253, 0.35);
-        border-radius: 30px 30px 0 0; padding: 28px 24px; z-index: 150;
+        background: #ffffff; border-top: 1px solid #bfdbfe;
+        border-radius: 30px 30px 0 0; padding: 24px; z-index: 150;
         transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-        box-shadow: 0 -10px 40px rgba(11,31,77,0.45);
+        box-shadow: 0 -10px 40px rgba(37,99,235,0.15);
     }
     .drawer-content.active { transform: translateY(0); }
 
-    /* Elegant spacing refinements (theme only) */
-    body.font-sans { background: #F4F8FF; }
-    #menuGrid { gap: 1.25rem; padding-bottom: 2rem; }
-    .food-card { padding: 1.1rem !important; border-radius: 1.4rem; background: #ffffff; }
-    #activeTracker { padding: 1.75rem; }
+    /* ===== WHITE & BLUE ELEGANT THEME ===== */
+    body { background: #f4f8ff !important; color: #0b2545 !important; }
+    .bg-light { background-color: #f4f8ff !important; }
+    .bg-dark { background-color: #ffffff !important; color: #0b2545 !important; border-color: #bfdbfe !important; }
+    .bg-dark .text-white { color: #0b2545 !important; }
+    .bg-dark .text-slate-400, .bg-dark .text-slate-300 { color: #64748b !important; }
+    .bg-dark .text-primary { color: #1d4ed8 !important; }
+    .bg-dark .bg-white\/10, .bg-dark .bg-white\/5 { background-color: #eff6ff !important; }
+    .bg-dark .border-white\/20, .bg-dark .border-white\/15, .bg-dark .border-white\/10 { border-color: #bfdbfe !important; }
+    .bg-dark\/80 { background-color: rgba(255,255,255,0.97) !important; }
+    .text-primary { color: #1d4ed8 !important; }
+    .text-secondary { color: #1e40af !important; }
+    .text-dark { color: #0b2545 !important; }
+    .text-white { color: #0b2545 !important; }
+    .text-slate-300, .text-slate-400, .text-slate-500 { color: #64748b !important; }
+    .bg-primary { background-color: #2563eb !important; }
+    .bg-primary\/10 { background-color: #eff6ff !important; }
+    .bg-primary\/20 { background-color: #dbeafe !important; }
+    .bg-primary.text-dark, .bg-primary.text-white { color: #ffffff !important; }
+    .bg-white\/5, .bg-white\/10 { background-color: #eff6ff !important; }
+    .border-white\/5, .border-white\/10, .border-white\/15, .border-white\/20 { border-color: #bfdbfe !important; }
+    .border-primary, .border-primary\/20, .border-primary\/30, .border-primary\/40, .border-primary\/50 { border-color: #93c5fd !important; }
+    .gold-gradient, .gold-gradient.text-dark { color: #ffffff !important; }
+    .gold-gradient.text-dark span { color: #ffffff !important; }
+    input, textarea, select { color: #0b2545 !important; }
+    input::placeholder, textarea::placeholder { color: #94a3b8 !important; }
+    #cartFooter { background: #ffffff !important; border-color: #93c5fd !important; box-shadow: 0 12px 40px rgba(37,99,235,0.18) !important; }
+    #activeTracker { background: #ffffff !important; border-color: #bfdbfe !important; box-shadow: 0 10px 30px rgba(37,99,235,0.12) !important; color: #0b2545 !important; }
+    #loginModal .bg-dark { box-shadow: 0 20px 60px rgba(11,37,69,0.25) !important; }
+    #loginModal input { background-color: #eff6ff !important; color: #1d4ed8 !important; }
+    #loginModal .text-white { color: #ffffff !important; }
+    #loginModal .text-primary\/70, #loginModal .text-primary\/80 { color: #1d4ed8 !important; }
+    .drawer-content .text-white { color: #0b2545 !important; }
+    .drawer-content .bg-white\/10 { background-color: #eff6ff !important; }
+    .drawer-content .bg-slate-800 { background-color: #f1f5f9 !important; }
+    .drawer-content .bg-slate-800 span, .drawer-content .text-slate-300 { color: #334155 !important; }
+    .drawer-content textarea { background: #f8fbff !important; border-color: #bfdbfe !important; }
+    .drawer-content .gold-text { background: linear-gradient(135deg,#1e3a8a,#2563eb); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    #historyModal .bg-white { background-color: #ffffff !important; }
+    #historyModal .border-primary\/50 { border-color: #93c5fd !important; }
+    .food-card .bg-dark { background-color: #2563eb !important; color: #ffffff !important; border-color: #2563eb !important; }
+    .food-card .bg-dark.text-primary { color: #ffffff !important; }
+    .food-card .bg-white.text-slate-600 { background-color: #ffffff !important; }
+    .category-btn { box-shadow: 0 1px 3px rgba(37,99,235,0.06); }
+    .category-btn.active { background-color: #1d4ed8 !important; color: #ffffff !important; border-color: #1d4ed8 !important; }
+    .category-btn:not(.active) { background-color: #ffffff !important; color: #475569 !important; border-color: #dbeafe !important; }
+    .category-btn[data-cat="Group"]:not(.active) { background-color: #eff6ff !important; color: #1d4ed8 !important; }
+    #tableOccupancyPill { letter-spacing: .02em; }
+    #loyaltyBarFill { background: linear-gradient(90deg,#60a5fa,#2563eb) !important; }
+    #connectionBanner, #loginModal .text-slate-400 { color: #ffffff; }
   </style>
 </head>
 <body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
@@ -77,10 +118,10 @@
   </div>
 
   <div id="loginModal" class="fixed top-0 left-0 w-full h-full min-h-screen z-[9999] flex flex-col items-center justify-center p-5 welcome-bg">
-    <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-primary opacity-20 blur-3xl rounded-full pointer-events-none"></div>
-    <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-primary opacity-10 blur-3xl rounded-full pointer-events-none"></div>
+    <div class="absolute top-[-50px] left-[-50px] w-40 h-40 bg-white opacity-20 blur-3xl rounded-full pointer-events-none"></div>
+    <div class="absolute bottom-[-50px] right-[-50px] w-60 h-60 bg-white opacity-10 blur-3xl rounded-full pointer-events-none"></div>
 
-    <div class="bg-dark p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_50px_rgba(59,130,246,0.25)] border border-primary/20 relative z-10">
+    <div class="bg-dark p-8 rounded-3xl text-center w-full max-w-sm shadow-[0_10px_50px_rgba(11,37,69,0.25)] border border-primary/20 relative z-10">
       <div class="flex justify-end mb-3">
         <div class="flex items-center gap-1.5 bg-white/5 border border-primary/30 rounded-xl px-2.5 py-1">
           <span class="text-[10px] font-bold text-primary/80 uppercase tracking-wider">🌐</span>
@@ -92,11 +133,11 @@
         </div>
       </div>
 
-      <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg border-2 border-dark">🍖</div>
-      <h2 class="text-3xl font-black text-white mb-2 tracking-tight gold-text" data-i18n="welcome">Mandi Croods</h2>
+      <div class="w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto mb-4 text-4xl shadow-lg border-2 border-white">🍖</div>
+      <h2 class="text-3xl font-black mb-2 tracking-tight gold-text" data-i18n="welcome">Mandi Croods</h2>
       <p class="text-primary/70 text-sm font-semibold mb-6 tracking-wide" data-i18n="enter_mobile">Enter mobile number to unlock our premium menu.</p>
       <input type="tel" id="customerMobile" inputmode="numeric" autocomplete="tel" maxlength="10" data-i18n-placeholder="mobile_placeholder" placeholder="10-Digit Mobile" oninput="this.value = this.value.replace(/\D/g,'').slice(-10)" onkeydown="if(event.key==='Enter') registerCustomer()" class="w-full text-center p-4 bg-white/10 text-primary border border-primary/30 rounded-2xl font-black text-xl focus:border-primary outline-none mb-6 transition-all placeholder-primary/30">
-      <button onclick="registerCustomer()" class="w-full gold-gradient font-black py-4 rounded-2xl shadow-[0_5px_20px_rgba(59,130,246,0.3)] active:scale-95 transition-transform uppercase tracking-widest text-sm" data-i18n="proceed">Enter Menu</button>
+      <button onclick="registerCustomer()" class="w-full gold-gradient font-black py-4 rounded-2xl shadow-[0_5px_20px_rgba(37,99,235,0.3)] active:scale-95 transition-transform uppercase tracking-widest text-sm" data-i18n="proceed">Enter Menu</button>
     </div>
   </div>
 
@@ -104,13 +145,13 @@
   <div class="bg-dark text-primary/80 px-5 py-2.5 flex justify-between items-center text-[10px] font-bold z-[105] relative border-b border-primary/20">
     <div class="flex items-center gap-2.5 w-3/4 truncate">
       <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
-        <img src="dev-logo.png (1).png" onerror="this.src='https://ui-avatars.com/api/?name=SZ&background=3B82F6&color=fff&bold=true'" class="h-6 w-6 rounded-full object-cover border border-primary/50 shadow-sm" alt="SZA Logo">
+        <img src="dev-logo.png (1).png" onerror="this.src='https://ui-avatars.com/api/?name=SZ&background=2563eb&color=fff&bold=true'" class="h-6 w-6 rounded-full object-cover border border-primary/50 shadow-sm" alt="SZA Logo">
       </a>
       <div class="flex flex-col leading-tight truncate">
-        <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="text-slate-400 hover:text-white text-[8px] uppercase tracking-widest transition-colors truncate">
+        <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="text-slate-400 hover:text-primary text-[8px] uppercase tracking-widest transition-colors truncate">
           Built by Developers • High-Fledged Solutions
         </a>
-        <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="text-primary hover:text-white font-black tracking-wide text-[11px] transition-colors truncate">
+        <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="text-primary hover:text-secondary font-black tracking-wide text-[11px] transition-colors truncate">
           @syedzeeshaanali07
         </a>
       </div>
@@ -125,7 +166,7 @@
   <header class="glass-nav sticky top-0 z-40 px-5 py-4 flex justify-between items-center">
     <div>
       <h1 class="text-2xl font-black tracking-tighter text-dark leading-none">Mandi <span class="text-primary">Croods</span></h1>
-      <p id="vipBadge" class="hidden text-[10px] font-black gold-gradient text-dark px-2.5 py-0.5 rounded-full mt-1.5 vip-glow inline-block uppercase tracking-widest shadow-sm">👑 VIP Guest (Streak: <span id="visitStreakCount">0</span>)</p>
+      <p id="vipBadge" class="hidden text-[10px] font-black gold-gradient px-2.5 py-0.5 rounded-full mt-1.5 vip-glow inline-block uppercase tracking-widest shadow-sm">👑 VIP Guest (Streak: <span id="visitStreakCount">0</span>)</p>
       <p id="loyaltyTeaser" class="hidden text-[10px] font-bold text-slate-400 mt-1"></p>
       <div id="loyaltyBar" class="hidden mt-1.5 w-32">
         <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden"><div id="loyaltyBarFill" class="h-full gold-gradient rounded-full transition-all" style="width:0%"></div></div>
@@ -172,11 +213,11 @@
     <button onclick="filterMenu('Beverages')" data-cat="Beverages" class="category-btn px-6 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 border border-slate-200 hover:border-primary transition whitespace-nowrap" data-i18n="cat_bev">Drinks & Desserts</button>
   </div>
 
-  <div id="activeTracker" class="hidden mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(37,99,235,0.25)] border border-primary/30 relative overflow-hidden">
-    <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
+  <div id="activeTracker" class="hidden mx-5 mt-4 bg-dark text-white p-6 rounded-3xl shadow-[0_10px_30px_rgba(37,99,235,0.12)] border border-primary/30 relative overflow-hidden">
+    <div class="absolute -right-10 -top-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
     <h3 class="text-xs text-primary font-black uppercase tracking-widest mb-1" data-i18n="live_status">Your Running Tab</h3>
     <p id="orderStatusText" class="text-2xl font-black text-white uppercase tracking-tight">Active Session</p>
-    <p id="etaLine" class="hidden text-[11px] font-bold text-amber-300 mt-1"></p>
+    <p id="etaLine" class="hidden text-[11px] font-bold text-blue-600 mt-1"></p>
     <p id="sessionTimer" class="text-[10px] font-bold text-slate-400 mt-0.5"></p>
 
     <div class="mt-4 border-t border-primary/20 pt-4">
@@ -185,15 +226,15 @@
       <div class="mb-4 p-3.5 bg-white/5 rounded-2xl border border-primary/20 space-y-2.5">
         <div class="flex items-center justify-between">
           <span class="text-[10px] font-black text-primary uppercase tracking-widest">🎟️ Have a Coupon Code?</span>
-          <span id="customerDiscountBadge" class="hidden text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full"></span>
+          <span id="customerDiscountBadge" class="hidden text-[10px] font-black bg-emerald-500/20 text-emerald-600 border border-emerald-500/40 px-2 py-0.5 rounded-full"></span>
         </div>
         <div id="couponInputRow" class="flex gap-2">
           <input type="text" id="customerCouponInput" placeholder="Enter Coupon Code" class="flex-1 bg-dark/80 border border-white/15 rounded-xl px-3 py-2 text-xs font-black text-primary uppercase outline-none focus:border-primary placeholder-slate-500">
-          <button onclick="applyCustomerCoupon()" class="gold-gradient text-dark font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider active:scale-95 transition-transform">Apply</button>
+          <button onclick="applyCustomerCoupon()" class="gold-gradient text-white font-black px-4 py-2 rounded-xl text-xs uppercase tracking-wider active:scale-95 transition-transform">Apply</button>
         </div>
-        <div id="appliedDiscountInfo" class="hidden flex items-center justify-between text-xs font-bold text-emerald-400 pt-1 border-t border-white/10">
+        <div id="appliedDiscountInfo" class="hidden flex items-center justify-between text-xs font-bold text-emerald-600 pt-1 border-t border-white/10">
           <span id="appliedDiscountText">Discount Applied</span>
-          <button id="removeCustomerCouponBtn" onclick="removeCustomerCoupon()" class="text-[10px] text-red-400 underline ml-2">Remove</button>
+          <button id="removeCustomerCouponBtn" onclick="removeCustomerCoupon()" class="text-[10px] text-red-500 underline ml-2">Remove</button>
         </div>
       </div>
 
@@ -205,7 +246,7 @@
         <div class="flex items-center gap-2">
           <button onclick="changeCustomerSplit(-1)" class="w-8 h-8 rounded-xl bg-white/10 border border-white/20 text-white font-black text-sm active:scale-90 transition-transform">-</button>
           <span id="customerSplitCountDisplay" class="font-black text-sm text-primary w-6 text-center">1</span>
-          <button onclick="changeCustomerSplit(1)" class="w-8 h-8 rounded-xl gold-gradient text-dark font-black text-sm active:scale-90 transition-transform">+</button>
+          <button onclick="changeCustomerSplit(1)" class="w-8 h-8 rounded-xl gold-gradient text-white font-black text-sm active:scale-90 transition-transform">+</button>
         </div>
       </div>
 
@@ -232,9 +273,9 @@
       <div id="paymentSelection" class="hidden flex flex-col gap-3 mt-4">
         <p class="text-xs text-primary font-bold uppercase tracking-widest text-center mb-1" data-i18n="select_payment">Select Payment Method</p>
         <div class="grid grid-cols-3 gap-2">
-            <button onclick="requestBill('UPI')" class="bg-blue-600/90 hover:bg-blue-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">UPI</button>
-            <button onclick="requestBill('CASH')" class="bg-emerald-600/90 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">CASH</button>
-            <button onclick="requestBill('CARD')" class="bg-purple-600/90 hover:bg-purple-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">CARD</button>
+            <button onclick="requestBill('UPI')" class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">UPI</button>
+            <button onclick="requestBill('CASH')" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">CASH</button>
+            <button onclick="requestBill('CARD')" class="bg-purple-600 hover:bg-purple-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition">CARD</button>
         </div>
         <button onclick="showSplitPay()" class="bg-white/10 hover:bg-white/20 text-primary py-3 rounded-xl font-black text-sm transition border border-primary/40 active:scale-95">💳 SPLIT: Cash + Online</button>
       </div>
@@ -245,11 +286,11 @@
           <span class="text-xs font-bold text-slate-400">Cash ₹</span>
           <input type="number" id="splitCashAmt" min="0" oninput="updateSplitRemain()" class="flex-1 bg-dark/80 border border-white/15 rounded-xl px-3 py-2 text-sm font-black text-white outline-none focus:border-primary">
         </div>
-        <p class="text-xs font-black text-blue-300">Online (UPI): <span id="splitRemainAmt">₹0</span></p>
-        <button onclick="requestSplitBill()" class="w-full gold-gradient text-dark font-black py-2.5 rounded-xl text-xs uppercase tracking-wider active:scale-95 transition-transform">Request Split Bill</button>
+        <p class="text-xs font-black text-blue-600">Online (UPI): <span id="splitRemainAmt">₹0</span></p>
+        <button onclick="requestSplitBill()" class="w-full gold-gradient text-white font-black py-2.5 rounded-xl text-xs uppercase tracking-wider active:scale-95 transition-transform">Request Split Bill</button>
       </div>
 
-      <button onclick="showPaymentOptions()" id="reqBillBtn" class="w-full gold-gradient py-3 rounded-xl font-black text-sm active:scale-95 transition-transform text-dark uppercase tracking-widest shadow-md" data-i18n="request_bill">Request Final Bill</button>
+      <button onclick="showPaymentOptions()" id="reqBillBtn" class="w-full gold-gradient py-3 rounded-xl font-black text-sm active:scale-95 transition-transform text-white uppercase tracking-widest shadow-md" data-i18n="request_bill">Request Final Bill</button>
     </div>
 
     <div id="feedbackSection" class="hidden mt-5 pt-5 border-t border-primary/20 text-center relative z-10">
@@ -260,12 +301,12 @@
         <div class="flex justify-center gap-6 text-4xl">
           <button id="emoji-Bad" onclick="handleEmojiFeedback('Bad')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all filter grayscale hover:grayscale-0">😞</button>
           <button id="emoji-Good" onclick="handleEmojiFeedback('Good')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all">😋</button>
-          <button id="emoji-Excellent" onclick="handleEmojiFeedback('Excellent')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all drop-shadow-[0_0_15px_rgba(96,165,250,0.8)]">😍</button>
+          <button id="emoji-Excellent" onclick="handleEmojiFeedback('Excellent')" class="p-2 rounded-2xl border border-transparent hover:scale-110 active:scale-90 transition-all drop-shadow-[0_0_12px_rgba(37,99,235,0.5)]">😍</button>
         </div>
       </div>
       <div id="upiArea" class="hidden">
         <p class="text-primary font-black mb-4 text-sm uppercase tracking-widest" data-i18n="scan_pay">Scan to Pay via UPI</p>
-        <img id="upiQRCode" src="upi-qr-img.jpeg" class="mx-auto rounded-2xl mb-4 w-44 h-auto bg-white p-3 shadow-[0_0_20px_rgba(96,165,250,0.35)] object-contain border-2 border-primary">
+        <img id="upiQRCode" src="upi-qr-img.jpeg" class="mx-auto rounded-2xl mb-4 w-44 h-auto bg-white p-3 shadow-[0_0_20px_rgba(37,99,235,0.2)] object-contain border-2 border-primary">
         <a id="gpayDirectLink" href="#" class="block w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white py-3 rounded-xl font-black text-sm transition-transform shadow-md">📱 Pay via GPay / PhonePe</a>
       </div>
     </div>
@@ -276,43 +317,43 @@
   </div>
 
   <!-- FLOATING ACTION BUTTONS -->
-  <button id="fabService" onclick="openServiceDrawer()" class="fab-dock fixed bottom-[164px] right-4 z-40 bg-dark border-2 border-primary text-primary w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(59,130,246,0.4)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Call Waiter / Service Request">🛎️</button>
+  <button id="fabService" onclick="openServiceDrawer()" class="fab-dock fixed bottom-[164px] right-4 z-40 bg-white border-2 border-primary text-primary w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(37,99,235,0.25)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Call Waiter / Service Request">🛎️</button>
   <button id="fabChat" onclick="askForHelp()" class="fab-dock fixed bottom-24 right-4 z-40 bg-white border border-slate-200 text-dark w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="WhatsApp Support">💬</button>
-  <button id="fabShare" onclick="shareWithFriends()" class="fab-dock fixed bottom-24 left-4 z-40 bg-primary text-dark w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(59,130,246,0.4)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Share Mandi Croods with a friend">👑</button>
+  <button id="fabShare" onclick="shareWithFriends()" class="fab-dock fixed bottom-24 left-4 z-40 bg-primary text-white w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(37,99,235,0.35)] flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Share Mandi Croods with a friend">👑</button>
   <button id="fabHistory" onclick="openHistory()" class="fab-dock fixed bottom-[164px] left-4 z-40 bg-white border border-slate-200 text-dark w-14 h-14 rounded-full shadow-xl flex items-center justify-center text-2xl active:scale-90 transition-transform" title="My order history">🕘</button>
   <button id="fabSound" onclick="toggleSound()" class="fab-dock fixed bottom-[236px] right-4 z-40 bg-white border border-slate-200 text-dark w-11 h-11 rounded-full shadow-lg flex items-center justify-center text-lg active:scale-90 transition-transform" title="Sound on/off">🔊</button>
-  <button id="fabDock" onclick="dockFabs()" class="fixed bottom-[236px] left-4 z-[60] bg-dark text-primary w-11 h-11 rounded-full shadow-[0_5px_20px_rgba(59,130,246,0.4)] border border-primary/40 flex items-center justify-center text-lg active:scale-90 transition-transform" title="Hide / show quick buttons">➖</button>
-  <button id="fabUndock" onclick="undockFabs()" class="hidden fixed bottom-6 left-4 z-[60] bg-dark text-primary w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(59,130,246,0.5)] border-2 border-primary flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Show quick buttons">➕</button>
+  <button id="fabDock" onclick="dockFabs()" class="fixed bottom-[236px] left-4 z-[60] bg-dark text-primary w-11 h-11 rounded-full shadow-[0_5px_20px_rgba(37,99,235,0.2)] border border-primary/40 flex items-center justify-center text-lg active:scale-90 transition-transform" title="Hide / show quick buttons">➖</button>
+  <button id="fabUndock" onclick="undockFabs()" class="hidden fixed bottom-6 left-4 z-[60] bg-dark text-primary w-14 h-14 rounded-full shadow-[0_5px_20px_rgba(37,99,235,0.25)] border-2 border-primary flex items-center justify-center text-2xl active:scale-90 transition-transform" title="Show quick buttons">➕</button>
 
   <!-- LUXURY SLIDING SERVICE DRAWER -->
   <div id="serviceDrawerOverlay" class="drawer-overlay" onclick="closeServiceDrawer()"></div>
   <div id="serviceDrawerContent" class="drawer-content">
-      <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-5"></div>
+      <div class="w-12 h-1.5 bg-blue-200 rounded-full mx-auto mb-5"></div>
       <div class="flex justify-between items-center mb-4">
         <div>
-            <h3 class="text-2xl font-black text-white tracking-tight gold-text">Premium Service</h3>
+            <h3 class="text-2xl font-black tracking-tight gold-text">Premium Service</h3>
             <p class="text-xs font-bold text-slate-400 mt-1">Table <span id="serviceTableDisplay" class="text-primary"></span></p>
         </div>
-        <button onclick="closeServiceDrawer()" class="w-10 h-10 bg-white/10 rounded-full text-white font-black text-lg flex items-center justify-center border border-white/20 active:scale-90 transition-transform">✕</button>
+        <button onclick="closeServiceDrawer()" class="w-10 h-10 bg-blue-50 rounded-full text-dark font-black text-lg flex items-center justify-center border border-blue-200 active:scale-90 transition-transform">✕</button>
       </div>
 
       <div class="grid grid-cols-2 gap-3 mb-4 mt-6">
-        <button onclick="submitServiceRequest('Water Refill')" class="bg-blue-900/40 text-blue-300 border border-blue-500/50 hover:bg-blue-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-lg">
+        <button onclick="submitServiceRequest('Water Refill')" class="bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-sm">
           <span class="text-3xl">💧</span> <span class="text-xs uppercase tracking-widest">Water Refill</span>
         </button>
-        <button onclick="submitServiceRequest('Clean Table')" class="bg-emerald-900/40 text-emerald-300 border border-emerald-500/50 hover:bg-emerald-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-lg">
+        <button onclick="submitServiceRequest('Clean Table')" class="bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-sm">
           <span class="text-3xl">🧽</span> <span class="text-xs uppercase tracking-widest">Clean Table</span>
         </button>
-        <button onclick="submitServiceRequest('Cutlery Needed')" class="bg-slate-800 text-slate-300 border border-slate-600 hover:bg-slate-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-lg">
+        <button onclick="submitServiceRequest('Cutlery Needed')" class="bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-sm">
           <span class="text-3xl">🍴</span> <span class="text-xs uppercase tracking-widest">Cutlery</span>
         </button>
-        <button onclick="submitServiceRequest('Call Waiter')" class="bg-amber-900/40 text-amber-300 border border-amber-500/50 hover:bg-amber-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-lg">
+        <button onclick="submitServiceRequest('Call Waiter')" class="bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-600 hover:text-white py-4 rounded-2xl font-black active:scale-95 transition-all flex flex-col items-center justify-center gap-2 shadow-sm">
           <span class="text-3xl">👤</span> <span class="text-xs uppercase tracking-widest">Call Staff</span>
         </button>
       </div>
 
-      <textarea id="serviceNotes" rows="2" placeholder="Any specific request for our staff?" class="w-full mb-4 p-4 rounded-2xl bg-white/5 border border-white/10 text-sm text-white font-semibold outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder-slate-500"></textarea>
-      <button onclick="submitServiceRequest('Other')" class="w-full gold-gradient text-dark py-4 rounded-2xl font-black shadow-[0_5px_20px_rgba(59,130,246,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest text-sm mb-4">
+      <textarea id="serviceNotes" rows="2" placeholder="Any specific request for our staff?" class="w-full mb-4 p-4 rounded-2xl bg-blue-50/50 border border-blue-200 text-sm text-dark font-semibold outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder-slate-400"></textarea>
+      <button onclick="submitServiceRequest('Other')" class="w-full gold-gradient text-white py-4 rounded-2xl font-black shadow-[0_5px_20px_rgba(37,99,235,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest text-sm mb-4">
         Send Custom Request
       </button>
   </div>
@@ -320,7 +361,7 @@
   <!-- ORDER HISTORY MODAL -->
   <div id="historyModal" class="fixed inset-0 z-[150] flex flex-col justify-end hidden transition-opacity">
     <div class="absolute inset-0 bg-dark/80 backdrop-blur-sm" onclick="closeHistory()"></div>
-    <div class="relative bg-white w-full rounded-t-[2rem] p-6 shadow-[0_-10px_50px_rgba(37,99,235,0.2)] border-t-2 border-primary/50 max-h-[75vh] flex flex-col">
+    <div class="relative bg-white w-full rounded-t-[2rem] p-6 shadow-[0_-10px_50px_rgba(37,99,235,0.15)] border-t-2 border-primary/50 max-h-[75vh] flex flex-col">
       <div class="flex justify-between items-center mb-3">
         <h3 class="text-xl font-black text-dark tracking-tight">🕘 My Order History</h3>
         <button onclick="closeHistory()" class="text-slate-400 hover:text-primary text-3xl font-black leading-none transition-colors">&times;</button>
@@ -330,25 +371,25 @@
   </div>
 
   <!-- COLLAPSIBLE CART WITH SYNCHRONIZED DRINKS & DESSERTS VISUAL ADD-ON CAROUSEL -->
-  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[430px] bg-dark border border-primary/40 rounded-3xl shadow-[0_10px_40px_rgba(37,99,235,0.3)] p-5 z-50 transition-all duration-300">
+  <div id="cartFooter" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-5 md:w-[430px] bg-dark border border-primary/40 rounded-3xl shadow-[0_10px_40px_rgba(37,99,235,0.18)] p-5 z-50 transition-all duration-300">
     <div class="flex items-center justify-between cursor-pointer select-none" onclick="toggleCart()">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-dark font-black relative shadow-md">
+        <div class="w-10 h-10 gold-gradient rounded-full flex items-center justify-center text-white font-black relative shadow-md">
           🛒
-          <span id="cartBadgeCount" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-dark shadow-sm">0</span>
+          <span id="cartBadgeCount" class="hidden absolute -top-1 -right-1 bg-red-600 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-white shadow-sm">0</span>
         </div>
         <div>
           <p class="text-[10px] font-bold text-primary opacity-80 uppercase tracking-widest" data-i18n="cart_total">Selected Items</p>
-          <p id="cartTotal" class="text-2xl font-black text-white leading-none">₹0</p>
+          <p id="cartTotal" class="text-2xl font-black text-dark leading-none">₹0</p>
         </div>
       </div>
-      <div id="cartToggleIcon" class="w-8 h-8 flex items-center justify-center bg-white/10 text-primary border border-primary/30 rounded-full font-black text-sm transition-transform duration-300 shadow-sm">
+      <div id="cartToggleIcon" class="w-8 h-8 flex items-center justify-center bg-blue-50 text-primary border border-primary/30 rounded-full font-black text-sm transition-transform duration-300 shadow-sm">
         ▼
       </div>
     </div>
 
     <div id="cartExpandedContent" class="overflow-hidden transition-all duration-300" style="max-height: 620px; opacity: 1; margin-top: 1rem;">
-      <div id="cartListUI" class="mb-3 max-h-40 overflow-y-auto text-white pr-1 hide-scroll"></div>
+      <div id="cartListUI" class="mb-3 max-h-40 overflow-y-auto text-dark pr-1 hide-scroll"></div>
 
       <!-- Interactive Cool Drinks, Desserts & Extras Carousel inside Cart -->
       <div id="cartUpsellSection" class="mb-3 pt-2.5 border-t border-primary/20">
@@ -359,8 +400,8 @@
         <div id="cartUpsellCarousel" class="flex gap-2.5 overflow-x-auto pb-1.5 hide-scroll"></div>
       </div>
 
-      <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Chef instructions or special requests?" class="w-full mb-3 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white font-semibold outline-none focus:border-primary text-xs placeholder-slate-500">
-      <button onclick="placeOrder()" id="placeOrderBtn" class="w-full gold-gradient text-dark py-3.5 rounded-xl font-black text-sm shadow-[0_5px_15px_rgba(59,130,246,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest">
+      <input type="text" id="orderNotes" data-i18n-placeholder="special_req" placeholder="Chef instructions or special requests?" class="w-full mb-3 px-4 py-2.5 rounded-xl bg-blue-50/60 border border-blue-200 text-dark font-semibold outline-none focus:border-primary text-xs placeholder-slate-400">
+      <button onclick="placeOrder()" id="placeOrderBtn" class="w-full gold-gradient text-white py-3.5 rounded-xl font-black text-sm shadow-[0_5px_15px_rgba(37,99,235,0.3)] active:scale-95 transition-transform flex items-center justify-center gap-2 uppercase tracking-widest">
         <span data-i18n="confirm_order">Send to Kitchen</span>
       </button>
     </div>
@@ -644,7 +685,7 @@
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         document.body.appendChild(canvas);
         const ctx = canvas.getContext('2d');
-        const colors = ['#3B82F6', '#93C5FD', '#1D4ED8', '#ffffff', '#BFDBFE'];
+        const colors = ['#2563eb', '#60a5fa', '#1e40af', '#ffffff', '#93c5fd'];
         const pieces = Array.from({ length: 100 }, () => ({
           x: Math.random() * canvas.width, y: -20 - Math.random() * canvas.height * 0.3,
           r: 3 + Math.random() * 6, c: colors[Math.floor(Math.random() * colors.length)],
@@ -1000,7 +1041,7 @@
       const isCritical = pct !== null ? pct <= 20 : stock <= 3;
       const isLow      = pct !== null ? pct <= 50 : stock <= 7;
       if(isCritical) return { text: `🔥 ${stock} ${t('qty_left')}!`, cls: 'bg-red-600 text-white shadow-sm', pct };
-      if(isLow)      return { text: `⚠ ${stock} ${t('qty_left')}`, cls: 'bg-amber-600 text-white shadow-sm', pct };
+      if(isLow)      return { text: `⚠ ${stock} ${t('qty_left')}`, cls: 'bg-amber-500 text-white shadow-sm', pct };
       return null;
     }
 
@@ -1048,9 +1089,9 @@
 
         grid.innerHTML += `
           <div class="food-card fade-in-card bg-card rounded-2xl p-4 flex flex-col relative overflow-hidden">
-            ${stock <= 0 ? `<div class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center"><span class="bg-dark text-primary font-black px-4 py-2 rounded-xl shadow-lg border border-primary/50">${t('sold_out')}</span></div>` : ''}
-            ${item.is_special ? `<div class="absolute top-3 left-3 bg-dark text-primary border border-primary/50 text-[10px] font-black px-2 py-1 rounded-md shadow-md z-20 uppercase tracking-widest">${t('special')}</div>` : ''}
-            <div class="w-full h-36 rounded-xl bg-light overflow-hidden shadow-inner mb-3 border border-slate-100">
+            ${stock <= 0 ? `<div class="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center"><span class="bg-primary text-white font-black px-4 py-2 rounded-xl shadow-lg">${t('sold_out')}</span></div>` : ''}
+            ${item.is_special ? `<div class="absolute top-3 left-3 bg-primary text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md z-20 uppercase tracking-widest">${t('special')}</div>` : ''}
+            <div class="w-full h-36 rounded-xl bg-light overflow-hidden shadow-inner mb-3 border border-blue-100">
               <img src="${item.image_url}" class="w-full h-full object-cover" loading="lazy">
             </div>
             <div class="flex flex-col flex-1">
@@ -1062,12 +1103,12 @@
               ${selectHtml}
               <div class="flex items-center justify-between mt-auto pt-4 z-0">
                  ${cartQty > 0
-                 ? `<div class="flex items-center bg-slate-50 border border-primary/20 rounded-lg p-1 w-full justify-between">
+                 ? `<div class="flex items-center bg-blue-50 border border-primary/20 rounded-lg p-1 w-full justify-between">
                       <button onclick="updateCartQty('${id}', -1,${stock})" class="w-8 h-8 bg-white rounded-md font-black shadow-sm text-slate-800 active:scale-90 transition-transform">-</button>
                       <span class="font-black text-sm">${cartQty}</span>
-                      <button onclick="updateCartQty('${id}', 1,${stock})" class="w-8 h-8 bg-dark rounded-md font-black shadow-sm text-primary active:scale-90 transition-transform">+</button>
+                      <button onclick="updateCartQty('${id}', 1,${stock})" class="w-8 h-8 bg-primary rounded-md font-black shadow-sm text-white active:scale-90 transition-transform">+</button>
                     </div>`
-                 : `<button onclick="updateCartQty('${id}', 1,${stock})" class="w-full bg-dark text-primary border border-primary/40 font-black text-xs py-2.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest">+ ${t('add')}</button>`
+                 : `<button onclick="updateCartQty('${id}', 1,${stock})" class="w-full bg-primary text-white font-black text-xs py-2.5 rounded-xl active:scale-95 transition-transform uppercase tracking-widest shadow-sm">+ ${t('add')}</button>`
                  }
               </div>
             </div>
@@ -1111,22 +1152,22 @@
         const price = Number(item.base_price) || 0;
 
         return `
-          <div class="shrink-0 w-32 bg-white/5 border border-primary/30 rounded-2xl p-2 flex flex-col justify-between shadow-sm">
+          <div class="shrink-0 w-32 bg-blue-50/60 border border-primary/20 rounded-2xl p-2 flex flex-col justify-between shadow-sm">
             <div>
-              <div class="w-full h-16 rounded-xl overflow-hidden bg-black/40 mb-1.5 border border-white/10 relative">
+              <div class="w-full h-16 rounded-xl overflow-hidden bg-blue-100 mb-1.5 border border-blue-100 relative">
                 <img src="${img}" class="w-full h-full object-cover" loading="lazy">
-                <span class="absolute bottom-1 right-1 bg-dark/90 text-primary text-[9px] font-black px-1.5 py-0.5 rounded border border-primary/30">₹${price}</span>
+                <span class="absolute bottom-1 right-1 bg-white text-primary text-[9px] font-black px-1.5 py-0.5 rounded border border-primary/30">₹${price}</span>
               </div>
-              <p class="text-[10px] font-bold text-white leading-tight line-clamp-2 h-7">${translateItem(item.name)}</p>
+              <p class="text-[10px] font-bold text-dark leading-tight line-clamp-2 h-7">${translateItem(item.name)}</p>
             </div>
             <div class="mt-1.5">
               ${qtyInCart > 0
-                ? `<div class="flex items-center justify-between bg-white/10 rounded-lg p-0.5 border border-primary/40">
-                    <button onclick="updateCartQty('${id}', -1, ${stock})" class="w-6 h-6 rounded bg-dark text-white font-black text-xs active:scale-90">-</button>
+                ? `<div class="flex items-center justify-between bg-white rounded-lg p-0.5 border border-primary/40">
+                    <button onclick="updateCartQty('${id}', -1, ${stock})" class="w-6 h-6 rounded bg-blue-50 text-primary font-black text-xs active:scale-90">-</button>
                     <span class="text-[11px] font-black text-primary">${qtyInCart}</span>
-                    <button onclick="updateCartQty('${id}', 1, ${stock})" class="w-6 h-6 rounded gold-gradient text-dark font-black text-xs active:scale-90">+</button>
+                    <button onclick="updateCartQty('${id}', 1, ${stock})" class="w-6 h-6 rounded bg-primary text-white font-black text-xs active:scale-90">+</button>
                   </div>`
-                : `<button onclick="updateCartQty('${id}', 1, ${stock})" class="w-full gold-gradient text-dark font-black text-[10px] py-1.5 rounded-lg uppercase tracking-wider active:scale-95 transition-transform shadow-sm">+ ${t('add')}</button>`
+                : `<button onclick="updateCartQty('${id}', 1, ${stock})" class="w-full bg-primary text-white font-black text-[10px] py-1.5 rounded-lg uppercase tracking-wider active:scale-95 transition-transform shadow-sm">+ ${t('add')}</button>`
               }
             </div>
           </div>
@@ -1193,18 +1234,18 @@
         const latestImg = (menuData[i.id] && menuData[i.id].image_url) ? menuData[i.id].image_url : i.image_url;
         total += (Number(i.price)||0) * (Number(i.qty)||0);
         totalQty += (Number(i.qty)||0);
-        uiHtml += `<div class="py-2.5 flex items-center justify-between border-b border-white/10 last:border-0 text-sm">
+        uiHtml += `<div class="py-2.5 flex items-center justify-between border-b border-blue-100 last:border-0 text-sm">
           <div class="flex items-center gap-3 flex-1 pr-2">
             <img src="${latestImg || 'https://images.unsplash.com/photo-1544025162-8111142154ea?w=100&q=80'}" class="w-10 h-10 rounded-lg object-cover border border-primary/30 shrink-0">
             <div class="flex flex-col flex-1">
-              <span class="font-bold text-white leading-tight text-xs">${translateItem(i.name)} <small class="text-primary opacity-80 font-semibold block">${translateItem(i.variant)}</small></span>
+              <span class="font-bold text-dark leading-tight text-xs">${translateItem(i.name)} <small class="text-primary opacity-80 font-semibold block">${translateItem(i.variant)}</small></span>
               <span class="text-primary font-black mt-0.5 text-xs">₹${(Number(i.price)||0) * (Number(i.qty)||0)}</span>
             </div>
           </div>
-          <div class="flex items-center bg-white/10 rounded-lg p-1 shrink-0">
-            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', -1)" class="w-7 h-7 bg-dark rounded-md font-black shadow-sm text-white active:scale-90 transition-transform border border-white/20">-</button>
-            <span class="font-black text-xs w-7 text-center text-white">${i.qty}</span>
-            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', 1)" class="w-7 h-7 bg-primary rounded-md font-black shadow-sm text-dark active:scale-90 transition-transform">+</button>
+          <div class="flex items-center bg-blue-50 rounded-lg p-1 shrink-0">
+            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', -1)" class="w-7 h-7 bg-white rounded-md font-black shadow-sm text-primary active:scale-90 transition-transform border border-blue-200">-</button>
+            <span class="font-black text-xs w-7 text-center text-dark">${i.qty}</span>
+            <button onclick="updateCartQtyFromCart('${i.id}', '${i.variant.replace(/'/g, "\\'")}', 1)" class="w-7 h-7 bg-primary rounded-md font-black shadow-sm text-white active:scale-90 transition-transform">+</button>
           </div>
         </div>`;
       });
@@ -1419,38 +1460,49 @@
       return `=== MANDI CROODS ===\nTable: ${order.table}\nMobile: ${order.phone || customerPhone}\nDate: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}\n------------------\n${body}\n------------------\n${extraLines}TOTAL: Rs. ${order.total}\n==================\nThank you for dining with Mandi Croods! 👑`;
     }
 
-    /* Order cancellation (timer + cancel buttons) removed — ordered items are now display-only. */
     function renderOrderedItemsList(order, tableId){
       const div = document.getElementById('customerOrderedItems');
       const lines = buildLineItemsArray(order);
       if(lines.length === 0 && (!order || !order.items)){ div.classList.add('hidden'); return; }
 
-      clearTimeout(cancelTimerInterval);
+      const elapsed = Date.now() - (order.timestamp || Date.now());
+      // Cancellation is allowed only while the order is pending, the KOT has NOT been printed, and the 2-minute window is open
+      const canCancel = order.status === 'pending' && !order.kotPrinted && elapsed <= 120000;
 
       if (lines.length === 0 && order.items) {
         const rawParts = String(order.items).split('|').map(s => s.trim()).filter(Boolean);
-        div.innerHTML = `<div class="text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-white/10 pb-1">Items Ordered:</div>` +
-          rawParts.map(p => `<div class="py-2 border-b border-white/5 last:border-0"><span class="text-primary mr-2">✓</span>${translateItem(p)}</div>`).join('');
+        div.innerHTML = `<div class="text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-blue-100 pb-1">Items Ordered:</div>` +
+          rawParts.map(p => `<div class="py-2 border-b border-blue-50 last:border-0"><span class="text-primary mr-2">✓</span>${translateItem(p)}</div>`).join('');
         div.classList.remove('hidden');
         return;
       }
 
-      div.innerHTML = `<div class="flex justify-between text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-white/10 pb-1">
+      div.innerHTML = `<div class="flex justify-between text-[10px] text-primary opacity-70 uppercase tracking-widest mb-2 font-bold border-b border-blue-100 pb-1">
           <span>Items Ordered:</span>
+          ${canCancel ? `<span class="text-amber-600 opacity-100">Cancel window open (${Math.max(0, Math.ceil((120000 - elapsed)/1000))}s left)</span>` : ''}
         </div>` +
         lines.map(li => {
           const lineTotal = (Number(li.price)||0) * (Number(li.qty)||0);
           if(li.cancelled){
-            return `<div class="py-2 border-b border-white/5 last:border-0 opacity-50">
+            return `<div class="py-2 border-b border-blue-50 last:border-0 opacity-50">
               <span class="text-red-500 mr-2">✕</span><s>${translateItem(li.name)} [${translateItem(li.variant || 'Regular')}] (x${li.qty})</s>
               <span class="text-[10px] text-red-500 font-black ml-1 border border-red-500/50 px-1 rounded">CANCELLED</span>
             </div>`;
           }
-          return `<div class="py-2 border-b border-white/5 last:border-0 flex items-center justify-between gap-2">
-            <span><span class="text-primary mr-2">✓</span>${translateItem(li.name)} <span class="opacity-70">[${translateItem(li.variant || 'Regular')}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-400 opacity-80">📝 ${li.note}</span>` : ''}</span>
+          return `<div class="py-2 border-b border-blue-50 last:border-0 flex items-center justify-between gap-2">
+            <span><span class="text-primary mr-2">✓</span>${translateItem(li.name)} <span class="opacity-70">[${translateItem(li.variant || 'Regular')}]</span> (x${li.qty}) — ₹${lineTotal}${li.note ? `<br><span class="text-[10px] text-amber-600 opacity-80">📝 ${li.note}</span>` : ''}</span>
+            ${canCancel ? `<button onclick="cancelOrderItem('${tableId}','${li.key}')" class="shrink-0 bg-red-50 text-red-500 border border-red-200 text-[10px] font-black px-2 py-1.5 rounded-lg active:scale-90 transition-transform">✕ Cancel</button>` : ''}
           </div>`;
-        }).join('');
+        }).join('') +
+        (!canCancel ? `<div class="text-[10px] text-slate-400 pt-3 italic">Order sent to chef — cancellations are no longer available.</div>` : '');
       div.classList.remove('hidden');
+
+      if (canCancel) {
+          clearTimeout(cancelTimerInterval);
+          cancelTimerInterval = setTimeout(() => { renderOrderedItemsList(order, tableId); }, 1000);
+      } else {
+          clearTimeout(cancelTimerInterval);
+      }
     }
 
     window.placeOrder = function() {
@@ -1505,7 +1557,8 @@
         total: finalTot,
         status: 'pending',
         timestamp: existing.timestamp || Date.now(),
-        paymentMethod: existing.paymentMethod || ''
+        paymentMethod: existing.paymentMethod || '',
+        kotPrinted: existing.kotPrinted || false
       });
 
       db.ref(`active_tables/${tableId}`).set(orderPayload).then(() => {
@@ -1520,9 +1573,44 @@
         renderMenu(); listenToRunningTab();
         btn.disabled = false;
       }).catch(error => {
-        console.error(error); playError(); 
+        console.error(error); playError();
         alert('Order Failed: ' + error.message);
         btn.disabled = false;
+      });
+    };
+
+    window.cancelOrderItem = function(tableId, lineItemKey){
+      if(!activeTableData || !activeTableData.line_items || !activeTableData.line_items[lineItemKey]) return;
+      const elapsed = Date.now() - (activeTableData.timestamp || Date.now());
+      if(activeTableData.status !== 'pending' || activeTableData.kotPrinted || elapsed > 120000) {
+        playError(); return alert('Time window exceeded or order already cooking. Cancellations are no longer available.');
+      }
+      if(!confirm('Cancel this item? It will be removed from your bill.')) return;
+
+      const li = activeTableData.line_items[lineItemKey];
+      if (li.cancelled) return;
+
+      const updatedLineItems = Object.assign({}, activeTableData.line_items);
+      updatedLineItems[lineItemKey] = Object.assign({}, li, { cancelled: true });
+
+      const subTot = computeOrderTotal(updatedLineItems);
+      const dAmt = computeDiscountFromOrder(subTot, activeTableData);
+      const tipAmt = Number(activeTableData.tipAmount) || 0;
+      const finalTot = Math.max(0, subTot - dAmt) + tipAmt;
+
+      db.ref(`active_tables/${tableId}`).update(sanitizeForFirebase({
+        line_items: updatedLineItems,
+        items: buildItemsString(updatedLineItems),
+        subtotal: subTot,
+        discountAmount: dAmt,
+        total: finalTot
+      })).then(() => {
+        if(li.itemId && li.qty){
+          db.ref(`menu/${li.itemId}/stock_count`).transaction(curr => (curr||0) + Number(li.qty));
+        }
+        playNotify(); vibrate(15); showFunToast('Item cancelled — bill updated ✅');
+      }).catch(err => {
+        console.error(err); playError(); alert('Could not cancel this item.');
       });
     };
 
@@ -1593,10 +1681,10 @@
       const occ = occupiedTablesMap[tableId];
       if(occ){
         const isMine = occ.phone === customerPhone;
-        pill.className = `text-[10px] font-black px-3 py-1.5 rounded-full inline-block border ${isMine ? 'bg-blue-900/40 text-blue-300 border-blue-500/50' : 'bg-red-900/40 text-red-300 border-red-500/50'}`;
+        pill.className = `text-[10px] font-black px-3 py-1.5 rounded-full inline-block border ${isMine ? 'bg-blue-50 text-blue-700 border-blue-300' : 'bg-red-50 text-red-600 border-red-300'}`;
         pill.innerText = isMine ? '🔵 Your active order is on this table (Table Locked 🔒)' : '🔴 This table is currently occupied';
       } else {
-        pill.className = 'text-[10px] font-black px-3 py-1.5 rounded-full inline-block bg-emerald-900/40 text-emerald-300 border border-emerald-500/50';
+        pill.className = 'text-[10px] font-black px-3 py-1.5 rounded-full inline-block bg-emerald-50 text-emerald-700 border border-emerald-300';
         pill.innerText = '🟢 This table is available';
       }
       pill.classList.remove('hidden');
@@ -1718,18 +1806,18 @@
           reqBtn.classList.remove('opacity-50','cursor-not-allowed');
 
           if (order.status === 'pending') {
-            st.innerText = lang==='en'?"Order Sent!":"ऑर्डर भेजा गया!"; st.className = "text-xl font-black text-amber-400 uppercase tracking-tight";
+            st.innerText = lang==='en'?"Order Sent!":"ऑर्डर भेजा गया!"; st.className = "text-xl font-black text-amber-600 uppercase tracking-tight";
             fbSec.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden'); reqBtn.innerText = t('request_bill');
           } else if (order.status === 'cooking') {
             if(statusChanged) playNotify();
-            st.innerText = lang==='en'?"Chef is cooking...":"खाना बन रहा है"; st.className = "text-xl font-black text-blue-400 uppercase tracking-tight";
+            st.innerText = lang==='en'?"Chef is cooking...":"खाना बन रहा है"; st.className = "text-xl font-black text-blue-600 uppercase tracking-tight";
             fbSec.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden'); reqBtn.innerText = t('request_bill');
           } else if (order.status === 'served') {
             if(statusChanged) playBell();
-            st.innerText = lang==='en'?"Food Served! Enjoy.":"खाना परोसा गया!"; st.className = "text-xl font-black text-emerald-400 uppercase tracking-tight";
+            st.innerText = lang==='en'?"Food Served! Enjoy.":"खाना परोसा गया!"; st.className = "text-xl font-black text-emerald-600 uppercase tracking-tight";
             fbSec.classList.remove('hidden'); upiArea.classList.add('hidden'); reqBtn.classList.remove('hidden'); paySel.classList.add('hidden'); reqBtn.innerText = t('request_bill');
           } else if (order.status === 'bill_requested') {
-            st.innerText = lang==='en'?"Waiting for Bill...":"बिल का इंतजार..."; st.className = "text-xl font-black text-white uppercase tracking-tight";
+            st.innerText = lang==='en'?"Waiting for Bill...":"बिल का इंतजार..."; st.className = "text-xl font-black text-dark uppercase tracking-tight";
             fbSec.classList.remove('hidden'); reqBtn.classList.add('hidden'); paySel.classList.add('hidden');
             if(order.paymentMethod === 'UPI' || order.paymentMethod === 'SPLIT') {
                 upiArea.classList.remove('hidden');
