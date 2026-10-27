@@ -30,7 +30,7 @@
     .fun-toast {
       position: fixed; left: 50%; top: 90px; transform: translateX(-50%) translateY(-20px);
       background: linear-gradient(135deg, #2563eb, #1e40af);
-      color: #ffffff; font-weight: 800; font-size: 13px; padding: 12px 24px;
+      color: #ffffff !important; font-weight: 800; font-size: 13px; padding: 12px 24px;
       border-radius: 999px; box-shadow: 0 10px 30px rgba(37,99,235,0.35);
       z-index: 9998; opacity: 0; animation: funToastIn .4s cubic-bezier(.34,1.56,.64,1) forwards;
       max-width: 88vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -59,7 +59,7 @@
     }
     .drawer-content.active { transform: translateY(0); }
 
-    /* ===== WHITE & BLUE ELEGANT THEME ===== */
+    /* ===== WHITE & BLUE ELEGANT THEME (FIXED CONTRAST) ===== */
     body { background: #f4f8ff !important; color: #0b2545 !important; }
     .bg-light { background-color: #f4f8ff !important; }
     .bg-dark { background-color: #ffffff !important; color: #0b2545 !important; border-color: #bfdbfe !important; }
@@ -74,24 +74,30 @@
     .text-dark { color: #0b2545 !important; }
     .text-white { color: #0b2545 !important; }
     .text-slate-300, .text-slate-400, .text-slate-500 { color: #64748b !important; }
-    .bg-primary { background-color: #2563eb !important; }
+    .bg-primary { background-color: #2563eb !important; color: #ffffff !important; }
     .bg-primary\/10 { background-color: #eff6ff !important; }
     .bg-primary\/20 { background-color: #dbeafe !important; }
-    .bg-primary.text-dark, .bg-primary.text-white { color: #ffffff !important; }
+    
+    /* Ensure colored buttons, badges, and gradients always keep crisp white text */
+    .bg-primary, .bg-primary.text-dark, .bg-primary.text-white, .bg-primary span,
+    .bg-blue-600, .bg-emerald-600, .bg-purple-600, .bg-red-600, .bg-amber-500,
+    .gold-gradient, .gold-gradient.text-dark, .gold-gradient.text-white, .gold-gradient span {
+      color: #ffffff !important;
+    }
+
     .bg-white\/5, .bg-white\/10 { background-color: #eff6ff !important; }
     .border-white\/5, .border-white\/10, .border-white\/15, .border-white\/20 { border-color: #bfdbfe !important; }
     .border-primary, .border-primary\/20, .border-primary\/30, .border-primary\/40, .border-primary\/50 { border-color: #93c5fd !important; }
-    .gold-gradient, .gold-gradient.text-dark { color: #ffffff !important; }
-    .gold-gradient.text-dark span { color: #ffffff !important; }
     input, textarea, select { color: #0b2545 !important; }
     input::placeholder, textarea::placeholder { color: #94a3b8 !important; }
     #cartFooter { background: #ffffff !important; border-color: #93c5fd !important; box-shadow: 0 12px 40px rgba(37,99,235,0.18) !important; }
     #activeTracker { background: #ffffff !important; border-color: #bfdbfe !important; box-shadow: 0 10px 30px rgba(37,99,235,0.12) !important; color: #0b2545 !important; }
     #loginModal .bg-dark { box-shadow: 0 20px 60px rgba(11,37,69,0.25) !important; }
     #loginModal input { background-color: #eff6ff !important; color: #1d4ed8 !important; }
-    #loginModal .text-white { color: #ffffff !important; }
     #loginModal .text-primary\/70, #loginModal .text-primary\/80 { color: #1d4ed8 !important; }
     .drawer-content .text-white { color: #0b2545 !important; }
+    .drawer-content .gold-gradient, .drawer-content .gold-gradient.text-white, .drawer-content .gold-gradient span { color: #ffffff !important; }
+    .drawer-content button:hover, .drawer-content button:hover span { color: #ffffff !important; }
     .drawer-content .bg-white\/10 { background-color: #eff6ff !important; }
     .drawer-content .bg-slate-800 { background-color: #f1f5f9 !important; }
     .drawer-content .bg-slate-800 span, .drawer-content .text-slate-300 { color: #334155 !important; }
@@ -108,7 +114,7 @@
     .category-btn[data-cat="Group"]:not(.active) { background-color: #eff6ff !important; color: #1d4ed8 !important; }
     #tableOccupancyPill { letter-spacing: .02em; }
     #loyaltyBarFill { background: linear-gradient(90deg,#60a5fa,#2563eb) !important; }
-    #connectionBanner, #loginModal .text-slate-400 { color: #ffffff; }
+    #connectionBanner { color: #ffffff !important; }
   </style>
 </head>
 <body class="bg-light text-slate-800 font-sans antialiased pb-32 overflow-hidden">
@@ -253,10 +259,10 @@
       <div class="mb-4 p-3.5 bg-white/5 rounded-2xl border border-primary/20">
         <span class="text-[10px] font-black text-primary uppercase tracking-widest block mb-2">💛 Tip Our Staff (Optional)</span>
         <div class="flex gap-2">
-          <button onclick="setTip(0)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">No Tip</button>
-          <button onclick="setTip(20)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">₹20</button>
-          <button onclick="setTip(50)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">₹50</button>
-          <button onclick="setTip(100)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">₹100</button>
+          <button onclick="setTip(0, this)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">No Tip</button>
+          <button onclick="setTip(20, this)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">₹20</button>
+          <button onclick="setTip(50, this)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">₹50</button>
+          <button onclick="setTip(100, this)" class="tip-btn flex-1 py-2 rounded-xl text-xs font-black bg-white/10 text-white border border-white/20 active:scale-95 transition-transform">₹100</button>
         </div>
       </div>
 
@@ -591,6 +597,10 @@
         return audioCtx;
       }catch(e){ return null; }
     }
+
+    // Unlock Web Audio on first user touch/click for mobile browsers
+    document.addEventListener('pointerdown', () => { getAudioCtx(); }, { once: true });
+
     function playTone(freq, duration, type, volume, delay){
       if (!soundOn) return;
       const ctx = getAudioCtx();
@@ -615,6 +625,15 @@
     function playClick(){ playTone(880,.05,'triangle',.1,0); }
     function playSuccess(){ playTone(659.25,.15,'sine',.15,0); playTone(880,.25,'sine',.15,.1); }
     function playBell(){ playTone(1046.5,.5,'sine',.2,0); playTone(1318.5,.4,'sine',.1,.08); }
+    
+    // Clear, loud Dual-Strike Reception Desk Bell Sound for Service Button & Requests
+    function playServiceBell(){
+      playTone(1318.5, 0.45, 'sine', 0.35, 0);
+      playTone(2637.0, 0.35, 'triangle', 0.2, 0);
+      playTone(1567.98, 0.65, 'sine', 0.35, 0.16);
+      playTone(3135.96, 0.5, 'triangle', 0.2, 0.16);
+    }
+
     function playNotify(){ playTone(440,.15,'sine',.15,0); playTone(554.37,.2,'sine',.15,.1); }
     function playError(){ playTone(220,.3,'sawtooth',.15,0); }
 
@@ -830,7 +849,8 @@
     };
 
     window.openServiceDrawer = function() {
-        playClick();
+        playServiceBell();
+        vibrate([25, 40, 25]);
         const tableVal = document.getElementById('tableNum').value;
         document.getElementById('serviceTableDisplay').innerText = tableVal;
         document.getElementById('serviceDrawerOverlay').classList.add('active');
@@ -838,12 +858,14 @@
     };
 
     window.closeServiceDrawer = function() {
+        playClick();
         document.getElementById('serviceDrawerOverlay').classList.remove('active');
         document.getElementById('serviceDrawerContent').classList.remove('active');
     };
 
     window.submitServiceRequest = function(type) {
-        playClick();
+        playServiceBell();
+        vibrate([40, 60, 40]);
         const tableVal = document.getElementById('tableNum').value;
         const phone = customerPhone || 'Guest';
         let note = document.getElementById('serviceNotes').value.trim();
@@ -854,8 +876,7 @@
             table: tableVal, phone: phone, request_type: type, note: note, status: 'pending', timestamp: Date.now()
         }).then(() => {
             myServiceRequests.add(newReqRef.key);
-            playNotify(); vibrate([30, 50, 30]);
-            showFunToast(`🛎️ Request sent to our staff!`);
+            showFunToast(`🛎️ ${type} request sent to our staff!`);
             closeServiceDrawer();
             document.getElementById('serviceNotes').value = '';
         }).catch(err => {
@@ -866,7 +887,7 @@
     db.ref('service_requests').on('child_changed', snap => {
         const req = snap.val();
         if(myServiceRequests.has(snap.key) && req && req.status === 'resolved') {
-            playSuccess();
+            playServiceBell();
             showFunToast("✅ Your request has been attended to. Thank you!");
             myServiceRequests.delete(snap.key);
         }
@@ -1373,10 +1394,17 @@
       });
     };
 
-    window.setTip = function(amount){
+    window.setTip = function(amount, btnEl){
       if (!activeTableData) { playError(); return alert('Place an order first to add a tip.'); }
       playClick();
-      document.querySelectorAll('.tip-btn').forEach(b => b.classList.replace('gold-gradient','bg-white/10'));
+      document.querySelectorAll('.tip-btn').forEach(b => {
+        b.classList.remove('gold-gradient');
+        b.classList.add('bg-white/10');
+      });
+      if (btnEl) {
+        btnEl.classList.remove('bg-white/10');
+        btnEl.classList.add('gold-gradient');
+      }
       const sub = computeOrderTotal(activeTableData.line_items) || Number(activeTableData.subtotal) || 0;
       const dAmt = Number(activeTableData.discountAmount) || 0;
       const base = Math.max(0, sub - dAmt);
@@ -1617,6 +1645,7 @@
     window.showPaymentOptions = function() {
         const reqBtn = document.getElementById('reqBillBtn');
         if(reqBtn.disabled) return;
+        playClick();
         reqBtn.classList.add('hidden');
         document.getElementById('paymentSelection').classList.remove('hidden');
     };
