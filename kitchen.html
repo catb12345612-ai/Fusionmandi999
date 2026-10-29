@@ -8,7 +8,7 @@
   <!-- Fast Load Preconnect & DNS Prefetch -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
   <link rel="dns-prefetch" href="https://www.gstatic.com">
   <link rel="dns-prefetch" href="https://fusionmandi999-36066-default-rtdb.asia-southeast1.firebasedatabase.app">
 
@@ -58,7 +58,7 @@
     .dash-card {
       box-shadow: 0 10px 30px -10px rgba(184, 134, 11, 0.14);
       border: 1px solid #eadbb8;
-      transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.36s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.28s ease;
+      transition: transform 0.34s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.34s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease;
       will-change: transform;
       backface-visibility: hidden;
     }
@@ -67,12 +67,21 @@
       box-shadow: 0 16px 38px -10px rgba(184, 134, 11, 0.22);
     }
 
+    .img-shimmer {
+      background: linear-gradient(110deg, #f7efe0 8%, #fffbf2 18%, #f7efe0 33%);
+      background-size: 200% 100%;
+      animation: shimmerLoad 1.5s linear infinite;
+    }
+    @keyframes shimmerLoad {
+      to { background-position-x: -200%; }
+    }
+
     @keyframes tabGlideIn {
       0% { opacity: 0; transform: translate3d(0, 10px, 0); }
       100% { opacity: 1; transform: translate3d(0, 0, 0); }
     }
     .tab-section:not(.hidden) {
-      animation: tabGlideIn 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation: tabGlideIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     body {
@@ -129,7 +138,7 @@
     .bg-red-600, .bg-red-500,
     .bg-amber-500, .bg-amber-600,
     .gold-gradient, .gold-gradient span,
-    #globalErrorBanner, #connectionBanner, #serviceBadge {
+    #globalErrorBanner, #connectionBanner, #serviceBadge, #cancelLogsBadge, #feedbackBadge {
       color: #ffffff !important;
     }
 
@@ -151,7 +160,7 @@
     /* Form fields */
     input, select, textarea { background-color: #ffffff !important; color: #1c160e !important; border-color: #e2cfa6 !important; }
     input::placeholder, textarea::placeholder { color: #9c8f7a !important; }
-    input:focus, select:focus { border-color: #c59b27 !important; box-shadow: 0 0 0 2px rgba(197, 155, 39, 0.18) !important; }
+    input:focus, select:focus, textarea:focus { border-color: #c59b27 !important; box-shadow: 0 0 0 2px rgba(197, 155, 39, 0.18) !important; }
     option { background-color: #ffffff; color: #1c160e; }
 
     /* Sidebar: Royal Deep Espresso & Gold with crisp light text */
@@ -331,6 +340,41 @@
       <div class="flex gap-2.5">
         <button id="adminPromptCancelBtn" class="flex-1 py-2.5 rounded-xl bg-light border border-primary/30 font-black text-xs text-slate-700 uppercase">Cancel</button>
         <button id="adminPromptOkBtn" class="flex-1 py-2.5 rounded-xl gold-gradient font-black text-xs uppercase shadow-md">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MANDATORY ADMIN / STAFF CANCELLATION REASON MODAL (SAVED SEPARATELY)      -->
+  <!-- ========================================================================= -->
+  <div id="adminCancelReasonModal" class="hidden fixed inset-0 z-[255] bg-black/65 backdrop-blur-sm flex items-center justify-center p-4 no-print">
+    <div class="bg-card border-2 border-red-400 rounded-3xl p-6 max-w-md w-full shadow-2xl">
+      <div class="flex justify-between items-center pb-3 mb-3 border-b border-primary/20">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl bg-red-600 text-white flex items-center justify-center text-lg shadow">🚫</div>
+          <div>
+            <h3 id="adminCancelModalHeader" class="font-serif font-black text-lg text-slate-900">Mandatory Cancellation Reason</h3>
+            <p id="adminCancelModalSub" class="text-xs font-bold text-red-600"></p>
+          </div>
+        </div>
+        <button onclick="closeAdminCancelModal()" class="w-8 h-8 rounded-full bg-light border border-primary/30 font-black text-xs">✕</button>
+      </div>
+
+      <p class="text-[11px] font-bold text-slate-500 mb-2">Select a quick reason or write the exact real reason below (saved to Cancellation Logs):</p>
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        <button type="button" onclick="setAdminCancelPreset('Customer changed mind')" class="px-2.5 py-1 rounded-xl bg-light border border-primary/30 hover:border-primary text-[10px] font-black text-dark transition">Customer changed mind</button>
+        <button type="button" onclick="setAdminCancelPreset('Wrong item punched in POS')" class="px-2.5 py-1 rounded-xl bg-light border border-primary/30 hover:border-primary text-[10px] font-black text-dark transition">Wrong item punched</button>
+        <button type="button" onclick="setAdminCancelPreset('Out of stock in kitchen')" class="px-2.5 py-1 rounded-xl bg-light border border-primary/30 hover:border-primary text-[10px] font-black text-dark transition">Out of stock in kitchen</button>
+        <button type="button" onclick="setAdminCancelPreset('Duplicate order placed')" class="px-2.5 py-1 rounded-xl bg-light border border-primary/30 hover:border-primary text-[10px] font-black text-dark transition">Duplicate order</button>
+        <button type="button" onclick="setAdminCancelPreset('Kitchen delay / taking too long')" class="px-2.5 py-1 rounded-xl bg-light border border-primary/30 hover:border-primary text-[10px] font-black text-dark transition">Kitchen delay</button>
+        <button type="button" onclick="setAdminCancelPreset('Guest walked out')" class="px-2.5 py-1 rounded-xl bg-light border border-primary/30 hover:border-primary text-[10px] font-black text-dark transition">Guest walked out</button>
+      </div>
+
+      <textarea id="adminCancelReasonText" rows="2" placeholder="Enter exact real reason for cancellation (Required)..." class="w-full p-3 rounded-xl bg-light border border-primary/40 text-xs font-bold text-dark outline-none mb-4 resize-none"></textarea>
+
+      <div class="flex gap-2.5">
+        <button onclick="closeAdminCancelModal()" class="flex-1 py-3 rounded-xl bg-light border border-primary/30 font-black text-xs uppercase text-slate-700">Back</button>
+        <button onclick="confirmAdminCancelAction()" class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 transition">🚫 Confirm &amp; Log Reason</button>
       </div>
     </div>
   </div>
@@ -564,7 +608,6 @@
             <button type="button" onclick="addFlexPortionRow('', '')" class="bg-primary/20 hover:bg-primary text-primary hover:text-white border border-primary/40 px-3 py-1.5 rounded-xl text-xs font-black transition">+ Add Portion / Variant</button>
           </div>
 
-          <!-- Quick Preset Portion Pills -->
           <div class="flex flex-wrap gap-1.5 mb-3 pb-3 border-b border-primary/20">
             <span class="text-[10px] font-bold text-slate-500 self-center mr-1">Quick Presets:</span>
             <button type="button" onclick="addFlexPortionRow('Half', '')" class="text-[10px] bg-white hover:bg-amber-50 px-2.5 py-1 rounded-lg font-bold text-slate-700 border border-primary/30">+ Half</button>
@@ -660,19 +703,27 @@
           <span id="liveClockSidebar" class="text-[9px] font-mono text-blue-100 font-bold"></span>
         </div>
       </div>
-      <nav class="flex-1 px-4 py-4 space-y-1.5 overflow-y-auto">
-        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn transition-all">
+      <nav class="flex-1 px-4 py-3 space-y-1.5 overflow-y-auto">
+        <button onclick="switchTab('orders')" id="tab-orders" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-bold text-sm bg-primary/20 text-primary border border-primary/50 tab-btn transition-all">
           <span data-i18n="nav_floor">📦 Active Floor</span>
           <span id="activeOrdersBadge" class="text-[10px] font-black px-2 py-0.5 rounded-full">0</span>
         </button>
-        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden transition-all" data-i18n="nav_pos">🧾 POS Order</button>
-        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden transition-all">
+        <button onclick="switchTab('pos')" id="tab-pos" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden transition-all" data-i18n="nav_pos">🧾 POS Order</button>
+        <button onclick="switchTab('services')" id="tab-services" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden transition-all">
           <div class="flex items-center gap-3" data-i18n="nav_service">🛎️ Service Req</div>
           <span id="serviceBadge" class="hidden bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-black animate-bounce">0</span>
         </button>
-        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden transition-all" data-i18n="nav_menu">🍔 Menu &amp; Food Stock</button>
-        <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden transition-all">🥩 Raw Materials</button>
-        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden transition-all" data-i18n="nav_analytics">📈 Analytics</button>
+        <button onclick="switchTab('cancellations')" id="tab-cancellations" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden transition-all">
+          <div class="flex items-center gap-2">🚫 Cancellations</div>
+          <span id="cancelLogsBadge" class="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
+        </button>
+        <button onclick="switchTab('feedback')" id="tab-feedback" class="w-full flex items-center justify-between px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-waiter-only hidden transition-all">
+          <div class="flex items-center gap-2">⭐ Guest Feedback</div>
+          <span id="feedbackBadge" class="bg-amber-600 text-white text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
+        </button>
+        <button onclick="switchTab('inventory')" id="tab-inventory" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden transition-all" data-i18n="nav_menu">🍔 Menu &amp; Food Stock</button>
+        <button onclick="switchTab('kitchen-inv')" id="tab-kitchen-inv" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden transition-all">🥩 Raw Materials</button>
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-sm text-slate-300 hover:bg-white/5 tab-btn admin-only hidden transition-all" data-i18n="nav_analytics">📈 Analytics</button>
       </nav>
       <div class="p-4 border-t border-white/10 space-y-2">
         <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="w-full py-2 px-3 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center gap-2 hover:bg-white/15 transition">
@@ -744,7 +795,118 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- 3. POS / DIRECT ORDER (WITH DIRECT ADMIN DISCOUNT & PAYMENT SELECTOR)     -->
+        <!-- 3. SEPARATE CANCELLATION REASONS LOG TAB (CUSTOMER + ADMIN)               -->
+        <!-- ========================================================================= -->
+        <section id="view-cancellations" class="tab-section hidden no-print">
+          <div class="bg-card p-6 rounded-3xl dash-card mb-6 border-l-4 border-red-500 flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-red-600 block mb-1">✦ Real-Time Audit Log</span>
+              <h2 class="text-3xl font-black text-slate-900 tracking-tight font-serif">🚫 Order &amp; Item Cancellation Reasons</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Every cancellation by a Customer or Admin is logged separately here with the exact reason.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="exportCancellationsExcel()" class="gold-gradient px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition">📥 Export Cancellations (Excel)</button>
+              <button onclick="clearCancellationLogs()" class="bg-red-50 text-red-600 border border-red-300 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider hover:bg-red-600 hover:text-white transition admin-only hidden">🧹 Clear Logs</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-card p-5 rounded-2xl dash-card border border-primary/30">
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Cancellations</p>
+              <p id="cancelKpiTotal" class="text-2xl font-black text-slate-900 font-serif">0</p>
+            </div>
+            <div class="bg-card p-5 rounded-2xl dash-card border border-amber-300">
+              <p class="text-[10px] font-black uppercase tracking-widest text-amber-800 mb-1">By Customer</p>
+              <p id="cancelKpiCustomer" class="text-2xl font-black text-amber-700 font-serif">0</p>
+            </div>
+            <div class="bg-card p-5 rounded-2xl dash-card border border-red-300">
+              <p class="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">By Admin / Staff</p>
+              <p id="cancelKpiAdmin" class="text-2xl font-black text-red-600 font-serif">0</p>
+            </div>
+            <div class="bg-card p-5 rounded-2xl dash-card border border-primary/40">
+              <p class="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Cancelled Value</p>
+              <p id="cancelKpiValue" class="text-2xl font-black text-primary font-serif">₹0</p>
+            </div>
+          </div>
+
+          <div class="bg-card p-6 rounded-3xl dash-card">
+            <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+              <div class="flex flex-wrap gap-2">
+                <button onclick="setCancelLogFilter('ALL')" id="cflt-ALL" class="cancel-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase gold-gradient shadow">All Logs</button>
+                <button onclick="setCancelLogFilter('Customer')" id="cflt-Customer" class="cancel-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase bg-light border border-primary/30 text-dark">By Customer</button>
+                <button onclick="setCancelLogFilter('ADMIN')" id="cflt-ADMIN" class="cancel-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase bg-light border border-primary/30 text-dark">By Admin / Staff</button>
+              </div>
+              <input type="text" id="cancelSearchInput" oninput="renderCancellationLogs()" placeholder="🔍 Search table, dish, or reason..." class="p-2.5 rounded-xl text-xs font-bold border outline-none w-64">
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm border-collapse">
+                <thead class="bg-sidebar text-white uppercase font-black text-[10px] tracking-widest">
+                  <tr>
+                    <th class="p-3.5 rounded-tl-xl">Date &amp; Time</th>
+                    <th class="p-3.5">Table &amp; Phone</th>
+                    <th class="p-3.5">Cancelled By</th>
+                    <th class="p-3.5">Type</th>
+                    <th class="p-3.5">Cancelled Dish / Order</th>
+                    <th class="p-3.5">Real Reason Provided</th>
+                    <th class="p-3.5 text-right rounded-tr-xl">Value</th>
+                  </tr>
+                </thead>
+                <tbody id="cancellationLogsTableBody" class="divide-y divide-amber-100 font-medium text-slate-700"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 4. GUEST FEEDBACK & 5-STAR REVIEWS PORTAL                                 -->
+        <!-- ========================================================================= -->
+        <section id="view-feedback" class="tab-section hidden no-print">
+          <div class="bg-card p-6 rounded-3xl dash-card mb-6 border-l-4 border-primary flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <span class="text-[10px] font-black uppercase tracking-widest text-primary block mb-1">✦ Voice of the Diner</span>
+              <h2 class="text-3xl font-black text-slate-900 tracking-tight font-serif">⭐ Guest Feedback &amp; Ratings</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Live 5-star ratings, mood tags, and written reviews submitted from customer tables.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="exportFeedbackExcel()" class="gold-gradient px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm active:scale-95 transition">📥 Export Feedback (Excel)</button>
+              <button onclick="clearFeedbackLogs()" class="bg-red-50 text-red-600 border border-red-300 px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider hover:bg-red-600 hover:text-white transition admin-only hidden">🧹 Clear Feedback</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-card p-5 rounded-2xl dash-card border border-primary/40">
+              <p class="text-[10px] font-black uppercase tracking-widest text-primary mb-1">Average Rating</p>
+              <p id="fbKpiAvg" class="text-2xl font-black text-primary font-serif">5.0 ★</p>
+            </div>
+            <div class="bg-card p-5 rounded-2xl dash-card border border-primary/20">
+              <p class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Total Reviews</p>
+              <p id="fbKpiTotal" class="text-2xl font-black text-slate-900 font-serif">0</p>
+            </div>
+            <div class="bg-card p-5 rounded-2xl dash-card border border-emerald-300">
+              <p class="text-[10px] font-black uppercase tracking-widest text-emerald-700 mb-1">😍 4–5★ Royal</p>
+              <p id="fbKpiPositive" class="text-2xl font-black text-emerald-600 font-serif">0</p>
+            </div>
+            <div class="bg-card p-5 rounded-2xl dash-card border border-red-300">
+              <p class="text-[10px] font-black uppercase tracking-widest text-red-600 mb-1">😞 Needs Action (1–3★)</p>
+              <p id="fbKpiAttention" class="text-2xl font-black text-red-600 font-serif">0</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+            <div class="flex flex-wrap gap-2">
+              <button onclick="setFeedbackFilter('ALL')" id="fflt-ALL" class="fb-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase gold-gradient shadow">All Reviews</button>
+              <button onclick="setFeedbackFilter('HIGH')" id="fflt-HIGH" class="fb-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase bg-white border border-primary/30 text-dark">😍 4–5★ Royal</button>
+              <button onclick="setFeedbackFilter('LOW')" id="fflt-LOW" class="fb-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase bg-white border border-primary/30 text-dark">😞 1–3★ Needs Follow-up</button>
+            </div>
+            <input type="text" id="feedbackSearchInput" oninput="renderFeedbackGrid()" placeholder="🔍 Search review, table, or tag..." class="p-2.5 rounded-xl text-xs font-bold border outline-none w-64">
+          </div>
+
+          <div id="feedbackCardsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </section>
+
+        <!-- ========================================================================= -->
+        <!-- 5. POS / DIRECT ORDER (WITH DIRECT ADMIN DISCOUNT & PAYMENT SELECTOR)     -->
         <!-- ========================================================================= -->
         <section id="view-pos" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-6 tracking-tight font-serif" data-i18n="title_pos">POS / Direct Order</h2>
@@ -876,7 +1038,7 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- 4. FLEXIBLE INVENTORY, PORTIONS/VARIANTS & MENU CONTROL                   -->
+        <!-- 6. FLEXIBLE INVENTORY, PORTIONS/VARIANTS & MENU CONTROL                   -->
         <!-- ========================================================================= -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight font-serif" data-i18n="title_menu">Menu &amp; Food Stock Control</h2>
@@ -985,7 +1147,7 @@
           <div id="inventoryList" class="grid grid-cols-1 xl:grid-cols-2 gap-4"></div>
         </section>
 
-        <!-- 5. Premium Raw Material Kitchen Inventory -->
+        <!-- 7. Premium Raw Material Kitchen Inventory -->
         <section id="view-kitchen-inv" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight font-serif">🥩 Kitchen Raw Materials</h2>
 
@@ -1023,7 +1185,7 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- 6. EXECUTIVE ANALYTICS DASHBOARD & ITEM SALES INTELLIGENCE                -->
+        <!-- 8. EXECUTIVE ANALYTICS DASHBOARD & CLEAR DAILY DATA WITH AUTO EXCEL       -->
         <!-- ========================================================================= -->
         <section id="view-dashboard" class="tab-section hidden">
           <div class="flex justify-between items-center mb-8 no-print flex-wrap gap-3">
@@ -1031,9 +1193,10 @@
               <span class="text-[10px] font-black uppercase tracking-widest text-primary block mb-1">✦ Executive Financial &amp; Item Intelligence</span>
               <h2 class="text-3xl font-black text-slate-900 tracking-tight font-serif" data-i18n="title_analytics">Analytics Dashboard</h2>
             </div>
-            <div class="flex items-center gap-3 flex-wrap">
-              <button onclick="exportTodayExcel()" class="bg-emerald-50 text-emerald-700 border border-emerald-300 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Auto-Download Today's Excel</button>
-              <button onclick="exportAllLogsExcel()" class="gold-gradient px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all">📥 Full History (Excel)</button>
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button onclick="exportTodayExcel()" class="bg-emerald-50 text-emerald-700 border border-emerald-300 px-4 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-emerald-600 hover:text-white transition-all">📥 Download Today's Excel</button>
+              <button onclick="clearDailyDataWithAutoExcel()" class="gold-gradient px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all">📥🧹 Clear Daily Data (Auto-Download Excel)</button>
+              <button onclick="exportAllLogsExcel()" class="bg-white text-primary border border-primary/40 px-4 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-primary hover:text-white transition-all">📥 Full History (Excel)</button>
             </div>
           </div>
 
@@ -1075,7 +1238,6 @@
 
             <!-- Dual Smooth Animated Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10 no-print">
-              <!-- Chart 1: Revenue by Payment Channel -->
               <div class="lg:col-span-5 bg-light rounded-3xl p-5 border border-primary/20 shadow-inner flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                   <div>
@@ -1088,7 +1250,6 @@
                 </div>
               </div>
 
-              <!-- Chart 2: Top Selling Dishes Horizontal Bar Chart -->
               <div class="lg:col-span-7 bg-light rounded-3xl p-5 border border-primary/20 shadow-inner flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                   <div>
@@ -1147,9 +1308,14 @@
             </div>
 
             <div class="mt-12 pt-8 border-t border-primary/20 text-center no-print flex flex-wrap justify-center gap-4">
-              <button onclick="clearDashboardRevenue()" class="bg-red-50 text-red-600 border border-red-300 px-5 py-3 rounded-xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-red-600 hover:text-white transition-all">🧹 Clear Dashboard &amp; Revenue (₹0)</button>
-              <button onclick="factoryResetSystem()" class="bg-red-500 text-white border border-red-600 px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md">
-                ⚠️ FACTORY RESET: Load Full Default Menu
+              <button onclick="clearDailyDataWithAutoExcel()" class="gold-gradient px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-lg active:scale-95 transition-all">
+                📥🧹 End Day: Auto-Download Excel &amp; Clear Daily Data (₹0)
+              </button>
+              <button onclick="startCompletelyNewSystem()" class="bg-red-50 text-red-600 border border-red-300 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider shadow-sm hover:bg-red-600 hover:text-white transition-all">
+                🆕 Start Completely New (Wipe All Old Data)
+              </button>
+              <button onclick="factoryResetSystem()" class="bg-red-500 text-white border border-red-600 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all shadow-md">
+                ⚠️ Reload Default Menu
               </button>
             </div>
           </div>
@@ -1173,7 +1339,6 @@
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
     const SUPPORT_WHATSAPP_NUMBER = "919133433655";
 
-    // Probe local logo if available on the user's server
     (function tryResolveAdminLocalLogo() {
       const el = document.getElementById('adminDevLogo');
       const localPath = el && el.getAttribute('data-local-src');
@@ -1183,7 +1348,15 @@
       probe.src = localPath;
     })();
 
-    // Non-blocking Custom Alert / Confirm / Prompt Replacements
+    // Fast-loading optimized image URLs (w=360&q=75&auto=format) for zero image lag
+    function optimizeImgUrl(url) {
+      if (!url || typeof url !== 'string') return "https://images.unsplash.com/photo-1544025162-8111142154ea?w=360&q=75&auto=format&fit=crop";
+      if (url.includes('images.unsplash.com')) {
+        return url.replace(/w=\d+/, 'w=360').replace(/q=\d+/, 'q=75') + (url.includes('auto=format') ? '' : '&auto=format&fit=crop');
+      }
+      return url;
+    }
+
     function alert(msg) {
       showGlobalToast(String(msg || ''), 'error');
     }
@@ -1234,6 +1407,9 @@
     let couponsCache = {};
     let rawMatsCache = {};
     let dailyLogsCache = {};
+    let cancellationLogsCache = {};
+    let feedbackCache = {};
+    let currentTallyCache = { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
     let dbConnected = false;
     let connBannerTimer = null;
     let chartInstance = null;
@@ -1247,9 +1423,10 @@
     let activePendingServiceList = [];
     let pendingImageUpdateItemId = null;
     let currentFloorFilter = 'ALL';
+    let currentCancelLogFilter = 'ALL';
+    let currentFeedbackFilter = 'ALL';
     let currentAdminLang = 'en';
 
-    // Shared Audio Context for reliable loud alerts
     let adminAudioCtx = null;
     function getAdminAudioCtx() {
       try {
@@ -1270,7 +1447,6 @@
       window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
     }
 
-    // Core Multilingual Speech Engine (English / Hindi / Telugu)
     window.speakPosAlert = function(enText, hiText, teText) {
       try {
         if (!('speechSynthesis' in window)) return;
@@ -1299,7 +1475,6 @@
       } catch(e) {}
     };
 
-    // Loud Dual-Strike Reception Desk Bell Sound for Customer Service Requests
     window.playServiceBellAlarm = function() {
       const ctx = getAdminAudioCtx();
       if (!ctx) return;
@@ -1330,7 +1505,6 @@
       } catch(e) {}
     };
 
-    // Cash Register / Bill Request Chime
     window.playBillRequestChime = function() {
       const ctx = getAdminAudioCtx();
       if (!ctx) return;
@@ -1352,7 +1526,6 @@
       } catch(e) {}
     };
 
-    // 1. Spoken Voice Announcement for Service Calls
     window.speakServiceCall = function(tableNum, reqType, customNote) {
       const cleanTable = String(tableNum || '').replace(/^TA(\d+)$/i, 'Takeaway $1');
       const cleanType = String(reqType || 'Assistance');
@@ -1365,7 +1538,6 @@
       speakPosAlert(en, hi, te);
     };
 
-    // 2. Spoken Voice Announcement for Incoming New Food Orders
     window.triggerNewOrderAlert = function(orderObj) {
       playAlarmTone();
       if (!orderObj) return;
@@ -1384,7 +1556,6 @@
       }, 650);
     };
 
-    // 3. Spoken Voice Announcement for Customer Bill Requests
     window.triggerBillRequestAlert = function(orderObj) {
       playBillRequestChime();
       if (!orderObj) return;
@@ -1438,17 +1609,17 @@
     }, 1000);
 
     function getDefaultMasterMenu() {
-      const IVM = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80";
-      const ICM = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80";
-      const IMM = "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&q=80";
-      const IFM = "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80";
-      const IPM = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80";
-      const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
-      const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80";
-      const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&q=80";
-      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
-      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
-      const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
+      const IVM = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=360&q=75&auto=format&fit=crop";
+      const ICM = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=360&q=75&auto=format&fit=crop";
+      const IMM = "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=360&q=75&auto=format&fit=crop";
+      const IFM = "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=360&q=75&auto=format&fit=crop";
+      const IPM = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=360&q=75&auto=format&fit=crop";
+      const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=360&q=75&auto=format&fit=crop";
+      const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=360&q=75&auto=format&fit=crop";
+      const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=360&q=75&auto=format&fit=crop";
+      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=360&q=75&auto=format&fit=crop";
+      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=360&q=75&auto=format&fit=crop";
+      const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=360&q=75&auto=format&fit=crop";
       const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
       const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
       const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
@@ -1487,11 +1658,11 @@
         'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
         'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
         'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
-        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
-        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=500&q=80" },
-        'ex7': { name: "Arabian Kunafa Dessert", category: "Beverages", base_price: 180, stock_count: 80, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=500&q=80" },
-        'ex8': { name: "Mint Mojito Cooler", category: "Beverages", base_price: 99, stock_count: 120, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80" },
+        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=360&q=75&auto=format&fit=crop" },
+        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=360&q=75&auto=format&fit=crop" },
+        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=360&q=75&auto=format&fit=crop" },
+        'ex7': { name: "Arabian Kunafa Dessert", category: "Beverages", base_price: 180, stock_count: 80, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=360&q=75&auto=format&fit=crop" },
+        'ex8': { name: "Mint Mojito Cooler", category: "Beverages", base_price: 99, stock_count: 120, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=360&q=75&auto=format&fit=crop" },
         'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
@@ -1531,7 +1702,6 @@
       };
     }
 
-    // Pre-populate menuCache immediately for fast 0ms initial render
     menuCache = getDefaultMasterMenu();
 
     function compressImageFile(file, maxWidth = 600, quality = 0.78) {
@@ -1683,8 +1853,8 @@
       const rawStr = tableData.items || '';
       if (!rawStr) return fallback;
       rawStr.split('|').map(s => s.trim()).filter(Boolean).forEach((part, idx) => {
-        const cancelled = part.includes('[CANCELLED]');
-        const clean = part.replace('[CANCELLED]', '').trim();
+        const cancelled = part.includes('[CANCELLED');
+        const clean = part.replace(/\[CANCELLED.*?\]/g, '').trim();
         const m = clean.match(/^(\d+)x\s+(.+?)(?:\s+\((.+)\))?$/i);
         if (m) {
           const qty = parseInt(m[1]) || 1;
@@ -1763,6 +1933,8 @@
       });
       document.getElementById(`view-${tab}`).classList.remove('hidden');
       if (tab === 'pos') renderPosMenu();
+      if (tab === 'cancellations') renderCancellationLogs();
+      if (tab === 'feedback') renderFeedbackGrid();
       if (tab === 'dashboard') {
         if (chartInstance) chartInstance.update();
         if (topItemsChartInstance) topItemsChartInstance.update();
@@ -1774,14 +1946,31 @@
     function loadSystem() {
       if(!db) return;
 
-      // Render immediately from default cache before Firebase finishes
+      // One-time Automatic Fresh Start v7 Check: wipes old test data and seeds fresh master menu
+      db.ref('system_meta/fresh_start_v7').once('value').then(snap => {
+        if (!snap.val()) {
+          Promise.all([
+            db.ref('active_tables').remove(),
+            db.ref('tallies').remove(),
+            db.ref('daily_logs').remove(),
+            db.ref('service_requests').remove(),
+            db.ref('cancellation_logs').remove(),
+            db.ref('feedback').remove(),
+            db.ref('menu').set(getDefaultMasterMenu()),
+            db.ref('system_meta/fresh_start_v7').set({ initializedAt: Date.now() })
+          ]).then(() => {
+            showGlobalToast("🆕 Fresh Start Activated: Old data wiped & system initialized clean!", "success");
+          });
+        }
+      }).catch(() => {});
+
       if(currentRole === 'admin') {
         renderInventory();
         renderDrinksDessertsSpotlight();
       }
       renderPosMenu();
 
-      // Sync Menu & Auto-Seed if empty
+      // Sync Menu
       db.ref('menu').on('value', snap => {
         const rawMenu = snap.val() || {};
         const loaded = {};
@@ -1822,6 +2011,24 @@
             showGlobalToast(`KITCHEN ALERT: ${mat.name} is running low (${mat.stock} ${mat.unit} left!)`, 'error');
           }
         });
+      });
+
+      // Sync Separate Cancellation Logs (Customer + Admin)
+      db.ref('cancellation_logs').on('value', snap => {
+        cancellationLogsCache = snap.val() || {};
+        const count = Object.keys(cancellationLogsCache).length;
+        const badge = document.getElementById('cancelLogsBadge');
+        if (badge) badge.textContent = count;
+        renderCancellationLogs();
+      });
+
+      // Sync Guest Feedback
+      db.ref('feedback').on('value', snap => {
+        feedbackCache = snap.val() || {};
+        const count = Object.keys(feedbackCache).length;
+        const badge = document.getElementById('feedbackBadge');
+        if (badge) badge.textContent = count;
+        renderFeedbackGrid();
       });
 
       // Sync Active Floor Orders
@@ -1961,6 +2168,7 @@
 
         db.ref(`tallies/daily/${dStr}`).on('value', s => {
           const data = s.val() || { total: 0, cash: 0, upi: 0, card: 0, orderCount: 0 };
+          currentTallyCache = data;
           const total = Number(data.total) || 0;
           const orders = Number(data.orderCount) || 0;
           const avg = orders > 0 ? Math.round(total / orders) : 0;
@@ -2020,6 +2228,293 @@
         osc.stop(ctx.currentTime + 0.6);
       } catch(e) {}
     }
+
+    /* ========================================================================= */
+    /* MANDATORY CANCELLATION REASON LOGGING & SEPARATE ADMIN TAB                */
+    /* ========================================================================= */
+    let pendingAdminCancelConfig = null;
+
+    function openAdminCancelReasonModal(config) {
+      pendingAdminCancelConfig = config;
+      document.getElementById('adminCancelModalHeader').textContent = config.title || 'Mandatory Cancellation Reason';
+      document.getElementById('adminCancelModalSub').textContent = config.subtitle || '';
+      document.getElementById('adminCancelReasonText').value = '';
+      document.getElementById('adminCancelReasonModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('adminCancelReasonText')?.focus(), 80);
+    }
+
+    window.closeAdminCancelModal = function() {
+      pendingAdminCancelConfig = null;
+      document.getElementById('adminCancelReasonModal').classList.add('hidden');
+    };
+
+    window.setAdminCancelPreset = function(reasonStr) {
+      const inp = document.getElementById('adminCancelReasonText');
+      if (inp) inp.value = reasonStr;
+    };
+
+    window.confirmAdminCancelAction = function() {
+      if (!pendingAdminCancelConfig) return;
+      const reason = (document.getElementById('adminCancelReasonText')?.value || '').trim();
+      if (!reason || reason.length < 3) {
+        return showGlobalToast("Please select or write the real reason for cancellation!", "error");
+      }
+
+      const cfg = pendingAdminCancelConfig;
+      const dStr = new Date().toISOString().split('T')[0];
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const logEntry = sanitizeForFirebase({
+        date: dStr,
+        time: timeStr,
+        timestamp: Date.now(),
+        table: String(cfg.table || 'N/A'),
+        phone: String(cfg.phone || 'Walk-in'),
+        cancelledBy: (currentRole || 'admin').toUpperCase(),
+        cancelType: cfg.cancelType || 'Item Cancelled',
+        items: String(cfg.itemsDesc || ''),
+        amount: Number(cfg.amount) || 0,
+        reason: reason
+      });
+
+      db.ref('cancellation_logs').push(logEntry).then(() => {
+        if (cfg.onExecute) cfg.onExecute(reason);
+        closeAdminCancelModal();
+      }).catch(err => {
+        showGlobalToast("Failed to log cancellation: " + err.message, "error");
+      });
+    };
+
+    window.setCancelLogFilter = function(flt) {
+      currentCancelLogFilter = flt;
+      ['ALL', 'Customer', 'ADMIN'].forEach(k => {
+        const b = document.getElementById(`cflt-${k}`);
+        if (!b) return;
+        if (k === flt) {
+          b.className = 'cancel-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase gold-gradient shadow';
+        } else {
+          b.className = 'cancel-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase bg-light border border-primary/30 text-dark';
+        }
+      });
+      renderCancellationLogs();
+    };
+
+    window.renderCancellationLogs = function() {
+      const tbody = document.getElementById('cancellationLogsTableBody');
+      if (!tbody) return;
+
+      const entries = Object.values(cancellationLogsCache || {}).filter(Boolean).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+      let custCount = 0;
+      let admCount = 0;
+      let totalVal = 0;
+
+      entries.forEach(e => {
+        if ((e.cancelledBy || '').toLowerCase() === 'customer') custCount++;
+        else admCount++;
+        totalVal += (Number(e.amount) || 0);
+      });
+
+      if (document.getElementById('cancelKpiTotal')) document.getElementById('cancelKpiTotal').textContent = entries.length;
+      if (document.getElementById('cancelKpiCustomer')) document.getElementById('cancelKpiCustomer').textContent = custCount;
+      if (document.getElementById('cancelKpiAdmin')) document.getElementById('cancelKpiAdmin').textContent = admCount;
+      if (document.getElementById('cancelKpiValue')) document.getElementById('cancelKpiValue').textContent = `₹${totalVal.toLocaleString('en-IN')}`;
+
+      const searchQ = (document.getElementById('cancelSearchInput')?.value || '').trim().toLowerCase();
+      const filtered = entries.filter(e => {
+        if (currentCancelLogFilter === 'Customer' && (e.cancelledBy || '').toLowerCase() !== 'customer') return false;
+        if (currentCancelLogFilter === 'ADMIN' && (e.cancelledBy || '').toLowerCase() === 'customer') return false;
+        if (searchQ) {
+          const hay = `${e.table} ${e.phone} ${e.items} ${e.reason} ${e.cancelledBy}`.toLowerCase();
+          if (!hay.includes(searchQ)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400 font-bold">No cancellations recorded matching your filter.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(e => {
+        const isCust = (e.cancelledBy || '').toLowerCase() === 'customer';
+        const byBadge = isCust
+          ? `<span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300 font-black text-[10px] uppercase">👤 Customer</span>`
+          : `<span class="px-2.5 py-1 rounded-full bg-red-50 text-red-600 border border-red-300 font-black text-[10px] uppercase">🛡️ ${e.cancelledBy || 'ADMIN'}</span>`;
+
+        return `
+          <tr class="hover:bg-amber-50/50 transition">
+            <td class="p-3.5 text-xs font-mono text-slate-600">${e.date || ''}<br><b>${e.time || ''}</b></td>
+            <td class="p-3.5">
+              <span class="bg-primary/10 text-primary border border-primary/40 px-2.5 py-0.5 rounded-lg font-black text-xs">T-${e.table}</span>
+              <span class="block text-[10px] text-slate-500 font-bold mt-0.5">📞 ${e.phone || 'Walk-in'}</span>
+            </td>
+            <td class="p-3.5">${byBadge}</td>
+            <td class="p-3.5 text-xs font-black text-slate-700 uppercase">${e.cancelType || 'Item'}</td>
+            <td class="p-3.5 text-xs font-bold text-slate-900">${e.items || ''}</td>
+            <td class="p-3.5">
+              <div class="p-2 rounded-xl bg-red-50/70 border border-red-200 text-xs font-black text-red-700">
+                "${e.reason || 'No reason provided'}"
+              </div>
+            </td>
+            <td class="p-3.5 font-black text-right text-red-600 text-sm">₹${Number(e.amount) || 0}</td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.exportCancellationsExcel = function() {
+      const entries = Object.values(cancellationLogsCache || {}).filter(Boolean);
+      if (entries.length === 0) return showGlobalToast("No cancellation logs to export.", "error");
+      const rows = entries.map(e => ({
+        Date: e.date || '',
+        Time: e.time || '',
+        Table: e.table || '',
+        Phone: e.phone || '',
+        Cancelled_By: e.cancelledBy || '',
+        Cancel_Type: e.cancelType || '',
+        Items_Cancelled: e.items || '',
+        Real_Reason: e.reason || '',
+        Value_INR: Number(e.amount) || 0
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Cancellation_Reasons");
+      XLSX.writeFile(wb, `MandiCroods_Cancellations_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
+    window.clearCancellationLogs = function() {
+      askAdminConfirm("Clear Cancellation Logs", "Remove all recorded cancellation logs?", () => {
+        db.ref('cancellation_logs').remove().then(() => showGlobalToast("Cancellation logs cleared!", "success"));
+      });
+    };
+
+    /* ========================================================================= */
+    /* GUEST FEEDBACK & 5-STAR REVIEWS MANAGEMENT TAB                            */
+    /* ========================================================================= */
+    window.setFeedbackFilter = function(flt) {
+      currentFeedbackFilter = flt;
+      ['ALL', 'HIGH', 'LOW'].forEach(k => {
+        const b = document.getElementById(`fflt-${k}`);
+        if (!b) return;
+        if (k === flt) {
+          b.className = 'fb-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase gold-gradient shadow';
+        } else {
+          b.className = 'fb-flt-btn px-3.5 py-1.5 rounded-xl text-xs font-black uppercase bg-white border border-primary/30 text-dark';
+        }
+      });
+      renderFeedbackGrid();
+    };
+
+    window.renderFeedbackGrid = function() {
+      const grid = document.getElementById('feedbackCardsGrid');
+      if (!grid) return;
+
+      const entries = Object.entries(feedbackCache || {})
+        .filter(([, f]) => f && typeof f === 'object')
+        .map(([key, f]) => ({ key, ...f }))
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+      let sumStars = 0;
+      let positiveCnt = 0;
+      let attentionCnt = 0;
+
+      entries.forEach(f => {
+        const st = Number(f.stars) || (f.rating === 'Bad' ? 2 : (f.rating === 'Good' ? 4 : 5));
+        sumStars += st;
+        if (st >= 4) positiveCnt++;
+        else attentionCnt++;
+      });
+
+      const avgStars = entries.length > 0 ? (sumStars / entries.length).toFixed(1) : '5.0';
+      if (document.getElementById('fbKpiAvg')) document.getElementById('fbKpiAvg').textContent = `${avgStars} ★`;
+      if (document.getElementById('fbKpiTotal')) document.getElementById('fbKpiTotal').textContent = entries.length;
+      if (document.getElementById('fbKpiPositive')) document.getElementById('fbKpiPositive').textContent = positiveCnt;
+      if (document.getElementById('fbKpiAttention')) document.getElementById('fbKpiAttention').textContent = attentionCnt;
+
+      const searchQ = (document.getElementById('feedbackSearchInput')?.value || '').trim().toLowerCase();
+      const filtered = entries.filter(f => {
+        const st = Number(f.stars) || (f.rating === 'Bad' ? 2 : (f.rating === 'Good' ? 4 : 5));
+        if (currentFeedbackFilter === 'HIGH' && st < 4) return false;
+        if (currentFeedbackFilter === 'LOW' && st >= 4) return false;
+        if (searchQ) {
+          const hay = `${f.table} ${f.phone} ${f.guestName || ''} ${f.note || ''} ${(f.tags || []).join(' ')}`.toLowerCase();
+          if (!hay.includes(searchQ)) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full bg-card p-10 rounded-3xl text-center border border-primary/20 text-slate-400 font-bold text-sm">No guest feedback entries found.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(f => {
+        const st = Number(f.stars) || (f.rating === 'Bad' ? 2 : (f.rating === 'Good' ? 4 : 5));
+        const starIcons = '⭐'.repeat(Math.max(1, Math.min(5, st)));
+        const moodEmoji = f.rating === 'Bad' ? '😞' : (f.rating === 'Okay' ? '😐' : (f.rating === 'Good' ? '😋' : '😍'));
+        const tagsHtml = Array.isArray(f.tags) && f.tags.length > 0
+          ? `<div class="flex flex-wrap gap-1 mt-2">${f.tags.map(t => `<span class="px-2 py-0.5 rounded-lg bg-primary/10 text-primary border border-primary/30 text-[10px] font-black">${t}</span>`).join('')}</div>`
+          : '';
+        const dateTimeStr = f.date ? `${f.date} ${f.time || ''}` : new Date(f.timestamp || Date.now()).toLocaleString();
+
+        return `
+          <div class="dash-card bg-card p-5 rounded-3xl border ${st <= 3 ? 'border-red-300' : 'border-primary/30'} flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start gap-2 mb-2">
+                <div>
+                  <span class="bg-primary/10 text-primary border border-primary/40 px-2.5 py-0.5 rounded-lg font-black text-xs">Table ${f.table || 'N/A'}</span>
+                  <h4 class="font-black text-slate-900 text-sm mt-1">${f.guestName || 'Valued Guest'} <span class="text-xs font-bold text-slate-500">(${f.phone || 'Guest'})</span></h4>
+                </div>
+                <div class="text-right">
+                  <span class="text-lg">${moodEmoji}</span>
+                  <div class="text-xs">${starIcons}</div>
+                </div>
+              </div>
+              <p class="p-3 rounded-2xl bg-light border border-primary/20 text-xs font-bold text-slate-800 italic">"${f.note || ''}"</p>
+              ${tagsHtml}
+            </div>
+            <div class="flex items-center justify-between pt-3 mt-3 border-t border-primary/15">
+              <span class="text-[10px] font-mono font-bold text-slate-400">${dateTimeStr}</span>
+              <button onclick="replyFeedbackWhatsApp('${f.phone || ''}', '${(f.guestName || 'Guest').replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-300 text-[10px] font-black uppercase transition">💬 Thank on WhatsApp</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.replyFeedbackWhatsApp = function(phone, guestName) {
+      const clean = String(phone || '').replace(/\D/g, '');
+      if (!clean || clean.length < 10) return showGlobalToast("Guest phone number not available.", "error");
+      const fullPhone = clean.length === 10 ? '91' + clean : clean;
+      const msg = `Greetings ${guestName} from Mandi Croods Management! 👑 Thank you so much for sharing your valuable feedback with us. We look forward to hosting you again soon!`;
+      window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
+    window.exportFeedbackExcel = function() {
+      const entries = Object.values(feedbackCache || {}).filter(Boolean);
+      if (entries.length === 0) return showGlobalToast("No feedback entries to export.", "error");
+      const rows = entries.map(f => ({
+        Date: f.date || new Date(f.timestamp || Date.now()).toLocaleDateString(),
+        Time: f.time || new Date(f.timestamp || Date.now()).toLocaleTimeString(),
+        Table: f.table || '',
+        Guest_Name: f.guestName || 'Guest',
+        Phone: f.phone || '',
+        Stars: Number(f.stars) || 5,
+        Mood: f.rating || '',
+        Highlights: Array.isArray(f.tags) ? f.tags.join(', ') : '',
+        Review_Note: f.note || ''
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Guest_Feedback");
+      XLSX.writeFile(wb, `MandiCroods_Feedback_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
+    window.clearFeedbackLogs = function() {
+      askAdminConfirm("Clear Feedback Logs", "Delete all guest feedback records?", () => {
+        db.ref('feedback').remove().then(() => showGlobalToast("Feedback logs cleared!", "success"));
+      });
+    };
 
     /* ========================================================================= */
     /* DIRECT ADMIN DISCOUNT FUNCTIONS (FLOOR CARD, LIVE EDITOR MODAL, POS)      */
@@ -2103,7 +2598,6 @@
       if (coup && dVal === 0) coup.value = '';
       updatePosCartUI();
 
-      // If an occupied table is currently selected in POS and POS cart is empty, apply immediately
       const tNum = document.getElementById('posTableNum')?.value;
       const tableId = `table_${tNum}`;
       if (tNum && window.currentTables && window.currentTables[tableId] && Object.keys(posCart).length === 0) {
@@ -2152,7 +2646,7 @@
             animation: {
               animateScale: true,
               animateRotate: true,
-              duration: 1100,
+              duration: 1000,
               easing: 'easeOutQuart'
             },
             plugins: {
@@ -2185,7 +2679,7 @@
             responsive: true,
             maintainAspectRatio: false,
             animation: {
-              duration: 1000,
+              duration: 900,
               easing: 'easeOutQuart'
             },
             plugins: {
@@ -2214,10 +2708,7 @@
       }
     }
 
-    window.renderSoldItemsBreakdown = function() {
-      const tbody = document.getElementById('itemSalesBreakdownTable');
-      if (!tbody) return;
-
+    function computeSortedItemSalesList() {
       const itemStats = {};
 
       const recordItemSale = (rawName, variant, qty, unitPrice) => {
@@ -2245,7 +2736,7 @@
       Object.values(dailyLogsCache || {}).forEach(log => {
         if (!log || !log.items) return;
         log.items.split('|').map(s => s.trim()).filter(Boolean).forEach(part => {
-          if (part.includes('[CANCELLED]')) return;
+          if (part.includes('[CANCELLED')) return;
           const m = part.match(/^(\d+)x\s+(.+?)(?:\s+\((.+)\))?$/i);
           if (m) {
             const qty = parseInt(m[1]) || 1;
@@ -2267,7 +2758,14 @@
         });
       });
 
-      const sorted = Object.values(itemStats).sort((a, b) => b.totalQty - a.totalQty);
+      return Object.values(itemStats).sort((a, b) => b.totalQty - a.totalQty);
+    }
+
+    window.renderSoldItemsBreakdown = function() {
+      const tbody = document.getElementById('itemSalesBreakdownTable');
+      if (!tbody) return;
+
+      const sorted = computeSortedItemSalesList();
       const totalUnitsAll = sorted.reduce((acc, it) => acc + it.totalQty, 0);
 
       const unitsKpi = document.getElementById('tallyItemsSoldCount');
@@ -2409,10 +2907,10 @@
 
       const newQty = (Number(liObj[lineKey].qty) || 1) + delta;
       if (newQty <= 0) {
-        delete liObj[lineKey];
-      } else {
-        liObj[lineKey].qty = newQty;
+        editModalDeleteLine(lineKey);
+        return;
       }
+      liObj[lineKey].qty = newQty;
       syncEditedTableToFirebase(activeEditTableId, liObj);
       showGlobalToast("Order quantity updated!", "success");
     };
@@ -2425,10 +2923,28 @@
         return showGlobalToast("KOT already printed — item removal is locked.", "error");
       }
       const liObj = ensureLineItemsObject(tbl);
-      delete liObj[lineKey];
-      if (replaceModeLineKey === lineKey) cancelReplaceMode();
-      syncEditedTableToFirebase(activeEditTableId, liObj);
-      showGlobalToast("Item removed from order", "success");
+      const targetItem = liObj[lineKey];
+      if (!targetItem) return;
+
+      const itemDesc = `${targetItem.qty}x ${targetItem.name} (${targetItem.variant || 'Regular'})`;
+      const itemVal = (Number(targetItem.price) || 0) * (Number(targetItem.qty) || 1);
+
+      openAdminCancelReasonModal({
+        title: `Cancel Item — Table ${tbl.table}`,
+        subtitle: `${itemDesc} (₹${itemVal})`,
+        table: tbl.table,
+        phone: tbl.phone || 'Walk-in',
+        cancelType: 'Single Item (Editor)',
+        itemsDesc: itemDesc,
+        amount: itemVal,
+        onExecute: (reason) => {
+          const freshObj = ensureLineItemsObject(window.currentTables[activeEditTableId] || tbl);
+          delete freshObj[lineKey];
+          if (replaceModeLineKey === lineKey) cancelReplaceMode();
+          syncEditedTableToFirebase(activeEditTableId, freshObj);
+          showGlobalToast(`Item removed & reason logged: "${reason}"`, "success");
+        }
+      });
     };
 
     window.editModalSelectMenuItem = function(itemId) {
@@ -2537,7 +3053,7 @@
                   <button onclick="startReplaceItemMode('${lineKey}', '${safeName}')" class="px-2.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition ${isBeingReplaced ? 'bg-amber-500 text-white' : 'bg-amber-50 hover:bg-amber-500 text-amber-800 hover:text-white border border-amber-300'}">
                     🔄 ${isBeingReplaced ? 'Select New Dish →' : 'Replace Item'}
                   </button>
-                  <button onclick="editModalDeleteLine('${lineKey}')" class="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-500 text-red-600 hover:text-white text-[10px] font-black uppercase transition border border-red-200" title="Remove Item">🗑️</button>`}
+                  <button onclick="editModalDeleteLine('${lineKey}')" class="px-2.5 py-1.5 rounded-lg bg-red-50 hover:bg-red-500 text-red-600 hover:text-white text-[10px] font-black uppercase transition border border-red-200" title="Cancel Item with Reason">🗑️</button>`}
                 </div>
               </div>
             </div>
@@ -2580,7 +3096,7 @@
           <div class="p-3 rounded-2xl bg-light border ${isReplacing ? 'border-amber-300 hover:border-amber-400' : 'border-primary/20 hover:border-primary'} flex flex-col justify-between transition">
             <div>
               <div class="flex items-center gap-2.5">
-                <img src="${item.image_url}" class="w-12 h-12 rounded-xl object-cover border border-primary/20 shrink-0" loading="lazy" alt="${item.name}">
+                <img src="${optimizeImgUrl(item.image_url)}" class="w-12 h-12 rounded-xl object-cover border border-primary/20 shrink-0 img-shimmer" loading="lazy" decoding="async" alt="${item.name}">
                 <div class="min-w-0">
                   <h5 class="font-black text-xs text-slate-900 truncate">${item.name}</h5>
                   <span class="text-[9px] font-bold text-slate-500 block truncate">${item.category || ''}</span>
@@ -2797,7 +3313,7 @@
         grid.innerHTML += `
           <div class="bg-light p-4 rounded-2xl border border-primary/30 flex items-center gap-3.5 shadow-sm">
             <div class="relative w-16 h-16 shrink-0">
-              <img src="${item.image_url}" class="w-16 h-16 rounded-xl object-cover border border-primary/50" loading="lazy" alt="${item.name}">
+              <img src="${optimizeImgUrl(item.image_url)}" class="w-16 h-16 rounded-xl object-cover border border-primary/50 img-shimmer" loading="lazy" decoding="async" alt="${item.name}">
               <button onclick="triggerItemPhotoUpdate('${id}')" class="absolute -bottom-1 -right-1 gold-gradient rounded-full w-7 h-7 flex items-center justify-center text-xs font-black shadow-md active:scale-90" title="Upload new photo from phone">📷</button>
             </div>
             <div class="flex-1 min-w-0">
@@ -2909,7 +3425,7 @@
           <div class="bg-card p-4 rounded-2xl border border-primary/20 hover:border-primary transition flex flex-col justify-between gap-3 dash-card">
             <div class="flex items-start justify-between gap-3.5">
               <div class="relative w-16 h-16 shrink-0">
-                <img src="${item.image_url}" class="w-16 h-16 rounded-xl object-cover border border-primary/40" loading="lazy" alt="${item.name}">
+                <img src="${optimizeImgUrl(item.image_url)}" class="w-16 h-16 rounded-xl object-cover border border-primary/40 img-shimmer" loading="lazy" decoding="async" alt="${item.name}">
                 <button onclick="triggerItemPhotoUpdate('${id}')" class="absolute -bottom-1 -right-1 gold-gradient rounded-full w-6 h-6 flex items-center justify-center text-[10px] font-black shadow" title="Change Photo">📷</button>
               </div>
               <div class="flex-1 min-w-0">
@@ -2919,7 +3435,6 @@
                 </div>
                 <span class="text-[10px] font-bold text-slate-500 block">${item.category || 'Mandi'}</span>
 
-                <!-- Inline Base Price & Stock Quick Edit -->
                 <div class="flex flex-wrap items-center gap-3 mt-2">
                   <div class="flex items-center gap-1 bg-light px-2.5 py-1 rounded-lg border border-primary/20">
                     <span class="text-[10px] font-bold text-slate-500">Base ₹</span>
@@ -2931,14 +3446,12 @@
                   </div>
                 </div>
 
-                <!-- Active Portions / Variants Display -->
                 <div class="mt-1.5">
                   ${portionBadges || `<span class="text-[10px] text-slate-400 italic">Single Regular price only — click "⚙️ Edit Price & Portions" to add Half/Full/2 Pcs/4P</span>`}
                 </div>
               </div>
             </div>
 
-            <!-- Action Toolbar -->
             <div class="flex items-center justify-between gap-2 pt-2.5 border-t border-primary/15 flex-wrap">
               <button onclick="openItemFlexModal('${id}')" class="bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/40 px-3 py-1.5 rounded-xl text-xs font-black transition flex items-center gap-1">
                 ⚙️ Edit Price &amp; Portions (2 Pcs / Half / Full)
@@ -2992,7 +3505,7 @@
       const btn = document.getElementById('addMenuBtn');
       if(btn) btn.disabled = true;
 
-      let image_url = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
+      let image_url = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=360&q=75&auto=format&fit=crop";
 
       try {
         if(fileInput.files && fileInput.files[0]) {
@@ -3167,16 +3680,32 @@
 
     window.adminCancelOrder = function(id) {
       const tbl = (window.currentTables || {})[id];
-      if (tbl && tbl.kotPrinted) {
+      if (!tbl) return;
+      if (tbl.kotPrinted) {
         return showGlobalToast("KOT already printed — cancelling the entire order is locked.", "error");
       }
-      askAdminConfirm("Cancel Entire Order", "Are you sure you want to cancel this entire order? The customer bill will become zero.", () => {
-        db.ref(`active_tables/${id}`).update({
-          status: 'cancelled',
-          total: 0,
-          subtotal: 0,
-          discountAmount: 0
-        }).then(() => showGlobalToast("Order Cancelled. Customer bill set to ₹0", "success"));
+
+      const itemsSummary = tbl.items || buildItemsStringFromLineItems(tbl.line_items) || 'Full Order';
+      const orderVal = Number(tbl.total) || Number(tbl.subtotal) || 0;
+
+      openAdminCancelReasonModal({
+        title: `Cancel Entire Order — Table ${tbl.table}`,
+        subtitle: `Total ₹${orderVal} • ${itemsSummary}`,
+        table: tbl.table,
+        phone: tbl.phone || 'Walk-in',
+        cancelType: 'Entire Order',
+        itemsDesc: itemsSummary,
+        amount: orderVal,
+        onExecute: (reason) => {
+          db.ref(`active_tables/${id}`).update({
+            status: 'cancelled',
+            cancelReason: reason,
+            cancelledBy: (currentRole || 'admin').toUpperCase(),
+            total: 0,
+            subtotal: 0,
+            discountAmount: 0
+          }).then(() => showGlobalToast(`Order Cancelled & Reason Saved: "${reason}"`, "success"));
+        }
       });
     };
 
@@ -3221,7 +3750,9 @@
       });
     };
 
-    /* ---- PREMIUM THERMAL BILL & KOT PRINTING (High-Contrast Bold Thermal Ready) ---- */
+    /* ========================================================================= */
+    /* PREMIUM THERMAL BILL & KOT PRINTING (CLEAR DEVELOPER SIGNATURE AT BOTTOM) */
+    /* ========================================================================= */
     window.printPremiumKOT = function(id) {
       const tableData = (window.currentTables || {})[id];
       if(!tableData) return showGlobalToast("Order data not found.", "error");
@@ -3266,7 +3797,9 @@
           <span>${totalQtyCount}</span>
         </div>
         <div class="receipt-divider"></div>
-        <div style="text-align:center; font-size:10px; font-weight:900; margin-top:4px;">POS by @syedzeeshaanali07</div>
+        <div style="text-align:center; font-size:11px; font-weight:900; margin-top:6px; padding-top:4px; border-top: 1.5px solid #000;">
+          DEVELOPED BY SYED ZEESHAN ALI<br>Instagram: @syedzeeshaanali07
+        </div>
       `;
 
       window.print();
@@ -3327,12 +3860,15 @@
         <div class="receipt-divider-solid"></div>
         <div style="text-align:center; margin-top:6px; font-size:13px; font-weight:900;">PAYMENT: ${pMethod} ${splitText}</div>
         <div class="receipt-footer">
-          <div>Thank you for dining with us!</div>
-          <div style="margin: 6px 0; padding: 4px 6px; border: 1.5px solid #000; border-radius: 4px; font-weight: 900; font-size: 12px; display: inline-block;">
-            <svg style="width:12px;height:12px;vertical-align:middle;display:inline-block;margin-right:3px;fill:#000;" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            Developed by @syedzeeshaanali07
+          <div style="font-weight: 900; font-size: 12px;">Thank you for dining with Mandi Croods!</div>
+          <div style="margin: 3px 0; font-size: 11px; font-weight: 900;">*** CUSTOMER COPY ***</div>
+          <div style="margin-top: 7px; padding: 6px 8px; border: 2px solid #000000; border-radius: 6px; text-align: center; background: #ffffff;">
+            <div style="font-family: 'Arial Black', 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 900; letter-spacing: 0.4px; text-transform: uppercase;">★ DEVELOPED BY SYED ZEESHAN ALI ★</div>
+            <div style="font-size: 12px; font-weight: 900; margin-top: 3px;">
+              <svg style="width:12px;height:12px;vertical-align:middle;display:inline-block;margin-right:3px;fill:#000;" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+              Instagram: @syedzeeshaanali07
+            </div>
           </div>
-          <div>*** CUSTOMER COPY ***</div>
         </div>
       `;
 
@@ -3513,12 +4049,27 @@
       if (existing.kotPrinted) {
         return showGlobalToast("KOT already printed — item removal is locked.", "error");
       }
-      askAdminConfirm("Remove Item", "Remove this item from the active order?", () => {
-        const updatedLineItems = ensureLineItemsObject(existing);
-        if (!updatedLineItems[lineItemKey]) return;
-        delete updatedLineItems[lineItemKey];
-        syncEditedTableToFirebase(tableId, updatedLineItems);
-        showGlobalToast("Item removed from order", "success");
+      const updatedLineItems = ensureLineItemsObject(existing);
+      const targetItem = updatedLineItems[lineItemKey];
+      if (!targetItem) return;
+
+      const itemDesc = `${targetItem.qty}x ${targetItem.name} (${targetItem.variant || 'Regular'})`;
+      const itemVal = (Number(targetItem.price) || 0) * (Number(targetItem.qty) || 1);
+
+      openAdminCancelReasonModal({
+        title: `Cancel Item — Table ${existing.table}`,
+        subtitle: `${itemDesc} (₹${itemVal})`,
+        table: existing.table,
+        phone: existing.phone || 'Walk-in',
+        cancelType: 'Single Item (POS)',
+        itemsDesc: itemDesc,
+        amount: itemVal,
+        onExecute: (reason) => {
+          const freshLines = ensureLineItemsObject(window.currentTables[tableId] || existing);
+          delete freshLines[lineItemKey];
+          syncEditedTableToFirebase(tableId, freshLines);
+          showGlobalToast(`Item removed & reason logged: "${reason}"`, "success");
+        }
       });
     };
 
@@ -3548,7 +4099,7 @@
         cards.push(`
           <div class="border border-primary/20 hover:border-primary rounded-2xl p-3 bg-light flex flex-col justify-between shadow-sm transition">
             <div>
-              <img src="${item.image_url}" class="w-full h-24 object-cover rounded-xl mb-2 border border-primary/20" loading="lazy" alt="${item.name}">
+              <img src="${optimizeImgUrl(item.image_url)}" class="w-full h-24 object-cover rounded-xl mb-2 border border-primary/20 img-shimmer" loading="lazy" decoding="async" alt="${item.name}">
               <h4 class="font-black text-xs text-slate-900 leading-tight mb-0.5">${item.name}</h4>
               <span class="text-[9px] text-slate-500 font-bold block">${item.category || ''}</span>
             </div>
@@ -3614,7 +4165,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-black text-slate-900">₹${item.price * item.qty}</span>
-                  ${existingTable.kotPrinted ? '' : `<button onclick="adminCancelOrderItemInPos('${tableId}', '${k}')" class="w-6 h-6 bg-red-50 text-red-600 border border-red-200 rounded text-xs font-black">✕</button>`}
+                  ${existingTable.kotPrinted ? '' : `<button onclick="adminCancelOrderItemInPos('${tableId}', '${k}')" class="w-6 h-6 bg-red-50 text-red-600 border border-red-200 rounded text-xs font-black" title="Cancel with Reason">✕</button>`}
                 </div>
               </div>`;
           }
@@ -3837,7 +4388,7 @@
       }));
       db.ref('active_tables/' + id).remove();
 
-      const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nSubtotal: Rs. ${tableData.subtotal || tot}\nDiscount: -Rs. ${tableData.discountAmount || 0}\nTotal: Rs. ${tot}\nMethod: ${displayMethod}\nDeveloped by @syedzeeshaanali07`;
+      const billText = `=== MANDI CROODS ADMIN COPY ===\nTable: ${tableData.table}\nDate: ${d} ${timeStr}\n\n${itemsSummary.replace(/ \| /g, '\n')}\n\nSubtotal: Rs. ${tableData.subtotal || tot}\nDiscount: -Rs. ${tableData.discountAmount || 0}\nTotal: Rs. ${tot}\nMethod: ${displayMethod}\n----------------------------------\nDEVELOPED BY: SYED ZEESHAN ALI\nInstagram: @syedzeeshaanali07\n==================================`;
       const a = document.createElement('a');
       a.href = URL.createObjectURL(new Blob([billText], { type: 'text/plain' }));
       a.download = `Admin_Copy_Bill_T${tableData.table}_${Date.now()}.txt`;
@@ -3854,7 +4405,7 @@
         const cleanPhone = String(targetPhone || '').replace(/\D/g, '');
         if (!cleanPhone) return showGlobalToast("Valid phone number required.", "error");
         const fullPhone = cleanPhone.length === 10 ? '91' + cleanPhone : cleanPhone;
-        const msg = `Hello from Mandi Croods! 👑🍖 Your total bill for Table ${tableNum} is ₹${total}. Thank you for dining with us! (Digital POS by Instagram @syedzeeshaanali07)`;
+        const msg = `Hello from Mandi Croods! 👑🍖 Your total bill for Table ${tableNum} is ₹${total}. Thank you for dining with us! (Developed by Syed Zeeshaan Ali • Instagram @syedzeeshaanali07)`;
         window.open(`https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
@@ -3867,19 +4418,146 @@
       }
     };
 
+    /* ========================================================================= */
+    /* EXCEL EXPORTS & CLEAR DAILY DATA WITH AUTO-DOWNLOAD EXCEL                 */
+    /* ========================================================================= */
+    function buildAndDownloadDailyWorkbook(dStr) {
+      const wb = XLSX.utils.book_new();
+
+      // Sheet 1: Completed Sales + Revenue Summary
+      const salesList = Object.values(dailyLogsCache || {}).filter(Boolean);
+      const salesRows = salesList.map(l => ({
+        Date: dStr,
+        Time: l.time || '',
+        Table: l.table || '',
+        Payment_Method: l.method || '',
+        Items_Ordered: l.items || '',
+        Amount_INR: Number(l.total) || 0
+      }));
+      salesRows.push({
+        Date: dStr,
+        Time: 'SUMMARY',
+        Table: `Orders: ${currentTallyCache.orderCount || salesList.length}`,
+        Payment_Method: `Cash: ₹${currentTallyCache.cash || 0} | UPI: ₹${currentTallyCache.upi || 0} | Card: ₹${currentTallyCache.card || 0}`,
+        Items_Ordered: 'GRAND TOTAL REVENUE',
+        Amount_INR: Number(currentTallyCache.total) || 0
+      });
+      const wsSales = XLSX.utils.json_to_sheet(salesRows);
+      XLSX.utils.book_append_sheet(wb, wsSales, "Daily_Sales");
+
+      // Sheet 2: Item-Wise Sales Breakdown
+      const itemSorted = computeSortedItemSalesList();
+      const itemRows = itemSorted.length > 0
+        ? itemSorted.map((it, idx) => ({
+            Rank: idx + 1,
+            Dish_Name: it.name,
+            Portions_Sold: Object.entries(it.variants).map(([v, q]) => `${v}: ${q}`).join(', '),
+            Total_Qty_Sold: it.totalQty,
+            Est_Revenue_INR: it.estRev
+          }))
+        : [{ Rank: '-', Dish_Name: 'No dishes sold yet', Portions_Sold: '-', Total_Qty_Sold: 0, Est_Revenue_INR: 0 }];
+      const wsItems = XLSX.utils.json_to_sheet(itemRows);
+      XLSX.utils.book_append_sheet(wb, wsItems, "Item_Breakdown");
+
+      // Sheet 3: Cancellation Reasons
+      const cancelEntries = Object.values(cancellationLogsCache || {}).filter(Boolean);
+      const cancelRows = cancelEntries.length > 0
+        ? cancelEntries.map(c => ({
+            Date: c.date || dStr,
+            Time: c.time || '',
+            Table: c.table || '',
+            Phone: c.phone || '',
+            Cancelled_By: c.cancelledBy || '',
+            Type: c.cancelType || '',
+            Items: c.items || '',
+            Real_Reason: c.reason || '',
+            Amount_INR: Number(c.amount) || 0
+          }))
+        : [{ Date: dStr, Time: '-', Table: '-', Phone: '-', Cancelled_By: '-', Type: '-', Items: 'No cancellations', Real_Reason: '-', Amount_INR: 0 }];
+      const wsCancels = XLSX.utils.json_to_sheet(cancelRows);
+      XLSX.utils.book_append_sheet(wb, wsCancels, "Cancellation_Reasons");
+
+      // Sheet 4: Guest Feedback
+      const fbEntries = Object.values(feedbackCache || {}).filter(Boolean);
+      const fbRows = fbEntries.length > 0
+        ? fbEntries.map(f => ({
+            Date: f.date || dStr,
+            Time: f.time || '',
+            Table: f.table || '',
+            Guest_Name: f.guestName || 'Guest',
+            Phone: f.phone || '',
+            Stars: Number(f.stars) || 5,
+            Mood: f.rating || '',
+            Tags: Array.isArray(f.tags) ? f.tags.join(', ') : '',
+            Review: f.note || ''
+          }))
+        : [{ Date: dStr, Time: '-', Table: '-', Guest_Name: '-', Phone: '-', Stars: '-', Mood: '-', Tags: '-', Review: 'No reviews yet' }];
+      const wsFb = XLSX.utils.json_to_sheet(fbRows);
+      XLSX.utils.book_append_sheet(wb, wsFb, "Guest_Feedback");
+
+      XLSX.writeFile(wb, `MandiCroods_Complete_Daily_Report_${dStr}.xlsx`);
+    }
+
     window.exportTodayExcel = function() {
       const dStr = new Date().toISOString().split('T')[0];
-      db.ref(`daily_logs/${dStr}`).once('value').then(snap => {
-        const logs = snap.val();
-        if(!logs) return showGlobalToast("No sales data found for today.", "error");
-        const data = Object.values(logs).map(l => ({
-          Date: dStr, Time: l.time, Table: l.table, Method: l.method, Items: l.items, Amount: l.total
-        }));
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "TodaySales");
-        XLSX.writeFile(wb, `MandiCroods_Sales_${dStr}.xlsx`);
-      });
+      buildAndDownloadDailyWorkbook(dStr);
+      showGlobalToast(`Downloaded MandiCroods_Complete_Daily_Report_${dStr}.xlsx!`, "success");
+    };
+
+    window.clearDailyDataWithAutoExcel = function() {
+      const dStr = new Date().toISOString().split('T')[0];
+      askAdminConfirm(
+        "Auto-Download Excel & Clear Daily Data",
+        `This will automatically download today's complete Excel Report (${dStr}) first, and then reset today's revenue tallies and completed logs back to ₹0. Proceed?`,
+        () => {
+          try {
+            buildAndDownloadDailyWorkbook(dStr);
+          } catch (e) {
+            console.error("Excel export error:", e);
+          }
+
+          Promise.all([
+            db.ref(`tallies/daily/${dStr}`).remove(),
+            db.ref(`daily_logs/${dStr}`).remove()
+          ]).then(() => {
+            document.getElementById('tallyTotal').innerText = '₹0';
+            document.getElementById('tallyCash').innerText = '₹0';
+            document.getElementById('tallyUPI').innerText = '₹0';
+            document.getElementById('tallyCard').innerText = '₹0';
+            document.getElementById('tallyOrders').innerText = '0';
+            document.getElementById('tallyItemsSoldCount').innerText = '0';
+            document.getElementById('dailyLogsTable').innerHTML = '';
+            if (chartInstance) {
+              chartInstance.data.datasets[0].data = [0, 0, 0];
+              chartInstance.update();
+            }
+            showGlobalToast("✅ Today's Excel Report downloaded & Daily Data reset to ₹0!", "success");
+          });
+        }
+      );
+    };
+
+    window.startCompletelyNewSystem = function() {
+      askAdminConfirm(
+        "Start Completely New (Wipe All Old Data)",
+        "This will auto-download a backup Excel first, then wipe ALL active tables, old daily logs, tallies, cancellations, service calls, and feedback to start 100% fresh. Continue?",
+        () => {
+          const dStr = new Date().toISOString().split('T')[0];
+          try { buildAndDownloadDailyWorkbook(dStr); } catch(e) {}
+          Promise.all([
+            db.ref('active_tables').remove(),
+            db.ref('tallies').remove(),
+            db.ref('daily_logs').remove(),
+            db.ref('service_requests').remove(),
+            db.ref('cancellation_logs').remove(),
+            db.ref('feedback').remove(),
+            db.ref('menu').set(getDefaultMasterMenu())
+          ]).then(() => {
+            try { localStorage.clear(); } catch(e) {}
+            showGlobalToast("🆕 All old data wiped! System is 100% fresh and new.", "success");
+          });
+        }
+      );
     };
 
     window.exportAllLogsExcel = function() {
@@ -3975,15 +4653,16 @@
 
         if (liList.length > 0) {
           structuredItemsHtml = liList.map(li => `
-            <div class="flex items-center justify-between py-2 px-3 rounded-xl bg-white border border-primary/20 ${li.cancelled ? 'opacity-40 line-through' : ''}">
+            <div class="flex items-center justify-between py-2 px-3 rounded-xl bg-white border border-primary/20 ${li.cancelled ? 'opacity-50' : ''}">
               <div class="flex items-center gap-2.5 min-w-0">
-                <span class="w-7 h-7 rounded-lg gold-gradient font-black text-xs flex items-center justify-center shrink-0 shadow">${li.qty}x</span>
+                <span class="w-7 h-7 rounded-lg ${li.cancelled ? 'bg-red-100 text-red-600' : 'gold-gradient'} font-black text-xs flex items-center justify-center shrink-0 shadow">${li.qty}x</span>
                 <div class="min-w-0">
-                  <p class="font-bold text-slate-900 text-xs truncate">${li.name}</p>
+                  <p class="font-bold text-slate-900 text-xs truncate ${li.cancelled ? 'line-through' : ''}">${li.name}</p>
                   ${li.variant && li.variant !== 'Regular' ? `<span class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/30 inline-block mt-0.5">${li.variant}</span>` : ''}
+                  ${li.cancelled && li.cancelReason ? `<span class="block text-[9px] font-black text-red-600 mt-0.5">🚫 Reason: "${li.cancelReason}"</span>` : ''}
                 </div>
               </div>
-              <span class="text-xs font-black text-slate-700 ml-2 shrink-0">₹${(Number(li.price)||0)*(Number(li.qty)||1)}</span>
+              <span class="text-xs font-black ${li.cancelled ? 'line-through text-red-400' : 'text-slate-700'} ml-2 shrink-0">₹${(Number(li.price)||0)*(Number(li.qty)||1)}</span>
             </div>
           `).join('');
         } else {
@@ -3998,7 +4677,6 @@
 
         grid.innerHTML += `
           <div class="dash-card bg-card rounded-3xl border-2 ${cardBorder} flex flex-col justify-between overflow-hidden">
-            <!-- Luxury Card Top Header -->
             <div>
               <div class="p-5 bg-gradient-to-b ${headerGlow} border-b border-primary/20 flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -4022,7 +4700,6 @@
                 </div>
               </div>
 
-              <!-- Ordered Dishes List -->
               <div class="p-5">
                 <div class="flex justify-between items-center mb-2.5">
                   <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Ordered Delicacies (${liList.filter(i=>!i.cancelled).length})</span>
@@ -4123,24 +4800,10 @@
 
               ${currentRole === 'admin' ? `
                 <button class="w-full mb-2 gold-gradient py-3 rounded-xl font-black shadow-lg active:scale-95 transition-all uppercase tracking-wider text-xs" onclick="clearTable('${id}')">✅ Settle &amp; Clear Table</button>
-                ${kotLocked ? '' : `<button class="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-300 py-2 rounded-xl font-black text-[11px] uppercase transition" onclick="adminCancelOrder('${id}')">✕ Cancel Entire Order</button>`}
+                ${kotLocked ? '' : `<button class="w-full bg-red-50 hover:bg-red-600 text-red-600 hover:text-white border border-red-300 py-2 rounded-xl font-black text-[11px] uppercase transition" onclick="adminCancelOrder('${id}')">✕ Cancel Order (Reason Required)</button>`}
               ` : ''}
             </div>
           </div>`;
-      });
-    };
-
-    window.clearDashboardRevenue = function() {
-      askAdminConfirm("Clear Revenue & Logs", "Clear all Dashboard Revenue and Transaction Logs back to ₹0?", () => {
-        Promise.all([ db.ref('tallies').remove(), db.ref('daily_logs').remove() ]).then(() => {
-          document.getElementById('tallyTotal').innerText = '₹0';
-          document.getElementById('dailyLogsTable').innerHTML = '';
-          if (chartInstance) {
-            chartInstance.data.datasets[0].data = [0, 0, 0];
-            chartInstance.update();
-          }
-          showGlobalToast("Dashboard Cleared to ₹0!", "success");
-        });
       });
     };
   </script>
