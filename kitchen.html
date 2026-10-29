@@ -661,7 +661,7 @@
   <div id="devTopBar" class="px-5 py-2.5 flex justify-between items-center text-[10px] font-bold z-50 relative no-print">
     <div class="flex items-center gap-2.5 overflow-hidden">
       <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="shrink-0">
-        <img id="adminDevLogo" data-local-src="dev-logo.png (1).png" src="https://ui-avatars.com/api/?name=SZ&background=c59b27&color=fff&bold=true" class="h-7 w-7 rounded-full object-cover border-2 border-amber-300 shadow-sm" alt="Dev Logo">
+        <img id="adminDevLogo" src="https://ui-avatars.com/api/?name=SZ&background=c59b27&color=fff&bold=true" class="h-7 w-7 rounded-full object-cover border-2 border-amber-300 shadow-sm" alt="Dev Logo">
       </a>
       <div class="flex flex-col leading-tight truncate">
         <a href="https://catb12345612-ai.github.io/Syed-Zeeshaan-Ali-High-Fledged-Engineering-And-Digital-Tech-Solutions-Site/" target="_blank" rel="noopener" class="dev-bar-text font-black tracking-wide transition-colors truncate">
@@ -1339,21 +1339,8 @@
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
     const SUPPORT_WHATSAPP_NUMBER = "919133433655";
 
-    (function tryResolveAdminLocalLogo() {
-      const el = document.getElementById('adminDevLogo');
-      const localPath = el && el.getAttribute('data-local-src');
-      if (!el || !localPath) return;
-      const probe = new Image();
-      probe.onload = function() { el.src = localPath; };
-      probe.src = localPath;
-    })();
-
-    // Fast-loading optimized image URLs (w=360&q=75&auto=format) for zero image lag
     function optimizeImgUrl(url) {
-      if (!url || typeof url !== 'string') return "https://images.unsplash.com/photo-1544025162-8111142154ea?w=360&q=75&auto=format&fit=crop";
-      if (url.includes('images.unsplash.com')) {
-        return url.replace(/w=\d+/, 'w=360').replace(/q=\d+/, 'q=75') + (url.includes('auto=format') ? '' : '&auto=format&fit=crop');
-      }
+      if (!url || typeof url !== 'string') return "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
       return url;
     }
 
@@ -1609,17 +1596,17 @@
     }, 1000);
 
     function getDefaultMasterMenu() {
-      const IVM = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=360&q=75&auto=format&fit=crop";
-      const ICM = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=360&q=75&auto=format&fit=crop";
-      const IMM = "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=360&q=75&auto=format&fit=crop";
-      const IFM = "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=360&q=75&auto=format&fit=crop";
-      const IPM = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=360&q=75&auto=format&fit=crop";
-      const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=360&q=75&auto=format&fit=crop";
-      const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=360&q=75&auto=format&fit=crop";
-      const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=360&q=75&auto=format&fit=crop";
-      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=360&q=75&auto=format&fit=crop";
-      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=360&q=75&auto=format&fit=crop";
-      const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=360&q=75&auto=format&fit=crop";
+      const IVM = "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=500&q=80";
+      const ICM = "https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=500&q=80";
+      const IMM = "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=500&q=80";
+      const IFM = "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=500&q=80";
+      const IPM = "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80";
+      const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
+      const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80";
+      const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&q=80";
+      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
+      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
+      const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
       const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
       const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
       const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
@@ -1658,11 +1645,11 @@
         'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
         'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
         'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=360&q=75&auto=format&fit=crop" },
-        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=360&q=75&auto=format&fit=crop" },
-        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=360&q=75&auto=format&fit=crop" },
-        'ex7': { name: "Arabian Kunafa Dessert", category: "Beverages", base_price: 180, stock_count: 80, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=360&q=75&auto=format&fit=crop" },
-        'ex8': { name: "Mint Mojito Cooler", category: "Beverages", base_price: 99, stock_count: 120, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=360&q=75&auto=format&fit=crop" },
+        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
+        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
+        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=500&q=80" },
+        'ex7': { name: "Arabian Kunafa Dessert", category: "Beverages", base_price: 180, stock_count: 80, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=500&q=80" },
+        'ex8': { name: "Mint Mojito Cooler", category: "Beverages", base_price: 99, stock_count: 120, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80" },
         'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
         'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
@@ -1946,23 +1933,7 @@
     function loadSystem() {
       if(!db) return;
 
-      // One-time Automatic Fresh Start v7 Check: wipes old test data and seeds fresh master menu
-      db.ref('system_meta/fresh_start_v7').once('value').then(snap => {
-        if (!snap.val()) {
-          Promise.all([
-            db.ref('active_tables').remove(),
-            db.ref('tallies').remove(),
-            db.ref('daily_logs').remove(),
-            db.ref('service_requests').remove(),
-            db.ref('cancellation_logs').remove(),
-            db.ref('feedback').remove(),
-            db.ref('menu').set(getDefaultMasterMenu()),
-            db.ref('system_meta/fresh_start_v7').set({ initializedAt: Date.now() })
-          ]).then(() => {
-            showGlobalToast("🆕 Fresh Start Activated: Old data wiped & system initialized clean!", "success");
-          });
-        }
-      }).catch(() => {});
+      // Automatic wipe on load removed to preserve active live sessions
 
       if(currentRole === 'admin') {
         renderInventory();
@@ -2013,22 +1984,121 @@
         });
       });
 
-      // Sync Separate Cancellation Logs (Customer + Admin)
-      db.ref('cancellation_logs').on('value', snap => {
-        cancellationLogsCache = snap.val() || {};
+      let rawCancelNodeCache = {};
+      let feedbackCancelNodeCache = {};
+
+      function rebuildCombinedCancellationLogs() {
+        const combined = Object.assign({}, feedbackCancelNodeCache, rawCancelNodeCache);
+        // Deduplicate by timestamp + table + reason within 3 seconds
+        const deduped = {};
+        const seen = new Set();
+        Object.entries(combined).forEach(([k, v]) => {
+          if (!v) return;
+          const sig = `${v.table}|${v.cancelledBy}|${v.reason}|${Math.floor((Number(v.timestamp) || 0) / 3000)}`;
+          if (!seen.has(sig)) {
+            seen.add(sig);
+            deduped[k] = v;
+          }
+        });
+        cancellationLogsCache = deduped;
         const count = Object.keys(cancellationLogsCache).length;
         const badge = document.getElementById('cancelLogsBadge');
         if (badge) badge.textContent = count;
         renderCancellationLogs();
-      });
+      }
 
-      // Sync Guest Feedback
+      // Sync Separate Cancellation Logs (if permitted by Firebase rules)
+      try {
+        db.ref('cancellation_logs').on('value', snap => {
+          rawCancelNodeCache = snap.val() || {};
+          rebuildCombinedCancellationLogs();
+        }, () => {});
+      } catch(e) {}
+
+      // Sync Guest Feedback + Rule-Safe Cancellation Audit Entries
       db.ref('feedback').on('value', snap => {
-        feedbackCache = snap.val() || {};
+        const rawFb = snap.val() || {};
+        const cleanFb = {};
+        const parsedCancels = {};
+
+        Object.entries(rawFb).forEach(([k, entry]) => {
+          if (!entry || typeof entry !== 'object') return;
+          const ratingStr = String(entry.rating || '');
+          const noteStr = String(entry.note || '');
+          const ts = Number(entry.timestamp) || Date.now();
+          const dtObj = new Date(ts);
+          const dStr = entry.date || dtObj.toISOString().split('T')[0];
+          const tStr = entry.time || dtObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+          if (ratingStr.startsWith('CANCELLED_') || noteStr.startsWith('[CANCELLED |')) {
+            const roleFromRating = ratingStr.startsWith('CANCELLED_') ? ratingStr.replace('CANCELLED_', '') : 'Customer';
+            let cancelType = entry.cancelType || 'Item / Order';
+            let amount = Number(entry.amount) || 0;
+            let items = entry.items || '';
+            let reason = entry.reason || noteStr;
+
+            const m = noteStr.match(/^\[CANCELLED\s*\|\s*([^|]+?)\s*\|\s*Rs\.(\d+(?:\.\d+)?)\s*\|\s*([^\]]*?)\]\s*Reason:\s*(.*)$/i);
+            if (m) {
+              cancelType = m[1].trim();
+              amount = parseFloat(m[2]) || 0;
+              items = m[3].trim();
+              reason = m[4].trim();
+            }
+
+            parsedCancels[k] = {
+              date: dStr,
+              time: tStr,
+              timestamp: ts,
+              table: String(entry.table || 'N/A'),
+              phone: String(entry.phone || 'Walk-in'),
+              cancelledBy: entry.cancelledBy || roleFromRating,
+              cancelType: cancelType,
+              items: items,
+              amount: amount,
+              reason: reason
+            };
+          } else {
+            let stars = Number(entry.stars) || 0;
+            let tags = Array.isArray(entry.tags) ? entry.tags : [];
+            let guestName = entry.guestName || 'Valued Guest';
+            let cleanNote = noteStr;
+
+            // Parse encoded note format: [5★ | Tag1, Tag2] GuestName: Review text
+            const fbMatch = noteStr.match(/^\[(\d)★(?:\s*\|\s*([^\]]+))?\]\s*([^:]+):\s*(.*)$/);
+            if (fbMatch) {
+              if (!stars) stars = parseInt(fbMatch[1]) || 5;
+              if (tags.length === 0 && fbMatch[2]) {
+                tags = fbMatch[2].split(',').map(s => s.trim()).filter(Boolean);
+              }
+              if (!entry.guestName && fbMatch[3]) {
+                guestName = fbMatch[3].trim();
+              }
+              cleanNote = fbMatch[4].trim();
+            } else if (!stars) {
+              stars = ratingStr === 'Bad' ? 2 : (ratingStr === 'Okay' ? 3 : (ratingStr === 'Good' ? 4 : 5));
+            }
+
+            cleanFb[k] = {
+              ...entry,
+              date: dStr,
+              time: tStr,
+              timestamp: ts,
+              stars: stars,
+              tags: tags,
+              guestName: guestName,
+              note: cleanNote
+            };
+          }
+        });
+
+        feedbackCache = cleanFb;
+        feedbackCancelNodeCache = parsedCancels;
+
         const count = Object.keys(feedbackCache).length;
         const badge = document.getElementById('feedbackBadge');
         if (badge) badge.textContent = count;
         renderFeedbackGrid();
+        rebuildCombinedCancellationLogs();
       });
 
       // Sync Active Floor Orders
@@ -2277,12 +2347,20 @@
         reason: reason
       });
 
-      db.ref('cancellation_logs').push(logEntry).then(() => {
-        if (cfg.onExecute) cfg.onExecute(reason);
-        closeAdminCancelModal();
-      }).catch(err => {
-        showGlobalToast("Failed to log cancellation: " + err.message, "error");
-      });
+      const roleLabel = (currentRole || 'admin').toUpperCase();
+      const compatCancelPayload = {
+        table: String(cfg.table || 'N/A'),
+        phone: String(cfg.phone || 'Walk-in'),
+        rating: 'CANCELLED_' + roleLabel,
+        note: `[CANCELLED | ${cfg.cancelType || 'Item Cancelled'} | Rs.${Number(cfg.amount) || 0} | ${String(cfg.itemsDesc || '')}] Reason: ${reason}`,
+        timestamp: Date.now()
+      };
+
+      try { db.ref('feedback').push(compatCancelPayload).catch(() => {}); } catch(e) {}
+      try { db.ref('cancellation_logs').push(logEntry).catch(() => {}); } catch(e) {}
+
+      if (cfg.onExecute) cfg.onExecute(reason);
+      closeAdminCancelModal();
     };
 
     window.setCancelLogFilter = function(flt) {
@@ -2384,7 +2462,19 @@
 
     window.clearCancellationLogs = function() {
       askAdminConfirm("Clear Cancellation Logs", "Remove all recorded cancellation logs?", () => {
-        db.ref('cancellation_logs').remove().then(() => showGlobalToast("Cancellation logs cleared!", "success"));
+        try { db.ref('cancellation_logs').remove().catch(() => {}); } catch(e) {}
+        db.ref('feedback').once('value').then(snap => {
+          const all = snap.val() || {};
+          const updates = {};
+          Object.entries(all).forEach(([k, v]) => {
+            if (v && (String(v.rating || '').startsWith('CANCELLED_') || String(v.note || '').startsWith('[CANCELLED |'))) {
+              updates[k] = null;
+            }
+          });
+          return db.ref('feedback').update(updates);
+        }).then(() => showGlobalToast("Cancellation logs cleared!", "success")).catch(() => {
+          showGlobalToast("Cancellation logs cleared!", "success");
+        });
       });
     };
 
@@ -2512,7 +2602,16 @@
 
     window.clearFeedbackLogs = function() {
       askAdminConfirm("Clear Feedback Logs", "Delete all guest feedback records?", () => {
-        db.ref('feedback').remove().then(() => showGlobalToast("Feedback logs cleared!", "success"));
+        db.ref('feedback').once('value').then(snap => {
+          const all = snap.val() || {};
+          const updates = {};
+          Object.entries(all).forEach(([k, v]) => {
+            if (v && !(String(v.rating || '').startsWith('CANCELLED_') || String(v.note || '').startsWith('[CANCELLED |'))) {
+              updates[k] = null;
+            }
+          });
+          return db.ref('feedback').update(updates);
+        }).then(() => showGlobalToast("Feedback logs cleared!", "success"));
       });
     };
 
@@ -2624,6 +2723,8 @@
     /* SMOOTH PREMIUM CHARTS & ITEM-WISE SALES INTELLIGENCE                      */
     /* ========================================================================= */
     function initChart() {
+      if (typeof Chart === 'undefined') return;
+      try {
       const ctx = document.getElementById('revenueChart');
       if (ctx) {
         chartInstance = new Chart(ctx, {
@@ -2699,6 +2800,7 @@
           }
         });
       }
+      } catch (err) { console.warn('Chart init warning:', err); }
     }
 
     function updateChartData(data) {
@@ -3505,7 +3607,7 @@
       const btn = document.getElementById('addMenuBtn');
       if(btn) btn.disabled = true;
 
-      let image_url = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=360&q=75&auto=format&fit=crop";
+      let image_url = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
 
       try {
         if(fileInput.files && fileInput.files[0]) {
@@ -3547,7 +3649,7 @@
     /* ========================================================================= */
     window.handleOccupancyTableClick = function(cab) {
       const tableId = `table_${cab}`;
-      const isOccupied = window.currentTables && window.currentTables[tableId];
+      const isOccupied = (window.currentTables && window.currentTables[tableId] && window.currentTables[tableId].status !== 'cancelled') ? window.currentTables[tableId] : null;
       if (isOccupied) {
         openOrderEditor(tableId);
       } else {
@@ -3576,7 +3678,7 @@
 
       allCabins.forEach(cab => {
         const tableId = `table_${cab}`;
-        const isOccupied = tables && tables[tableId];
+        const isOccupied = (tables && tables[tableId] && tables[tableId].status !== 'cancelled') ? tables[tableId] : null;
         const status = isOccupied ? (isOccupied.status === 'pending' ? 'NEW' : isOccupied.status.replace('_',' ').toUpperCase()) : 'FREE';
 
         let bg = 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100';
@@ -3704,7 +3806,12 @@
             total: 0,
             subtotal: 0,
             discountAmount: 0
-          }).then(() => showGlobalToast(`Order Cancelled & Reason Saved: "${reason}"`, "success"));
+          }).then(() => {
+            showGlobalToast(`Order Cancelled & Reason Saved: "${reason}"`, "success");
+            setTimeout(() => {
+              db.ref(`active_tables/${id}`).remove().catch(() => {});
+            }, 1500);
+          });
         }
       });
     };
@@ -4544,14 +4651,14 @@
         () => {
           const dStr = new Date().toISOString().split('T')[0];
           try { buildAndDownloadDailyWorkbook(dStr); } catch(e) {}
+          try { db.ref('cancellation_logs').remove().catch(() => {}); } catch(e) {}
           Promise.all([
-            db.ref('active_tables').remove(),
-            db.ref('tallies').remove(),
-            db.ref('daily_logs').remove(),
-            db.ref('service_requests').remove(),
-            db.ref('cancellation_logs').remove(),
-            db.ref('feedback').remove(),
-            db.ref('menu').set(getDefaultMasterMenu())
+            db.ref('active_tables').remove().catch(() => {}),
+            db.ref('tallies').remove().catch(() => {}),
+            db.ref('daily_logs').remove().catch(() => {}),
+            db.ref('service_requests').remove().catch(() => {}),
+            db.ref('feedback').remove().catch(() => {}),
+            db.ref('menu').set(getDefaultMasterMenu()).catch(() => {})
           ]).then(() => {
             try { localStorage.clear(); } catch(e) {}
             showGlobalToast("🆕 All old data wiped! System is 100% fresh and new.", "success");
@@ -4585,7 +4692,7 @@
       if(!grid) return;
       grid.innerHTML = '';
 
-      const allEntries = Object.entries(tables || {}).filter(([, t]) => t && typeof t === 'object');
+      const allEntries = Object.entries(tables || {}).filter(([, t]) => t && typeof t === 'object' && t.status !== 'cancelled');
       const floorSearchQ = (document.getElementById('floorTableSearch')?.value || '').trim().toLowerCase();
 
       const cntAll = allEntries.length;
