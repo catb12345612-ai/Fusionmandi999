@@ -136,9 +136,10 @@
     }
     .drawer-content.active { transform: translate3d(0, 0, 0); }
 
-    /* ===== ROYAL WHITE & CHAMPAGNE GOLD THEME ===== */
+    /* ===== ROYAL WHITE & CHAMPAGNE GOLD THEME (FIXED CONTRAST & HOVER STATES) ===== */
     body { background: #faf7f0 !important; color: #1c160e !important; }
     .bg-light { background-color: #faf7f0 !important; }
+    .bg-card { background-color: #ffffff !important; }
     .bg-dark { background-color: #ffffff !important; color: #1c160e !important; border-color: #e6d6b5 !important; }
     .bg-dark .text-white { color: #1c160e !important; }
     .bg-dark .text-slate-400, .bg-dark .text-slate-300 { color: #786b59 !important; }
@@ -149,17 +150,29 @@
     .text-primary { color: #b8860b !important; }
     .text-secondary { color: #9a6f07 !important; }
     .text-dark { color: #1c160e !important; }
-    .text-white { color: #1c160e !important; }
     .text-slate-300, .text-slate-400, .text-slate-500 { color: #786b59 !important; }
     .bg-primary { background-color: #c59b27 !important; color: #ffffff !important; }
     .bg-primary\/10 { background-color: #fbf5e6 !important; }
     .bg-primary\/20 { background-color: #f5e8c7 !important; }
 
+    /* Ensure all solid colored buttons, badges, and gradients keep crisp white text */
     .bg-primary, .bg-primary.text-dark, .bg-primary.text-white, .bg-primary span,
     .bg-blue-600, .bg-emerald-600, .bg-purple-600, .bg-red-600, .bg-amber-500, .bg-amber-600,
-    .gold-gradient, .gold-gradient.text-dark, .gold-gradient.text-white, .gold-gradient span {
+    .gold-gradient, .gold-gradient.text-dark, .gold-gradient.text-white, .gold-gradient span,
+    .gold-gradient .text-dark, .gold-gradient .text-primary {
       color: #ffffff !important;
     }
+
+    /* Fixed hover states so background & text transition cleanly */
+    .hover\:bg-primary:hover { background-color: #c59b27 !important; color: #ffffff !important; border-color: #b8860b !important; }
+    .hover\:bg-primary:hover * { color: #ffffff !important; }
+    .hover\:bg-primary\/10:hover { background-color: #fbf5e6 !important; }
+    .hover\:bg-primary\/20:hover { background-color: #f5e8c7 !important; }
+    .hover\:bg-red-500:hover { background-color: #ef4444 !important; color: #ffffff !important; }
+    .hover\:bg-emerald-500:hover { background-color: #10b981 !important; color: #ffffff !important; }
+    .hover\:bg-amber-500:hover { background-color: #f59e0b !important; color: #ffffff !important; }
+    .hover\:bg-purple-500:hover { background-color: #a855f7 !important; color: #ffffff !important; }
+    .hover\:text-white:hover { color: #ffffff !important; }
 
     .bg-white\/5, .bg-white\/10 { background-color: #fbf6eb !important; }
     .border-white\/5, .border-white\/10, .border-white\/15, .border-white\/20 { border-color: #e6d6b5 !important; }
@@ -293,7 +306,7 @@
           <button type="button" onclick="toggleFeedbackTag(this, 'Authentic Mandi Taste')" class="fb-tag-btn px-3 py-1.5 rounded-xl text-[11px] font-black border border-primary/30 bg-light text-dark transition">🍖 Authentic Mandi Taste</button>
           <button type="button" onclick="toggleFeedbackTag(this, 'Fast Kitchen Service')" class="fb-tag-btn px-3 py-1.5 rounded-xl text-[11px] font-black border border-primary/30 bg-light text-dark transition">⚡ Fast Kitchen Service</button>
           <button type="button" onclick="toggleFeedbackTag(this, 'Royal Ambience & Cleanliness')" class="fb-tag-btn px-3 py-1.5 rounded-xl text-[11px] font-black border border-primary/30 bg-light text-dark transition">✨ Ambience &amp; Cleanliness</button>
-          <button type="button" onclick="toggleFeedbackTag(this, 'Polite Staff Hospitality')" class="fb-tag-btn px-3 py-1.5 rounded-xl text-[11px] font-black border border-primary/30 bg-light text-dark transition">👨‍🍳 Staff Hospitality</button>
+          <button type="button" onclick="toggleFeedbackTag(this, 'Polite Staff Hospitality')" class="fb-tag-btn px-3 py-1.5 rounded-xl text-[11px] font-black border border-primary/30 bg-light text-dark transition">👨🍳 Staff Hospitality</button>
           <button type="button" onclick="toggleFeedbackTag(this, 'Great Portions & Value')" class="fb-tag-btn px-3 py-1.5 rounded-xl text-[11px] font-black border border-primary/30 bg-light text-dark transition">💰 Great Portions &amp; Value</button>
         </div>
       </div>
@@ -377,6 +390,7 @@
       <div class="flex items-center gap-2">
         <span class="w-8 h-8 rounded-xl gold-gradient flex items-center justify-center font-serif font-black text-sm shadow-sm">MC</span>
         <h1 class="text-2xl font-black tracking-tight text-dark leading-none font-serif">Mandi <span class="gold-text">Croods</span></h1>
+        <span class="text-[9px] font-black gold-gradient px-2 py-0.5 rounded-full shadow-sm uppercase tracking-wider">Starts @ ₹249</span>
       </div>
       <p id="vipBadge" class="hidden text-[10px] font-black gold-gradient px-2.5 py-0.5 rounded-full mt-1.5 vip-glow inline-block uppercase tracking-widest shadow-sm">👑 VIP Guest (Streak: <span id="visitStreakCount">0</span>)</p>
       <p id="loyaltyTeaser" class="hidden text-[10px] font-bold text-slate-400 mt-1"></p>
@@ -433,7 +447,7 @@
       <button onclick="filterMenu('Fish')" data-cat="Fish" class="category-btn px-5 py-2 rounded-xl font-bold text-xs whitespace-nowrap border" data-i18n="cat_fish">Fish &amp; Prawns</button>
       <button onclick="filterMenu('Veg')" data-cat="Veg" class="category-btn px-5 py-2 rounded-xl font-bold text-xs whitespace-nowrap border" data-i18n="cat_veg">Veg</button>
       <button onclick="filterMenu('Starters')" data-cat="Starters" class="category-btn px-5 py-2 rounded-xl font-bold text-xs whitespace-nowrap border" data-i18n="cat_starters">Starters</button>
-      <button onclick="filterMenu('Beverages')" data-cat="Beverages" class="category-btn px-5 py-2 rounded-xl font-bold text-xs whitespace-nowrap border" data-i18n="cat_bev">Drinks &amp; Desserts</button>
+      <button onclick="filterMenu('Beverages')" data-cat="Beverages" class="category-btn px-5 py-2 rounded-xl font-bold text-xs whitespace-nowrap border" data-i18n="cat_bev">Drinks &amp; Extras</button>
     </div>
   </div>
 
@@ -551,7 +565,7 @@
   <!-- Luxury Developer Publicity Footer -->
   <footer class="mt-12 mx-5 p-6 rounded-3xl bg-white border-2 border-primary/30 text-center shadow-sm">
     <div class="w-10 h-10 rounded-full gold-gradient mx-auto mb-2 flex items-center justify-center font-serif font-black text-sm shadow">MC</div>
-    <h4 class="font-serif font-black text-base text-dark">Mandi Croods — Royal Arabian Dining</h4>
+    <h4 class="font-serif font-black text-base text-dark">Mandi Croods — Royal Taste... Royal Feast.</h4>
     <p class="text-[11px] text-slate-400 font-semibold mt-0.5 mb-4">Crafted for a seamless, fast &amp; luxury table ordering experience</p>
     <div class="flex flex-col sm:flex-row items-center justify-center gap-2.5 pt-3 border-t border-primary/20">
       <a href="https://www.instagram.com/syedzeeshaanali07/" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-4 py-2 rounded-full gold-gradient font-black text-xs shadow-md active:scale-95 transition-transform">
@@ -644,7 +658,7 @@
 
       <div id="cartUpsellSection" class="mb-3 pt-2.5 border-t border-primary/20">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-[10px] font-black text-primary uppercase tracking-widest" data-i18n="upsell_title">🥤🍨 Add Cool Drinks &amp; Desserts</span>
+          <span class="text-[10px] font-black text-primary uppercase tracking-widest" data-i18n="upsell_title">🍹🍚 Add Mocktails, Beverages &amp; Extras</span>
           <span class="text-[9px] font-bold text-slate-400">Swipe ➔</span>
         </div>
         <div id="cartUpsellCarousel" class="flex gap-2.5 overflow-x-auto pb-1.5 hide-scroll"></div>
@@ -673,6 +687,7 @@
     const UPI_ID = "yourupi@okbank";
     const UPI_PAYEE_NAME = "Mandi Croods";
     const RESTAURANT_HELP_PHONE = "919133433655";
+    const MENU_SYNC_VERSION = "mc_menu_2026_11_v2";
 
     let cancelTimerInterval = null;
     let specialOnlyFilter = false;
@@ -713,86 +728,73 @@
       const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
       const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80";
       const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&q=80";
-      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
-      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
+      const IMB = "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80";
+      const IRM = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500&q=80";
       const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
-      const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
-      const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
-      const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
-      const P_C3 = { "2P": 529, "3P": 779, "4P (Gang)": 1049, "5P (Gang)": 1339 };
-      const P_M1 = { "2P": 719, "3P": 950, "4P (Gang)": 1310, "5P (Gang)": 1599 };
-      const P_M2 = { "2P": 699, "3P": 929, "4P (Gang)": 1230, "5P (Gang)": 1599 };
+
+      const P_VM = { "2P": 389, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
 
       return {
+        /* ===== STARTERS ===== */
+        'cs1': { name: "Chicken 65", category: "Chicken Starters", base_price: 259, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
+        'cs2': { name: "Chicken Chilli", category: "Chicken Starters", base_price: 269, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs3': { name: "Chicken Manchurian", category: "Chicken Starters", base_price: 220, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 150, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs2': { name: "Veg Manchurian", category: "Veg Starters", base_price: 160, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+
+        /* ===== VEG MANDI ===== */
         'vm1': { name: "Paneer Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
         'vm2': { name: "Paneer Fry Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
         'vm3': { name: "Mushroom Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
         'vm4': { name: "Baby Corn Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
-        'vm5': { name: "Special Veg Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: true, portions: P_VM, image_url: IVM },
-        'cm1': { name: "Rara Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
-        'cm2': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm3': { name: "Chicken Dill Kush Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm4': { name: "Murgh Musallam Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
-        'cm5': { name: "Chicken BBQ Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm6': { name: "Chicken Juicy Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: true, portions: P_C2, image_url: ICM },
-        'cm7': { name: "Chicken Al Faham Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: P_C2, image_url: ICM },
-        'cm8': { name: "Chicken Fry Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
-        'cm9': { name: "Drumstick Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
-        'mm1': { name: "Mutton Rara Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
-        'mm2': { name: "Mutton F2 Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm3': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M2, image_url: IMM },
-        'mm4': { name: "Mutton BBQ Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm5': { name: "Mutton Ghee Roast Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
-        'mm6': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm7': { name: "Mutton Tandoori Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 699, "3P": 929, "4P (Gang)": 1290, "5P (Gang)": 1599 }, image_url: IMM },
-        'fm1': { name: "Fish Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
-        'fm2': { name: "Grill Fish Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
-        'pm1': { name: "Prawns Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
-        'pm2': { name: "Prawns Masala Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
-        'spm1': { name: "Zurbiyan Mandi (4P Pack)", category: "Specials", base_price: 1399, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1399 }, image_url: ISM },
-        'spm2': { name: "M.C Special Mix Mandi (8 Items - 4P)", category: "Specials", base_price: 1799, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1799 }, image_url: ISM },
-        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
-        'ex5': { name: "Ice Creams & Pastries", category: "Desserts", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
-        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=500&q=80" },
-        'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
-        'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs4': { name: "Paneer Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs5': { name: "Mushroom Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs6': { name: "Baby Corn Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs7': { name: "Chilly Pepper", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs8': { name: "Chilly Baby Corn", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs9': { name: "Chilly Mushroom", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs10': { name: "Paneer Finger", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs11': { name: "Corn Salad Pepper", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'cs1': { name: "Chicken 65", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs2': { name: "Chilly Chicken", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs3': { name: "Chicken Manchuria", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs4': { name: "Chicken Majestic", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs5': { name: "Chicken Lollipop", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs6': { name: "Dragon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs7': { name: "Garlic Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs8': { name: "Lemon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs9': { name: "Chicken Drumstick", category: "Chicken Starters", base_price: 249, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs10': { name: "Chicken Wings Chilly", category: "Chicken Starters", base_price: 199, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs11': { name: "Chicken Stick", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs12': { name: "Turkish Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs13': { name: "Lemonies Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs14': { name: "Chicken Fingers", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'ms1': { name: "BBQ Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: true, portions: {}, image_url: IMS },
-        'ms2': { name: "Tandoori Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
-        'ms3': { name: "Mutton Fry Starter", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
-        'fs1': { name: "Apollo Fish", category: "Fish & Prawns Starters", base_price: 349, stock_count: 45, is_special: true, portions: {}, image_url: ISS },
-        'fs2': { name: "Fish Fingers", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'fs3': { name: "Arabian Fish", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'fs4': { name: "Grill Fish Starter", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'ps1': { name: "Prawns Butter Fry", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
-        'ps2': { name: "Golden Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: true, portions: {}, image_url: IPM },
-        'ps3': { name: "Prawns 65", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
-        'ps4': { name: "Crispy Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM }
+
+        /* ===== CHICKEN MANDI ===== */
+        'cm1': { name: "Rara Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: true, portions: { "2P": 579, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm2': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm3': { name: "Chicken F2 Marsh", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: { "2P": 779, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm4': { name: "Chicken Dilkush", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: { "2P": 779, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm5': { name: "Murgh Masalan", category: "Chicken Mandi", base_price: 329, stock_count: 50, is_special: true, portions: { "2P": 779, "3P": 749, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm6': { name: "Chicken BBQ", category: "Chicken Mandi", base_price: 329, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm7': { name: "Chicken Ashiana", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm8': { name: "Tandoori Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm9': { name: "Chicken Juicy", category: "Chicken Mandi", base_price: 270, stock_count: 50, is_special: true, portions: { "2P": 479, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm10': { name: "Chicken Al Faham", category: "Chicken Mandi", base_price: 270, stock_count: 50, is_special: false, portions: { "2P": 479, "3P": 729, "4P (Gang)": 1049, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm11': { name: "Chicken Fry", category: "Chicken Mandi", base_price: 220, stock_count: 50, is_special: false, portions: { "2P": 479, "3P": 729, "4P (Gang)": 1049, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm12': { name: "Drumstick Mandi", category: "Chicken Mandi", base_price: 269, stock_count: 50, is_special: false, portions: { "2P": 479, "3P": 729, "4P (Gang)": 1049, "5P (Gang)": 1379 }, image_url: ICM },
+
+        /* ===== MUTTON MANDI ===== */
+        'mm1': { name: "Mutton Rara Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: { "2P": 649, "3P": 950, "4P (Gang)": 1310, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm2': { name: "Mutton P2 Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1310, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm3': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm4': { name: "Mutton BBQ Mandi", category: "Mutton Mandi", base_price: 380, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm5': { name: "Mutton Ghee Roast", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: true, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1600 }, image_url: IMM },
+        'mm6': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm7': { name: "Mutton Tandoori Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1590 }, image_url: IMM },
+
+        /* ===== FISH & PRAWNS MANDI ===== */
+        'fm1': { name: "Fish Fry Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IFM },
+        'fm2': { name: "Grill Fish Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IFM },
+        'pm1': { name: "Prawns Fry Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IPM },
+        'pm2': { name: "Prawns Masala Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IPM },
+
+        /* ===== M.C SPECIAL MANDI ===== */
+        'spm1': { name: "M.C Star Special Mandi", category: "Specials", base_price: 2499, stock_count: 30, is_special: true, portions: {}, image_url: ISM },
+        'spm2': { name: "Mutton King Mandi", category: "Specials", base_price: 2599, stock_count: 30, is_special: true, portions: {}, image_url: IMM },
+        'spm3': { name: "Chicken King Mandi", category: "Specials", base_price: 1299, stock_count: 35, is_special: true, portions: {}, image_url: ICM },
+        'spm4': { name: "Fish King Mandi", category: "Specials", base_price: 1199, stock_count: 35, is_special: true, portions: {}, image_url: IFM },
+        'spm5': { name: "Mix Grill Mandi", category: "Specials", base_price: 1499, stock_count: 35, is_special: true, portions: {}, image_url: ISM },
+        'spm6': { name: "Family Special Mandi", category: "Specials", base_price: 1999, stock_count: 30, is_special: true, portions: {}, image_url: ISM },
+        'spm7': { name: "Royal Feast Mandi", category: "Specials", base_price: 2799, stock_count: 25, is_special: true, portions: {}, image_url: ISM },
+
+        /* ===== MOCKTAILS & BEVERAGES ===== */
+        'mb1': { name: "Mojito Lemon", category: "Beverages", base_price: 60, stock_count: 150, is_special: true, portions: {}, image_url: IMB },
+        'mb2': { name: "Rose Milk", category: "Beverages", base_price: 60, stock_count: 150, is_special: true, portions: {}, image_url: IRM },
+        'mb3': { name: "Sweet Lime Soda", category: "Beverages", base_price: 60, stock_count: 150, is_special: false, portions: {}, image_url: IMB },
+        'mb4': { name: "Mojito Mint", category: "Beverages", base_price: 60, stock_count: 150, is_special: true, portions: {}, image_url: IMB },
+
+        /* ===== EXTRA ===== */
+        'ex1': { name: "Extra Rice", category: "Beverages", base_price: 145, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
+        'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX }
       };
     }
 
@@ -1163,25 +1165,29 @@
     }
 
     const i18n = {
-      en: { welcome: "Mandi Croods", enter_mobile: "Enter mobile number to view our premium menu.", mobile_placeholder: "10-Digit Mobile", proceed: "Enter Menu", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "Premium Menu", cat_group: "👑 Royal Packs (4+)", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_fish: "Fish & Prawns", cat_veg: "Veg", cat_starters: "Starters", cat_bev: "Drinks & Desserts", add: "ADD", sold_out: "SOLD OUT", special: "⭐ SPECIAL", qty_left: "Left", total_bill: "Total Tab:", cart_total: "Selected Items", confirm_order: "Send to Kitchen", special_req: "Chef instructions or special requests?", live_status: "Your Running Tab", food_feedback: "Rate your luxury experience", thanks_feedback: "Thank you for your valuable feedback! 👑", scan_pay: "Scan to Pay via UPI", request_bill: "Request Final Bill", select_payment: "Select Payment Method", loading_menu: "Loading Premium Menu...", upsell_title: "🥤🍨 Add Cool Drinks & Desserts" },
-      hi: { welcome: "मंडी क्रूड्स", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_group: "👑 4+ लोग", cat_chicken: "चिकन", cat_mutton: "मटन", cat_fish: "फिश और प्रॉन्स", cat_veg: "वेज", cat_starters: "स्टार्टर्स", cat_bev: "ड्रिंक्स और डेसर्ट", add: "जोड़ें", sold_out: "ख़त्म हो गया", special: "⭐ विशेष", qty_left: "बचे हैं", total_bill: "कुल बिल:", cart_total: "नए आइटम", confirm_order: "किचन में भेजें", special_req: "कोई निर्देश?", live_status: "आपका रनिंग टैब", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! 👑", scan_pay: "UPI से भुगतान करें", request_bill: "फाइनल बिल मांगें", select_payment: "भुगतान का तरीका चुनें", loading_menu: "लोड हो रहा है...", upsell_title: "🥤🍨 कोल्ड ड्रिंक्स और डेसर्ट जोड़ें" },
-      te: { welcome: "మండి క్రూడ్స్", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_group: "👑 4+ వ్యక్తులు", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_fish: "ఫిష్ & ప్రాన్స్", cat_veg: "వెజ్", cat_starters: "స్టార్టర్స్", cat_bev: "కూల్ డ్రింక్స్ & డెజర్ట్స్", add: "జోడించు", sold_out: "అయిపోయింది", special: "⭐ స్పెషల్", qty_left: "మిగిలి ఉన్నాయి", total_bill: "మొత్తం బిల్లు:", cart_total: "కొత్త వస్తువులు", confirm_order: "వంటగదికి పంపండి", special_req: "ఏదైనా సూచనలు?", live_status: "టేబుల్ రన్నింగ్ ట్యాబ్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! 👑", scan_pay: "స్కాన్ చేయండి", request_bill: "ఫైనల్ బిల్ అడగండి", select_payment: "చెల్లింపు విధానాన్ని ఎంచుకోండి", loading_menu: "లోడ్ అవుతోంది...", upsell_title: "🥤🍨 కూల్ డ్రింక్స్ & డెజర్ట్స్ జోడించండి" }
+      en: { welcome: "Mandi Croods", enter_mobile: "Enter mobile number to view our premium menu.", mobile_placeholder: "10-Digit Mobile", proceed: "Enter Menu", smart_dine: "Smart Dine-In", table: "TABLE", all_items: "Premium Menu", cat_group: "👑 Royal Packs (4+)", cat_chicken: "Chicken", cat_mutton: "Mutton", cat_fish: "Fish & Prawns", cat_veg: "Veg", cat_starters: "Starters", cat_bev: "Drinks & Extras", add: "ADD", sold_out: "SOLD OUT", special: "⭐ SPECIAL", qty_left: "Left", total_bill: "Total Tab:", cart_total: "Selected Items", confirm_order: "Send to Kitchen", special_req: "Chef instructions or special requests?", live_status: "Your Running Tab", food_feedback: "Rate your luxury experience", thanks_feedback: "Thank you for your valuable feedback! 👑", scan_pay: "Scan to Pay via UPI", request_bill: "Request Final Bill", select_payment: "Select Payment Method", loading_menu: "Loading Premium Menu...", upsell_title: "🍹🍚 Add Mocktails, Beverages & Extras" },
+      hi: { welcome: "मंडी क्रूड्स", enter_mobile: "मेनू देखने के लिए मोबाइल दर्ज करें।", mobile_placeholder: "10-अंकीय मोबाइल", proceed: "मेनू पर जाएं", smart_dine: "स्मार्ट डाइन-इन", table: "टेबल", all_items: "सभी मेनू", cat_group: "👑 4+ लोग", cat_chicken: "चिकन", cat_mutton: "मटन", cat_fish: "फिश और प्रॉन्स", cat_veg: "वेज", cat_starters: "स्टार्टर्स", cat_bev: "ड्रिंक्स और एक्स्ट्रा", add: "जोड़ें", sold_out: "ख़त्म हो गया", special: "⭐ विशेष", qty_left: "बचे हैं", total_bill: "कुल बिल:", cart_total: "नए आइटम", confirm_order: "किचन में भेजें", special_req: "कोई निर्देश?", live_status: "आपका रनिंग टैब", food_feedback: "रेटिंग दें", thanks_feedback: "धन्यवाद! 👑", scan_pay: "UPI से भुगतान करें", request_bill: "फाइनल बिल मांगें", select_payment: "भुगतान का तरीका चुनें", loading_menu: "लोड हो रहा है...", upsell_title: "🍹🍚 मॉकटेल्स और एक्स्ट्रा जोड़ें" },
+      te: { welcome: "మండి క్రూడ్స్", enter_mobile: "మెనూ చూడటానికి మొబైల్ నంబర్ నమోదు చేయండి.", mobile_placeholder: "10-అంకెల మొబైల్", proceed: "మెనూకి వెళ్ళండి", smart_dine: "స్మార్ట్ డైన్-ఇన్", table: "టేబుల్", all_items: "అన్ని", cat_group: "👑 4+ వ్యక్తులు", cat_chicken: "చికెన్", cat_mutton: "మటన్", cat_fish: "ఫిష్ & ప్రాన్స్", cat_veg: "వెజ్", cat_starters: "స్టార్టర్స్", cat_bev: "డ్రింక్స్ & ఎక్స్‌ట్రా", add: "జోడించు", sold_out: "అయిపోయింది", special: "⭐ స్పెషల్", qty_left: "మిగిలి ఉన్నాయి", total_bill: "మొత్తం బిల్లు:", cart_total: "కొత్త వస్తువులు", confirm_order: "వంటగదికి పంపండి", special_req: "ఏదైనా సూచనలు?", live_status: "టేబుల్ రన్నింగ్ ట్యాబ్", food_feedback: "రేటింగ్ ఇవ్వండి", thanks_feedback: "ధన్యవాదాలు! 👑", scan_pay: "స్కాన్ చేయండి", request_bill: "ఫైనల్ బిల్ అడగండి", select_payment: "చెల్లింపు విధానాన్ని ఎంచుకోండి", loading_menu: "లోడ్ అవుతోంది...", upsell_title: "🍹🍚 మాక్‌టెయిల్స్ & ఎక్స్‌ట్రా జోడించండి" }
     };
 
     const wordDict = {
       'hi': {
         'chicken': 'चिकन', 'mutton': 'मटन', 'veg': 'वेज', 'mandi': 'मंडी', 'fry': 'फ्राई',
         'special': 'स्पेशल', 'juicy': 'जूसी', 'mixed': 'मिक्स्ड', 'paneer': 'पनीर', 'mushroom': 'मशरूम',
-        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस',
+        'bbq': 'बीबीक्यू', 'alfaham': 'अल फहम', 'al faham': 'अल फहम', 'broasted': 'ब्रोस्टेड', 'wings': 'विंग्स', 'piece': 'पीस',
         'pcs': 'पीस', 'half': 'हाफ', 'full': 'फुल', 'regular': 'रेगुलर', 'single': 'सिंगल', 'triple': 'ट्रिपल',
-        'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'bhakasura': 'बकासुर', 'fish': 'फिश', 'prawns': 'प्रॉन्स'
+        'rara': 'रारा', 'murg musallam': 'मुर्ग मुसल्लम', 'murgh masalan': 'मुर्ग मसलन', 'fish': 'फिश', 'prawns': 'प्रॉन्स',
+        'chilli': 'चिल्ली', 'manchurian': 'मंचूरियन', 'dilkush': 'दिलखुश', 'ashiana': 'आशियाना', 'tandoori': 'तंदूरी',
+        'king': 'किंग', 'royal': 'रॉयल', 'feast': 'फीस्ट', 'mojito': 'मोजिटो', 'rose milk': 'रोज़ मिल्क', 'extra': 'एक्स्ट्रा', 'rice': 'राइस'
       },
       'te': {
         'chicken': 'చికెన్', 'mutton': 'మటన్', 'veg': 'వెజ్', 'mandi': 'మండి', 'fry': 'ఫ్రై',
         'special': 'స్పెషల్', 'juicy': 'జ్యూసీ', 'mixed': 'మిక్స్డ్', 'paneer': 'పనీర్', 'mushroom': 'మష్రూమ్',
-        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్',
+        'bbq': 'బార్బెక్యూ', 'alfaham': 'అల్ ఫహమ్', 'al faham': 'అల్ ఫహమ్', 'broasted': 'బ్రోస్టెడ్', 'wings': 'వింగ్స్', 'piece': 'పీస్',
         'pcs': 'పీస్', 'half': 'హాఫ్', 'full': 'ఫుల్', 'regular': 'రెగ్యులర్', 'single': 'సింగిల్', 'triple': 'ట్రిపుల్',
-        'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'bhakasura': 'బకాసుర', 'fish': 'ఫిష్', 'prawns': 'ప్రాన్స్'
+        'rara': 'రారా', 'murg musallam': 'ముర్గ్ ముసల్లమ్', 'murgh masalan': 'ముర్గ్ మసలన్', 'fish': 'ఫిష్', 'prawns': 'ప్రాన్స్',
+        'chilli': 'చిల్లీ', 'manchurian': 'మంచూరియన్', 'dilkush': 'దిల్‌ఖుష్', 'ashiana': 'ఆషియానా', 'tandoori': 'తందూరి',
+        'king': 'కింగ్', 'royal': 'రాయల్', 'feast': 'ఫీస్ట్', 'mojito': 'మోజిటో', 'rose milk': 'రోజ్ మిల్క్', 'extra': 'ఎక్స్‌ట్రా', 'rice': 'రైస్'
       }
     };
 
@@ -1270,11 +1276,16 @@
       const cat = (item.category || '').toLowerCase();
       const name = (item.name || '').toLowerCase();
       return id.startsWith('ex') ||
+             id.startsWith('mb') ||
              cat.includes('beverage') ||
              cat.includes('drink') ||
+             cat.includes('mocktail') ||
              cat.includes('dessert') ||
              cat.includes('ice cream') ||
              cat.includes('extra') ||
+             name.includes('mojito') ||
+             name.includes('rose milk') ||
+             name.includes('lime soda') ||
              name.includes('thumbs up') ||
              name.includes('cold drink') ||
              name.includes('ice cream') ||
@@ -1323,14 +1334,28 @@
           if (rawData._system_coupons) {
             couponsData = Object.assign({}, couponsData, rawData._system_coupons);
           }
-          const loadedMenu = {};
-          Object.keys(rawData).forEach(k => {
-            if (k !== '_system_coupons' && !k.startsWith('_') && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
-              loadedMenu[k] = rawData[k];
+          const defaults = getDefaultCustomerMenu();
+          if (rawData._menu_version !== MENU_SYNC_VERSION) {
+            const customItems = {};
+            Object.keys(rawData).forEach(k => {
+              if (k.startsWith('item_') && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
+                customItems[k] = rawData[k];
+              }
+            });
+            menuData = Object.assign({}, defaults, customItems);
+            const syncPayload = Object.assign({}, menuData, { _menu_version: MENU_SYNC_VERSION });
+            if (rawData._system_coupons) syncPayload._system_coupons = rawData._system_coupons;
+            db.ref('menu').set(sanitizeForFirebase(syncPayload)).catch(()=>{});
+          } else {
+            const loadedMenu = {};
+            Object.keys(rawData).forEach(k => {
+              if (k !== '_system_coupons' && !k.startsWith('_') && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
+                loadedMenu[k] = rawData[k];
+              }
+            });
+            if (Object.keys(loadedMenu).length > 0) {
+              menuData = Object.assign({}, defaults, loadedMenu);
             }
-          });
-          if (Object.keys(loadedMenu).length > 0) {
-            menuData = Object.assign({}, getDefaultCustomerMenu(), loadedMenu);
           }
           renderMenu();
         }catch(e){ console.error('Menu render error', e); }
@@ -1454,7 +1479,7 @@
       });
 
       upsellEntries.sort((a, b) => {
-        const priorityOrder = ['ex4', 'ex5', 'ex6', 'ex3', 'ex1', 'ex2'];
+        const priorityOrder = ['mb1', 'mb4', 'mb2', 'mb3', 'ex1', 'ex3'];
         const idxA = priorityOrder.indexOf(a[0]);
         const idxB = priorityOrder.indexOf(b[0]);
         if (idxA !== -1 && idxB !== -1) return idxA - idxB;
@@ -1473,7 +1498,7 @@
         const stock = item.stock_count !== undefined ? Number(item.stock_count) : 50;
         let qtyInCart = 0;
         Object.keys(cart).forEach(k => { if (k.startsWith(id + "|")) qtyInCart += cart[k].qty; });
-        const img = item.image_url || 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80';
+        const img = item.image_url || 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80';
         const price = Number(item.base_price) || 0;
 
         return `
@@ -1994,7 +2019,6 @@
       const tblLabel = String(activeTableData.table || document.getElementById('tableNum').value);
       const phoneLabel = String(activeTableData.phone || customerPhone || 'Guest');
 
-      // 1. Update Active Table Order (primary guaranteed operation)
       db.ref(`active_tables/${tableId}`).update(sanitizeForFirebase({
         line_items: updatedLineItems,
         items: buildItemsString(updatedLineItems),
@@ -2002,11 +2026,9 @@
         discountAmount: dAmt,
         total: finalTot
       })).then(() => {
-        // 2. Restore Stock
         if(li.itemId && li.qty){
           db.ref(`menu/${li.itemId}/stock_count`).transaction(curr => (curr||0) + Number(li.qty)).catch(()=>{});
         }
-        // 3. Save Separate Permanent Cancellation Audit Log to Admin (using guaranteed `feedback` path + `cancellation_logs` fallback)
         db.ref('feedback').push({
           table: tblLabel,
           phone: phoneLabel,
@@ -2271,7 +2293,6 @@
             document.getElementById('runningTotalDisplay').innerText = `₹0`;
             const reasonMsg = order.cancelReason ? ` (Reason: ${order.cancelReason})` : '';
             showFunToast(`Order cancelled by admin${reasonMsg}. Bill: ₹0.`);
-            // Remove the cancelled node from Firebase so it never causes a reload loop
             db.ref(`active_tables/${tableId}`).remove().catch(()=>{});
             activeTableData = null;
             tr.classList.add('hidden');
