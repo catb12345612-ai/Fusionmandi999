@@ -14,22 +14,24 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Plus Jakarta Sans', 'sans-serif'],
-            serif: ['Playfair Display', 'serif']
-          },
-          colors: {
-            primary: '#b8860b',
-            secondary: '#9a6f07',
-            dark: '#1c160e',
-            light: '#faf7f0',
-            card: '#ffffff'
+    if (typeof tailwind !== 'undefined') {
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Plus Jakarta Sans', 'sans-serif'],
+              serif: ['Playfair Display', 'serif']
+            },
+            colors: {
+              primary: '#b8860b',
+              secondary: '#9a6f07',
+              dark: '#1c160e',
+              light: '#faf7f0',
+              card: '#ffffff'
+            }
           }
         }
-      }
+      };
     }
   </script>
   <style>
@@ -849,7 +851,9 @@
 
     let soundOn = safeGetStorage('mc_sound_on', 'on') !== 'off';
     let audioCtx = null;
+    let userInteracted = false;
     function getAudioCtx(){
+      if (!userInteracted) return null;
       try{
         if(!audioCtx){
           const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -861,7 +865,8 @@
       }catch(e){ return null; }
     }
 
-    document.addEventListener('pointerdown', () => { getAudioCtx(); }, { once: true });
+    document.addEventListener('pointerdown', () => { userInteracted = true; getAudioCtx(); }, { once: true });
+    document.addEventListener('keydown', () => { userInteracted = true; }, { once: true });
 
     function playTone(freq, duration, type, volume, delay){
       if (!soundOn) return;
@@ -934,7 +939,7 @@
       }catch(e){ }
     }
 
-    function vibrate(pattern){ try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){ } }
+    function vibrate(pattern){ if(!userInteracted) return; try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){ } }
 
     const FUN_LINES = [
       "Your order is locked in — our chefs are preparing your masterpiece! 👑",
@@ -1241,6 +1246,7 @@
       const num = digits;
       document.getElementById('customerMobile').value = num;
 
+      userInteracted = true;
       customerPhone = num; safeSetStorage('mc_cust_phone', num);
 
       playChime(); speakWelcome(); vibrate(20);
@@ -1335,28 +1341,29 @@
             couponsData = Object.assign({}, couponsData, rawData._system_coupons);
           }
           const defaults = getDefaultCustomerMenu();
-          if (rawData._menu_version !== MENU_SYNC_VERSION) {
-            const customItems = {};
-            Object.keys(rawData).forEach(k => {
-              if (k.startsWith('item_') && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
-                customItems[k] = rawData[k];
+          const mergedMenu = {};
+          Object.keys(defaults).forEach(k => {
+            const defItem = defaults[k];
+            const fbItem = rawData[k];
+            if (fbItem && typeof fbItem === 'object' && fbItem.name) {
+              if (rawData._menu_version === MENU_SYNC_VERSION) {
+                mergedMenu[k] = Object.assign({}, defItem, fbItem);
+              } else {
+                mergedMenu[k] = Object.assign({}, defItem, {
+                  stock_count: fbItem.stock_count !== undefined ? Number(fbItem.stock_count) : defItem.stock_count,
+                  image_url: fbItem.lastPhotoUpdate ? fbItem.image_url : defItem.image_url
+                });
               }
-            });
-            menuData = Object.assign({}, defaults, customItems);
-            const syncPayload = Object.assign({}, menuData, { _menu_version: MENU_SYNC_VERSION });
-            if (rawData._system_coupons) syncPayload._system_coupons = rawData._system_coupons;
-            db.ref('menu').set(sanitizeForFirebase(syncPayload)).catch(()=>{});
-          } else {
-            const loadedMenu = {};
-            Object.keys(rawData).forEach(k => {
-              if (k !== '_system_coupons' && !k.startsWith('_') && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
-                loadedMenu[k] = rawData[k];
-              }
-            });
-            if (Object.keys(loadedMenu).length > 0) {
-              menuData = Object.assign({}, defaults, loadedMenu);
+            } else {
+              mergedMenu[k] = Object.assign({}, defItem);
             }
-          }
+          });
+          Object.keys(rawData).forEach(k => {
+            if (k.startsWith('item_') && rawData[k] && typeof rawData[k] === 'object' && rawData[k].name) {
+              mergedMenu[k] = rawData[k];
+            }
+          });
+          menuData = mergedMenu;
           renderMenu();
         }catch(e){ console.error('Menu render error', e); }
       });
