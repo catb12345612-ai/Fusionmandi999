@@ -102,22 +102,20 @@
     .ig-gradient { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
     .glass-panel { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(16px); }
 
-    /* ===== ROYAL WHITE & GOLD ELEGANT THEME OVERRIDES ===== */
+    /* ===== ROYAL WHITE & GOLD ELEGANT THEME OVERRIDES (FIXED CONTRAST & HOVER) ===== */
     .bg-card { background-color: #ffffff !important; }
     .bg-light { background-color: #faf7f0 !important; }
     .bg-sidebar { background-color: #1f170c !important; color: #ffffff !important; }
     .bg-sidebar .text-white, .bg-sidebar h3, .bg-sidebar span, .bg-sidebar th { color: #ffffff !important; }
     .bg-sidebar .text-blue-100 { color: #f3e5c0 !important; }
     .bg-sidebar\/90, .bg-sidebar\/60 { background-color: #fdf9f0 !important; }
-    .bg-dark { background-color: #241b0f !important; }
+    .bg-dark { background-color: #241b0f !important; color: #ffffff !important; }
     .bg-black\/80 { background-color: rgba(28, 22, 14, 0.55) !important; }
     .bg-primary { background-color: #c59b27 !important; color: #ffffff !important; }
     .bg-primary\/10, .bg-primary\/15, .bg-primary\/20 { background-color: #fbf4e2 !important; }
     .bg-white\/5, .bg-white\/10, .bg-white\/15 { background-color: #fbf6eb !important; }
-    .hover\:bg-white\/15:hover, .hover\:bg-white\/20:hover, .hover\:bg-white\/5:hover { background-color: #f5e8c7 !important; }
     .bg-white\/80 { background-color: rgba(255, 255, 255, 0.88) !important; }
 
-    .text-white { color: #1c160e !important; }
     .text-black { color: #1c160e !important; }
     .text-dark { color: #1c160e !important; }
     .text-primary { color: #b8860b !important; }
@@ -142,10 +140,21 @@
       color: #ffffff !important;
     }
 
-    .hover\:bg-red-500:hover, .hover\:bg-red-600:hover, .hover\:bg-emerald-600:hover,
-    .hover\:bg-emerald-500:hover, .hover\:bg-blue-600:hover, .hover\:bg-blue-500:hover,
-    .hover\:bg-primary:hover, .hover\:bg-purple-600:hover, .hover\:bg-amber-500:hover,
-    .hover\:bg-amber-400:hover { color: #ffffff !important; }
+    /* Fixed hover states so background & text transition together */
+    .hover\:bg-primary:hover { background-color: #c59b27 !important; color: #ffffff !important; border-color: #b8860b !important; }
+    .hover\:bg-primary\/10:hover { background-color: #fbf4e2 !important; }
+    .hover\:bg-red-500:hover { background-color: #ef4444 !important; color: #ffffff !important; border-color: #dc2626 !important; }
+    .hover\:bg-red-600:hover { background-color: #dc2626 !important; color: #ffffff !important; border-color: #b91c1c !important; }
+    .hover\:bg-emerald-500:hover { background-color: #10b981 !important; color: #ffffff !important; border-color: #059669 !important; }
+    .hover\:bg-emerald-600:hover { background-color: #059669 !important; color: #ffffff !important; border-color: #047857 !important; }
+    .hover\:bg-emerald-700:hover { background-color: #047857 !important; color: #ffffff !important; }
+    .hover\:bg-blue-500:hover, .hover\:bg-blue-600:hover { background-color: #2563eb !important; color: #ffffff !important; }
+    .hover\:bg-purple-600:hover { background-color: #9333ea !important; color: #ffffff !important; }
+    .hover\:bg-amber-500:hover { background-color: #f59e0b !important; color: #ffffff !important; }
+    .hover\:bg-amber-400:hover { background-color: #fbbf24 !important; color: #ffffff !important; }
+    .hover\:bg-amber-50:hover { background-color: #fffbeb !important; }
+    .hover\:bg-emerald-50:hover { background-color: #ecfdf5 !important; }
+    .hover\:bg-purple-50:hover { background-color: #faf5ff !important; }
     .hover\:text-white:hover, .hover\:text-black:hover { color: #ffffff !important; }
 
     .border-white\/5, .border-white\/10, .border-white\/15, .border-white\/20,
@@ -163,7 +172,7 @@
     input:focus, select:focus, textarea:focus { border-color: #c59b27 !important; box-shadow: 0 0 0 2px rgba(197, 155, 39, 0.18) !important; }
     option { background-color: #ffffff; color: #1c160e; }
 
-    /* Sidebar: Royal Deep Espresso & Gold with crisp light text */
+    /* Sidebar & Dark Header Containers: Royal Deep Espresso & Gold with crisp light text */
     aside { background: linear-gradient(180deg, #1c150b 0%, #2a1f10 100%) !important; }
     aside .text-white { color: #ffffff !important; }
     aside .text-primary { color: #f5d77f !important; }
@@ -171,7 +180,20 @@
     aside .text-slate-300, aside .text-slate-400, aside .text-blue-200, aside .text-blue-100 { color: #e8d8b5 !important; }
     aside .bg-primary\/20 { background: linear-gradient(135deg, rgba(229, 193, 88, 0.25), rgba(197, 155, 39, 0.18)) !important; }
     aside .border-primary\/50 { border-color: #d4af37 !important; }
-    aside .hover\:bg-white\/5:hover { background-color: rgba(212, 175, 55, 0.14) !important; }
+    aside .bg-white\/5, aside .bg-white\/10, aside .bg-white\/15,
+    .bg-sidebar .bg-white\/5, .bg-sidebar .bg-white\/10, .bg-sidebar .bg-white\/15 {
+      background-color: rgba(255, 255, 255, 0.10) !important;
+      color: #ffffff !important;
+      border-color: rgba(212, 175, 55, 0.35) !important;
+    }
+    aside .border-white\/10, aside .border-white\/20, aside .border-white\/25,
+    .bg-sidebar .border-white\/10, .bg-sidebar .border-white\/20, .bg-sidebar .border-white\/30 {
+      border-color: rgba(212, 175, 55, 0.30) !important;
+    }
+    aside .hover\:bg-white\/5:hover, aside .hover\:bg-white\/15:hover {
+      background-color: rgba(212, 175, 55, 0.20) !important;
+      color: #ffffff !important;
+    }
 
     /* Top Developer Luxury Bar */
     #devTopBar { background: linear-gradient(90deg, #1c150b 0%, #2c2010 50%, #1c150b 100%) !important; border-bottom: 1px solid #d4af37 !important; }
@@ -527,12 +549,10 @@
                 <option value="Mutton Mandi">Mutton Mandi</option>
                 <option value="Veg Mandi">Veg Mandi</option>
                 <option value="Fish & Prawns Mandi">Fish &amp; Prawns Mandi</option>
-                <option value="Specials">👑 Royal Specials</option>
+                <option value="Specials">👑 M.C Specials</option>
                 <option value="Chicken Starters">Chicken Starters</option>
-                <option value="Mutton Starters">Mutton Starters</option>
                 <option value="Veg Starters">Veg Starters</option>
-                <option value="Fish & Prawns Starters">Fish &amp; Prawns Starters</option>
-                <option value="Beverages">🥤 Cool Drinks &amp; Desserts</option>
+                <option value="Beverages">🍹 Mocktails, Drinks &amp; Extras</option>
               </select>
             </div>
           </div>
@@ -568,12 +588,12 @@
           <div>
             <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Category</label>
             <select id="flexEditCategory" class="w-full p-3 rounded-xl font-bold text-sm border outline-none">
-              <option value="Beverages">🥤 Cool Drinks &amp; Desserts (Cart Upsell)</option>
+              <option value="Beverages">🍹 Mocktails, Drinks &amp; Extras (Cart Upsell)</option>
               <option value="Chicken Mandi">Chicken Mandi</option>
               <option value="Mutton Mandi">Mutton Mandi</option>
               <option value="Veg Mandi">Veg Mandi</option>
               <option value="Fish & Prawns Mandi">Fish &amp; Prawns Mandi</option>
-              <option value="Specials">👑 Royal Specials</option>
+              <option value="Specials">👑 M.C Specials</option>
               <option value="Chicken Starters">Chicken Starters</option>
               <option value="Mutton Starters">Mutton Starters</option>
               <option value="Veg Starters">Veg Starters</option>
@@ -921,12 +941,10 @@
                   <option value="Mutton Mandi">Mutton Mandi</option>
                   <option value="Veg Mandi">Veg Mandi</option>
                   <option value="Fish & Prawns Mandi">Fish &amp; Prawns Mandi</option>
-                  <option value="Specials">👑 Specials</option>
+                  <option value="Specials">👑 M.C Specials</option>
                   <option value="Chicken Starters">Chicken Starters</option>
-                  <option value="Mutton Starters">Mutton Starters</option>
                   <option value="Veg Starters">Veg Starters</option>
-                  <option value="Fish & Prawns Starters">Fish &amp; Prawns Starters</option>
-                  <option value="Beverages">🥤 Drinks &amp; Desserts</option>
+                  <option value="Beverages">🍹 Mocktails, Drinks &amp; Extras</option>
                 </select>
               </div>
               <div id="posMenuGrid" class="grid grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto pr-2 pb-10 flex-1 hide-scroll content-start"></div>
@@ -1038,7 +1056,7 @@
         </section>
 
         <!-- ========================================================================= -->
-        <!-- 6. FLEXIBLE INVENTORY, PORTIONS/VARIANTS & MENU CONTROL                   -->
+        <!-- 6. FLEXIBLE INVENTORY, PORTIONS/VARIANTS & MENU CONTROL                  -->
         <!-- ========================================================================= -->
         <section id="view-inventory" class="tab-section hidden no-print">
           <h2 class="text-3xl font-black text-slate-900 mb-8 tracking-tight font-serif" data-i18n="title_menu">Menu &amp; Food Stock Control</h2>
@@ -1073,12 +1091,12 @@
             <div id="couponsListAdmin" class="flex flex-wrap gap-2 pt-2 border-t border-primary/20"></div>
           </div>
 
-          <!-- Weekly Cool Drinks, Desserts & Add-ons Mobile Photo Manager -->
+          <!-- Weekly Mocktails, Beverages & Extras Mobile Photo Manager -->
           <div class="bg-card p-6 rounded-3xl dash-card mb-8 border-t-4 border-primary">
             <div class="flex flex-wrap justify-between items-center gap-2 mb-4">
               <div>
-                <h3 class="text-lg font-black text-slate-900 font-serif">🥤🍨 Weekly Cool Drinks, Desserts &amp; Cart Add-ons Manager</h3>
-                <p class="text-xs text-slate-500">Items in <span class="text-primary font-bold">Beverages / Cool Drinks / Desserts</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> or <span class="text-primary font-bold">⚙️ Portions</span> anytime.</p>
+                <h3 class="text-lg font-black text-slate-900 font-serif">🍹🍚 Weekly Mocktails, Beverages &amp; Cart Extras Manager</h3>
+                <p class="text-xs text-slate-500">Items in <span class="text-primary font-bold">Beverages / Mocktails / Extras</span> appear automatically inside the Customer Cart with photos! Tap <span class="text-primary font-bold">📷 Change Photo</span> or <span class="text-primary font-bold">⚙️ Portions</span> anytime.</p>
               </div>
             </div>
             <div id="drinksDessertsSpotlightGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
@@ -1099,16 +1117,14 @@
               <div>
                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Category</label>
                 <select id="newItemCategory" class="w-full p-3 bg-light rounded-xl font-bold text-sm outline-none border">
-                  <option value="Beverages">🥤 Cool Drinks &amp; Desserts (Cart Upsell)</option>
+                  <option value="Beverages">🍹 Mocktails, Drinks &amp; Extras (Cart Upsell)</option>
                   <option value="Chicken Mandi">Chicken Mandi</option>
                   <option value="Mutton Mandi">Mutton Mandi</option>
                   <option value="Veg Mandi">Veg Mandi</option>
                   <option value="Fish & Prawns Mandi">Fish &amp; Prawns Mandi</option>
-                  <option value="Specials">👑 Royal Specials</option>
+                  <option value="Specials">👑 M.C Specials</option>
                   <option value="Chicken Starters">Chicken Starters</option>
-                  <option value="Mutton Starters">Mutton Starters</option>
                   <option value="Veg Starters">Veg Starters</option>
-                  <option value="Fish & Prawns Starters">Fish &amp; Prawns Starters</option>
                 </select>
               </div>
               <div>
@@ -1134,12 +1150,10 @@
                 <option value="Mutton Mandi">Mutton Mandi</option>
                 <option value="Veg Mandi">Veg Mandi</option>
                 <option value="Fish & Prawns Mandi">Fish &amp; Prawns Mandi</option>
-                <option value="Specials">👑 Specials</option>
+                <option value="Specials">👑 M.C Specials</option>
                 <option value="Chicken Starters">Chicken Starters</option>
-                <option value="Mutton Starters">Mutton Starters</option>
                 <option value="Veg Starters">Veg Starters</option>
-                <option value="Fish & Prawns Starters">Fish &amp; Prawns Starters</option>
-                <option value="Beverages">🥤 Drinks &amp; Desserts</option>
+                <option value="Beverages">🍹 Drinks &amp; Extras</option>
               </select>
             </div>
             <span id="menuCountLabel" class="text-xs font-black text-primary uppercase tracking-widest whitespace-nowrap bg-card px-4 py-2 rounded-xl border border-primary/30"></span>
@@ -1338,6 +1352,7 @@
 
     const GOOGLE_SHEET_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbz-Ahs8nMIKF1H9JKCiekoUsMRvAdUWf2frZTmHlsNkah2Cysrym9Smk92j_wIn50dipQ/exec";
     const SUPPORT_WHATSAPP_NUMBER = "919133433655";
+    const MENU_SYNC_VERSION = "mc_menu_2026_11_v2";
 
     function optimizeImgUrl(url) {
       if (!url || typeof url !== 'string') return "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
@@ -1604,88 +1619,73 @@
       const ISM = "https://images.unsplash.com/photo-1544025162-8111142154ea?w=500&q=80";
       const IVS = "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&q=80";
       const ICS = "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=500&q=80";
-      const IMS = "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=500&q=80";
-      const ISS = "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&q=80";
+      const IMB = "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80";
+      const IRM = "https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=500&q=80";
       const IEX = "https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80";
-      const P_VM = { "2P": 499, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
-      const P_C1 = { "2P": 599, "3P": 849, "4P (Gang)": 1099, "5P (Gang)": 1389 };
-      const P_C2 = { "2P": 529, "3P": 779, "4P (Gang)": 1079, "5P (Gang)": 1379 };
-      const P_C3 = { "2P": 529, "3P": 779, "4P (Gang)": 1049, "5P (Gang)": 1339 };
-      const P_M1 = { "2P": 719, "3P": 950, "4P (Gang)": 1310, "5P (Gang)": 1599 };
-      const P_M2 = { "2P": 699, "3P": 929, "4P (Gang)": 1230, "5P (Gang)": 1599 };
+
+      const P_VM = { "2P": 389, "3P": 749, "4P (Gang)": 999, "5P (Gang)": 1199 };
 
       return {
+        /* ===== STARTERS ===== */
+        'cs1': { name: "Chicken 65", category: "Chicken Starters", base_price: 259, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
+        'cs2': { name: "Chicken Chilli", category: "Chicken Starters", base_price: 269, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'cs3': { name: "Chicken Manchurian", category: "Chicken Starters", base_price: 220, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
+        'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 150, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+        'vs2': { name: "Veg Manchurian", category: "Veg Starters", base_price: 160, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
+
+        /* ===== VEG MANDI ===== */
         'vm1': { name: "Paneer Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
         'vm2': { name: "Paneer Fry Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
         'vm3': { name: "Mushroom Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
         'vm4': { name: "Baby Corn Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: false, portions: P_VM, image_url: IVM },
-        'vm5': { name: "Special Veg Mandi", category: "Veg Mandi", base_price: 270, stock_count: 50, is_special: true, portions: P_VM, image_url: IVM },
-        'cm1': { name: "Rara Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
-        'cm2': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm3': { name: "Chicken Dill Kush Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm4': { name: "Murgh Musallam Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: true, portions: P_C1, image_url: ICM },
-        'cm5': { name: "Chicken BBQ Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: P_C1, image_url: ICM },
-        'cm6': { name: "Chicken Juicy Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: true, portions: P_C2, image_url: ICM },
-        'cm7': { name: "Chicken Al Faham Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: P_C2, image_url: ICM },
-        'cm8': { name: "Chicken Fry Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
-        'cm9': { name: "Drumstick Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: false, portions: P_C3, image_url: ICM },
-        'mm1': { name: "Mutton Rara Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
-        'mm2': { name: "Mutton F2 Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm3': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: P_M2, image_url: IMM },
-        'mm4': { name: "Mutton BBQ Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm5': { name: "Mutton Ghee Roast Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: true, portions: P_M1, image_url: IMM },
-        'mm6': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: P_M2, image_url: IMM },
-        'mm7': { name: "Mutton Tandoori Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 699, "3P": 929, "4P (Gang)": 1290, "5P (Gang)": 1599 }, image_url: IMM },
-        'fm1': { name: "Fish Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
-        'fm2': { name: "Grill Fish Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1199 }, image_url: IFM },
-        'pm1': { name: "Prawns Fry Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
-        'pm2': { name: "Prawns Masala Mandi (2P Base)", category: "Fish & Prawns Mandi", base_price: 699, stock_count: 40, is_special: false, portions: { "4P (Gang)": 1249 }, image_url: IPM },
-        'spm1': { name: "Zurbiyan Mandi (4P Pack)", category: "Specials", base_price: 1399, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1399 }, image_url: ISM },
-        'spm2': { name: "M.C Special Mix Mandi (8 Items - 4P)", category: "Specials", base_price: 1799, stock_count: 30, is_special: true, portions: { "4P (Gang)": 1799 }, image_url: ISM },
-        'ex1': { name: "Extra Mandi Rice", category: "Beverages", base_price: 129, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex2': { name: "Extra Piece", category: "Beverages", base_price: 149, stock_count: 100, is_special: false, portions: {}, image_url: ICS },
-        'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
-        'ex4': { name: "Thumbs Up / Cold Drinks", category: "Beverages", base_price: 45, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80" },
-        'ex5': { name: "Ice Creams & Pastries", category: "Beverages", base_price: 90, stock_count: 200, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80" },
-        'ex6': { name: "Mineral Water Bottle", category: "Beverages", base_price: 20, stock_count: 200, is_special: false, portions: {}, image_url: "https://images.unsplash.com/photo-1548839140-29a749e1bc4c?w=500&q=80" },
-        'ex7': { name: "Arabian Kunafa Dessert", category: "Beverages", base_price: 180, stock_count: 80, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1579372786545-d24232daf58c?w=500&q=80" },
-        'ex8': { name: "Mint Mojito Cooler", category: "Beverages", base_price: 99, stock_count: 120, is_special: true, portions: {}, image_url: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&q=80" },
-        'vs1': { name: "Paneer 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs2': { name: "Mushroom 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs3': { name: "Baby Corn 65", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs4': { name: "Paneer Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs5': { name: "Mushroom Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs6': { name: "Baby Corn Manchuria", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs7': { name: "Chilly Pepper", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs8': { name: "Chilly Baby Corn", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs9': { name: "Chilly Mushroom", category: "Veg Starters", base_price: 279, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs10': { name: "Paneer Finger", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'vs11': { name: "Corn Salad Pepper", category: "Veg Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: IVS },
-        'cs1': { name: "Chicken 65", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs2': { name: "Chilly Chicken", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs3': { name: "Chicken Manchuria", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs4': { name: "Chicken Majestic", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs5': { name: "Chicken Lollipop", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs6': { name: "Dragon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs7': { name: "Garlic Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs8': { name: "Lemon Chicken", category: "Chicken Starters", base_price: 309, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs9': { name: "Chicken Drumstick", category: "Chicken Starters", base_price: 249, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs10': { name: "Chicken Wings Chilly", category: "Chicken Starters", base_price: 199, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs11': { name: "Chicken Stick", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs12': { name: "Turkish Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: true, portions: {}, image_url: ICS },
-        'cs13': { name: "Lemonies Chicken", category: "Chicken Starters", base_price: 319, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'cs14': { name: "Chicken Fingers", category: "Chicken Starters", base_price: 299, stock_count: 50, is_special: false, portions: {}, image_url: ICS },
-        'ms1': { name: "BBQ Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: true, portions: {}, image_url: IMS },
-        'ms2': { name: "Tandoori Mutton", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
-        'ms3': { name: "Mutton Fry Starter", category: "Mutton Starters", base_price: 399, stock_count: 45, is_special: false, portions: {}, image_url: IMS },
-        'fs1': { name: "Apollo Fish", category: "Fish & Prawns Starters", base_price: 349, stock_count: 45, is_special: true, portions: {}, image_url: ISS },
-        'fs2': { name: "Fish Fingers", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'fs3': { name: "Arabian Fish", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'fs4': { name: "Grill Fish Starter", category: "Fish & Prawns Starters", base_price: 359, stock_count: 45, is_special: false, portions: {}, image_url: ISS },
-        'ps1': { name: "Prawns Butter Fry", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
-        'ps2': { name: "Golden Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: true, portions: {}, image_url: IPM },
-        'ps3': { name: "Prawns 65", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM },
-        'ps4': { name: "Crispy Prawns", category: "Fish & Prawns Starters", base_price: 319, stock_count: 45, is_special: false, portions: {}, image_url: IPM }
+
+        /* ===== CHICKEN MANDI ===== */
+        'cm1': { name: "Rara Mandi", category: "Chicken Mandi", base_price: 289, stock_count: 50, is_special: true, portions: { "2P": 579, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm2': { name: "Chicken F2 Mandi", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm3': { name: "Chicken F2 Marsh", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: { "2P": 779, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm4': { name: "Chicken Dilkush", category: "Chicken Mandi", base_price: 320, stock_count: 50, is_special: false, portions: { "2P": 779, "3P": 799, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm5': { name: "Murgh Masalan", category: "Chicken Mandi", base_price: 329, stock_count: 50, is_special: true, portions: { "2P": 779, "3P": 749, "4P (Gang)": 1099, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm6': { name: "Chicken BBQ", category: "Chicken Mandi", base_price: 329, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm7': { name: "Chicken Ashiana", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1389 }, image_url: ICM },
+        'cm8': { name: "Tandoori Mandi", category: "Chicken Mandi", base_price: 299, stock_count: 50, is_special: false, portions: { "2P": 579, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm9': { name: "Chicken Juicy", category: "Chicken Mandi", base_price: 270, stock_count: 50, is_special: true, portions: { "2P": 479, "3P": 749, "4P (Gang)": 1079, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm10': { name: "Chicken Al Faham", category: "Chicken Mandi", base_price: 270, stock_count: 50, is_special: false, portions: { "2P": 479, "3P": 729, "4P (Gang)": 1049, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm11': { name: "Chicken Fry", category: "Chicken Mandi", base_price: 220, stock_count: 50, is_special: false, portions: { "2P": 479, "3P": 729, "4P (Gang)": 1049, "5P (Gang)": 1379 }, image_url: ICM },
+        'cm12': { name: "Drumstick Mandi", category: "Chicken Mandi", base_price: 269, stock_count: 50, is_special: false, portions: { "2P": 479, "3P": 729, "4P (Gang)": 1049, "5P (Gang)": 1379 }, image_url: ICM },
+
+        /* ===== MUTTON MANDI ===== */
+        'mm1': { name: "Mutton Rara Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: { "2P": 649, "3P": 950, "4P (Gang)": 1310, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm2': { name: "Mutton P2 Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1310, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm3': { name: "Mutton Juicy Mandi", category: "Mutton Mandi", base_price: 389, stock_count: 50, is_special: true, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm4': { name: "Mutton BBQ Mandi", category: "Mutton Mandi", base_price: 380, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm5': { name: "Mutton Ghee Roast", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: true, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1600 }, image_url: IMM },
+        'mm6': { name: "Mutton Fry Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1599 }, image_url: IMM },
+        'mm7': { name: "Mutton Tandoori Mandi", category: "Mutton Mandi", base_price: 350, stock_count: 50, is_special: false, portions: { "2P": 649, "3P": 929, "4P (Gang)": 1280, "5P (Gang)": 1590 }, image_url: IMM },
+
+        /* ===== FISH & PRAWNS MANDI ===== */
+        'fm1': { name: "Fish Fry Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IFM },
+        'fm2': { name: "Grill Fish Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IFM },
+        'pm1': { name: "Prawns Fry Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IPM },
+        'pm2': { name: "Prawns Masala Mandi", category: "Fish & Prawns Mandi", base_price: 649, stock_count: 40, is_special: false, portions: {}, image_url: IPM },
+
+        /* ===== M.C SPECIAL MANDI ===== */
+        'spm1': { name: "M.C Star Special Mandi", category: "Specials", base_price: 2499, stock_count: 30, is_special: true, portions: {}, image_url: ISM },
+        'spm2': { name: "Mutton King Mandi", category: "Specials", base_price: 2599, stock_count: 30, is_special: true, portions: {}, image_url: IMM },
+        'spm3': { name: "Chicken King Mandi", category: "Specials", base_price: 1299, stock_count: 35, is_special: true, portions: {}, image_url: ICM },
+        'spm4': { name: "Fish King Mandi", category: "Specials", base_price: 1199, stock_count: 35, is_special: true, portions: {}, image_url: IFM },
+        'spm5': { name: "Mix Grill Mandi", category: "Specials", base_price: 1499, stock_count: 35, is_special: true, portions: {}, image_url: ISM },
+        'spm6': { name: "Family Special Mandi", category: "Specials", base_price: 1999, stock_count: 30, is_special: true, portions: {}, image_url: ISM },
+        'spm7': { name: "Royal Feast Mandi", category: "Specials", base_price: 2799, stock_count: 25, is_special: true, portions: {}, image_url: ISM },
+
+        /* ===== MOCKTAILS & BEVERAGES ===== */
+        'mb1': { name: "Mojito Lemon", category: "Beverages", base_price: 60, stock_count: 150, is_special: true, portions: {}, image_url: IMB },
+        'mb2': { name: "Rose Milk", category: "Beverages", base_price: 60, stock_count: 150, is_special: true, portions: {}, image_url: IRM },
+        'mb3': { name: "Sweet Lime Soda", category: "Beverages", base_price: 60, stock_count: 150, is_special: false, portions: {}, image_url: IMB },
+        'mb4': { name: "Mojito Mint", category: "Beverages", base_price: 60, stock_count: 150, is_special: true, portions: {}, image_url: IMB },
+
+        /* ===== EXTRA ===== */
+        'ex1': { name: "Extra Rice", category: "Beverages", base_price: 145, stock_count: 100, is_special: false, portions: {}, image_url: IEX },
+        'ex3': { name: "Extra Mayonnaise", category: "Beverages", base_price: 30, stock_count: 100, is_special: false, portions: {}, image_url: IEX }
       };
     }
 
@@ -1933,8 +1933,6 @@
     function loadSystem() {
       if(!db) return;
 
-      // Automatic wipe on load removed to preserve active live sessions
-
       if(currentRole === 'admin') {
         renderInventory();
         renderDrinksDessertsSpotlight();
@@ -1944,20 +1942,35 @@
       // Sync Menu
       db.ref('menu').on('value', snap => {
         const rawMenu = snap.val() || {};
-        const loaded = {};
-        Object.keys(rawMenu).forEach(k => {
-          if (k !== '_system_coupons' && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
-            loaded[k] = rawMenu[k];
-            const stock = Number(loaded[k].stock_count);
-            if (stock === 5 || stock === 3) {
-              showGlobalToast(`LOW STOCK ALERT: ${loaded[k].name} has only ${stock} portions left!`, 'error');
-            }
-          }
-        });
+        const defaults = getDefaultMasterMenu();
 
-        menuCache = Object.keys(loaded).length > 0
-          ? Object.assign({}, getDefaultMasterMenu(), loaded)
-          : getDefaultMasterMenu();
+        if (rawMenu._menu_version !== MENU_SYNC_VERSION) {
+          const customItems = {};
+          Object.keys(rawMenu).forEach(k => {
+            if (k.startsWith('item_') && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
+              customItems[k] = rawMenu[k];
+            }
+          });
+          menuCache = Object.assign({}, defaults, customItems);
+          const syncPayload = Object.assign({}, menuCache, { _menu_version: MENU_SYNC_VERSION });
+          if (rawMenu._system_coupons) syncPayload._system_coupons = rawMenu._system_coupons;
+          db.ref('menu').set(sanitizeForFirebase(syncPayload)).catch(()=>{});
+        } else {
+          const loaded = {};
+          Object.keys(rawMenu).forEach(k => {
+            if (k !== '_system_coupons' && !k.startsWith('_') && rawMenu[k] && typeof rawMenu[k] === 'object' && rawMenu[k].name) {
+              loaded[k] = rawMenu[k];
+              const stock = Number(loaded[k].stock_count);
+              if (stock === 5 || stock === 3) {
+                showGlobalToast(`LOW STOCK ALERT: ${loaded[k].name} has only ${stock} portions left!`, 'error');
+              }
+            }
+          });
+
+          menuCache = Object.keys(loaded).length > 0
+            ? Object.assign({}, defaults, loaded)
+            : defaults;
+        }
 
         if(currentRole === 'admin') {
           renderInventory();
@@ -1989,7 +2002,6 @@
 
       function rebuildCombinedCancellationLogs() {
         const combined = Object.assign({}, feedbackCancelNodeCache, rawCancelNodeCache);
-        // Deduplicate by timestamp + table + reason within 3 seconds
         const deduped = {};
         const seen = new Set();
         Object.entries(combined).forEach(([k, v]) => {
@@ -2007,7 +2019,6 @@
         renderCancellationLogs();
       }
 
-      // Sync Separate Cancellation Logs (if permitted by Firebase rules)
       try {
         db.ref('cancellation_logs').on('value', snap => {
           rawCancelNodeCache = snap.val() || {};
@@ -2063,7 +2074,6 @@
             let guestName = entry.guestName || 'Valued Guest';
             let cleanNote = noteStr;
 
-            // Parse encoded note format: [5★ | Tag1, Tag2] GuestName: Review text
             const fbMatch = noteStr.match(/^\[(\d)★(?:\s*\|\s*([^\]]+))?\]\s*([^:]+):\s*(.*)$/);
             if (fbMatch) {
               if (!stars) stars = parseInt(fbMatch[1]) || 5;
@@ -3403,11 +3413,11 @@
       const upsellItems = Object.entries(menuCache).filter(([, item]) => {
         if(!item || !item.name) return false;
         const cat = (item.category || '').toLowerCase();
-        return cat.includes('bev') || cat.includes('drink') || cat.includes('dessert') || cat.includes('extra') || cat.includes('ice');
+        return cat.includes('bev') || cat.includes('drink') || cat.includes('mocktail') || cat.includes('dessert') || cat.includes('extra') || cat.includes('ice');
       });
 
       if(upsellItems.length === 0) {
-        grid.innerHTML = `<p class="text-xs text-slate-500 col-span-full">No Cool Drinks or Desserts found. Add one below under the "Cool Drinks & Desserts" category!</p>`;
+        grid.innerHTML = `<p class="text-xs text-slate-500 col-span-full">No Mocktails, Beverages, or Extras found.</p>`;
         return;
       }
 
@@ -3636,10 +3646,10 @@
     };
 
     window.factoryResetSystem = function() {
-      askAdminConfirm("Factory Reset Menu", "Reload the entire default Mandi Croods Menu into Firebase? (Your custom added items will remain safe)", () => {
-        const defaults = getDefaultMasterMenu();
-        db.ref('menu').update(defaults).then(() => {
-          showGlobalToast("Default Master Menu loaded into Firebase!", "success");
+      askAdminConfirm("Factory Reset Menu", "Reload the entire updated Mandi Croods Menu into Firebase?", () => {
+        const defaults = Object.assign({}, getDefaultMasterMenu(), { _menu_version: MENU_SYNC_VERSION });
+        db.ref('menu').set(sanitizeForFirebase(defaults)).then(() => {
+          showGlobalToast("Updated Master Menu loaded into Firebase!", "success");
         });
       });
     };
@@ -3949,7 +3959,7 @@
       const receiptDiv = document.getElementById('printableReceipt');
       receiptDiv.innerHTML = `
         <div class="receipt-brand">✦ MANDI CROODS ✦</div>
-        <div style="text-align:center; font-size:12px; font-weight:900; margin-bottom:8px;">Premium Dining Experience<br>Khammam, Telangana</div>
+        <div style="text-align:center; font-size:12px; font-weight:900; margin-bottom:8px;">Royal Taste... Royal Feast.<br>Khammam, Telangana</div>
         <div class="receipt-divider-solid"></div>
         <div class="receipt-line" style="font-size:14px; font-weight:900;"><span>TABLE: ${tableData.table}</span><span>${d}</span></div>
         <div class="receipt-line"><span>Mob: ${tableData.phone || 'Walk-in'}</span><span>${timeStr}</span></div>
@@ -4531,7 +4541,6 @@
     function buildAndDownloadDailyWorkbook(dStr) {
       const wb = XLSX.utils.book_new();
 
-      // Sheet 1: Completed Sales + Revenue Summary
       const salesList = Object.values(dailyLogsCache || {}).filter(Boolean);
       const salesRows = salesList.map(l => ({
         Date: dStr,
@@ -4552,7 +4561,6 @@
       const wsSales = XLSX.utils.json_to_sheet(salesRows);
       XLSX.utils.book_append_sheet(wb, wsSales, "Daily_Sales");
 
-      // Sheet 2: Item-Wise Sales Breakdown
       const itemSorted = computeSortedItemSalesList();
       const itemRows = itemSorted.length > 0
         ? itemSorted.map((it, idx) => ({
@@ -4566,7 +4574,6 @@
       const wsItems = XLSX.utils.json_to_sheet(itemRows);
       XLSX.utils.book_append_sheet(wb, wsItems, "Item_Breakdown");
 
-      // Sheet 3: Cancellation Reasons
       const cancelEntries = Object.values(cancellationLogsCache || {}).filter(Boolean);
       const cancelRows = cancelEntries.length > 0
         ? cancelEntries.map(c => ({
@@ -4584,7 +4591,6 @@
       const wsCancels = XLSX.utils.json_to_sheet(cancelRows);
       XLSX.utils.book_append_sheet(wb, wsCancels, "Cancellation_Reasons");
 
-      // Sheet 4: Guest Feedback
       const fbEntries = Object.values(feedbackCache || {}).filter(Boolean);
       const fbRows = fbEntries.length > 0
         ? fbEntries.map(f => ({
@@ -4652,13 +4658,14 @@
           const dStr = new Date().toISOString().split('T')[0];
           try { buildAndDownloadDailyWorkbook(dStr); } catch(e) {}
           try { db.ref('cancellation_logs').remove().catch(() => {}); } catch(e) {}
+          const freshMenu = Object.assign({}, getDefaultMasterMenu(), { _menu_version: MENU_SYNC_VERSION });
           Promise.all([
             db.ref('active_tables').remove().catch(() => {}),
             db.ref('tallies').remove().catch(() => {}),
             db.ref('daily_logs').remove().catch(() => {}),
             db.ref('service_requests').remove().catch(() => {}),
             db.ref('feedback').remove().catch(() => {}),
-            db.ref('menu').set(getDefaultMasterMenu()).catch(() => {})
+            db.ref('menu').set(sanitizeForFirebase(freshMenu)).catch(() => {})
           ]).then(() => {
             try { localStorage.clear(); } catch(e) {}
             showGlobalToast("🆕 All old data wiped! System is 100% fresh and new.", "success");
@@ -4884,7 +4891,7 @@
 
               ${canKitchenAct ? `
                 ${table.status === 'pending' ? `
-                  <button class="w-full mb-2.5 gold-gradient py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition active:scale-95" onclick="acceptOrder('${id}')">👨‍🍳 Accept &amp; Start Cooking</button>
+                  <button class="w-full mb-2.5 gold-gradient py-3 rounded-xl font-black shadow-lg uppercase tracking-wider text-xs transition active:scale-95" onclick="acceptOrder('${id}')">👨🍳 Accept &amp; Start Cooking</button>
                 ` : ''}
 
                 ${table.status === 'cooking' ? `
